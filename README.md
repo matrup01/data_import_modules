@@ -356,7 +356,7 @@
 	
 5.3   SEN55.quickplot()
 	
-	draws a plot of tvoc vs time
+	draws a plot of pm25 vs time
 	
 5.4   SEN55.findplot(y)
 	
@@ -377,58 +377,26 @@
 	changes all values to be expressed relative to the mean
 	
 	
-6.    getdata.py
+6.    wibs.py
 
-6.1   getdata(day,height,loc,bgstart,pops,sen55,ccs811,file,absvals)
+6.1   WIBS(file)
 
-	returns a dictionary containing lists of data-objects (Pops,SEN55,CCS811) of all flights that meet certain criteria (day,height,loc) which are specified on a lookuptable
-	
-	day (list of str) ... only flights on days in this list are returned (if no day is given, flights from all days are returned) - legal strings: "1106","1206","1306","1406","0807","0907","1007","1107"
-	height (list of str) ... only flights on heights AGL in this list are returned (if no day is given, flights from all days are returned) - legal strings: "15","25","40","50","80"
-	loc (list of str) ... only flights on locations in this list are returned (if no day is given, flights from all days are returned) - legal strings: "canopyTU","canopyVT","meadow"
-	bgstart (str) ... only flight with exact bgstart is returned (can be used to filter for exact flights) - check lookuptable for legal strings
-	pops (bool) ... decides if the output-dict should have an entry "pops" containing a list of Pops-obj with data relative to ground, default-True
-	sen55 (bool) ... decides if the output-dict should have an entry "sen55" containing a list of SEN55-obj, default-False
-	ccs811 (bool) ... decides if the output-dict should have an entry "ccs811" containing a list of CCS811-obj, default-False
-	file (str) ... takes a csv-file and uses it as a lookuptable for days, heights, locs and filenames of different flights, default-"flights_lookuptable.csv" (see owncloud)
-	absvals (bool) ... takes a boolean to decide if data should be expressed as absolute values rather than relative to bg, default - False
-	
-6.2   flightvals(day,flight,file)
+    creates a WIBS-object
+    
+    file (str or list of str) ... takes a WIBS-produced h5-file or a list of WIBS-produced H5-files
+    
+    timecorr (int, optional) ... takes an int and corrects the time by it (should be used for time differences between WIBS-computer and real time; weird WIBS time format should automatically be corrected)
+    bin_borders (list of int, optional) ... takes a list of ints and uses them as bin borders in micro meters, default-[0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,1.7,2,2.5,3,3.5,4,5,10,15,20]
+    flow (float) ... takes the volumetric flow rate in l/min, default-0.3
+    
+6.2   WIBS.quickplot(y)
 
-	takes a day and a flightnumber and returns a list with getdata()-readable data: [day,bgstart,loc,height]
-	
-	day (str) ... decides the day - legal strings: "1106","1206","1306","1406","0807","0907","1007","1107"
-	flight (int) ... decides which flight (assumes flights on each day are numbered 1-n) - for legal ints see lookuptable
-	file (str) ... takes a csv-file and uses it as a lookuptable for days, heights, locs and filenames of different flights, default-"flights_lookuptable.csv" (see owncloud)
-	
-6.3   flightsummary(day,flight,y,file,ylims,averaged,absvals,title)
+    draws a plot of y vs time
+    
+    y (str) ... decides which variable y should be plotted; legal strings: partconc
+    
+6.3   WIBS.quickheatmap(y)
 
-	takes a day and a flightnumber and draws boxplots of the data y of every height and loc on the given flight
-	
-	day (str) ... decides the day - legal strings: "1106","1206","1306","1406","0807","0907","1007","1107"
-	flight (int) ... decides which flight (assumes flights on each day are numbered 1-n) - for legal ints see lookuptable
-	y (str) ... decides which data should be shown in the boxplot - for legal strings see 1.16
-	file (str) ... takes a csv-file and uses it as a lookuptable for days, heights, locs and filenames of different flights, default - "flights_lookuptable.csv" (see owncloud)
-	ylims (list of int) ... takes a list of int with two entrys and uses them as ylims for the boxplot-graph, default - [-100,300]
-	averaged (bool) ... if True boxplots will be drawn from minutewise averaged data instead of raw data, default - False
-	absvals (bool) ... takes a boolean to decide if data should be expressed as absolute values rather than relative to bg, default - False
-	title (bool) ... if True plot will get the title "date flightno y", default - True
-	
-6.4   means(flightlist,y,outputfilename,file)
-
-	takes a list of linenumbers of the lookuptable and returns a list of lists in the form [[mean,rawdata],...] for each flight and saves it as /json/y/outputfilename.json
-	
-	flightlist(list of int) ... decides which flights (linenumbers of lookuptable) should be used
-	y (str) ... decides which data should be used - for legal strings see 1.16
-	outputfilename (str) ... data will be saved as outputfilename.json (to have the labeling in getdata.plotmeans() work properly files should be named name_Altitude.json, eg canopy_40.json)
-	file (str) ... takes a csv-file and uses it as a lookuptable for flights, default - "flights_lookuptable.csv" (see owncloud)
-	
-6.5   plotmeans(jsonlist,y)
-
-	takes a list of getdata.means()-generated .json-files and plots them
-	
-	jsonlist (list of str) ... imports given .json-files
-	y (str) ... decides which data should be plotted - for legal strings see 1.16 (technically strings are only legal after the corresponding .json-file has been created)
-	
-	title (str, optional) ... if a title is given, the plot will have a title
-	customlabels (list of str, optional) ... if customlabels are given they will be used as xlabels (if the jsonfiles are named in the form name_Altitude.json xlabels will be the altitudes by default)
+    draws a heatmap of y1
+    
+    y (str) ... decides which variable y should be plotted; legal strings: cps, dndlogdp
