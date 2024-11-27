@@ -384,19 +384,26 @@
     creates a WIBS-object
     
     file (str or list of str) ... takes a WIBS-produced h5-file or a list of WIBS-produced H5-files
+    FT_file (str) ... takes a WIBS-produced h5-file and uses the FluorPeaks to calculate a background (give "none" if no FT was made)
     
+    FT_sigma (int, optional) ... decides how many times std should be added to mean in FT, default-3
     timecorr (int, optional) ... takes an int and corrects the time by it (should be used for time differences between WIBS-computer and real time; weird WIBS time format should automatically be corrected)
     bin_borders (list of int, optional) ... takes a list of ints and uses them as bin borders in micro meters, default-[0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,1.7,2,2.5,3,3.5,4,5,10,15,20]
     flow (float) ... takes the volumetric flow rate in l/min, default-0.3
+    loadexcited (bool) ... decides if excited particles are loaded (only toggle if needed, performance might suffer if to much data is handled), default-False
+    loadfl1 (bool) ... decides if Fluorescence_1 is loaded (only toggle if needed, performance might suffer if to much data is handled), default-False
+    loadfl2 (bool) ... decides if Fluorescence_2 is loaded (only toggle if needed, performance might suffer if to much data is handled), default-False
+    loadfl3 (bool) ... decides if Fluorescence_3 is loaded (only toggle if needed, performance might suffer if to much data is handled), default-False
+    FixedFT (list of int with len=3) ... takes 3 ints and takes them as FT-backgrounds, default values are completely random, default-[1000000,500000,300000]
     
 6.2   WIBS.quickplot(y)
 
     draws a plot of y vs time
     
-    y (str) ... decides which variable y should be plotted; legal strings: partconc
+    y (str) ... decides which variable y should be plotted, legal strings depend on loaded data
     
 6.3   WIBS.quickheatmap(y)
 
     draws a heatmap of y1
     
-    y (str) ... decides which variable y should be plotted; legal strings: cps, dndlogdp
+    y (str) ... decides which variable y should be plotted, legal strings depend on loaded data

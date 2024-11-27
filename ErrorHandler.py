@@ -7,10 +7,10 @@ Created on Wed Nov 27 15:15:41 2024
 
 class IllegalValue(Exception):
     
-    def __init__(self,illegalvar,funcname,keys):
+    def __init__(self,illegalvar,funcname,legallist):
 
-        legalstrings = ", ".join(list(keys.keys()))
-        self.message = "Illegal " + illegalvar + " was given for " + funcname + "\nLegal " + illegalvar + "s: " + legalstrings
+        legalstrings = ", ".join(legallist)
+        self.message = "Illegal " + illegalvar + " was given for " + funcname + "\nCheck for typos or if needed data is loaded\nLegal " + illegalvar + "s: " + legalstrings
         super().__init__(self.message)
         
         
