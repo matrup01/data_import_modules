@@ -9,7 +9,7 @@ from copy import copy
 
 class Pops:
     
-    """full documentation see https://github.com/matrup01/bac_modules \n
+    """full documentation see https://github.com/matrup01/data_import_modules \n
 
 	file (str) ... Takes a POPS-produced csv-file (eg '112233.csv') \n
 

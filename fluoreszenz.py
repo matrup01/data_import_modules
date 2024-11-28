@@ -1,12 +1,15 @@
 import csv
 import datetime as dt
 import numpy as np
+from copy import deepcopy
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
+from matplotlib.colors import LogNorm
+from ErrorHandler import IllegalArgument
 
 class FData:
     
-    """full documentation see https://github.com/matrup01/bac_modules \n \n
+    """full documentation see https://github.com/matrup01/data_import_modules \n \n
     
     file (str) ... takes an FSpec-produced csv-file\n\n
 
@@ -34,7 +37,7 @@ class FData:
         
         #extract x and y values from list
         self.t = [dt.datetime.strptime(data[i][1],"%H:%M:%S.%f") for i in range(1+skiprows,len(data))]
-        self.channels = [[int(data[i][j])-1000 for i in range(1+skiprows,len(data))] for j in range(2,18)]
+        self.channels = [[int(data[i][j])-1000 for i in range(1+skiprows,len(data))] for j in range(3,19)]
         
         #crop
         t_start = 0
@@ -131,6 +134,88 @@ class FData:
         self.t = [self.t[i] for i in range(startcrop,length-endcrop)]
         for i in range(len(self.channels)):
             self.channels[i] = [self.channels[i][j] for j in range(startcrop,length-endcrop)]
+            
+            
+    def quickheatmap(self):
+        
+        xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+        heatmap_data = deepcopy(self.channels)
+        heatmap_data = self.hk_replacezeros(heatmap_data)
+        
+        fig,ax = plt.subplots()
+        
+        im = ax.pcolormesh(xx,yy,heatmap_data,cmap="RdYlBu_r",norm=LogNorm(),shading="nearest")
+        ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
+        ax.set_ylabel("Channels")
+        ax.set_xlabel("CET")
+        
+        ticks = [i+0.5 for i in range(len(self.channels))]
+        ticklabels = [i+1 for i in range(len(ticks))]
+        ax.set_yticks(ticks,labels=ticklabels)
+        ax.yaxis.set_tick_params(which='minor', size=0)
+        ax.yaxis.set_tick_params(which='minor', width=0)
+        
+        plt.colorbar(im,ax=ax,label="Fluorescence Intensity")
+        
+        plt.show()
+            
+        
+    def heatmap(self,ax,**kwargs):
+        
+        #import kwargs
+        smooth = kwargs["smooth"] if "smooth" in kwargs else True
+        cmap = kwargs["cmap"] if "cmap" in kwargs else "RdYlBu_r"
+        pad = kwargs["pad"] if "pad" in kwargs else 0.01
+        togglecbar = kwargs["togglecbar"] if "togglecbar" in kwargs else True
+        xlims = kwargs["xlims"] if "xlims" in kwargs else "none"
+        
+        #error handling
+        for key in kwargs.keys():
+            if key not in ["smooth","cmap","pad","togglecbar","xlims"]:
+                raise IllegalArgument(key,"FData.heatmap()")
+        
+        #prepare data
+        xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+        heatmap_data = deepcopy(self.channels)
+        heatmap_data = self.hk_replacezeros(heatmap_data)
+        if type(xlims) == list:
+            ax.set_xlim([dt.datetime.strptime(element, "%H:%M:%S") for element in xlims])
+        
+        #draw
+        if smooth:
+            im = ax.pcolormesh(xx,yy,heatmap_data,cmap=cmap,norm=LogNorm(),shading="gouraud")
+        else:
+            im = ax.pcolormesh(xx,yy,heatmap_data,cmap=cmap,norm=LogNorm(),shading="nearest")
+        ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
+        ax.set_ylabel("Channels")
+        ax.set_xlabel("CET")
+        
+        ticks = [i+0.5 for i in range(len(self.channels))]
+        ticklabels = [i+1 for i in range(len(ticks))]
+        ax.set_yticks(ticks,labels=ticklabels)
+        ax.yaxis.set_tick_params(which='minor', size=0)
+        ax.yaxis.set_tick_params(which='minor', width=0)
+        if togglecbar:
+            plt.colorbar(im,ax=ax,label="Fluorescence Intensity",pad=pad)
+        
+        
+        
+    #housekeeping funcs
+    def hk_replacezeros(self,arr):
+        
+        array = deepcopy(arr)
+        
+        smallest = 10000
+        for row in array:
+            for element in row:
+                if element < smallest and element > 0:
+                    smallest = element
+        for i in range(len(array)):
+            for j in range(len(array[i])):
+                if array[i][j] == 0:
+                    array[i][j] += smallest
+                    
+        return array
             
             
             

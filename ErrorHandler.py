@@ -22,3 +22,11 @@ class NotPlottable(Exception):
         legalstr = ", ".join(legallist)
         self.message = givenvar + " is not plottable in " + funcname + "\nLegal strings: " + legalstr
         super().__init__(self.message)
+        
+        
+class IllegalArgument(Exception):
+    
+    def __init__(self,arg,func):
+        
+        self.message = arg + " isn't a legal keyword for " + func + "\nCheck for typos or consult documentation"
+        super().__init__(self.message)

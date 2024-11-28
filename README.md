@@ -379,7 +379,7 @@
 	
 6.    wibs.py
 
-6.1   WIBS(file)
+6.1   WIBS(file,FT_file,**kwargs)
 
     creates a WIBS-object
     
@@ -390,10 +390,10 @@
     timecorr (int, optional) ... takes an int and corrects the time by it (should be used for time differences between WIBS-computer and real time; weird WIBS time format should automatically be corrected)
     bin_borders (list of int, optional) ... takes a list of ints and uses them as bin borders in micro meters, default-[0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,1.7,2,2.5,3,3.5,4,5,10,15,20]
     flow (float) ... takes the volumetric flow rate in l/min, default-0.3
-    loadexcited (bool) ... decides if excited particles are loaded (only toggle if needed, performance might suffer if to much data is handled), default-False
-    loadfl1 (bool) ... decides if Fluorescence_1 is loaded (only toggle if needed, performance might suffer if to much data is handled), default-False
-    loadfl2 (bool) ... decides if Fluorescence_2 is loaded (only toggle if needed, performance might suffer if to much data is handled), default-False
-    loadfl3 (bool) ... decides if Fluorescence_3 is loaded (only toggle if needed, performance might suffer if to much data is handled), default-False
+    loadexcited (bool) ... decides if excited particles are loaded (untoggle if facing performance issues), default-True
+    loadfl1 (bool) ... decides if Fluorescence_1 is loaded (untoggle if facing performance issues), default-True
+    loadfl2 (bool) ... decides if Fluorescence_2 is loaded (untoggle if facing performance issues), default-True
+    loadfl3 (bool) ... decides if Fluorescence_3 is loaded (untoggle if facing performance issues), default-True
     FixedFT (list of int with len=3) ... takes 3 ints and takes them as FT-backgrounds, default values are completely random, default-[1000000,500000,300000]
     
 6.2   WIBS.quickplot(y)
@@ -407,3 +407,15 @@
     draws a heatmap of y1
     
     y (str) ... decides which variable y should be plotted, legal strings depend on loaded data
+    
+6.4   WIBS.heatmap(ax,y,**kwargs)
+
+    draws a heatmap on an existing mpl-axis
+    
+    ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
+    y (str) ... decides which variable y should be plotted, legal strings depend on loaded data
+    
+    smooth (bool) ... decides if heatmap should be smoothed (gouraud) or show raw data, default-True
+    cmap (str) ... decides which colormap should be used, default-"RdYlBu_r"
+    pad (float) ... moves the colormap away from the axis, default-0
+    togglecbar (bool) ... toggles colorbar, default-True

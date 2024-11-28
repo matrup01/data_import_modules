@@ -8,7 +8,7 @@ import math
 
 class SEN55:
     
-    """full documentation see https://github.com/matrup01/bac_modules \n
+    """full documentation see https://github.com/matrup01/data_import_modules \n
     
     file (str) ... takes a sen55-produced csv-file\n
 	
