@@ -31,7 +31,8 @@ class WIBS:
     loadfl1 (bool) ... decides if Fluorescence_1 is loaded (untoggle if facing performance issues), default-True\n
     loadfl2 (bool) ... decides if Fluorescence_2 is loaded (untoggle if facing performance issues), default-True\n
     loadfl3 (bool) ... decides if Fluorescence_3 is loaded (untoggle if facing performance issues), default-True\n
-    FixedFT (list of int with len=3) ... takes 3 ints and takes them as FT-backgrounds, default values are completely random, default-[1000000,500000,300000]"""
+    FixedFT (list of int with len=3) ... takes 3 ints and takes them as FT-backgrounds, default values are completely random, default-[1000000,500000,300000]\n
+    wintertime (bool) ... if True 3600s are taken from wibstime, default-True"""
     
     def __init__(self,file,FT_file,**kwargs):
         
@@ -500,6 +501,7 @@ class WIBS:
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         
         ax.tick_params(axis='y', colors=color)
+        ax.axes.yaxis.label.set_color(color)
         if not secondary:
             ax.spines["left"].set_color(color)
         else:

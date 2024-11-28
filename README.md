@@ -248,6 +248,22 @@
 
 	startcrop (int) ... Takes an int and crops the beginning of the plot by its amount datapoints
 	endcrop (int) ... Takes an int and crops the end of the plot by its amount datapoints
+	
+2.7   FData.quickheatmap()
+
+    draws a heatmap of fluorescence intensity over all channels
+    
+2.8   FData.heatmap(ax,**kwargs)
+
+    draws a heatmap of fluorescence intensity over all channels on an existing mpl-axis
+    
+    ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
+    
+    smooth (bool) ... decides if heatmap should be smoothed (gouraud) or show raw data, default-True
+    cmap (str) ... decides which colormap should be used, default-"RdYlBu_r"
+    pad (float) ... moves the colormap away from the axis, default-0
+    togglecbar (bool) ... toggles colorbar, default-True
+    xlims (list of str) ... takes 2 strings in "H:M:S"-format and uses them as xlims
 
 
 3.    ccs811.py
@@ -395,6 +411,7 @@
     loadfl2 (bool) ... decides if Fluorescence_2 is loaded (untoggle if facing performance issues), default-True
     loadfl3 (bool) ... decides if Fluorescence_3 is loaded (untoggle if facing performance issues), default-True
     FixedFT (list of int with len=3) ... takes 3 ints and takes them as FT-backgrounds, default values are completely random, default-[1000000,500000,300000]
+    wintertime (bool) ... if True 3600s are taken from wibstime, default-True
     
 6.2   WIBS.quickplot(y)
 
@@ -419,3 +436,15 @@
     cmap (str) ... decides which colormap should be used, default-"RdYlBu_r"
     pad (float) ... moves the colormap away from the axis, default-0
     togglecbar (bool) ... toggles colorbar, default-True
+    xlims (list of str) ... takes 2 strings in "H:M:S"-format and uses them as xlims
+    
+6.5 WIBS.plot(ax,y,**kwargs)
+
+    draws a plot of y on an existing mpl-axis
+    
+    y (str) ... decides which variable y should be plotted, legal strings depend on loaded data
+    ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
+    
+    label (str) ... gives the plot a label used in a legend
+    color (str) ... changes the color of the plot, default-"tab:orange"
+    secondary (bool) ... should be toggled if the plot uses the right-hand yaxis, default-False
