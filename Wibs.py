@@ -43,11 +43,18 @@ class WIBS:
         
         timecorr = kwargs["timecorr"] if "timecorr" in kwargs else 0
         wintertime = kwargs["wintertime"] if "wintertime" in kwargs else True
-        loadexcited = kwargs["loadexcited"] if "loadexcited" in kwargs else True
+        loadexcited = kwargs["loadexcited"] if "loadexcited" in kwargs else False
         loadfl1 = kwargs["loadfl1"] if "loadfl1" in kwargs else True
         loadfl2 = kwargs["loadfl2"] if "loadfl2" in kwargs else True
         loadfl3 = kwargs["loadfl3"] if "loadfl3" in kwargs else True
         fixed = kwargs["FixedFT"] if "FixedFT" in kwargs else [100000,500000,300000]
+        channels = kwargs["channels"] if "channels" in kwargs else "none"
+        
+        #make sure fluorescence data is loaded when channels are given
+        if type(channels) == list:
+            loadfl1 = True
+            loadfl2 = True
+            loadfl3 = True
         
         #setup variables
         self.bins = len(self.bin_borders)-1
@@ -58,7 +65,7 @@ class WIBS:
         
         #error handling
         for key in kwargs:
-            if key not in ["FT_sigma","bin_borders","flow","timecorr","loadexcited","loadfl1","loadfl2","loadfl3","FixedFT"]:
+            if key not in ["FT_sigma","bin_borders","flow","timecorr","loadexcited","loadfl1","loadfl2","loadfl3","FixedFT","channels"]:
                 raise IllegalArgument(key,"WIBS")
         
         
@@ -76,6 +83,9 @@ class WIBS:
                 
                 ft_xe1 = np.transpose(list(ft3["Xe1_FluorPeak"]))
                 ft_xe2 = np.transpose(list(ft3["Xe2_FluorPeak"]))
+                self.start_FT = list(ft3["Seconds"])[0]
+                self.start_FT = self.start_FT- 3810797754 + 1727952954 - timecorr + 3600 if wintertime else self.start_FT- 3810797754 + 1727952954 - timecorr + 7200
+                self.start_FT = datetime.utcfromtimestamp(self.start_FT)
                 
                 if loadfl1: self.fl1_FTbg = np.mean(ft_xe1[0]) + self.sigma * np.std(ft_xe1[0])
                 if loadfl2: self.fl2_FTbg = np.mean(ft_xe1[1]) + self.sigma * np.std(ft_xe1[1])
@@ -236,7 +246,7 @@ class WIBS:
                 for count in handler:
                     if self.data["Fl1"][count]:
                         appender[self.hk_binsorter(self.data["size"][count])] += 1
-                cps1.append(np.array(appender))
+                cps.append(np.array(appender))
             self.processed_data["fl1_cps"] = cps1
             self.misc["fl1_cps"] = ["Counts (Fl1)","#/s",False]
             
@@ -313,6 +323,11 @@ class WIBS:
                 dndlogdp.append(dat)
             self.processed_data["fl3_dndlogdp"] = dndlogdp
             self.misc["fl3_dndlogdp"] = ["dN/dlog$D_p$ (Fl3)","cm${}^{-3}$",False]
+            
+        #get channels
+        if type(channels) == list:
+            for string in channels:
+                self.hk_getchannels(string)
             
     
     def quickplot(self,y):
@@ -544,3 +559,49 @@ class WIBS:
                     array[i][j] += smallest
                     
         return array
+    
+    def hk_getchannels(self,ip_str):
+        
+        a = True if "a" in ip_str else False
+        b = True if "b" in ip_str else False
+        c = True if "c" in ip_str else False
+        
+        checker = [False for i in range(len(self.data["Fl1"]))]
+        for i in range(len(self.data["Fl1"])):
+            if self.data["Fl1"][i] == a:
+                if self.data["Fl2"][i] == b:
+                    if self.data["Fl3"][i] == c:
+                        checker[i] = True
+        
+        self.checker = checker
+        
+        #counts per second
+        op_key = ip_str + "_cps"
+        cps = []
+        for handler in self.timehandler:
+            appender = [0 for i in range(self.bins)]
+            for count in handler:
+                #if self.data["Fl1"][count] == a and self.data["Fl2"][count] == b and self.data["Fl3"] == c:
+                if checker[count] == True:
+                    appender[self.hk_binsorter(self.data["size"][count])] += 1
+            cps.append(np.array(appender))
+        self.processed_data[op_key] = cps
+        self.misc[op_key] = ["Counts ("+ip_str+")","#/s",False]
+        
+        #particle concentration
+        op_key2 = ip_str + "_partconc"
+        partconc = []
+        for dataset in self.processed_data[op_key]:
+            conc = sum(dataset) / self.flow
+            partconc.append(conc)
+        self.processed_data[op_key2] = partconc
+        self.misc[op_key2] = ["Particle Concentration ("+ip_str+")","#/cm${}^3$",True]
+            
+        #dndlogdp
+        op_key3 = ip_str + "_dndlogdp"
+        dndlogdp = []
+        for dataset in self.processed_data[op_key]:
+            dat = self.hk_dndlogdp(dataset)
+            dndlogdp.append(dat)
+        self.processed_data[op_key3] = dndlogdp
+        self.misc[op_key3] = ["dN/dlog$D_p$ ("+ip_str+")","cm${}^{-3}$",False]
