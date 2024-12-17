@@ -22,7 +22,7 @@ class Pops:
 	relobj(Pops,optional) ... Takes a Pops object and displays all data as relative to the mean of it \n
 	deviate(bool,optional) ... decides if values should be expressed as relatives to mean, default-False"""
     
-    def __init__(self,file,title="Kein Titel",start="none",end="none",bgobj="none",box=True,timecorr=23,relobj="none",deviate=False):
+    def __init__(self,file,title="Kein Titel",start="none",end="none",bgobj="none",box=True,timecorr=2,relobj="none",deviate=False,wintertime=False):
 
         #init vars
         self.filename = file
@@ -40,13 +40,16 @@ class Pops:
         #deletes last row if it hasnt been written completely
         if len(data[0]) > len(data[-1]):
             data = [data[i] for i in range(len(data)-1)]
+            
+        #init wintertime-correction
+        wt_corr = dt.timedelta(0,3600) if wintertime else dt.timedelta(0,7200)
         
         #extract x and y values from list
         if box:
-            self.popstime = [dt.datetime.strptime("00:00:00","%H:%M:%S")-dt.timedelta(0,timecorr)+dt.timedelta(0,7200)+dt.timedelta(0,float(data[i][23])) for i in range(1,len(data))]
+            self.popstime = [dt.datetime.strptime("00:00:00","%H:%M:%S")-dt.timedelta(0,timecorr)+wt_corr+dt.timedelta(0,float(data[i][23])) for i in range(1,len(data))]
             self.t = [dt.datetime.strptime(data[i][1],"%H:%M:%S") for i in range(1,len(data))]
         else:
-            self.popstime = [dt.datetime.strptime("00:00:00","%H:%M:%S")-dt.timedelta(0,timecorr)+dt.timedelta(0,7200)+dt.timedelta(0,float(data[i][0])) for i in range(1,len(data))]
+            self.popstime = [dt.datetime.strptime("00:00:00","%H:%M:%S")-dt.timedelta(0,timecorr)+wt_corr+dt.timedelta(0,float(data[i][0])) for i in range(1,len(data))]
             self.t = self.popstime
         
         self.ydata = [[float(data[i][j]) for i in range(1,len(data))]for j in [2,3,11,10,4,5,6,7,8,9,12,13,14,15]]

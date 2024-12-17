@@ -5,7 +5,8 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
 from matplotlib.colors import LogNorm
-from ErrorHandler import IllegalArgument
+from ErrorHandler import IllegalArgument, IllegalFileFormat
+import pickle
 
 class FData:
     
@@ -219,4 +220,248 @@ class FData:
             
             
             
-
+class NewFData:
+    
+    def __init__(self,file,bg_file="blank.blank",**kwargs):
+        
+        #check if data is loaded from .csv or .fspec
+        filetype = file.split(".")[-1]
+        if filetype == "csv":
+        
+            #kwargs
+            self.hk_kwargs(kwargs, "sigma", 1)
+            self.hk_kwargs(kwargs, "measurement_frequency", 100)
+            self.hk_kwargs(kwargs, "start", "none")
+            self.hk_kwargs(kwargs, "end", "none")
+            
+            #error handling
+            for key in kwargs:
+                if key not in ["sigma","measurement_frequency","start","end"]:
+                    raise IllegalArgument(key,"NewFData")
+            
+            #import background-data
+            bg_filetype = bg_file.split(".")[-1]
+            if bg_filetype == "csv":
+                bgdata = np.array(list(csv.reader(open(bg_file,encoding="ansi"),delimiter=";"))[1:]).transpose()
+                bgdata = bgdata[3:].astype("int")
+                self.bg = np.array([np.mean(channel)+np.std(channel)*self.sigma for channel in bgdata])
+            elif bg_filetype == "fspec":
+                bg_ip = pickle.load(open(bg_file,"rb"))
+                self.bg = np.array([mean+std*self.sigma for mean,std in zip(bg_ip["bg_means"],bg_ip["bg_stds"])])
+            else:
+                raise IllegalFileFormat(bg_filetype, "csv", "bg_file")
+            
+            #import raw data
+            data = np.array(list(csv.reader(open(file,encoding="ansi"),delimiter=";"))[1:]).transpose()
+            self.rawtime = np.array([dt.datetime.strptime(time,"%H:%M:%S.%f").replace(microsecond=0) for time in data[1]])
+            self.rawchannels = np.array(data[3:],int)
+            
+            #crop
+            t_start = 0
+            t_end = len(self.t)
+            if self.start != "none":
+                tcounter = -1
+                for element in self.rawtime:
+                    tcounter += 1
+                    if str(element)[11:19] == self.start:
+                        t_start = tcounter
+                
+            if self.end != "none":
+                tcounter = -1
+                for element in self.rawtime:
+                    tcounter += 1
+                    if str(element)[11:19] == self.end:
+                        t_end = tcounter
+            
+            self.rawtime = self.rawtime[t_start:t_end]
+            self.rawchannels = [channel[t_start:t_end] for channel in self.rawchannels]
+            
+            #process data
+            secs = []
+            for t in self.rawtime:
+                if t not in secs:
+                    secs.append(t)
+            self.t = np.array(secs)
+            
+            self.channels = np.array([[0 for j in range(len(self.t))] for i in range(len(self.rawchannels))])
+            for t in range(len(self.t)):
+                for channel in range(len(self.rawchannels)):
+                    
+                    counter = 0
+                    for val in range(len(self.rawchannels[channel])):
+                        if self.rawchannels[channel][val] > self.bg[channel] and self.rawtime[val] == self.t[t]:
+                            counter += 1
+                    self.channels[channel][t] = counter / self.measurement_frequency
+                    
+        elif filetype == "fspec":
+                
+            ip = pickle.load(open(file,"rb"))
+            
+            self.hk_kwargs(ip,"sigma",1)
+            self.hk_kwargs(ip,"measurement_frequency", 100)
+            self.hk_kwargs(ip,"bg", "null")
+            self.hk_kwargs(ip,"rawtime", "null")
+            self.hk_kwargs(ip,"rawchannels", "null")
+            self.hk_kwargs(ip,"t", "null")
+            self.hk_kwargs(ip,"channels","null")
+            
+            self.hk_kwargs(kwargs, "start", "none")
+            self.hk_kwargs(kwargs, "end", "none")
+            
+            #crop
+            t_start = 0
+            t_end = len(self.t)
+            if self.start != "none":
+                tcounter = -1
+                for element in self.t:
+                    tcounter += 1
+                    if str(element)[11:19] == self.start:
+                        t_start = tcounter
+                
+            if self.end != "none":
+                tcounter = -1
+                for element in self.t:
+                    tcounter += 1
+                    if str(element)[11:19] == self.end:
+                        t_end = tcounter
+            
+            self.t = self.t[t_start:t_end]
+            self.channels = [channel[t_start:t_end] for channel in self.channels]
+            
+        else:
+            raise IllegalFileFormat(filetype, "csv-file or .fspec", file)
+            
+                   
+    
+    def save(self,filename,**kwargs):
+        
+        #kwargs
+        start = kwargs["start"] if "start" in kwargs else "none"
+        end = kwargs["end"] if "end" in kwargs else "none"
+        
+        #error handling
+        for key in kwargs:
+            if key not in ["start","end"]:
+                raise IllegalArgument(key,"NewFData.save()")
+        
+        #crop
+        t_start = 0
+        t_end = len(self.t)
+        if start != "none":
+            tcounter = -1
+            for element in self.t:
+                tcounter += 1
+                if str(element)[11:19] == start:
+                    t_start = tcounter
+            
+        if end != "none":
+            tcounter = -1
+            for element in self.t:
+                tcounter += 1
+                if str(element)[11:19] == end:
+                    t_end = tcounter
+                    
+        raw_start = 0
+        raw_end = len(self.rawtime)
+        if start != "none":
+            tcounter = -1
+            for element in self.rawtime:
+                tcounter += 1
+                if str(element)[11:19] == start:
+                    raw_start = tcounter
+            
+        if end != "none":
+            tcounter = -1
+            for element in self.rawtime:
+                tcounter += 1
+                if str(element)[11:19] == end:
+                    raw_end = tcounter
+        
+        save_t = self.t[t_start:t_end]
+        save_channels = [channel[t_start:t_end] for channel in self.channels]
+        
+        #create background params
+        bg_means = np.array([np.mean(channel) for channel in self.rawchannels[raw_start:raw_end]])
+        bg_stds = np.array([np.std(channel) for channel in self.rawchannels[raw_start:raw_end]])
+        
+        op = {"sigma" : self.sigma,
+              "measurement_frequency" : self.measurement_frequency,
+              "bg" : self.bg,
+              "rawtime" : self.rawtime,
+              "rawchannels" : self.rawchannels,
+              "t" : save_t,
+              "channels" : save_channels,
+              "bg_means" : bg_means,
+              "bg_stds" : bg_stds}
+        
+        if filename[-6:] != ".fspec":
+            filename += ".fspec"
+        
+        pickle.dump(op,open(filename,"wb"),4)
+        
+        
+    def quickplot(self,channelno):
+        
+        channelname = "ch" + str(channelno)
+        channelno -= 1
+        
+        #draw plot        
+        fig,ax = plt.subplots()
+        ax.plot(self.t,self.channels[channelno],label=channelname)
+        ax.set_xlabel("CET")
+        ax.set_ylabel("Fluorescence Index")
+        ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
+        plt.legend()
+        plt.show()
+        
+        
+    def quickheatmap(self):
+        
+        xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+        heatmap_data = deepcopy(self.channels)
+        heatmap_data = self.hk_replacezeros(heatmap_data)
+        
+        fig,ax = plt.subplots()
+        
+        im = ax.pcolormesh(xx,yy,heatmap_data,cmap="RdYlBu_r",norm=LogNorm(),shading="nearest")
+        ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
+        ax.set_ylabel("Channels")
+        ax.set_xlabel("CET")
+        
+        ticks = [i+0.5 for i in range(len(self.channels))]
+        ticklabels = [i+1 for i in range(len(ticks))]
+        ax.set_yticks(ticks,labels=ticklabels)
+        ax.yaxis.set_tick_params(which='minor', size=0)
+        ax.yaxis.set_tick_params(which='minor', width=0)
+        
+        plt.colorbar(im,ax=ax,label="Fluorescence Index")
+        
+        plt.show()
+        
+        
+    #housekeeping funcs
+    def hk_kwargs(self,kwargs,key,default):
+        
+        op = kwargs[key] if key in kwargs else default
+        if type(op) == str:
+            if op =="null":
+                print("WARNING: Loaded file seems to have been produced either from another object than NewFData or another version of NewFData. Some functions may not be available.")
+        exec(f"self.{key} = op")
+        
+        
+    def hk_replacezeros(self,arr):
+        
+        array = deepcopy(arr)
+        
+        smallest = 10000
+        for row in array:
+            for element in row:
+                if element < smallest and element > 0:
+                    smallest = element
+        for i in range(len(array)):
+            for j in range(len(array[i])):
+                if array[i][j] == 0:
+                    array[i][j] += smallest
+                    
+        return array
+        

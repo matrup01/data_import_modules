@@ -30,3 +30,11 @@ class IllegalArgument(Exception):
         
         self.message = arg + " isn't a legal keyword for " + func + "\nCheck for typos or consult documentation"
         super().__init__(self.message)
+        
+        
+class IllegalFileFormat(Exception):
+    
+    def __init__(self,wrongfile,correctfile,argname):
+        
+        self.message = "." + wrongfile + "-files are not legal as " + argname + ". Expected file: ." + correctfile
+        super().__init__(self.message)

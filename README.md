@@ -201,7 +201,7 @@
 	end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp
 	skiprows (int, optional) ... takes an int and skips the first rows (may be used if the first rows are corrupted), default-0
 
-2.2   FData.internalbg(startmeasurementtime)
+2.1.1 FData.internalbg(startmeasurementtime)
 
 	takes data before startmeasurementtime-timestamp and treats it as bg to correct the data after it (crops bg in the process)
 
@@ -209,7 +209,7 @@
 
 	bgcrop (int,optional) ... Takes an int and crops the start of the background by its amount datapoints
 
-2.3   FData.externalbg(bgfile)
+2.1.2 FData.externalbg(bgfile)
 
 	takes data from another file and treats it as bg to correct the data from the FData-object
 
@@ -218,7 +218,7 @@
 	startcrop (int,optional) ... Takes an int and crops the start of the background by its amount datapoints
 	endcrop (int,optional) ... Takes an int and crops the end of the background by its amount datapoints
 
-2.4   FData.quickplot(channelno)
+2.1.3 FData.quickplot(channelno)
 
 	draws a plot of the intensity of the given channel vs time
 
@@ -227,7 +227,7 @@
 	startcrop (int, optional) ... Takes an int and crops the beginning of the plot by its amount datapoints
 	endcrop (int, optional) ... Takes an int and crops the end of the plot by its amount datapoints
 
-2.5   FData.plot(channelno,ax)
+2.1.4 FData.plot(channelno,ax)
 
 	draws a plot of the intensity of the given channel vs time on an existing matplotlib-axis
 
@@ -241,7 +241,7 @@
 	startcrop (int, optional) ... Takes an int and crops the beginning of the plot by its amount datapoints
 	endcrop (int, optional) ... Takes an int and crops the end of the plot by its amount datapoints
 
-2.6   FData.crop(startcrop,endcrop)
+2.1.5 FData.crop(startcrop,endcrop)
 
 	Shouldn't be used any more, use start and end in init (see 2.1)
 	crops the data by startcrop datapoints at the start and endrop datapoints at the end
@@ -249,11 +249,11 @@
 	startcrop (int) ... Takes an int and crops the beginning of the plot by its amount datapoints
 	endcrop (int) ... Takes an int and crops the end of the plot by its amount datapoints
 	
-2.7   FData.quickheatmap()
+2.1.6 FData.quickheatmap()
 
     draws a heatmap of fluorescence intensity over all channels
     
-2.8   FData.heatmap(ax,**kwargs)
+2.1.6 FData.heatmap(ax,**kwargs)
 
     draws a heatmap of fluorescence intensity over all channels on an existing mpl-axis
     
@@ -264,6 +264,38 @@
     pad (float) ... moves the colormap away from the axis, default-0
     togglecbar (bool) ... toggles colorbar, default-True
     xlims (list of str) ... takes 2 strings in "H:M:S"-format and uses them as xlims
+
+2.2   NewFData(file,bg_file,**kwargs)
+
+    creates a NewFData-object (forced trigger mode)
+    In contrast to FData all data is represented using Fluorescence Index, which is calculated using all the counts within a second whose fluorescence is higher than mean + std * sigma of the background and normalized by the measurement_frequency
+    
+    file (str) ... takes a Fspec produced .csv-file or a .fspec-file (if a .fspec-file is given, every other argument will be ignored)
+    bg_file (str) ... takes a FSpec-produced .csv-file or a .fspec-file
+    
+    sigma (float) ... decides when a count differs from background (similar to WIBS), default-CCS811
+    measurement_frequency (int) ... default-100
+    start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp
+	end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp
+	
+2.2.1 NewFData.save(filename,**kwargs)
+
+    saves the NewFData-object as an .fspec-file
+    
+    file(str) ... filename
+    
+    start (str,optional) ... takes a str in 'hh:mm:ss'-format and only saves data acquired after that timestamp
+	end (str,optional) ... takes a str in 'hh:mm:ss'-format and only saves data acquired before that timestamp
+	
+2.2.2 NewFData.quickplot(channelno)
+
+    draws the Fluorescence Index of one channel over time
+    
+    channelno (int) ... decides which channel should be plotted
+    
+2.2.3 NewFData.quickheatmap()
+
+    draws a heatmap of all channels over time
 
 
 3.    ccs811.py
