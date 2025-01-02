@@ -253,7 +253,7 @@
 
     draws a heatmap of fluorescence intensity over all channels
     
-2.1.6 FData.heatmap(ax,**kwargs)
+2.1.7 FData.heatmap(ax,**kwargs)
 
     draws a heatmap of fluorescence intensity over all channels on an existing mpl-axis
     
@@ -276,7 +276,7 @@
     sigma (float) ... decides when a count differs from background (similar to WIBS), default-CCS811
     measurement_frequency (int) ... default-100
     start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp
-	end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp
+    end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp
 	
 2.2.1 NewFData.save(filename,**kwargs)
 
@@ -285,7 +285,7 @@
     file(str) ... filename
     
     start (str,optional) ... takes a str in 'hh:mm:ss'-format and only saves data acquired after that timestamp
-	end (str,optional) ... takes a str in 'hh:mm:ss'-format and only saves data acquired before that timestamp
+    end (str,optional) ... takes a str in 'hh:mm:ss'-format and only saves data acquired before that timestamp
 	
 2.2.2 NewFData.quickplot(channelno)
 
@@ -297,6 +297,43 @@
 
     draws a heatmap of all channels over time
 
+2.2.4 NewFData.plot(channelno,ax,**kwargs)
+
+    draws the Fluorescence Index of one channel over time on an existing axis
+    
+    channelno (int) ... decides which channel should be plotted
+    ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
+    
+    quakes (list of str, optional) ... takes a list of string in the format 'hh:mm:ss' and draws vertical, dashed lines at those timestamps
+    quakeslabel (str, optional) ... takes a str and uses it as a label for the quakes if a legend is used
+    quakecolor (str, optional) ... changes the color of the quakes, default-"tab:purple"
+    color (str, optional) ... changes the color of the plot, default-"tab:green"
+    
+2.2.5 NewFData.meanplot(ax,**kwargs)
+
+    draws the mean Fluorescence Index (over all or some channels) over time on an existing axis
+    
+    ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
+    
+    min_ch (int, optional) ... all channels lower than this wont be taken into account for calculating the mean, default-1
+    max_ch (int, optional) ... all channels bigger than this wont be taken into account for calculating the mean, default-16
+    quakes (list of str, optional) ... takes a list of string in the format 'hh:mm:ss' and draws vertical, dashed lines at those timestamps
+    quakeslabel (str, optional) ... takes a str and uses it as a label for the quakes if a legend is used
+    quakecolor (str, optional) ... changes the color of the quakes, default-"tab:purple"
+    color (str, optional) ... changes the color of the plot, default-"tab:green"
+    
+2.2.6 NewFData.heatmap(ax,**kwargs)
+
+    draws a heatmap of all channels over time on an existing axis
+    
+    ax (axis) ... takes a matplotlib-axis, on which the heatmap will be drawn
+
+    smooth (bool) ... decides if heatmap should be smoothed (gouraud) or show raw data, default-True
+    cmap (str) ... decides which colormap should be used, default-"RdYlBu_r"
+    pad (float) ... moves the colormap away from the axis, default-0
+    togglecbar (bool) ... toggles colorbar, default-True
+    xlims (list of str) ... takes 2 strings in "H:M:S"-format and uses them as xlims
+    
 
 3.    ccs811.py
 
@@ -442,7 +479,7 @@
     loadfl1 (bool, optional) ... decides if Fluorescence_1 is loaded (untoggle if facing performance issues), default-True
     loadfl2 (bool, optional) ... decides if Fluorescence_2 is loaded (untoggle if facing performance issues), default-True
     loadfl3 (bool, optional) ... decides if Fluorescence_3 is loaded (untoggle if facing performance issues), default-True
-    FixedFT (list of int with len=3, optional) ... takes 3 ints and takes them as FT-backgrounds, default values are completely random, default-[1000000,500000,300000]
+    FixedFT (list of int with len=3, optional) ... takes 3 ints and takes them as FT-backgrounds (only applies if FT_file = "none"), default values are completely random, default-[1000000,500000,300000]
     wintertime (bool, optional) ... if True 3600s are taken from wibstime, default-True
     channels (list of str, optional) ... takes a list of strings to decide which channels should be loaded (loadfl,loadfl2 and loadfl3 need to be true), eg.: channels=["a","ac","abc"]
     

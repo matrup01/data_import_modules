@@ -26,9 +26,13 @@ class NotPlottable(Exception):
         
 class IllegalArgument(Exception):
     
-    def __init__(self,arg,func):
+    def __init__(self,arg,func,legallist=[]):
         
-        self.message = arg + " isn't a legal keyword for " + func + "\nCheck for typos or consult documentation"
+        if len(legallist) != 0:
+            legalstr = ", ".join(legallist)
+            self.message = arg + " isn't a legal kwarg for " + func + "\nLegal arguments: " + legalstr
+        else:
+            self.message = arg + " isn't a legal kwarg for " + func + "\nCheck for typos or consult documentation: "
         super().__init__(self.message)
         
         

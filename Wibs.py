@@ -49,6 +49,7 @@ class WIBS:
         loadfl3 = kwargs["loadfl3"] if "loadfl3" in kwargs else True
         fixed = kwargs["FixedFT"] if "FixedFT" in kwargs else [100000,500000,300000]
         channels = kwargs["channels"] if "channels" in kwargs else "none"
+        FT_time = kwargs["FT_time"] if "FT_time" in kwargs else "none"
         
         #make sure fluorescence data is loaded when channels are given
         if type(channels) == list:
@@ -65,12 +66,12 @@ class WIBS:
         
         #error handling
         for key in kwargs:
-            if key not in ["FT_sigma","bin_borders","flow","timecorr","loadexcited","loadfl1","loadfl2","loadfl3","FixedFT","channels"]:
+            if key not in ["FT_sigma","bin_borders","flow","timecorr","loadexcited","loadfl1","loadfl2","loadfl3","FixedFT","channels","FT_time"]:
                 raise IllegalArgument(key,"WIBS")
         
         
         #load Forced Trigger
-        if loadfl1 or loadfl2 or loadfl3:
+        if loadfl1 or loadfl2 or loadfl3 or FT_time != "none":
             if FT_file == "none":
                 
                 #random values, load FT for accurate results
@@ -86,6 +87,14 @@ class WIBS:
                 self.start_FT = list(ft3["Seconds"])[0]
                 self.start_FT = self.start_FT- 3810797754 + 1727952954 - timecorr + 3600 if wintertime else self.start_FT- 3810797754 + 1727952954 - timecorr + 7200
                 self.start_FT = datetime.utcfromtimestamp(self.start_FT)
+                
+                if FT_time != "none":
+                    
+                    FT_time = datetime.strptime(FT_time,"%H:%M:%S")
+                    self.FT_timecorrection = FT_time - self.start_FT
+                    
+                else:
+                    self.FT_timecorrection = self.start_FT - self.start_FT
                 
                 if loadfl1: self.fl1_FTbg = np.mean(ft_xe1[0]) + self.sigma * np.std(ft_xe1[0])
                 if loadfl2: self.fl2_FTbg = np.mean(ft_xe1[1]) + self.sigma * np.std(ft_xe1[1])
@@ -104,7 +113,7 @@ class WIBS:
                 wibstime = [wibstime[i] + 3600 - timecorr for i in range(len(wibstime))] #correct timezone and WIBS-computer time error
             else:
                 wibstime = [wibstime[i] + 7200 - timecorr for i in range(len(wibstime))] #correct timezone and WIBS-computer time error
-            self.wibstime = [datetime.utcfromtimestamp(wibstime[i]) for i in range(len(wibstime))] #convert to datetime
+            self.wibstime = [datetime.utcfromtimestamp(wibstime[i]) + self.FT_timecorrection for i in range(len(wibstime))] #convert to datetime
             
             xe1 = np.transpose(list(f3["Xe1_FluorPeak"]))
             xe2 = np.transpose(list(f3["Xe2_FluorPeak"]))
@@ -136,7 +145,7 @@ class WIBS:
                     filetime = [filetime[i] + 3600 - timecorr for i in range(len(filetime))] #correct timezone and WIBS-computer time error
                 else:
                     filetime = [filetime[i] + 7200 - timecorr for i in range(len(filetime))] #correct timezone and WIBS-computer time error
-                filetime = [datetime.utcfromtimestamp(filetime[i]) for i in range(len(filetime))] #convert to datetime
+                filetime = [datetime.utcfromtimestamp(filetime[i]) + self.FT_timecorrection for i in range(len(filetime))] #convert to datetime
                 
                 filecounts = list(f3["Size_um"])
                 xe1 = np.transpose(list(f3["Xe1_FluorPeak"]))
@@ -496,14 +505,14 @@ class WIBS:
             for key in keys:
                 if self.misc[key][2] == True:
                     legallist.append(key)
-            raise IllegalValue("y","quickplot",legallist)
+            raise IllegalValue("y","WIBS.plot()",legallist)
         if self.misc[y][2] == False:
             legallist = []
             keys = self.misc.keys()
             for key in keys:
                 if self.misc[key][2] == True:
                     legallist.append(key)
-            raise NotPlottable(y,"quickplot",legallist)
+            raise NotPlottable(y,"WIBS.plot()",legallist)
         for key in kwargs.keys():
             if key not in ["label","color","secondary"]:
                 raise IllegalArgument(key,"WIBS.plot()")

@@ -245,6 +245,7 @@ class NewFData:
                 bgdata = np.array(list(csv.reader(open(bg_file,encoding="ansi"),delimiter=";"))[1:]).transpose()
                 bgdata = bgdata[3:].astype("int")
                 self.bg = np.array([np.mean(channel)+np.std(channel)*self.sigma for channel in bgdata])
+                self.bg = self.bg - 1000
             elif bg_filetype == "fspec":
                 bg_ip = pickle.load(open(bg_file,"rb"))
                 self.bg = np.array([mean+std*self.sigma for mean,std in zip(bg_ip["bg_means"],bg_ip["bg_stds"])])
@@ -255,10 +256,11 @@ class NewFData:
             data = np.array(list(csv.reader(open(file,encoding="ansi"),delimiter=";"))[1:]).transpose()
             self.rawtime = np.array([dt.datetime.strptime(time,"%H:%M:%S.%f").replace(microsecond=0) for time in data[1]])
             self.rawchannels = np.array(data[3:],int)
+            self.rawchannels = self.rawchannels - 1000
             
             #crop
             t_start = 0
-            t_end = len(self.t)
+            t_end = len(self.rawtime)
             if self.start != "none":
                 tcounter = -1
                 for element in self.rawtime:
@@ -283,7 +285,7 @@ class NewFData:
                     secs.append(t)
             self.t = np.array(secs)
             
-            self.channels = np.array([[0 for j in range(len(self.t))] for i in range(len(self.rawchannels))])
+            self.channels = np.array([[0 for j in range(len(self.t))] for i in range(len(self.rawchannels))],float)
             for t in range(len(self.t)):
                 for channel in range(len(self.rawchannels)):
                     
@@ -336,8 +338,8 @@ class NewFData:
     def save(self,filename,**kwargs):
         
         #kwargs
-        start = kwargs["start"] if "start" in kwargs else "none"
-        end = kwargs["end"] if "end" in kwargs else "none"
+        start = self.hk_func_kwargs(kwargs, "start", "none")
+        end = self.hk_func_kwargs(kwargs, "end", "none")
         
         #error handling
         for key in kwargs:
@@ -439,6 +441,102 @@ class NewFData:
         plt.show()
         
         
+    def plot(self,channelno,ax,**kwargs):
+        
+        #import kwargs        
+        keys = ["quakes","quakeslabel","quakecolor","color"]
+        defaults = [[],"no label","tab:purple","tab:green"]
+        for key,default in zip(keys,defaults):
+            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        
+        #error handling
+        for key in kwargs:
+            if key not in keys:
+                raise IllegalArgument(key,"NewFData.plot()",legallist=keys)
+        
+        channelname = "ch" + str(channelno)
+        channelno -= 1
+        
+        #draw plot
+        ax.plot(self.t,self.channels[channelno],label=channelname,color=kwargs["color"])
+        ax.set_ylabel("fluorescence index (channel " + str(channelno+1) + ")")
+        if len(kwargs["quakes"]) != 0:
+            ax.vlines(x=[dt.datetime.strptime(element, "%H:%M:%S")for element in kwargs["quakes"]],ymin=min(self.channels[channelno]),ymax=max(self.channels[channelno]),color=kwargs["quakecolor"],ls="dashed",label=kwargs["quakeslabel"])
+        ax.tick_params(axis='y', colors=kwargs["color"])
+        ax.axes.yaxis.label.set_color(kwargs["color"])
+        
+        
+    def meanplot(self,ax,min_ch=1,max_ch=16,**kwargs):
+        
+        #import kwargs
+        keys = ["min_ch","max_ch","quakes","quakeslabel","quakecolor","color"]
+        defaults = [1,16,[],"no label","tab:purple","tab:green"]
+        for key,default in zip(keys,defaults):
+            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        
+        #error handling
+        for key in kwargs:
+            if key not in keys:
+                raise IllegalArgument(key,"NewFData.meanplot()",legallist=keys)
+        
+        meanchannel = [0 for i in range(len(self.t))]
+        
+        min_ch -= 1
+        ch_len = len(list(range(min_ch,max_ch)))
+        
+        for i in range(len(self.t)):
+            for ch in range(min_ch,max_ch):
+                meanchannel[i] += self.channels[ch][i]
+        for i in range(len(meanchannel)):
+            meanchannel[i] /= ch_len
+                
+        #draw plot
+        ax.plot(self.t,meanchannel,label="mean of all channels",color=kwargs["color"])
+        ax.set_ylabel("fluorescence index (mean)")
+        if len(kwargs["quakes"]) != 0:
+            ax.vlines(x=[dt.datetime.strptime(element, "%H:%M:%S")for element in kwargs["quakes"]],ymin=min(meanchannel),ymax=max(meanchannel),color=kwargs["quakecolor"],ls="dashed",label=kwargs["quakeslabel"])
+        ax.tick_params(axis='y', colors=kwargs["color"])
+        ax.axes.yaxis.label.set_color(kwargs["color"])
+        
+        
+    def heatmap(self,ax,**kwargs):
+        
+        #import kwargs
+        keys = ["smooth","cmap","pad","togglecbar","xlims"]
+        defaults = [True,"RdYlBu_r",0.01,True,"none"]
+        for key,default in zip(keys,defaults):
+            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        
+        #error handling
+        for key in kwargs:
+            if key not in keys:
+                raise IllegalArgument(key,"NewFData.heatmap()",legallist=keys)
+        
+        #prepare data
+        xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+        heatmap_data = deepcopy(self.channels)
+        heatmap_data = self.hk_replacezeros(heatmap_data)
+        if type(kwargs["xlims"]) == list:
+            ax.set_xlim([dt.datetime.strptime(element, "%H:%M:%S") for element in kwargs["xlims"]])
+        
+        #draw
+        if kwargs["smooth"]:
+            im = ax.pcolormesh(xx,yy,heatmap_data,cmap=kwargs["cmap"],norm=LogNorm(),shading="gouraud")
+        else:
+            im = ax.pcolormesh(xx,yy,heatmap_data,cmap=kwargs["cmap"],norm=LogNorm(),shading="nearest")
+        ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
+        ax.set_ylabel("Channels")
+        ax.set_xlabel("CET")
+        
+        ticks = [i+0.5 for i in range(len(self.channels))]
+        ticklabels = [i+1 for i in range(len(ticks))]
+        ax.set_yticks(ticks,labels=ticklabels)
+        ax.yaxis.set_tick_params(which='minor', size=0)
+        ax.yaxis.set_tick_params(which='minor', width=0)
+        if kwargs["togglecbar"]:
+            plt.colorbar(im,ax=ax,label="Fluorescence Index",pad=kwargs["pad"])
+        
+        
     #housekeeping funcs
     def hk_kwargs(self,kwargs,key,default):
         
@@ -447,6 +545,12 @@ class NewFData:
             if op =="null":
                 print("WARNING: Loaded file seems to have been produced either from another object than NewFData or another version of NewFData. Some functions may not be available.")
         exec(f"self.{key} = op")
+        
+        
+    def hk_func_kwargs(self,kwargs,key,default):
+        
+        op = kwargs[key] if key in kwargs else default
+        return op
         
         
     def hk_replacezeros(self,arr):
