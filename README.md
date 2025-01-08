@@ -277,6 +277,8 @@
     measurement_frequency (int) ... default-100
     start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp
     end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp
+    jit (bool, optional) ... decides if Numba JIT-compiler should be used, default-True
+    debugging (bool,optional) ... for debugging purposes, if you dont know what its doing, leave it , default-False
 	
 2.2.1 NewFData.save(filename,**kwargs)
 

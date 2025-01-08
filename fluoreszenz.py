@@ -7,6 +7,20 @@ import matplotlib.dates as md
 from matplotlib.colors import LogNorm
 from ErrorHandler import IllegalArgument, IllegalFileFormat
 import pickle
+from numba import njit, prange, float64
+
+#jit-compiled housekeeping funcs
+@njit(float64[:,:](float64[:],float64[:,:],float64[:],float64[:],float64[:,:]))
+def hk_process_data(tt,rc,bg,rt,channels):
+
+    for t in prange(len(tt)):
+        for channel in prange(len(rc)):
+            for val in prange(len(rc[channel])):
+                if rc[channel][val] > bg[channel] and rt[val] == tt[t]:
+                    channels[channel][t] += 1
+         
+    return channels
+
 
 class FData:
     
@@ -233,10 +247,12 @@ class NewFData:
             self.hk_kwargs(kwargs, "measurement_frequency", 100)
             self.hk_kwargs(kwargs, "start", "none")
             self.hk_kwargs(kwargs, "end", "none")
+            self.hk_kwargs(kwargs, "jit", True)
+            self.hk_kwargs(kwargs, "debugging", False)
             
             #error handling
             for key in kwargs:
-                if key not in ["sigma","measurement_frequency","start","end"]:
+                if key not in ["sigma","measurement_frequency","start","end","debugging","jit"]:
                     raise IllegalArgument(key,"NewFData")
             
             #import background-data
@@ -285,15 +301,23 @@ class NewFData:
                     secs.append(t)
             self.t = np.array(secs)
             
-            self.channels = np.array([[0 for j in range(len(self.t))] for i in range(len(self.rawchannels))],float)
-            for t in range(len(self.t)):
-                for channel in range(len(self.rawchannels)):
-                    
-                    counter = 0
-                    for val in range(len(self.rawchannels[channel])):
-                        if self.rawchannels[channel][val] > self.bg[channel] and self.rawtime[val] == self.t[t]:
-                            counter += 1
-                    self.channels[channel][t] = counter / self.measurement_frequency
+            if self.jit:
+                numba_t = np.array([(i - dt.datetime(1970, 1, 1)).total_seconds() for i in self.t],float)
+                numba_rt = np.array([(i - dt.datetime(1970, 1, 1)).total_seconds() for i in self.rawtime],float)
+                numba_rc = np.array(self.rawchannels,float)
+                numba_bg = np.array(self.bg,float)
+                numba_ch = np.array([[float(0) for j in range(len(numba_t))] for i in range(len(numba_rc))])
+                self.channels = hk_process_data(numba_t,numba_rc,numba_bg,numba_rt,numba_ch)
+            else:
+                self.channels = np.array([[0 for j in range(len(self.t))] for i in range(len(self.rawchannels))],float)
+                for t in range(len(self.t)):
+                    for channel in range(len(self.rawchannels)):
+                        
+                        counter = 0
+                        for val in range(len(self.rawchannels[channel])):
+                            if self.rawchannels[channel][val] > self.bg[channel] and self.rawtime[val] == self.t[t]:
+                                counter += 1
+                        self.channels[channel][t] = counter / self.measurement_frequency
                     
         elif filetype == "fspec":
                 
@@ -537,7 +561,7 @@ class NewFData:
             plt.colorbar(im,ax=ax,label="Fluorescence Index",pad=kwargs["pad"])
         
         
-    #housekeeping funcs
+    #housekeeping funcs    
     def hk_kwargs(self,kwargs,key,default):
         
         op = kwargs[key] if key in kwargs else default
