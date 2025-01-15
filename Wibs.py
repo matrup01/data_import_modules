@@ -32,7 +32,8 @@ class WIBS:
     loadfl2 (bool) ... decides if Fluorescence_2 is loaded (untoggle if facing performance issues), default-True\n
     loadfl3 (bool) ... decides if Fluorescence_3 is loaded (untoggle if facing performance issues), default-True\n
     FixedFT (list of int with len=3) ... takes 3 ints and takes them as FT-backgrounds, default values are completely random, default-[1000000,500000,300000]\n
-    wintertime (bool) ... if True 3600s are taken from wibstime, default-True"""
+    wintertime (bool) ... if True 3600s are taken from wibstime, default-True\n
+    channels (list of str, optional) ... takes a list of strings to decide which channels should be loaded (loadfl,loadfl2 and loadfl3 need to be true), eg.: channels=["a","ac","abc"]"""
     
     def __init__(self,file,FT_file,**kwargs):
         
@@ -196,7 +197,8 @@ class WIBS:
         for handler in self.timehandler:
             appender = [0 for i in range(self.bins)]
             for count in handler:
-                appender[self.hk_binsorter(self.data["size"][count])] += 1
+                if self.hk_binsorter(self.data["size"][count]) != 123456789:
+                    appender[self.hk_binsorter(self.data["size"][count])] += 1
             cps.append(np.array(appender))
         self.processed_data["cps"] = cps
         self.misc["cps"] = ["Counts","#/s",False]
@@ -225,7 +227,8 @@ class WIBS:
                 appender = [0 for i in range(self.bins)]
                 for count in handler:
                     if self.data["excited"][count]:
-                        appender[self.hk_binsorter(self.data["size"][count])] += 1
+                        if self.hk_binsorter(self.data["size"][count]) != 123456789:
+                            appender[self.hk_binsorter(self.data["size"][count])] += 1
                 cps.append(np.array(appender))
             self.processed_data["ex_cps"] = cps
             self.misc["ex_cps"] = ["Counts (excited)","#/s",False]
@@ -254,7 +257,8 @@ class WIBS:
                 appender = [0 for i in range(self.bins)]
                 for count in handler:
                     if self.data["Fl1"][count]:
-                        appender[self.hk_binsorter(self.data["size"][count])] += 1
+                        if self.hk_binsorter(self.data["size"][count]) != 123456789:
+                            appender[self.hk_binsorter(self.data["size"][count])] += 1
                 cps.append(np.array(appender))
             self.processed_data["fl1_cps"] = cps1
             self.misc["fl1_cps"] = ["Counts (Fl1)","#/s",False]
@@ -283,7 +287,8 @@ class WIBS:
                 appender = [0 for i in range(self.bins)]
                 for count in handler:
                     if self.data["Fl2"][count]:
-                        appender[self.hk_binsorter(self.data["size"][count])] += 1
+                        if self.hk_binsorter(self.data["size"][count]) != 123456789:
+                            appender[self.hk_binsorter(self.data["size"][count])] += 1
                 cps.append(np.array(appender))
             self.processed_data["fl2_cps"] = cps
             self.misc["fl2_cps"] = ["Counts (Fl2)","#/s",False]
@@ -312,7 +317,8 @@ class WIBS:
                 appender = [0 for i in range(self.bins)]
                 for count in handler:
                     if self.data["Fl3"][count]:
-                        appender[self.hk_binsorter(self.data["size"][count])] += 1
+                        if self.hk_binsorter(self.data["size"][count]) != 123456789:
+                            appender[self.hk_binsorter(self.data["size"][count])] += 1
                 cps.append(np.array(appender))
             self.processed_data["fl3_cps"] = cps
             self.misc["fl3_cps"] = ["Counts (Fl3)","#/s",False]
@@ -536,7 +542,7 @@ class WIBS:
     
     def hk_binsorter(self,size):
         
-        op = self.bins - 1
+        op = 123456789
         
         for i in range(self.bins):
             if self.bin_borders[i] <= size and self.bin_borders[i+1] > size:
@@ -592,7 +598,8 @@ class WIBS:
             for count in handler:
                 #if self.data["Fl1"][count] == a and self.data["Fl2"][count] == b and self.data["Fl3"] == c:
                 if checker[count] == True:
-                    appender[self.hk_binsorter(self.data["size"][count])] += 1
+                    if self.hk_binsorter(self.data["size"][count]) != 123456789:
+                        appender[self.hk_binsorter(self.data["size"][count])] += 1
             cps.append(np.array(appender))
         self.processed_data[op_key] = cps
         self.misc[op_key] = ["Counts ("+ip_str+")","#/s",False]

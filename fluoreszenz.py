@@ -9,6 +9,7 @@ from ErrorHandler import IllegalArgument, IllegalFileFormat
 import pickle
 from numba import njit, prange, float64
 
+
 #jit-compiled housekeeping funcs
 @njit(float64[:,:](float64[:],float64[:,:],float64[:],float64[:],float64[:,:]))
 def hk_process_data(tt,rc,bg,rt,channels):
@@ -266,12 +267,19 @@ class NewFData:
                 bg_ip = pickle.load(open(bg_file,"rb"))
                 self.bg = np.array([mean+std*self.sigma for mean,std in zip(bg_ip["bg_means"],bg_ip["bg_stds"])])
             else:
-                raise IllegalFileFormat(bg_filetype, "csv", "bg_file")
+                raise IllegalFileFormat(bg_filetype, "csv or .fspec", "bg_file")
             
             #import raw data
             data = np.array(list(csv.reader(open(file,encoding="ansi"),delimiter=";"))[1:]).transpose()
             self.rawtime = np.array([dt.datetime.strptime(time,"%H:%M:%S.%f").replace(microsecond=0) for time in data[1]])
-            self.rawchannels = np.array(data[3:],int)
+            self.rawchannels = data[3:]
+            for i in range(len(self.rawchannels)):
+                for j in range(len(self.rawchannels[i])):
+                    try:
+                        self.rawchannels[i][j] = int(self.rawchannels[i][j])
+                    except ValueError:
+                        self.rawchannels[i][j] = 1000
+            self.rawchannels = np.array(self.rawchannels,int)
             self.rawchannels = self.rawchannels - 1000
             
             #crop
@@ -308,6 +316,7 @@ class NewFData:
                 numba_bg = np.array(self.bg,float)
                 numba_ch = np.array([[float(0) for j in range(len(numba_t))] for i in range(len(numba_rc))])
                 self.channels = hk_process_data(numba_t,numba_rc,numba_bg,numba_rt,numba_ch)
+                self.channels /= self.measurement_frequency
             else:
                 self.channels = np.array([[0 for j in range(len(self.t))] for i in range(len(self.rawchannels))],float)
                 for t in range(len(self.t)):
