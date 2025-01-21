@@ -11,16 +11,7 @@ from numba import njit, prange, float64
 
 
 #jit-compiled housekeeping funcs
-@njit(float64[:,:](float64[:],float64[:,:],float64[:],float64[:],float64[:,:]))
-def hk_process_data(tt,rc,bg,rt,channels):
 
-    for t in prange(len(tt)):
-        for channel in prange(len(rc)):
-            for val in prange(len(rc[channel])):
-                if rc[channel][val] > bg[channel] and rt[val] == tt[t]:
-                    channels[channel][t] += 1
-         
-    return channels
 
 
 class FData:
@@ -259,7 +250,16 @@ class NewFData:
             #import background-data
             bg_filetype = bg_file.split(".")[-1]
             if bg_filetype == "csv":
-                bgdata = np.array(list(csv.reader(open(bg_file,encoding="ansi"),delimiter=";"))[1:]).transpose()
+                bgdata = list(csv.reader(open(bg_file,encoding="ansi"),delimiter=";"))[1:]
+                for i in range(len(bgdata)):
+                    if len(bgdata[i]) != 19:
+                        if len(bgdata[i]) < 19:
+                            for j in range(19-len(bgdata[i])):
+                                bgdata[i].append(0)
+                        elif len(bgdata[i]) > 19:
+                            j = len(bgdata[i]) - 19
+                            bgdata[i] = bgdata[i][:-j]
+                bgdata = np.array(bgdata).transpose()
                 bgdata = bgdata[3:].astype("int")
                 self.bg = np.array([np.mean(channel)+np.std(channel)*self.sigma for channel in bgdata])
                 self.bg = self.bg - 1000
@@ -270,7 +270,16 @@ class NewFData:
                 raise IllegalFileFormat(bg_filetype, "csv or .fspec", "bg_file")
             
             #import raw data
-            data = np.array(list(csv.reader(open(file,encoding="ansi"),delimiter=";"))[1:]).transpose()
+            data = list(csv.reader(open(file,encoding="ansi"),delimiter=";",))[1:]
+            for i in range(len(data)):
+                if len(data[i]) != 19:
+                    if len(data[i]) < 19:
+                        for j in range(19-len(data[i])):
+                            data[i].append(0)
+                    elif len(data[i]) > 19:
+                        j = len(data[i]) - 19
+                        data[i] = data[i][:-j]
+            data = np.array(data).transpose()
             self.rawtime = np.array([dt.datetime.strptime(time,"%H:%M:%S.%f").replace(microsecond=0) for time in data[1]])
             self.rawchannels = data[3:]
             for i in range(len(self.rawchannels)):
@@ -315,7 +324,7 @@ class NewFData:
                 numba_rc = np.array(self.rawchannels,float)
                 numba_bg = np.array(self.bg,float)
                 numba_ch = np.array([[float(0) for j in range(len(numba_t))] for i in range(len(numba_rc))])
-                self.channels = hk_process_data(numba_t,numba_rc,numba_bg,numba_rt,numba_ch)
+                self.channels = self.hk_process_data(numba_t,numba_rc,numba_bg,numba_rt,numba_ch)
                 self.channels /= self.measurement_frequency
             else:
                 self.channels = np.array([[0 for j in range(len(self.t))] for i in range(len(self.rawchannels))],float)
@@ -524,6 +533,7 @@ class NewFData:
             meanchannel[i] /= ch_len
                 
         #draw plot
+        label = "mean of channels " + str(min_ch) + " - " + str(max_ch)
         ax.plot(self.t,meanchannel,label="mean of all channels",color=kwargs["color"])
         ax.set_ylabel("fluorescence index (mean)")
         if len(kwargs["quakes"]) != 0:
@@ -601,4 +611,17 @@ class NewFData:
                     array[i][j] += smallest
                     
         return array
+    
+    
+    @staticmethod
+    @njit(float64[:,:](float64[:],float64[:,:],float64[:],float64[:],float64[:,:]))
+    def hk_process_data(tt,rc,bg,rt,channels):
+
+        for t in prange(len(tt)):
+            for channel in prange(len(rc)):
+                for val in prange(len(rc[channel])):
+                    if rc[channel][val] > bg[channel] and rt[val] == tt[t]:
+                        channels[channel][t] += 1
+             
+        return channels
         
