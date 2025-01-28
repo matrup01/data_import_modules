@@ -241,16 +241,31 @@ class NewFData:
             self.hk_kwargs(kwargs, "end", "none")
             self.hk_kwargs(kwargs, "jit", True)
             self.hk_kwargs(kwargs, "debugging", False)
+            self.hk_kwargs(kwargs,"bg_start","*")
+            self.hk_kwargs(kwargs,"bg_end","*")
             
             #error handling
             for key in kwargs:
-                if key not in ["sigma","measurement_frequency","start","end","debugging","jit"]:
+                if key not in ["sigma","measurement_frequency","start","end","debugging","jit","bg_start","bg_end"]:
                     raise IllegalArgument(key,"NewFData")
             
             #import background-data
             bg_filetype = bg_file.split(".")[-1]
             if bg_filetype == "csv":
-                bgdata = list(csv.reader(open(bg_file,encoding="ansi"),delimiter=";"))[1:]
+                bgdata_all = list(csv.reader(open(bg_file,encoding="ansi"),delimiter=";"))
+                bgdata_time = [bgdata_all[1] for i in range(len(bgdata_all))]
+                bgdata = bgdata_all[1:]
+                bg_start_index = 0
+                bg_end_index = len(bgdata)
+                if self.bg_start != "*" or self.bg_end != "*":
+                    for i in range(len(bgdata_time)):
+                        match bgdata_time[i][:7]:
+                            case self.bg_start:
+                                bgdata_start_index = i
+                            case self.bg_end:
+                                bgdata_end_index = i
+                            case _:
+                                pass
                 for i in range(len(bgdata)):
                     if len(bgdata[i]) != 19:
                         if len(bgdata[i]) < 19:
