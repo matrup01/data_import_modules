@@ -253,19 +253,22 @@ class NewFData:
             bg_filetype = bg_file.split(".")[-1]
             if bg_filetype == "csv":
                 bgdata_all = list(csv.reader(open(bg_file,encoding="ansi"),delimiter=";"))
-                bgdata_time = [bgdata_all[1] for i in range(len(bgdata_all))]
+                bgdata_time = [bgdata_all[i][1] for i in range(len(bgdata_all))]
                 bgdata = bgdata_all[1:]
-                bg_start_index = 0
-                bg_end_index = len(bgdata)
+                print(len(bgdata))
                 if self.bg_start != "*" or self.bg_end != "*":
+                    bg_start_index = 0
+                    bg_end_index = len(bgdata)
                     for i in range(len(bgdata_time)):
-                        match bgdata_time[i][:7]:
+                        match bgdata_time[i][:8]:
                             case self.bg_start:
-                                bgdata_start_index = i
+                                bg_start_index = i
                             case self.bg_end:
-                                bgdata_end_index = i
+                                bg_end_index = i
                             case _:
                                 pass
+                    bgdata = bgdata[bg_start_index:bg_end_index]
+                print(len(bgdata))
                 for i in range(len(bgdata)):
                     if len(bgdata[i]) != 19:
                         if len(bgdata[i]) < 19:

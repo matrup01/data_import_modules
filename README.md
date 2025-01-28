@@ -278,6 +278,8 @@
     start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp
     end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp
     jit (bool, optional) ... decides if Numba JIT-compiler should be used, default-True
+    bg_start (str,optional) ... only uses data from bg_file which was acquired after bg_start (only works if a csv-bg_file is used, format:"HH:MM:SS")
+    bg_end (str,optional) ... only uses data from bg_file which was acquired before bg_start (only works if a csv-bg_file is used, format:"HH:MM:SS")
     debugging (bool,optional) ... for debugging purposes, if you dont know what its doing, leave it , default-False
 	
 2.2.1 NewFData.save(filename,**kwargs)
