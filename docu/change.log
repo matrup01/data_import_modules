@@ -1,0 +1,21 @@
+######################### MR 26.02.2025 #########################
+#     "started code de-spaghettification and revamped docu"     #
+#                                                               #
+# - Revamped documentation                                      #
+# - despaghettified code                                        #
+# - Added kwarg "layout" to FData, NewFData and Pops to account #
+#   for new Instruments with different data files               #
+# - Removed kwarg "box" from Pops since the same can now be     #
+#   achieved with "layout"                                      #
+# - Removed funcs Pops.internalbg() and Pops.externalbg() since # 
+# - they are no longer needed                                   #
+# - Moved CCS811 and SEN55 modules into lowcostsensors.py       #
+#################################################################
+
+
+######################### MR 18.01.2025 #########################
+#          "NewFData csv-background is now trimmable"           #
+#                                                               #
+# - Added kwargs "bg_start" and "bg_end" to NewFData.__init__   #
+#                                                               #
+#################################################################

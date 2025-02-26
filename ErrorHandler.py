@@ -42,3 +42,11 @@ class IllegalFileFormat(Exception):
         
         self.message = "." + wrongfile + "-files are not legal as " + argname + ". Expected file: ." + correctfile
         super().__init__(self.message)
+        
+        
+class SensorNotMounted(Exception):
+    
+    def __init__(self,illegalvar,instrument):
+        
+        self.message = illegalvar + " cant be used here, since the corresponding sensor is not mounted onto " + instrument + " in the given layout"
+        super().__init__(self.message)

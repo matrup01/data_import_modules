@@ -16,17 +16,9 @@ from numba import njit, prange, float64
 
 class FData:
     
-    """full documentation see https://github.com/matrup01/data_import_modules \n \n
+    """full documentation see https://github.com/matrup01/data_import_modules"""
     
-    file (str) ... takes an FSpec-produced csv-file\n\n
-
-	title (str, optional) ... takes a str and uses it as a title for quickplots\n
-	encoding_artifacts (bool, optional) ... takes a boolean to determine if there are encoding artifacts that need to be removed, default-True\n
-	start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp\n
-	end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp\n
-	skiprows (int, optional) ... takes an int and skips the first rows (may be used if the first rows are corrupted), default-0"""
-    
-    def __init__(self,file,title="kein Titel",encoding_artifacts=True,start="none",end="none",skiprows=0):
+    def __init__(self,file,title="kein Titel",encoding_artifacts=True,start="none",end="none",skiprows=0,layout=[3,18]):
         
         #reads data from csv to list
         self.title = title
@@ -44,7 +36,13 @@ class FData:
         
         #extract x and y values from list
         self.t = [dt.datetime.strptime(data[i][1],"%H:%M:%S.%f") for i in range(1+skiprows,len(data))]
-        self.channels = [[int(data[i][j])-1000 for i in range(1+skiprows,len(data))] for j in range(3,19)]
+        self.channels = [[data[i][j] for i in range(1+skiprows,len(data))] for j in range(layout[0],layout[1]+1)]
+        for i in range(len(self.channels)):
+            for j in range(len(self.channels[i])):
+                try:
+                    self.channels[i][j] = int(self.channels[i][j]) - 1000
+                except ValueError:
+                    self.channels[i][j] = 0
         
         #crop
         t_start = 0
@@ -132,6 +130,7 @@ class FData:
         #draw plot
         ax.plot(self.t,self.channels[channelno],label=channelname,color=color)
         ax.set_ylabel("Intensität in " + channelname)
+        ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         if len(quakes) != 0:
             ax.vlines(x=[dt.datetime.strptime(element, "%H:%M:%S")for element in quakes],ymin=min(self.channels[channelno]),ymax=max(self.channels[channelno]),color=quakecolor,ls="dashed",label=quakeslabel)
             
@@ -243,6 +242,7 @@ class NewFData:
             self.hk_kwargs(kwargs, "debugging", False)
             self.hk_kwargs(kwargs,"bg_start","*")
             self.hk_kwargs(kwargs,"bg_end","*")
+            self.hk_kwargs(kwargs,"layout",[3,18])
             
             #error handling
             for key in kwargs:
@@ -255,10 +255,10 @@ class NewFData:
                 bgdata_all = list(csv.reader(open(bg_file,encoding="ansi"),delimiter=";"))
                 bgdata_time = [bgdata_all[i][1] for i in range(len(bgdata_all))]
                 bgdata = bgdata_all[1:]
-                print(len(bgdata))
+                bg_start_index = 100
+                bg_end_index = len(bgdata)
                 if self.bg_start != "*" or self.bg_end != "*":
-                    bg_start_index = 0
-                    bg_end_index = len(bgdata)
+                   
                     for i in range(len(bgdata_time)):
                         match bgdata_time[i][:8]:
                             case self.bg_start:
@@ -267,8 +267,7 @@ class NewFData:
                                 bg_end_index = i
                             case _:
                                 pass
-                    bgdata = bgdata[bg_start_index:bg_end_index]
-                print(len(bgdata))
+                bgdata = bgdata[bg_start_index:bg_end_index]
                 for i in range(len(bgdata)):
                     if len(bgdata[i]) != 19:
                         if len(bgdata[i]) < 19:
@@ -299,7 +298,7 @@ class NewFData:
                         data[i] = data[i][:-j]
             data = np.array(data).transpose()
             self.rawtime = np.array([dt.datetime.strptime(time,"%H:%M:%S.%f").replace(microsecond=0) for time in data[1]])
-            self.rawchannels = data[3:]
+            self.rawchannels = data[self.layout[0]:self.layout[1]]
             for i in range(len(self.rawchannels)):
                 for j in range(len(self.rawchannels[i])):
                     try:
@@ -520,6 +519,7 @@ class NewFData:
         #draw plot
         ax.plot(self.t,self.channels[channelno],label=channelname,color=kwargs["color"])
         ax.set_ylabel("fluorescence index (channel " + str(channelno+1) + ")")
+        ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         if len(kwargs["quakes"]) != 0:
             ax.vlines(x=[dt.datetime.strptime(element, "%H:%M:%S")for element in kwargs["quakes"]],ymin=min(self.channels[channelno]),ymax=max(self.channels[channelno]),color=kwargs["quakecolor"],ls="dashed",label=kwargs["quakeslabel"])
         ax.tick_params(axis='y', colors=kwargs["color"])
@@ -551,9 +551,10 @@ class NewFData:
             meanchannel[i] /= ch_len
                 
         #draw plot
-        label = "mean of channels " + str(min_ch) + " - " + str(max_ch)
-        ax.plot(self.t,meanchannel,label="mean of all channels",color=kwargs["color"])
-        ax.set_ylabel("fluorescence index (mean)")
+        label = "mean of channels " + str(min_ch + 1) + " - " + str(max_ch)
+        ax.plot(self.t,meanchannel,label=label,color=kwargs["color"])
+        ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
+        ax.set_ylabel("Fluorescence Index (" + label + ")")
         if len(kwargs["quakes"]) != 0:
             ax.vlines(x=[dt.datetime.strptime(element, "%H:%M:%S")for element in kwargs["quakes"]],ymin=min(meanchannel),ymax=max(meanchannel),color=kwargs["quakecolor"],ls="dashed",label=kwargs["quakeslabel"])
         ax.tick_params(axis='y', colors=kwargs["color"])
