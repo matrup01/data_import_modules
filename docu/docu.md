@@ -28,6 +28,12 @@
                                 "popstime" : 23,
                                 "t" : 1,
                                 "flow" : 38}
+            FlyingFlo2.0 (Vanessa) ... {"bins" : [pbin for pbin in range(36,52)],
+                                        "ydata" : "NULL",
+                                        "ydata2" : [6,21,12],
+                                        "popstime" : 3,
+                                        "t" : 1,
+                                        "flow" : 16}
 
 1.4   Pops.exportbg()
 
@@ -176,7 +182,8 @@
 	skiprows (int, optional) ... takes an int and skips the first rows (may be used if the first rows are corrupted), default-0
 	layout (list,optional) ... decides which columns from the csv should be taken (Syntax: [firstcolumn,lastcolumn]), default-[3,18]
         Layout-Lookuptable:
-            FlyingFlo 1.0 ... [3,18]
+            FlyingFlo 1.0 (Peter) ... [3,18]
+            FlyingFlo 2.0 (Vanessa) ... [3,18]
 
 2.1.1 FData.internalbg(startmeasurementtime)
 
@@ -260,7 +267,8 @@
     debugging (bool,optional) ... for debugging purposes, if you dont know what its doing, leave it , default-False
     layout (list,optional) ... decides which columns from the csv should be taken (Syntax: [firstcolumn,lastcolumn]), default-[3,18]
         Layout-Lookuptable:
-            FlyingFlo 1.0 ... [3,18]
+            FlyingFlo 1.0 (Peter) ... [3,18]
+            FlyingFlo 2.0 (Vanessa) ... [3,18]
 	
 2.2.1 NewFData.save(filename,**kwargs)
 
