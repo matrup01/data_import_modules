@@ -1,0 +1,27 @@
+Metadata-Version: 2.2
+Name: data_import_modules
+Version: 0.1.0
+Summary: A collection of data import modules for the Lab on a Drone project.
+Author: matrup01
+Author-email: Florian Wieland <wie-flo.waffle918@8shield.net>
+Project-URL: Homepage, https://github.com/matrup01/data_import_modules/
+Project-URL: Bug Tracker, https://github.com/matrup01/data_import_modules/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# Welcome to the data analysis modules of AG Grothe
+
+## Contents
+
+This repo contains modules with python importable classes that can be used for data analysis of different instruments. Further documentation is available in /docu/docu.md
+
+## How to contribute
+
+If you are from AG Grothe you are welcome to add/improve on modules and commit into this repo. Please just keep the following things in mind:
+
+- Please add documentation of your changes in both docu.md and change.log in a consistent way, to make it easier for others to make use of your improvements!
+- This repo only contains general purpose import classes for different instruments. Please dont add code for data analysis of a specific project!
