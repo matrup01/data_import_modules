@@ -1,0 +1,15 @@
+LICENSE
+README.md
+setup.py
+agg_dim/ErrorHandler.py
+agg_dim/__init__.py
+agg_dim/drone.py
+agg_dim/fluoreszenz.py
+agg_dim/lowcostsensors.py
+agg_dim/pops.py
+agg_dim/wibs.py
+agg_dim.egg-info/PKG-INFO
+agg_dim.egg-info/SOURCES.txt
+agg_dim.egg-info/dependency_links.txt
+agg_dim.egg-info/requires.txt
+agg_dim.egg-info/top_level.txt
