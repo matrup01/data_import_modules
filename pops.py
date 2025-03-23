@@ -32,7 +32,6 @@ class Pops:
                     "deviate" : False,
                     "wintertime" : False,
                     "layout" : {"bins" : [pbin for pbin in range(33,49)],"ydata" : "NULL","ydata2" : [5,20,11],"popstime" : 1,"t" : -1,"flow" : 15}}
-        print(defaults.keys())
         for key,value in zip(defaults.keys(),defaults.values()):
             self.hk_kwargs(kwargs, key, value)
         self.hk_errorhandling(kwargs, defaults.keys(), "Pops")

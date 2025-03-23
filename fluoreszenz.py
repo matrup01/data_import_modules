@@ -234,15 +234,18 @@ class NewFData:
         if filetype == "csv":
         
             #kwargs
-            self.hk_kwargs(kwargs, "sigma", 1)
-            self.hk_kwargs(kwargs, "measurement_frequency", 100)
-            self.hk_kwargs(kwargs, "start", "none")
-            self.hk_kwargs(kwargs, "end", "none")
-            self.hk_kwargs(kwargs, "jit", True)
-            self.hk_kwargs(kwargs, "debugging", False)
-            self.hk_kwargs(kwargs,"bg_start","*")
-            self.hk_kwargs(kwargs,"bg_end","*")
-            self.hk_kwargs(kwargs,"layout",[3,18])
+            defaults = {"sigma" : 1,
+                        "measurement_frequency" : 100,
+                        "start" : "none",
+                        "end" : "none",
+                        "jit" : True,
+                        "debugging" : False,
+                        "bg_start" : "*",
+                        "bg_end" : "*",
+                        "layout" : [3,18]}
+            for key,value in zip(defaults.keys(),defaults.values()):
+                self.hk_kwargs(kwargs, key, value)
+            self.hk_errorhandling(kwargs, defaults.keys(), "NewFData")
             
             #error handling
             for key in kwargs:
@@ -397,45 +400,44 @@ class NewFData:
     def save(self,filename,**kwargs):
         
         #kwargs
-        start = self.hk_func_kwargs(kwargs, "start", "none")
-        end = self.hk_func_kwargs(kwargs, "end", "none")
-        
-        #error handling
-        for key in kwargs:
-            if key not in ["start","end"]:
-                raise IllegalArgument(key,"NewFData.save()")
+        defaults = {"start" : "none",
+                    "end" : "none"}
+        for key,default in zip(defaults.keys(),defaults.values()):
+            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        self.hk_errorhandling(kwargs, defaults.keys(), "NewFData.save()")
+
         
         #crop
         t_start = 0
         t_end = len(self.t)
-        if start != "none":
+        if kwargs["start"] != "none":
             tcounter = -1
             for element in self.t:
                 tcounter += 1
-                if str(element)[11:19] == start:
+                if str(element)[11:19] == kwargs["start"]:
                     t_start = tcounter
             
-        if end != "none":
+        if kwargs["end"] != "none":
             tcounter = -1
             for element in self.t:
                 tcounter += 1
-                if str(element)[11:19] == end:
+                if str(element)[11:19] == kwargs["end"]:
                     t_end = tcounter
                     
         raw_start = 0
         raw_end = len(self.rawtime)
-        if start != "none":
+        if kwargs["start"] != "none":
             tcounter = -1
             for element in self.rawtime:
                 tcounter += 1
-                if str(element)[11:19] == start:
+                if str(element)[11:19] == kwargs["start"]:
                     raw_start = tcounter
             
-        if end != "none":
+        if kwargs["end"] != "none":
             tcounter = -1
             for element in self.rawtime:
                 tcounter += 1
-                if str(element)[11:19] == end:
+                if str(element)[11:19] == kwargs["end"]:
                     raw_end = tcounter
         
         save_t = self.t[t_start:t_end]
@@ -502,16 +504,15 @@ class NewFData:
         
     def plot(self,channelno,ax,**kwargs):
         
-        #import kwargs        
-        keys = ["quakes","quakeslabel","quakecolor","color"]
-        defaults = [[],"no label","tab:purple","tab:green"]
-        for key,default in zip(keys,defaults):
+        #import kwargs   
+        defaults = {"quakes" : [],
+                    "quakeslabel" : "no label",
+                    "quakecolor" : "tab:purple",
+                    "color" : "tab:green"}
+        for key,default in zip(defaults.keys(),defaults.values()):
             kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        self.hk_errorhandling(kwargs, defaults.keys(), "NewFData.plot()")
         
-        #error handling
-        for key in kwargs:
-            if key not in keys:
-                raise IllegalArgument(key,"NewFData.plot()",legallist=keys)
         
         channelname = "ch" + str(channelno)
         channelno -= 1
@@ -529,15 +530,15 @@ class NewFData:
     def meanplot(self,ax,min_ch=1,max_ch=16,**kwargs):
         
         #import kwargs
-        keys = ["min_ch","max_ch","quakes","quakeslabel","quakecolor","color"]
-        defaults = [1,16,[],"no label","tab:purple","tab:green"]
-        for key,default in zip(keys,defaults):
+        defaults = {"min_ch" : 1,
+                    "max_ch" : 16,
+                    "quakes" : [],
+                    "quakeslabel" : "tab:purple",
+                    "quakecolor" : "tab:purple",
+                    "color" : "tab:green"}
+        for key,default in zip(defaults.keys(),defaults.values()):
             kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        
-        #error handling
-        for key in kwargs:
-            if key not in keys:
-                raise IllegalArgument(key,"NewFData.meanplot()",legallist=keys)
+        self.hk_errorhandling(kwargs, defaults.keys(), "NewFData.meanplot()")
         
         meanchannel = [0 for i in range(len(self.t))]
         
@@ -564,15 +565,14 @@ class NewFData:
     def heatmap(self,ax,**kwargs):
         
         #import kwargs
-        keys = ["smooth","cmap","pad","togglecbar","xlims"]
-        defaults = [True,"RdYlBu_r",0.01,True,"none"]
-        for key,default in zip(keys,defaults):
+        defaults = {"smooth" : True,
+                   "cmap" : "RdYlBu_r",
+                   "pad" : 0.01,
+                   "togglecbar" : True,
+                   "xlims" : "none"}
+        for key,default in zip(defaults.keys(),defaults.values()):
             kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        
-        #error handling
-        for key in kwargs:
-            if key not in keys:
-                raise IllegalArgument(key,"NewFData.heatmap()",legallist=keys)
+        self.hk_errorhandling(kwargs, defaults.keys(), "NewFData.heatmap()")
         
         #prepare data
         xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
@@ -630,6 +630,13 @@ class NewFData:
                     array[i][j] += smallest
                     
         return array
+    
+    
+    def hk_errorhandling(self,kwargs,legallist,funcname):
+        
+        for key in kwargs:
+            if key not in legallist:
+                raise IllegalArgument(key,funcname,legallist)
     
     
     @staticmethod
