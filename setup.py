@@ -1,9 +1,18 @@
 from setuptools import setup, find_packages
 
+with open("README.md","r") as f:
+    long_description = f.read()
+
 setup(
     name = "agg_dim",
     version = 0.1,
+    description="Data import modules for instruments used by AG Grothe",
     packages = find_packages(),
+    long_description = long_description,
+    long_description_content_type = "text/markdown",
+    url = "https://github.com/matrup01/data_import_modules/",
+    author = "Mathaeus Rupprecht, Florian Wieland",
+    license = "MIT",
     licence_files = ("LICENSE"),
     install_requires = ["branca>=0.7.2",
                         "certifi>=2024.8.30",
@@ -29,5 +38,6 @@ setup(
                         "six>=1.16.0",
                         "urllib3>=2.0.7",
                         "xyzservices>=2022.9.0",
-                        ]
+                        ],
+    python_requires=">=3.11.7"
     )

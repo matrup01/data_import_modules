@@ -14,7 +14,7 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
 from matplotlib.colors import LogNorm
-from ErrorHandler import IllegalValue,NotPlottable,IllegalArgument
+from .ErrorHandler import IllegalValue,NotPlottable,IllegalArgument
 
 class WIBS:
     

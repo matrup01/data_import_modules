@@ -1,6 +1,12 @@
 Metadata-Version: 2.1
 Name: agg-dim
 Version: 0.1
+Summary: Data import modules for instruments used by AG Grothe
+Home-page: https://github.com/matrup01/data_import_modules/
+Author: Mathaeus Rupprecht, Florian Wieland
+License: MIT
+Requires-Python: >=3.11.7
+Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: branca>=0.7.2
 Requires-Dist: certifi>=2024.8.30
@@ -26,3 +32,24 @@ Requires-Dist: requests>=2.31.0
 Requires-Dist: six>=1.16.0
 Requires-Dist: urllib3>=2.0.7
 Requires-Dist: xyzservices>=2022.9.0
+
+# Welcome to the data analysis modules of AG Grothe
+
+## Contents
+
+This repo contains modules with python importable classes that can be used for data analysis of different instruments. Further documentation is available in /docu/docu.md
+
+Supported instruments:
+- POPS
+- FlyingFlo
+- WIBS
+- SEN55
+- CCS811
+
+## How to contribute
+
+If you are from AG Grothe you are welcome to add/improve on modules and commit into this repo. Please just keep the following things in mind:
+
+- Please add documentation of your changes in both docu.md and change.log in a consistent way, to make it easier for others to make use of your improvements!
+- This repo only contains general purpose import classes for different instruments. Please dont add code for data analysis of a specific project!
+- Please add your changes to dev or create a new branch. Changes will be merged into main for new releases.

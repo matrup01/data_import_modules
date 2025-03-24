@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as md
 from matplotlib.colors import LogNorm
 from copy import copy
-from ErrorHandler import IllegalArgument,SensorNotMounted
+from .ErrorHandler import IllegalArgument,SensorNotMounted
 
 class Pops:
     

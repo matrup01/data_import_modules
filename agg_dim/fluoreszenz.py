@@ -5,7 +5,7 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
 from matplotlib.colors import LogNorm
-from ErrorHandler import IllegalArgument, IllegalFileFormat
+from .ErrorHandler import IllegalArgument, IllegalFileFormat
 import pickle
 from numba import njit, prange, float64
 
