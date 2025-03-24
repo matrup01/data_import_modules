@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-with open("README.md","r") as f:
+with open("docu/pypi_descr.md","r") as f:
     long_description = f.read()
 
 setup(
@@ -12,8 +12,9 @@ setup(
     long_description_content_type = "text/markdown",
     url = "https://github.com/matrup01/data_import_modules/",
     author = "Mathaeus Rupprecht, Florian Wieland",
-    license = "MIT",
-    licence_files = ("LICENSE"),
+    classifiers = ["License :: OSI Approved :: MIT License",
+                   "Operating System :: OS Independent",
+                   "Programming Language :: Python"],
     install_requires = ["branca>=0.7.2",
                         "certifi>=2024.8.30",
                         "charset-normalizer>=2.0.4",
@@ -39,5 +40,6 @@ setup(
                         "urllib3>=2.0.7",
                         "xyzservices>=2022.9.0",
                         ],
+    extras_require={"dev" : ["twine>=6.1.0"]},
     python_requires=">=3.11.7"
     )

@@ -11,6 +11,22 @@ Supported instruments:
 - SEN55
 - CCS811
 
+## How to use
+
+# Automatic installation
+
+Enter the following command in your console:
+```
+pip install -i https://test.pypi.org/simple/ agg-dim
+```
+
+# Manual installation
+
+Download the .whl-file from the release folder and enter the following in your console:
+```
+pip install yourlocalpath/yourlocalfilename.whl
+```
+
 ## How to contribute
 
 If you are from AG Grothe you are welcome to add/improve on modules and commit into this repo. Please just keep the following things in mind:
