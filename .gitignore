@@ -1,16 +1,15 @@
 *
 
-!*.py
+!.py
+!.md
+!.txt
 !.gz
 !.whl
-!readme.md
 !docu
 !change.log
-!docu.md
 !LICENSE
 !dist
 !agg_dim
 !agg_dim.egg-info
-!*.txt
 !PKG-INFO
 !.gitignore

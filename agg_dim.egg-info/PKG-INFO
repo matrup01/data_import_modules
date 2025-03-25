@@ -3,7 +3,8 @@ Name: agg-dim
 Version: 0.1
 Summary: Data import modules for instruments used by AG Grothe
 Home-page: https://github.com/matrup01/data_import_modules/
-Author: Mathaeus Rupprecht, Florian Wieland
+Author: Matthäus Rupprecht, Florian Wieland
+Maintainer: Matthäus Rupprecht
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
 Classifier: Programming Language :: Python
