@@ -14,7 +14,7 @@
 	timecorr (int,optional) ... Takes an int and corrects popstime by it, default-23
 	relobj(Pops,optional) ... Takes a Pops object and displays all data as relative to the mean of it (see 1.22)
 	deviate(bool,optional) ... decides if values should be expressed as relatives to mean, default-False
-	layout (dict,optional) ... decides which columns from the csv should be taken as input, default-desktopmode (see Lookuptable below)
+	layout (dict or str,optional) ... decides which columns from the csv should be taken as input. You can use one of the provided ones (see lookuptable) by entering a str or use a custom one by entering a dict, default - "FlyingFlo2.0"
         Layout-Lookuptable:
             desktopmode ... {"bins" : [pbin for pbin in range(33,49)],
                             "ydata" : "NULL",
@@ -28,26 +28,26 @@
                                 "popstime" : 23,
                                 "t" : 1,
                                 "flow" : 38}
-            FlyingFlo2.0 (Vanessa) ... {"bins" : [pbin for pbin in range(36,52)],
-                                        "ydata" : "NULL",
-                                        "ydata2" : [6,21,12],
-                                        "popstime" : 3,
-                                        "t" : 1,
-                                        "flow" : 16}
+            FlyingFlo2.0  ... {"bins" : [pbin for pbin in range(36,52)],
+                                "ydata" : "NULL",
+                                "ydata2" : [6,21,12],
+                                "popstime" : 3,
+                                "t" : 1,
+                                "flow" : 16}
 
-1.4   Pops.exportbg()
+1.1.1   Pops.exportbg()
 
 	treats the data from the Pops-file as bg and returns the bg in the format [[ch0-ch15],total]
 	can be used, however the method to import a bgobj (see 1.1) is better
 
-1.5   Pops.importbg(bg)
+1.1.2   Pops.importbg(bg)
 
 	uses data in the format [[ch0-ch15],total] and corrects the Pops-objects data by it
 	just use the method to import a bgobj, trust me it's better (see 1.1)
 
 	bg (nested list of floats) ... Takes a list containing the data for bg-correction 
 
-1.6   Pops.quickplot(y)
+1.1.3   Pops.quickplot(y)
 
 	draws a plot y vs time
 
@@ -56,7 +56,7 @@
 	startcrop (int, optional) ... Takes an int and crops the beginning of the plot by its amount seconds
 	endcrop (int, optional) ... Takes an int and crops the end of the plot by its amount seconds
 
-1.7   Pops.plot(ax,y)
+1.1.4   Pops.plot(ax,y)
 
 	draws a plot y vs time on an existing matplotlib-axis
 
@@ -73,12 +73,13 @@
 	printstats (bool, optional) ... takes a boolean to decide if mean, std and var of the plot should be printed to the console, default-False
 	secondary (bool, optional) ... determines which y-axis should be colored (False-left axis/True-right axis), default-False
 	plotlabel (str, optional) ... changes label of the plot (used for legend) into the given string. If none is given, it uses one fitting the given y
+	usepopstime (bool, optional) ... if True, popstime is used rather than raspi-time
 
-1.8   Pops.quickheatmap()
+1.1.5   Pops.quickheatmap()
 
 	draws a dndlogdp-heatmap over time 
 
-1.9   Pops.heatmap(ax)
+1.1.6   Pops.heatmap(ax)
 
 	draws a dndlogdp-heatmap over time on an existing matplotlib-axis
 	
@@ -90,22 +91,22 @@
 	togglecbar (bool, optional) ... takes a bool to determine if the cbar should be drawn, default-True
 	pad (float, optional) ... takes a float and moves the cbar further away from the heatmap the higher the pad is, default-0
 	
-1.10  Pops.dndlogdp(ax)
+1.1.7  Pops.dndlogdp(ax)
 
 	draws a barplot of dndlogdp-distribution on an existing matplotlib-axis
 
 	ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
 
-1.11  Pops.quickdndlogdp()
+1.1.8  Pops.quickdndlogdp()
 
 	draws a barplot of dndlogdp-distribution
 
-1.12  Pops.cumulativeparticles()
+1.1.9  Pops.cumulativeparticles()
 
 	prints and returns the sum of the means of all bins
 	no real usecase, was used before "total"-channel was implemented
 
-1.13  Pops.crop(startcrop,endcrop)
+1.1.10  Pops.crop(startcrop,endcrop)
 
 	Shouldn't be used any more, use start and end in init (see 1.1)
 	crops the data by startcrop seconds at the start and endrop seconds at the end
@@ -113,49 +114,49 @@
 	startcrop (int) ... Takes an int and crops the beginning of the plot by its amount seconds
 	endcrop (int) ... Takes an int and crops the end of the plot by its amount seconds
 
-1.14  Pops.stats(y)
+1.1.11  Pops.stats(y)
 
 	prints mean, std and var of the given data to the console
 
 	y (str) ... takes a string to determine which y should be plotted (for accepted strings see 1.16)
 
-1.15  Pops.returnstats(y)
+1.1.12  Pops.returnstats(y)
 
 	return mean, std and var of the given data in the format [mean,std,var]
 
 	y (str) ... takes a string to determine which y should be plotted (for accepted strings see 1.16)
 	
-1.16  Pops.append(obj)
+1.1.13  Pops.append(obj)
 	
 	takes another Pops-Object and appends its data to the first one to create one object that contains all data 
 	
 	obj (Pops-obj) ... takes a Pops object whichs data should be appended
 	
-1.17  Pops.add(obj)	
+1.1.14  Pops.add(obj)	
 	
 	takes another Pops-Object and returns a new Pops-Object containing data of both objects without changing them 
 	
 	obj (Pops-obj) ... takes a Pops object whichs data should be appended
 	
-1.18  Pops.average()
+1.1.15  Pops.average()
 	
 	averages all the data minutewise
 
-1.19  Pops.returndata(y)
+1.1.16  Pops.returndata(y)
 
 	returns a list of the data y
 	
-1.20  Pops.relativevals(bgobj)
+1.1.17  Pops.relativevals(bgobj)
 
 	changes all data to relative to the mean of the bgobj
 	
 	bgobj (Pops-obj) ... takes a Pops object to whichs mean data should be relative to
 	
-1.21  Pops.deviatefrommean()
+1.1.18  Pops.deviatefrommean()
 
 	changes all values to be expressed relative to the mean
 	
-1.22  Pops.newheatmap(ax)
+1.1.19  Pops.newheatmap(ax)
 
 	creates a heatmap with consistant y-increments on an existing axis
 	
@@ -327,7 +328,7 @@
     xlims (list of str) ... takes 2 strings in "H:M:S"-format and uses them as xlims
     
 
-3.    ccs811.py
+3.    lowcostsensors.py
 
 
 3.1   CCS811(file)
@@ -341,7 +342,7 @@
 	title (str, optional) ... takes a str and uses it as a title for quickplots
 	deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False
 
-3.2   CCS811.plot(ax,y)
+3.1.1   CCS811.plot(ax,y)
 
 	draws a plot of tvoc vs time or co2 vs time on an existing matplotlib-axis
 
@@ -351,66 +352,29 @@
 	color (str, optional) ... changes the color of the plot, default-"tab:brown"
 	secondary (bool, oprional) ... determines which y-axis should be colored (False-left axis/True-right axis), default-False
 	
-3.3   CCS811.quickplot()
+3.1.2   CCS811.quickplot()
 	
 	draws a plot of tvoc vs time
 	
-3.4   CCS811.findplot(y)
+3.1.3   CCS811.findplot(y)
 	
 	matches the given str with the correct data and returns it
 	
 	y (str) ... plottype (legal strings: 'tvoc','co2')
 	
-3.5   CCS811.average()
+3.1.4   CCS811.average()
 	
 	averages all the data minutewise
 
-3.6   CCS811.returndata(y)
+3.1.5   CCS811.returndata(y)
 
 	returns a list of the data y
 	
-3.7   CCS811.deviatefrommean()
+3.1.6   CCS811.deviatefrommean()
 
 	changes all values to be expressed relative to the mean
-
-
-4.    drone.py
-
-
-4.1   Dronedata(file)
-
-	creates a Dronedata-object
-
-	file (str) ... takes a drone-produced csv-file
-
-4.2   Dronedata.plot(ax)
-
-	draws a plot of data vs time on an existing matplotlib-axis
-
-	ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
 	
-	plot (str) ... decides which data should be drawn (height,lat,long,ws), default - height
-	color (str, optional) ... changes the color of the plot, default-"tab:purple"
-	secondary (bool, optional) ... determines which y-axis should be colored (False-left axis/True-right axis), default-False
-	
-4.3   Dronedata.flightmap()
-	
-	opens your flight in openstreetmap in the browser with colors indicating height
-	
-	zoomstart (int, optional) ... changes the zoomlevel of the map (can be further changed manually once the map is opened), default-21 
-	colors (list of strings, optional) ... changes the colors for the height colormap, default-("brown","blue","white")
-	
-4.4   Dronedata.append()	
-	
-	takes another Dronedata-Object and appends its data to the first one to create one object that contains all data
-	
-	obj (Dronedata-obj) ... takes a Dronedata-Object whichs data should be appended
-
-
-5.    sen55.py
-
-
-5.1   SEN55(file)
+3.2   SEN55(file)
 
 	creates a SEN55-object
 
@@ -421,7 +385,7 @@
 	title (str, optional) ... takes a str and uses it as a title for quickplots
 	deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False
 
-5.2   SEN55.plot(ax,y)
+3.2.1   SEN55.plot(ax,y)
 
 	draws a plot of tvoc vs time or co2 vs time on an existing matplotlib-axis
 
@@ -431,27 +395,100 @@
 	color (str, optional) ... changes the color of the plot, default-"tab:red"
 	secondary (bool, optional) ... determines which y-axis should be colored (False-left axis/True-right axis), default-False
 	
-5.3   SEN55.quickplot()
+3.2.2   SEN55.quickplot()
 	
 	draws a plot of pm25 vs time
 	
-5.4   SEN55.findplot(y)
+3.2.3   SEN55.findplot(y)
 	
 	matches the given str with the correct data and returns it
 	
 	y (str) ... plottype (legal strings: 'pm1','pm25','pm4','pm10','temp','hum')
 	
-5.5   SEN55.average()
+3.2.4   SEN55.average()
 	
 	averages all the data minutewise
 
-5.6   SEN55.returndata(y)
+3.2.5   SEN55.returndata(y)
 
 	returns a list of the data y
 	
-5.7   SEN55.deviatefrommean()
+3.2.6   SEN55.deviatefrommean()
 
 	changes all values to be expressed relative to the mean
+	
+3.3   FlyingFlo_USB(file, kwargs)
+    
+	creates a FlyingFlo_USB object
+    
+   file (str) ... takes a FlyingFlo_USB-produced csv-file
+   
+   start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp
+   end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp
+   title (str, optional) ... takes a str and uses it as a title for quickplots
+   deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False 
+   
+   FlyingFlo_USB.title (str) ... Title used for quickplots
+   FlyingFlo_USB.deviated (bool) ... Stores if the data is expressed relative to mean
+   FlyingFlo_USB.t (np.array of dt.datetime) ... Time array
+   FlyingFlo_USB.y (dict of str : [np.array,str,str]) ... Dictionary with Datatypes as keys storing lists in the form of [data-array, full data name, unit]
+   
+3.3.1 FlyingFlo_USB.quickplot(y)
+
+   draws a plot y vs time
+   
+   y (str) ... plottype
+
+3.3.2 FlyingFlo_USB.plot(ax,y,kwargs)
+
+   draws a plot of tvoc vs time or co2 vs time on an existing matplotlib-axis
+
+   ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
+   y (str) ... determines which plot should be drawn (legal strings: 'pm1','pm25','pm4','pm10','temp','hum')
+
+   color (str, optional) ... changes the color of the plot, default-"tab:brown"
+   secondary (bool, optional) ... determines which y-axis should be colored (False-left axis/True-right axis), default-False 
+   
+3.3.3 FlyingFlo_USB.average()  
+
+	averages all the data minutewise
+	
+3.3.4 FlyingFlo_USB.deviatefrommean() 
+
+	changes all values to be expressed relative to the mean
+   
+
+4.    drone.py
+
+
+4.1   Dronedata(file)
+
+	creates a Dronedata-object
+
+	file (str) ... takes a drone-produced csv-file
+
+4.1.1   Dronedata.plot(ax)
+
+	draws a plot of data vs time on an existing matplotlib-axis
+
+	ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
+	
+	plot (str) ... decides which data should be drawn (height,lat,long,ws), default - height
+	color (str, optional) ... changes the color of the plot, default-"tab:purple"
+	secondary (bool, optional) ... determines which y-axis should be colored (False-left axis/True-right axis), default-False
+	
+4.1.2   Dronedata.flightmap()
+	
+	opens your flight in openstreetmap in the browser with colors indicating height
+	
+	zoomstart (int, optional) ... changes the zoomlevel of the map (can be further changed manually once the map is opened), default-21 
+	colors (list of strings, optional) ... changes the colors for the height colormap, default-("brown","blue","white")
+	
+4.1.3   Dronedata.append()	
+	
+	takes another Dronedata-Object and appends its data to the first one to create one object that contains all data
+	
+	obj (Dronedata-obj) ... takes a Dronedata-Object whichs data should be appended
 	
 	
 6.    wibs.py
@@ -475,19 +512,19 @@
     wintertime (bool, optional) ... if True 3600s are taken from wibstime, default-True
     channels (list of str, optional) ... takes a list of strings to decide which channels should be loaded (loadfl,loadfl2 and loadfl3 need to be true), eg.: channels=["a","ac","abc"]
     
-6.2   WIBS.quickplot(y)
+6.1.1   WIBS.quickplot(y)
 
     draws a plot of y vs time
     
     y (str) ... decides which variable y should be plotted, legal strings depend on loaded data
     
-6.3   WIBS.quickheatmap(y)
+6.1.2   WIBS.quickheatmap(y)
 
     draws a heatmap of y1
     
     y (str) ... decides which variable y should be plotted, legal strings depend on loaded data
     
-6.4   WIBS.heatmap(ax,y,**kwargs)
+6.1.3   WIBS.heatmap(ax,y,**kwargs)
 
     draws a heatmap on an existing mpl-axis
     
@@ -500,7 +537,7 @@
     togglecbar (bool) ... toggles colorbar, default-True
     xlims (list of str) ... takes 2 strings in "H:M:S"-format and uses them as xlims
     
-6.5 WIBS.plot(ax,y,**kwargs)
+6.1.4 WIBS.plot(ax,y,**kwargs)
 
     draws a plot of y on an existing mpl-axis
     

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as md
 from matplotlib.colors import LogNorm
 from copy import copy
-from .ErrorHandler import IllegalArgument,SensorNotMounted
+from .ErrorHandler import IllegalArgument,SensorNotMounted,UnknownLayoutError
 
 class Pops:
     
@@ -31,15 +31,47 @@ class Pops:
                     "relobj" : "none",
                     "deviate" : False,
                     "wintertime" : False,
-                    "layout" : {"bins" : [pbin for pbin in range(33,49)],"ydata" : "NULL","ydata2" : [5,20,11],"popstime" : 1,"t" : -1,"flow" : 15}}
+                    "layout" : "FlyingFlo2.0"}
         for key,value in zip(defaults.keys(),defaults.values()):
             self.hk_kwargs(kwargs, key, value)
         self.hk_errorhandling(kwargs, defaults.keys(), "Pops")
+        
+        #fix layout
+        if type(self.layout) == str:
+            match self.layout:
+                case "desktopmode":
+                    self.layout = {"bins" : [pbin for pbin in range(33,49)],
+                                   "ydata" : "NULL",
+                                   "ydata2" : [5,20,11],
+                                   "popstime" : 1,
+                                   "t" : -1,
+                                   "flow" : 15}
+                case "box_pallnsdorfer":
+                    self.layout = {"bins" : [pbin for pbin in range(56,72)],
+                                   "ydata" : [2,3,11,10,4,5,6,7,8,9,12,13,14,15],
+                                   "ydata2" : [28,43,34],
+                                   "popstime" : 23,
+                                   "t" : 1,
+                                   "flow" : 38}
+                case "FlyingFlo2.0":
+                    self.layout = {"bins" : [pbin for pbin in range(36,52)],
+                                   "ydata" : "NULL",
+                                   "ydata2" : [6,21,12],
+                                   "popstime" : 3,
+                                   "t" : 1,
+                                   "flow" : 16}
+                case _:
+                    raise UnknownLayoutError(self.layout, ["desktopmode","box_pallnsdorfer","FlyingFlo2.0"], "POPS")
         
         
         #reads data from csv to list
         data = csv.reader(open(file),delimiter=",")
         data = list(data)
+        newdata = []
+        for dat in data:
+            if dat[0] != "Raspi-Date":
+                newdata.append(dat)
+        data = newdata
         
         #deletes last row if it hasnt been written completely
         if len(data[0]) > len(data[-1]):
@@ -163,7 +195,7 @@ class Pops:
         plt.show()
         
         
-    def plot(self,ax,y,**kwargs):
+    def plot(self,ax,y,**kwargs): #add usepopstime kwarg
         
         #kwargs
         defaults = {"startcrop" : 0,
@@ -175,13 +207,16 @@ class Pops:
                     "togglexticks" : True,
                     "printstats" : False,
                     "secondary" : False,
-                    "plotlabel" : "none"}
+                    "plotlabel" : "none",
+                    "usepopstime" : False}
         for key,default in zip(defaults.keys(),defaults.values()):
             kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
         self.hk_errorhandling(kwargs, defaults.keys(), "Pops.plot()")
         
         #find plotdata
         plotx,ploty,label,ylabel = self.hk_findplottype(y)
+        if kwargs["usepopstime"]:
+            plotx = self.popstime
         plotx = [plotx[i] for i in range(kwargs["startcrop"],len(plotx)-kwargs["endcrop"])]
         ploty = [ploty[i] for i in range(kwargs["startcrop"],len(ploty)-kwargs["endcrop"])]
         
@@ -586,7 +621,7 @@ class Pops:
         
         for i in range(len(self.plottypes2)):
             if y == self.plottypes2[i][0]:
-                plotx = self.popstime
+                plotx = self.t
                 ploty = self.ydata2[i]
                 label = self.plottypes2[i][1]
                 ylabel = self.plottypes2[i][2] if not self.relative else "% of background"
@@ -597,7 +632,7 @@ class Pops:
             
         for i in range(16):
             if "".join([char for char in y if char.isdigit()]) == str(i):
-                plotx = self.popstime
+                plotx = self.t
                 ploty = self.pops_bins[i]
                 label = "b" + str(i)
                 ylabel = r"Counts/$cm^3$" if not self.relative else "% of background"
