@@ -1,3 +1,17 @@
+######################### MR 28.03.2025 #########################
+#                  "added FlyingFlo_USB class"                  #
+#                                                               #
+# - added FlyingFlo_USB class to lowcostsensors.py              #
+# - changeed Pops to automatically clean extra headers          #
+# - changed hk_findplottype in Pops to always use self.t        #
+# - added the kwarg usepopstime to Pops.plot()                  #
+# - allowed str as input for the layout kwarg in Pops.__init__  #
+# - changed default for layout kwarg in Pops.__init__           #
+#   to "FlyingFlo2.0"                                           #
+# - Fixed docu.md numbering                                     #
+#################################################################
+
+
 ######################### MR 23.03.2025##########################
 #                 "further despaghettification"                 #
 #                                                               #

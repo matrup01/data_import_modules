@@ -5,17 +5,20 @@ with open("docu/pypi_descr.md","r") as f:
 
 setup(
     name = "agg_dim",
-    version = 0.1,
+    version = "0.1.1",
     description="Data import modules for instruments used by AG Grothe",
     packages = find_packages(),
     long_description = long_description,
     long_description_content_type = "text/markdown",
     url = "https://github.com/matrup01/data_import_modules/",
-    maintainer = "Matthäus Rupprecht",
-    author = "Matthäus Rupprecht, Florian Wieland",
     classifiers = ["License :: OSI Approved :: MIT License",
                    "Operating System :: OS Independent",
                    "Programming Language :: Python"],
+    author = "Matthäus Rupprecht, Florian Wieland",
+    maintainer = "Matthäus Rupprecht",
+    maintainer_email = "e12102474@student.tuwien.ac.at",
+    license = "MIT",
+    licence_files = ("LICENSE"),
     install_requires = ["branca>=0.7.2",
                         "certifi>=2024.8.30",
                         "charset-normalizer>=2.0.4",
@@ -43,4 +46,5 @@ setup(
                         ],
     extras_require={"dev" : ["twine>=6.1.0"]},
     python_requires=">=3.11.7"
+    keywords = ["POPS","WIBS","SEN55","CCS811"]
     )

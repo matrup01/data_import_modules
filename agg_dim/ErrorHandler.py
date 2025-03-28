@@ -50,3 +50,12 @@ class SensorNotMounted(Exception):
         
         self.message = illegalvar + " cant be used here, since the corresponding sensor is not mounted onto " + instrument + " in the given layout"
         super().__init__(self.message)
+        
+
+class UnknownLayoutError(Exception):
+    
+    def __init__(self,illegal,legallist,instrument):
+        
+        legal = ", ".join(legallist)
+        self.message = f"{illegal} is no legal layout for {instrument}. You can use a custom layout or use one of the known layouts: {legal}"
+        super().__init__(self.message)
