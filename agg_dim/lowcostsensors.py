@@ -11,7 +11,7 @@ import datetime as dt
 import csv
 import matplotlib.pyplot as plt
 import math
-from .ErrorHandler import IllegalArgument
+from ErrorHandler import IllegalArgument
 
 
 class CCS811:
@@ -370,6 +370,7 @@ class FlyingFlo_USB:
         #init
         self.title = title
         self.deviated = False
+        self.averaged = False
         
         
         #read data from csv to list
@@ -402,7 +403,7 @@ class FlyingFlo_USB:
         if start != "none":
             indices = []
             for i in range(len(self.t)):
-                if dt.datetime.strptime(start,"%H:%M:%S.%f") <= self.t[i]:
+                if dt.datetime.strptime(start,"%H:%M:%S") <= self.t[i]:
                     indices.append(i)
             start_i = indices[0]
         else: start_i = 0
@@ -410,7 +411,7 @@ class FlyingFlo_USB:
         if end != "none":
             indices = []
             for i in range(len(self.t)):
-                if dt.datetime.strptime(end,"%H:%M:%S.%f") <= self.t[i]:
+                if dt.datetime.strptime(end,"%H:%M:%S") <= self.t[i]:
                     indices.append(i)
             end_i = indices[0]
         else: end_i = len(self.t)-1
@@ -553,6 +554,7 @@ class FlyingFlo_USB:
             elif minute != timestamp.minute:
                 minute = None
         self.t = np.array(new_array)
+        self.averaged = True
             
     def deviatefrommean(self):
         """
@@ -576,6 +578,33 @@ class FlyingFlo_USB:
             self.y[key][0] = element[0]
                 
         self.deviated = True
+        
+    def returndata(self):
+        
+        op_t = []
+        new_t = self.t[0].replace(microsecond=0)
+        while new_t < self.t[-1]:
+            op_t.append(new_t)
+            new_t += dt.timedelta(seconds=1)
+        op_t = np.array(op_t)
+        
+        mask = []
+        compare_t = [i.replace(microsecond=0) for i in self.t]
+        for i in op_t:
+            if i in compare_t:
+                mask.append(compare_t.index(i))
+            else:
+                mask.append(np.nan)
+        op = {"t" : op_t}
+        op_details = {}
+        for key,val in self.y.items():
+            y_op = np.array([val[0][i] if not np.isnan(i) else np.nan for i in mask])
+            op[key] = y_op
+            op_details[key] = [val[1],val[2]]
+            
+        return op,op_details
+        
+        
         
     #Housekeeping funcs
     

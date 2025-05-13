@@ -5,7 +5,7 @@ with open("docu/pypi_descr.md","r") as f:
 
 setup(
     name = "agg_dim",
-    version = "0.1.1",
+    version = "0.1.2",
     description="Data import modules for instruments used by AG Grothe",
     packages = find_packages(),
     long_description = long_description,
@@ -45,6 +45,6 @@ setup(
                         "xyzservices>=2022.9.0",
                         ],
     extras_require={"dev" : ["twine>=6.1.0"]},
-    python_requires=">=3.11.7"
+    python_requires=">=3.11.7",
     keywords = ["POPS","WIBS","SEN55","CCS811"]
     )

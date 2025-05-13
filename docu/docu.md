@@ -142,9 +142,11 @@
 	
 	averages all the data minutewise
 
-1.1.16  Pops.returndata(y)
+1.1.16  Pops.returndata()
 
-	returns a list of the data y
+	up to v0.1.1: takes an argument y and returns a list of the data y
+	
+	v0.1.2 or newer: returns a dict of all data
 	
 1.1.17  Pops.relativevals(bgobj)
 
@@ -327,6 +329,10 @@
     togglecbar (bool) ... toggles colorbar, default-True
     xlims (list of str) ... takes 2 strings in "H:M:S"-format and uses them as xlims
     
+2.2.7 NewFData.returndata()
+
+    returns a dict of all data
+    
 
 3.    lowcostsensors.py
 
@@ -456,6 +462,10 @@
 3.3.4 FlyingFlo_USB.deviatefrommean() 
 
 	changes all values to be expressed relative to the mean
+	
+3.3.5 FlyingFlo_USB.returndata()
+
+   returns a dict of all data
    
 
 4.    drone.py
@@ -490,6 +500,79 @@
 	
 	obj (Dronedata-obj) ... takes a Dronedata-Object whichs data should be appended
 	
+4.2   DroneWrapper(file,kwargs)
+
+   creates a DroneWrapper object
+   
+   file (str) ... takes a Drone produced csv file
+   
+   dronetype (str, optional) ... specifies which drone was used to read csv correctly (curreently implemented: "BladeScapes","Own") - default: "BladeScapes"
+   start (str, optional) ... if a str of the form "HH:MM:SS" is given, all data acquired before this timestamp wont be used
+   end (str, optional) ... if a str of the form "HH:MM:SS" ist given, all data acquired after this timestamp wont be used
+
+4.2.1 DroneWrapper.wrap(name,obj,kwargs)
+
+   adds an instance of a data class (Pops,NewFData or FlyingFlo_USB) to the DroneWrapper
+
+   name (str) ... name that is used to find the data from the wrapped object   
+   obj (Pops|NewFData|FlyingFlo_USB) ... obj that should be wrapped
+
+4.2.2 DroneWrapper.returndata(kwargs)
+
+   returns a dict of the Drone-produced data or all the Drone data and all the wrapped data if nested=True
+
+   nested (bool, optional) ... if nested, the wrapped data of other objects is also returned
+
+4.2.3 DroneWrapper.flightmap(kwargs)
+
+   plots the height AGL of the drone over an OSM Map in your browser
+
+   zoomstart (int, optional) ... decides on which zoomlevel the map should be rendered (can be changed while using the map by turning the mousewheel) - default: 21
+   colors (list of str, optional) ... changes the color used for the colormap - default: ["brown","white","blue"]
+
+4.2.5 DroneWrapper.advancedflightmap(y,kwargs)
+
+   plots data of any wrapped obj over an OSM Map in your browser
+
+   y (str) ... decides which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of)
+
+   zoomstart (int, optional) ... decides on which zoomlevel the map should be rendered (can be changed while using the map by turning the mousewheel) - default: 21
+   colors (list of str, optional, optional) ... changes the color used for the colormap - default: ["brown","white","blue"]
+   target_height (int|float, optional) ... if a target height is given, only data in the height-range of target_height+-height_deviation is plotted
+   height_deviation (int|float) ... specifies the range for the target height (only usefull if a target_height is given) - default: 1
+   bettermap (bool, optional) ... if True a grid of the values is calculated and plotted instead of single datapoints
+   bettermap_resolution (int, optional) ... only usefull if bettermap=True. A grid of bettermap_resolution x bettermap_resolution will be used to plot the data - default: 15
+
+4.2.6 DroneWrapper.plot(ax,y,**kwargs)
+
+   plots Drone-produced data over time on an mpl-axis
+
+   ax (mpl-axis) ... takes a mpl-axis on which the data will be plotted
+   y (str) ... decides which data will be plotted (legal: "height", "long", "lat")
+
+   quakes (list of str, optional) ... takes a list of "HH:MM:SS"-strings and draws vertical lines at these times
+   quakeslabel (str, optional) ... a label that is used for the quakes if a legend is drawn
+   quakecolor (str, optional) ... decides the color of the quake-lines - default: "tab:purple"
+   color (str, optional) ... decides the color of the plot - default: "tab:green"
+   plotlabel (str, optional) ... a label that is used for the plot if a legend is drawn
+   ylabel (str, optional) ... a label that is used for the y-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given y
+   secondary (bool, optional) ... if True the plot will be drawn on the right y-axis - default: False
+   masknan (bool, optional) ... if True NaN values are masked out to draw a uninterupted plot - default: True
+
+4.2.7 DroneWrapper.advancedplot(ax,x,y,kwargs)
+
+   ax (mpl-axis) ... takes a mpl-axis on which the data will be plotted
+   y (str) ... decides which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of)
+   x (str) ... decides over which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of; if the plot should be over time use "name_t")
+
+   color (str, optional) ... decides the color of the plot - default: "tab:green"
+   plotlabel (str, optional) ... a label that is used for the plot if a legend is drawn
+   xlabel (str, optional) ... a label that is used for the x-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given x
+   ylabel (str, optional) ... a label that is used for the y-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given y
+   scatter (bool, optional) ... if True the data is plotted as a scatterplot - default: False
+   secondary (bool, optional) ... if True the plot will be drawn on the right y-axis - default: False
+   masknan (bool, optional) ... if True NaN values are masked out to draw a uninterupted plot - default: True
+
 	
 6.    wibs.py
 

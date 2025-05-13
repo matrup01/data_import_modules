@@ -1,3 +1,14 @@
+######################### MR 13.05.2025 #########################
+#                     "added DroneWrapper"                      #
+#                                                               #
+# - added Dronewrapper class to drone.py                        #
+# - changed pops_pm25 to pm25 and pops_underpm25 to underpm25   #
+#   in Pops class                                               #
+# - changed Pops.returndata() to be readable by DroneWrapper    #
+# - added NewFData.returndata()                                 #
+# - added FlyingFlo_USB.returndata()                            #
+#################################################################
+
 ######################### MR 28.03.2025 #########################
 #                  "added FlyingFlo_USB class"                  #
 #                                                               #

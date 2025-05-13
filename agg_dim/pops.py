@@ -20,7 +20,7 @@ class Pops:
         self.deviated = False
         self.d_categories = [element * 1000 for element in [0.115,0.125,0.135,0.150,0.165,0.185,0.210,0.250,0.350,0.475,0.575,0.855,1.220,1.53,1.99,2.585,3.37]]
         self.plottypes = [["temp_bm680","temperature (bm680)","°C"],["hum_bm680","rel. humidity (bm680)","%"],["temp_sen55","temperature","°C"],["hum_sen55","rel. humidity","%"],["press","ambient pressure","hPa"],["gas","Gaswiderstand",r"$\Ohm$"],["pm1","PM1.0",r"$\mu$g/$m^3$"],["pm25","PM2.5",r"$\mu$g/$m^3$"],["pm4","PM4.0",r"$\mu$g/$m^3$"],["pm10","PM10.0",r"$\mu$g/$m^3$"],["voc","VOC-Index",""],["nox",r"$NO_X$-Index",""],["co2",r"$CO_2$","ppm"],["tvoc","TVOC","ppb"]]
-        self.plottypes2 = [["total","part. conc." , r"Counts/$cm^3$"],["popstemp","temperature inside POPS-box","°C"],["boardtemp","boardtemp","°C"],["pops_pm25","PM2.5 from POPS",r"Counts/$cm^3$"],["pops_underpm25","particles smaller than 350 nm",r"Counts/$cm^3$"]]
+        self.plottypes2 = [["total","part. conc." , r"Counts/$cm^3$"],["popstemp","temperature inside POPS-box","°C"],["boardtemp","boardtemp","°C"],["pm25","PM2.5 from POPS",r"Counts/$cm^3$"],["underpm25","particles smaller than 350 nm",r"Counts/$cm^3$"]]
         
         #kwargs
         defaults = {"title" : "no title",
@@ -414,13 +414,6 @@ class Pops:
         return mean,std,var
     
     
-    def returndata(self,y):
-        
-        placeholder,data,ph2,ph3 = self.hk_findplottype(y)
-        
-        return data
-    
-    
     def append(self,obj):
         
         self.popstime += obj.popstime
@@ -528,9 +521,6 @@ class Pops:
                 self.pops_bins[j] = copy(newdata)
             
         self.relative = True
-        
-        
-    
     
     
     def average(self):
@@ -576,6 +566,40 @@ class Pops:
         self.ydata = meanydata
         self.ydata2 = meanydata2
         self.pops_bins = meanpopsbins
+        
+        
+    def returndata(self):
+        
+        y = {}
+        op_details = {}
+        for i in range(len(self.plottypes2)):
+            y[self.plottypes2[i][0]] = self.ydata2[i]
+            op_details[self.plottypes2[i][0]] = [self.plottypes2[i][1],self.plottypes2[i][2]]
+        for i in range(16):
+            y[f"b{i}"] = self.pops_bins[i]
+            op_details[f"b{i}"] = [f"Bin {i}",r"Counts/$cm^3$"]
+            
+        op_t = []
+        new_t = self.t[0].replace(microsecond=0)
+        while new_t < self.t[-1]:
+            op_t.append(new_t)
+            new_t += dt.timedelta(seconds=1)
+        op_t = np.array(op_t)
+        
+        mask = []
+        compare_t = [i.replace(microsecond=0) for i in self.t]
+        for i in op_t:
+            if i in compare_t:
+                mask.append(compare_t.index(i))
+            else:
+                mask.append(np.nan)
+                
+        op = {"t" : op_t}
+        for key,val in y.items():
+            y_op = np.array([val[i] if not np.isnan(i) else np.nan for i in mask])
+            op[key] = y_op
+            
+        return op,op_details
         
         
     #housekeeping funcs    

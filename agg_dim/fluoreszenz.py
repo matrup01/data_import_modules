@@ -10,10 +10,6 @@ import pickle
 from numba import njit, prange, float64
 
 
-#jit-compiled housekeeping funcs
-
-
-
 class FData:
     
     """full documentation see https://github.com/matrup01/data_import_modules"""
@@ -255,7 +251,7 @@ class NewFData:
             #import background-data
             bg_filetype = bg_file.split(".")[-1]
             if bg_filetype == "csv":
-                bgdata_all = list(csv.reader(open(bg_file,encoding="ansi"),delimiter=";"))
+                bgdata_all = list(csv.reader(open(bg_file,encoding="ansi"),delimiter=";"))[1:-1]
                 bgdata_time = [bgdata_all[i][1] for i in range(len(bgdata_all))]
                 bgdata = bgdata_all[1:]
                 bg_start_index = 100
@@ -290,7 +286,7 @@ class NewFData:
                 raise IllegalFileFormat(bg_filetype, "csv or .fspec", "bg_file")
             
             #import raw data
-            data = list(csv.reader(open(file,encoding="ansi"),delimiter=";",))[1:]
+            data = list(csv.reader(open(file,encoding="ansi"),delimiter=";",))[1:-1]
             for i in range(len(data)):
                 if len(data[i]) != 19:
                     if len(data[i]) < 19:
@@ -597,7 +593,25 @@ class NewFData:
         ax.yaxis.set_tick_params(which='minor', width=0)
         if kwargs["togglecbar"]:
             plt.colorbar(im,ax=ax,label="Fluorescence Index",pad=kwargs["pad"])
+            
+            
+    def returndata(self):
         
+        op = {}
+        op_details = {}
+        op_t = np.array([t.replace(microsecond=0) for t in self.t])
+        for i,ch in enumerate(self.channels):
+            name = f"ch{i+1}"
+            op[name] = ch
+        op["meanchannel"] = np.mean(self.channels,axis=0)
+        for key,val in op.items():
+            if key[-1] != "l":
+                op_details[key] = [f"Channel {key[2:]}","Fluorescence Index"]
+            else:
+                op_details[key] = ["Mean Channel","Fluorescence Index"]
+        op["t"] = op_t
+        
+        return op,op_details
         
     #housekeeping funcs    
     def hk_kwargs(self,kwargs,key,default):
