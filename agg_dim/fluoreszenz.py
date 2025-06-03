@@ -251,7 +251,12 @@ class NewFData:
             #import background-data
             bg_filetype = bg_file.split(".")[-1]
             if bg_filetype == "csv":
-                bgdata_all = list(csv.reader(open(bg_file,encoding="ansi"),delimiter=";"))[1:-1]
+                with open(bg_file,"r",encoding="ansi") as f:
+                    bgdata_all = list(f)[1:-1]
+                for i in range(len(bgdata_all)):
+                    bgdata_all[i] = bgdata_all[i].split(";")
+                    if len(bgdata_all[i]) < 2:
+                        print(bgdata_all[i])
                 bgdata_time = [bgdata_all[i][1] for i in range(len(bgdata_all))]
                 bgdata = bgdata_all[1:]
                 bg_start_index = 100
@@ -286,8 +291,10 @@ class NewFData:
                 raise IllegalFileFormat(bg_filetype, "csv or .fspec", "bg_file")
             
             #import raw data
-            data = list(csv.reader(open(file,encoding="ansi"),delimiter=";",))[1:-1]
+            with open(file,"r",encoding="ansi") as f:
+                data = list(f)[1:-1]
             for i in range(len(data)):
+                data[i] = data[i].split(";")
                 if len(data[i]) != 19:
                     if len(data[i]) < 19:
                         for j in range(19-len(data[i])):
@@ -295,7 +302,8 @@ class NewFData:
                     elif len(data[i]) > 19:
                         j = len(data[i]) - 19
                         data[i] = data[i][:-j]
-            data = np.array(data).transpose()
+            #data = np.array(data).transpose()
+            data = [list(row) for row in zip(*data)] #transpose without np
             self.rawtime = np.array([dt.datetime.strptime(time,"%H:%M:%S.%f").replace(microsecond=0) for time in data[1]])
             self.rawchannels = data[self.layout[0]:self.layout[1]]
             for i in range(len(self.rawchannels)):
@@ -523,7 +531,7 @@ class NewFData:
         ax.axes.yaxis.label.set_color(kwargs["color"])
         
         
-    def meanplot(self,ax,min_ch=1,max_ch=16,**kwargs):
+    def meanplot(self,ax,min_ch=1,max_ch=15,**kwargs):
         
         #import kwargs
         defaults = {"min_ch" : 1,

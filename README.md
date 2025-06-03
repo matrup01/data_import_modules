@@ -13,14 +13,14 @@ Supported instruments:
 
 ## How to use
 
-# Automatic installation
+### Automatic installation
 
 Enter the following command in your console:
 ```
 pip install -i https://test.pypi.org/simple/ agg-dim
 ```
 
-# Manual installation
+### Manual installation
 
 Download the .whl-file from the release folder and enter the following in your console:
 ```

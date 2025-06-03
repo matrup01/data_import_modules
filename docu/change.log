@@ -1,3 +1,15 @@
+######################### MR 03.06.2025 #########################
+#             "fixed problems with large datasets"              #
+#                                                               #
+# - removed csv module from NewFData, because it has a maximum  #
+#   field size                                                  #
+# - changed default for max_ch to 15 in NewFData.meanplot() for #
+    channel 16 doesnt exist                                     #
+# - removed underscores from temp_bme, hum_bme, temp_sen        #
+#   hum_sen and voc_sen in FlyingFlo_USB to make it             #
+#   readable inside DroneWrapper                                #
+#################################################################
+
 ######################### MR 13.05.2025 #########################
 #                     "added DroneWrapper"                      #
 #                                                               #

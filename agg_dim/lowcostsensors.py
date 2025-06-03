@@ -11,7 +11,7 @@ import datetime as dt
 import csv
 import matplotlib.pyplot as plt
 import math
-from ErrorHandler import IllegalArgument
+from .ErrorHandler import IllegalArgument
 
 
 class CCS811:
@@ -386,15 +386,15 @@ class FlyingFlo_USB:
             "pm25" : [np.array([float(data[i][9]) for i in range(1,len(data)-2)]),"PM2.5","$\mu$g/$m^3$"],
             "pm4" : [np.array([float(data[i][10]) for i in range(1,len(data)-2)]),"PM4","$\mu$g/$m^3$"],
             "pm10" : [np.array([float(data[i][11]) for i in range(1,len(data)-2)]),"PM10","$\mu$g/$m^3$"],
-            "temp_bme" : [np.array([float(data[i][4]) for i in range(1,len(data)-2)]),"temperature","°C"],
-            "hum_bme" : [np.array([float(data[i][6]) for i in range(1,len(data)-2)]),"humidity","%"],
+            "tempbme" : [np.array([float(data[i][4]) for i in range(1,len(data)-2)]),"temperature","°C"],
+            "humbme" : [np.array([float(data[i][6]) for i in range(1,len(data)-2)]),"humidity","%"],
             "gas" : [np.array([float(data[i][5]) for i in range(1,len(data)-2)]),"gas resistance","$\Ohm$"],
             "co2" : [np.array([float(data[i][2]) for i in range(1,len(data)-2)]),r"$CO_2$","ppm"],
             "tvoc" : [np.array([float(data[i][3]) for i in range(1,len(data)-2)]),"TVOC","ppb"],
             "press" : [np.array([float(data[i][7]) for i in range(1,len(data)-2)]),"$ambient pressure","hPa"],
-            "hum_sen" : [np.array([float(data[i][12]) for i in range(1,len(data)-2)]),"humidity","%"],
-            "temp_sen" : [np.array([float(data[i][13]) for i in range(1,len(data)-2)]),"temperature","°C"],
-            "voc_sen" : [np.array([float(data[i][14]) for i in range(1,len(data)-2)]),"VOC-Index","a.u"],
+            "humsen" : [np.array([float(data[i][12]) for i in range(1,len(data)-2)]),"humidity","%"],
+            "tempsen" : [np.array([float(data[i][13]) for i in range(1,len(data)-2)]),"temperature","°C"],
+            "vocsen" : [np.array([float(data[i][14]) for i in range(1,len(data)-2)]),"VOC-Index","a.u"],
             "nox" : [np.array([float(data[i][15]) for i in range(1,len(data)-2)]),r"$NO_X$-Index","a.u."]
             }
         

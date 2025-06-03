@@ -447,10 +447,10 @@
 
 3.3.2 FlyingFlo_USB.plot(ax,y,kwargs)
 
-   draws a plot of tvoc vs time or co2 vs time on an existing matplotlib-axis
+   draws a plot of y time on an existing matplotlib-axis
 
    ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
-   y (str) ... determines which plot should be drawn (legal strings: 'pm1','pm25','pm4','pm10','temp','hum')
+   y (str) ... determines which plot should be drawn (legal strings: 'pm1','pm25','pm4','pm10','tempbme','humbme','gas','co2','tvoc','press','humsen','tempsen','vocsen','nox') (up to v0.1.2.1 some were different: 'temp_bme', 'hum_bme', 'temp_sen', 'hum_sen', 'voc_sen')
 
    color (str, optional) ... changes the color of the plot, default-"tab:brown"
    secondary (bool, optional) ... determines which y-axis should be colored (False-left axis/True-right axis), default-False 
