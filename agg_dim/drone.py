@@ -104,7 +104,41 @@ class Dronedata:
         
 class DroneWrapper:
     
+    """full documentation see https://github.com/matrup01/data_import_modules \n\n
+    
+    Parameters\n
+    ----------\n
+    file (str) ... takes a Drone produced .csv file
+    dronetype (str, optional) ... specifies which drone was used to read csv correctly (currently implemented: "BladeScapes","Own") - default: "BladeScapes"\n
+    start (str, optional) ... if a str of the form "HH:MM:SS" is given, all data acquired before this timestamp wont be used\n
+    end (str, optional) ... if a str of the form "HH:MM:SS" ist given, all data acquired after this timestamp wont be used\n\n
+    
+    Variables\n
+    ---------\n
+    DroneWrapper.data (nested dict) ... contains the data of all data and wrapped data\n
+    DroneWrapper.details (nested dict) ... contains lists of type [name, unit] for each data array in DroneWrapper.data
+    """
+    
     def __init__(self,file,**kwargs):
+        """
+        inits DroneWrapper object
+
+        Parameters
+        ----------
+        file : str
+            takes a Drone produced .csv file.
+        dronetype : str, optional
+            specifies which drone was used to read csv correctly (currently implemented: "BladeScapes","Own"). The default is "BladeScapes".
+        start : str, optional
+            if a str of the form "HH:MM:SS" is given, all data acquired before this timestamp wont be used
+        end : str, optional
+            if a str of the form "HH:MM:SS" is given, all data acquired after this timestamp wont be used
+
+        Returns
+        -------
+        None.
+
+        """
         
         #kwargs
         defaults = {"dronetype" : "BladeScapes",
@@ -181,6 +215,21 @@ class DroneWrapper:
                  
                 
     def wrap(self,name,obj):
+        """
+        adds an instance of a data class (Pops,NewFData or FlyingFlo_USB) to the DroneWrapper
+
+        Parameters
+        ----------
+        name : str
+            name that is used to find the data from the wrapped object (key in DroneWrapper.data and DroneWrapper.details).
+        obj : Pops, NewFDatam or FlyingFlo_USB
+            Object which should  be wrapped.
+
+        Returns
+        -------
+        None.
+
+        """
         
         y,details = obj.returndata()
         
@@ -189,6 +238,22 @@ class DroneWrapper:
         
     
     def returndata(self,nested=False):
+        """
+        
+
+        Parameters
+        ----------
+        nested : bool, optional
+            if nested, the wrapped data of other objects is also returne. The default is False.
+
+        Returns
+        -------
+        data
+            self.data (with or without wrapped data)
+        details
+            self.details (with or without wrapped data).
+
+        """
         
         if nested:
             return self.data,self.details
@@ -197,6 +262,21 @@ class DroneWrapper:
         
         
     def flightmap(self,zoomstart=21,colors=["brown","white","blue"]):
+        """
+        plots the height AGL of the drone over an OSM Map in your browser
+
+        Parameters
+        ----------
+        zoomstart : int, optional
+            decides on which zoomlevel the map should be rendered (can be changed while using the map by turning the mousewheel). The default is 21.
+        colors : list of str, optional
+            changes the color used for the colormap. The default is ["brown","white","blue"].
+
+        Returns
+        -------
+        None.
+
+        """
         
         _lat = self.data["Drone"]["lat"]
         _long = self.data["Drone"]["long"]
@@ -222,6 +302,31 @@ class DroneWrapper:
         
         
     def advancedflightmap(self,y,**kwargs):
+        """
+        plots data of any wrapped obj over an OSM Map in your browser
+
+        Parameters
+        ----------
+        y : str
+            decides which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of).
+        zoomstart : str, optional
+            decides on which zoomlevel the map should be rendered (can be changed while using the map by turning the mousewheel). The default is 21.
+        colors : list of str, optional
+            changes the color used for the colormap. The default is ["purple","blue","yellow","red"].
+        target_height : int|float, optional
+            if a target height is given, only data in the height-range of target_height+-height_deviation is plotted
+        height_deviation : int|float, optional
+            specifies the range for the target height (only usefull if a target_height is given). The default is 1.
+        bettermap : bool, optional
+            if True a grid of the values is calculated and plotted instead of single datapoints. The default is False.
+        bettermap_resolution : int, optional
+            only usefull if bettermap=True. A grid of bettermap_resolution x bettermap_resolution will be used to plot the data. The default is 15.
+
+        Returns
+        -------
+        None.
+
+        """
         
         #import kwargs
         defaults = {"zoomstart" : 21,

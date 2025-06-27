@@ -334,7 +334,7 @@ class FlyingFlo_USB:
     
     file (str) ... takes a FlyingFlo_USB-produced csv-file\n\n
 	
-	start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp\n
+    start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp\n
 	end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp\n
 	title (str, optional) ... takes a str and uses it as a title for quickplots\n
 	deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False\n\n

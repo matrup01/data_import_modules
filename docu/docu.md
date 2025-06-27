@@ -506,7 +506,7 @@
    
    file (str) ... takes a Drone produced csv file
    
-   dronetype (str, optional) ... specifies which drone was used to read csv correctly (curreently implemented: "BladeScapes","Own") - default: "BladeScapes"
+   dronetype (str, optional) ... specifies which drone was used to read csv correctly (currently implemented: "BladeScapes","Own") - default: "BladeScapes"
    start (str, optional) ... if a str of the form "HH:MM:SS" is given, all data acquired before this timestamp wont be used
    end (str, optional) ... if a str of the form "HH:MM:SS" ist given, all data acquired after this timestamp wont be used
 
@@ -539,7 +539,7 @@
    zoomstart (int, optional) ... decides on which zoomlevel the map should be rendered (can be changed while using the map by turning the mousewheel) - default: 21
    colors (list of str, optional, optional) ... changes the color used for the colormap - default: ["brown","white","blue"]
    target_height (int|float, optional) ... if a target height is given, only data in the height-range of target_height+-height_deviation is plotted
-   height_deviation (int|float) ... specifies the range for the target height (only usefull if a target_height is given) - default: 1
+   height_deviation (int|float, optional) ... specifies the range for the target height (only usefull if a target_height is given) - default: 1
    bettermap (bool, optional) ... if True a grid of the values is calculated and plotted instead of single datapoints
    bettermap_resolution (int, optional) ... only usefull if bettermap=True. A grid of bettermap_resolution x bettermap_resolution will be used to plot the data - default: 15
 
