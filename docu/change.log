@@ -1,3 +1,10 @@
+######################### MR 13.08.2025 #########################
+#                                                               #
+# - added .flight datatype for DroneWrapper                     #
+# - added DroneWrapper.save() and DroneWrapper.returnattime()   #
+# - updated documentation (added docstrings)                    #
+#################################################################
+
 ######################### MR 03.06.2025 #########################
 #             "fixed problems with large datasets"              #
 #                                                               #

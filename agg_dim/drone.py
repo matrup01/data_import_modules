@@ -8,6 +8,7 @@ import branca.colormap as cm
 from .ErrorHandler import IllegalArgument, IllegalFileFormat
 import numpy as np
 from numba import njit, prange, float64
+import pickle
 
 class Dronedata:
     
@@ -152,66 +153,72 @@ class DroneWrapper:
         #variables
         self.data = {}
         self.details = {"Drone" : {"height" : ["Height AGL","m AGL"], "long" : ["longitude","eastern longitude"], "lat" : ["latitude","nothern latitude"]}}
+         
+        match file.split(".")[-1]:
+            case "csv":
         
-        if file.split(".")[-1] != "csv":
-            raise IllegalFileFormat(file.split(".")[-1], ".csv", "DroneWrapper arguments")
-          
-        data = csv.reader(open(file),delimiter=",")
-        data = list(data)
-            
-        match self.dronetype.lower():
-            case "own":
-                self.data["Drone"] = {
-                    "t" : np.array([dt.datetime.strptime(data[i][1].replace(",","."),"%I:%M:%S.%f %p").replace(microsecond=0) for i in range(1,len(data))]),
-                    #data: [height,long,lat,ws]
-                    "height" : np.array([float(data[i][6].replace(",",".")) for i in range(1,len(data))]),
-                    "long" : np.array([float(data[i][5].replace(",",".")) for i in range(1,len(data))]),
-                    "lat" : np.array([float(data[i][4].replace(",",".")) for i in range(1,len(data))]),
-                    }
-            case "bladescapes":
-                current_time = data[1][1][:-4]
-                takeoff_alt = float(data[1][12])
-                h_appender, long_appender, lat_appender = [],[],[]
-                t, h, long, lat = [], [], [], []
-                for line in data[1:]:
-                    if line[1][:-4] == current_time:
-                        h_appender.append(float(line[12])-takeoff_alt)
-                        long_appender.append(float(line[11]))
-                        lat_appender.append(float(line[10]))
-                    else:
-                        t.append(dt.datetime.strptime(current_time.replace(".","-"),"%Y-%m-%d %H:%M:%S"))
-                        h.append(np.mean(h_appender))
-                        long.append(np.mean(long_appender))
-                        lat.append(np.mean(lat_appender))
-                        h_appender = [float(line[12])-takeoff_alt]
-                        long_appender = [float(line[11])]
-                        lat_appender = [float(line[10])]
-                        current_time = line[1][:-4]
-                        
-                    self.data["Drone"] = {
-                        "t" : np.array(t),
-                        "height" : np.array(h),
-                        "long" : np.array(long),
-                        "lat" : np.array(lat)
-                        }
+                data = csv.reader(open(file),delimiter=",")
+                data = list(data)
                     
-        #crop
-        if self.start != "*":
-            for i in range(len(self.data["Drone"]["t"])):
-                if dt.datetime.strptime(self.start,"%H:%M:%S").time() <= self.data["Drone"]["t"][i].time():
-                    break
-            start_i = i
-        else: start_i = 0
-        
-        if self.end != "*":
-            for i in range(len(self.data["Drone"]["t"])):
-                if dt.datetime.strptime(self.end,"%H:%M:%S") <= self.data["Drone"]["t"][i]:
-                    break
-            end_i = i
-        else: end_i = len(self.data["Drone"]["t"])-1
-        
-        for key in self.data["Drone"]:
-            self.data["Drone"][key] = self.data["Drone"][key][start_i:end_i]
+                match self.dronetype.lower():
+                    case "own":
+                        self.data["Drone"] = {
+                            "t" : np.array([dt.datetime.strptime(data[i][1].replace(",","."),"%I:%M:%S.%f %p").replace(microsecond=0) for i in range(1,len(data))]),
+                            #data: [height,long,lat,ws]
+                            "height" : np.array([float(data[i][6].replace(",",".")) for i in range(1,len(data))]),
+                            "long" : np.array([float(data[i][5].replace(",",".")) for i in range(1,len(data))]),
+                            "lat" : np.array([float(data[i][4].replace(",",".")) for i in range(1,len(data))]),
+                            }
+                    case "bladescapes":
+                        current_time = data[1][1][:-4]
+                        takeoff_alt = float(data[1][12])
+                        h_appender, long_appender, lat_appender = [],[],[]
+                        t, h, long, lat = [], [], [], []
+                        for line in data[1:]:
+                            if line[1][:-4] == current_time:
+                                h_appender.append(float(line[12])-takeoff_alt)
+                                long_appender.append(float(line[11]))
+                                lat_appender.append(float(line[10]))
+                            else:
+                                t.append(dt.datetime.strptime(current_time.replace(".","-"),"%Y-%m-%d %H:%M:%S"))
+                                h.append(np.mean(h_appender))
+                                long.append(np.mean(long_appender))
+                                lat.append(np.mean(lat_appender))
+                                h_appender = [float(line[12])-takeoff_alt]
+                                long_appender = [float(line[11])]
+                                lat_appender = [float(line[10])]
+                                current_time = line[1][:-4]
+                                
+                            self.data["Drone"] = {
+                                "t" : np.array(t),
+                                "height" : np.array(h),
+                                "long" : np.array(long),
+                                "lat" : np.array(lat)
+                                }
+                            
+                #crop
+                if self.start != "*":
+                    for i in range(len(self.data["Drone"]["t"])):
+                        if dt.datetime.strptime(self.start,"%H:%M:%S").time() <= self.data["Drone"]["t"][i].time():
+                            break
+                    start_i = i
+                else: start_i = 0
+                
+                if self.end != "*":
+                    for i in range(len(self.data["Drone"]["t"])):
+                        if dt.datetime.strptime(self.end,"%H:%M:%S") <= self.data["Drone"]["t"][i]:
+                            break
+                    end_i = i
+                else: end_i = len(self.data["Drone"]["t"])-1
+                
+                for key in self.data["Drone"]:
+                    self.data["Drone"][key] = self.data["Drone"][key][start_i:end_i]
+            
+            case "flight":
+                self.data, self.details = pickle.load(open(file,"rb"))
+            
+            case _:
+                raise IllegalFileFormat(file.split(".")[-1], ".csv or .flight", "DroneWrapper arguments")
                  
                 
     def wrap(self,name,obj):
@@ -244,7 +251,7 @@ class DroneWrapper:
         Parameters
         ----------
         nested : bool, optional
-            if nested, the wrapped data of other objects is also returne. The default is False.
+            if nested, the wrapped data of other objects is also returned. The default is False.
 
         Returns
         -------
@@ -420,7 +427,6 @@ class DroneWrapper:
                                 if nb_long[i] >= nb_longs[y] and nb_long[i] <= nb_longs[y+1]:
                                     nb_map_array[x][y][0] += nb_y[i]
                                     nb_map_array[x][y][1] += 1
-                a=2
                 return nb_map_array
              
             map_array = calcmap(map_array,lats,longs,y,lat,long)
@@ -446,6 +452,38 @@ class DroneWrapper:
         
         
     def plot(self,ax,y,**kwargs):
+        """
+        plots Drone-produced data over time on an mpl-axis
+
+        Parameters
+        ----------
+        ax : mpl-axis
+            takes a mpl-axis on which the data will be plotted.
+        y : str
+            decides which data will be plotted (legal: "height", "long", "lat").
+        quakes : [str], optional
+            takes a list of "HH:MM:SS"-strings and draws vertical lines at these times. The default is [].
+        quakeslabel : str, optional
+            a label that is used for the quakes if a legend is drawn. The default is "no label".g
+        quakecolor : str, optional
+            decides the color of the quake-lines. The default is "tab:purple".
+        color : str, optional
+            decides the color of the plot. The defaultl is "tab:green"
+        plotlabel : str, optional
+            a label that is used for the plot if a legend is drawn. The default is "no label".
+        ylabel : str, optional
+            a label that is used for the y-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given y
+        secondary : bool, optional
+            if True the plot will be drawn on the right y-axis. The default is False.
+        masknan : bool, optional
+            if True NaN values are masked out to draw a uninterupted plot. The default is True.
+        
+
+        Returns
+        -------
+        None.
+
+        """
         
         #import kwargs   
         defaults = {"quakes" : [],
@@ -489,6 +527,37 @@ class DroneWrapper:
         
         
     def advancedplot(self,ax,x,y,**kwargs):
+        """
+        plots x-data over y-data on a mpl-axis
+
+        Parameters
+        ----------
+        ax : mpl-axis
+            takes a mpl-axis on which the data will be plotted.
+        x : str
+            decides over which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of; if the plot should be over time use "name_t").
+        y : str
+            decides which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of).
+        color : str, optional
+            decides the color of the plot. The default is "tab:green".
+        plotlabel : str, optional
+            a label that is used for the plot if a legend is drawn. The default is "no label".
+        xlabel : str, optional
+            a label that is used for the x-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given x
+        ylabel : str, optional
+            a label that is used for the y-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given y
+        scatter : bool, optional
+            if True the data is plotted as a scatterplot. The default is False.
+        secondary : bool, optional
+            f True the plot will be drawn on the right y-axis. The default is False.
+        masknan : bool, optional
+            if True NaN values are masked out to draw a uninterupted plot. The default is True
+
+        Returns
+        -------
+        None.
+
+        """
         
         #import kwargs   
         defaults = {"color" : "tab:green",
@@ -554,6 +623,58 @@ class DroneWrapper:
         else:
             ax.spines["right"].set_color(kwargs["color"])
             ax.spines["left"].set_alpha(0)
+            
+            
+    def save(self, filename):
+        """
+        saves object as .flight file
+
+        Parameters
+        ----------
+        filename : str
+            name of the generated file.
+
+        Returns
+        -------
+        None.
+
+        """
+        
+        op = (self.data,self.details)
+        if filename[-7:] != ".flight":
+            filename += ".flight"
+            
+        pickle.dump(op,open(filename,"wb"),4)
+        
+        
+    def returnattime(self, y, timestamp):
+        """
+        returns the requested value at the given timestamp
+
+        Parameters
+        ----------
+        y : str
+            decides which datatype should be returned. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of).
+        timestamp : str
+            decides which data should be returned. Takes a str in the format "hh:mm:ss".
+
+        Returns
+        -------
+        requested value as float.
+
+        """
+        
+        y1 = y.split("_")[0]
+        tt = dt.datetime.strptime(timestamp,"%H:%M:%S")
+        found = False
+        for i,ts in enumerate(self.data[y1]["t"]):
+            if ts - tt == dt.timedelta(0):
+                found = True
+                break
+        if found:
+            return self.data[y1][y.split("_")[1]][i]
+        else:
+            raise IndexError("given timestamp wasnt found in dataset")
         
             
     #housekeeping funcs

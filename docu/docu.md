@@ -572,6 +572,12 @@
    scatter (bool, optional) ... if True the data is plotted as a scatterplot - default: False
    secondary (bool, optional) ... if True the plot will be drawn on the right y-axis - default: False
    masknan (bool, optional) ... if True NaN values are masked out to draw a uninterupted plot - default: True
+   
+4.2.8 DroneWrapper.save(filename)
+
+    saves the DroneWrapper object as a .flight file
+    
+    filename (str) ... determines the filename of the outputted file
 
 	
 6.    wibs.py
