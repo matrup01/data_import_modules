@@ -1,4 +1,13 @@
+######################### MR 19.08.2025 #########################
+#                    "fixed minor problems"                     #
+#                                                               #
+# - changed pm25 to overpm25 for the pops-produced pm25, since  #
+#   pm25 is already taken for the sen55-produced one            #
+# - changed the check for corrupted rows in Pops                #
+#################################################################
+
 ######################### MR 13.08.2025 #########################
+#                   "added .flight datatype"                    #
 #                                                               #
 # - added .flight datatype for DroneWrapper                     #
 # - added DroneWrapper.save() and DroneWrapper.returnattime()   #
