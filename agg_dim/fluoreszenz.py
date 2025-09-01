@@ -31,6 +31,17 @@ class FData:
                         #data[i][j] = data[i][j][126:130]
         
         #extract x and y values from list
+        faulty_lines = []
+        for i in range(len(data)):
+            if len(data[i]) != 19:
+                faulty_lines.append(i)
+        newdata = []
+        for i in range(len(data)):
+            if i not in faulty_lines:
+                newdata.append(data[i])
+        data = newdata
+        del newdata
+        del faulty_lines
         self.t = [dt.datetime.strptime(data[i][1],"%H:%M:%S.%f") for i in range(1+skiprows,len(data))]
         self.channels = [[data[i][j] for i in range(1+skiprows,len(data))] for j in range(layout[0],layout[1]+1)]
         for i in range(len(self.channels)):

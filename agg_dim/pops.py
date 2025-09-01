@@ -59,7 +59,7 @@ class Pops:
                                    "ydata2" : [6,21,12],
                                    "popstime" : 3,
                                    "t" : 1,
-                                   "flow" : 16}
+                                   "flow" : 18}
                 case _:
                     raise UnknownLayoutError(self.layout, ["desktopmode","box_pallnsdorfer","FlyingFlo2.0"], "POPS")
         
@@ -101,13 +101,13 @@ class Pops:
         #crop
         if self.start != "none":
             tcounter = -1
-            for element in [data[i][1] for i in range(1,len(data))]:
+            for element in [data[i][self.layout["t"]] for i in range(1,len(data))]:
                 tcounter += 1
                 if self.start == element:
                   t_start = tcounter
             popscounter = -1
             unixstart = str(int(self.start[0:2])*3600+int(self.start[3:5])*60+int(self.start[6:8])-7200 + self.timecorr)
-            for element in [data[i][23][0:5] for i in range(1,len(data))]:
+            for element in [data[i][self.layout["popstime"]][0:5] for i in range(1,len(data))]:
                 popscounter += 1
                 if unixstart == element:
                     pops_start = popscounter
@@ -117,13 +117,13 @@ class Pops:
             
         if self.end != "none":
             tcounter = -1
-            for element in [data[i][1] for i in range(1,len(data))]:
+            for element in [data[i][self.layout["t"]] for i in range(1,len(data))]:
                 tcounter += 1
                 if self.end == element:
                   t_end = tcounter
             popscounter = -1
             unixend = str(int(self.end[0:2])*3600+int(self.end[3:5])*60+int(self.end[6:8])-7200 + self.timecorr)
-            for element in [data[i][23][0:5] for i in range(1,len(data))]:
+            for element in [data[i][self.layout["popstime"]][0:5] for i in range(1,len(data))]:
                 popscounter += 1
                 if unixend == element:
                     pops_end = popscounter

@@ -1,3 +1,11 @@
+######################### MR 01.09.2025 #########################
+#               "added pearsonr to DroneWrapper"                #
+#                                                               #
+# - fixed DroneWrapper.returnattime()                           #
+# - added "showpearsonr" kwarg to DroneWrapper.advancedplot()   #
+# - fixed flow correction in FlyingFlo2.0 layout for Pops       #
+#################################################################
+
 ######################### MR 19.08.2025 #########################
 #                    "fixed minor problems"                     #
 #                                                               #

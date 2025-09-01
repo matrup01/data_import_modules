@@ -572,6 +572,7 @@
    scatter (bool, optional) ... if True the data is plotted as a scatterplot - default: False
    secondary (bool, optional) ... if True the plot will be drawn on the right y-axis - default: False
    masknan (bool, optional) ... if True NaN values are masked out to draw a uninterupted plot - default: True
+   showpearsonr (bool, optional) ... if True Pearsons R is calculated and shown in the plot - default: True
    
 4.2.8 DroneWrapper.save(filename)
 

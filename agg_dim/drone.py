@@ -552,6 +552,8 @@ class DroneWrapper:
             f True the plot will be drawn on the right y-axis. The default is False.
         masknan : bool, optional
             if True NaN values are masked out to draw a uninterupted plot. The default is True
+        showpearsonr : bool, optional
+            if True Pearsons R will be calculated. The default is True
 
         Returns
         -------
@@ -566,7 +568,8 @@ class DroneWrapper:
                     "ylabel" : "*",
                     "scatter" : False,
                     "secondary" : False,
-                    "masknan" : True}
+                    "masknan" : True,
+                    "showpearsonr" : True}
         for key,default in zip(defaults.keys(),defaults.values()):
             kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
         self.hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.advancedplot()")
@@ -609,6 +612,16 @@ class DroneWrapper:
         if kwargs["ylabel"] == "*":
             kwargs["ylabel"] = f"{self.details[yname][yy][0]} in {self.details[yname][yy][1]}"
             
+        #calc Pearson
+        if kwargs["showpearsonr"]:
+            xx = x - np.mean(x)
+            yy = y - np.mean(y)
+
+            sp = np.sum(xx*yy)
+            sqx = np.sum(xx**2)
+            sqy = np.sum(yy**2)
+            r = sp/(np.sqrt(sqx*sqy))
+            
         #draw plot
         if kwargs["scatter"]:
             ax.scatter(x,y,label=kwargs["plotlabel"],color=kwargs["color"])
@@ -618,6 +631,8 @@ class DroneWrapper:
         ax.set_xlabel(kwargs["xlabel"])
         ax.tick_params(axis='y', colors=kwargs["color"])
         ax.axes.yaxis.label.set_color(kwargs["color"])
+        if kwargs["showpearsonr"]:
+            ax.annotate(f"Pearson's R: {r:.3f}",(0.9,0.9),xycoords='axes fraction')
         if not kwargs["secondary"]:
             ax.spines["left"].set_color(kwargs["color"])
         else:
@@ -667,6 +682,7 @@ class DroneWrapper:
         y1 = y.split("_")[0]
         tt = dt.datetime.strptime(timestamp,"%H:%M:%S")
         found = False
+        tt = tt.replace(day=self.data[y1]["t"][0].day,month=self.data[y1]["t"][0].month,year=self.data[y1]["t"][0].year)
         for i,ts in enumerate(self.data[y1]["t"]):
             if ts - tt == dt.timedelta(0):
                 found = True
