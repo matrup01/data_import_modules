@@ -10,6 +10,7 @@ Supported instruments:
 - WIBS
 - SEN55
 - CCS811
+- Weatherstation
 
 ## Documentation
 
