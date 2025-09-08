@@ -500,7 +500,7 @@ class DroneWrapper:
         
         name,yy = y.split("_")
         y = self.data[name][yy]
-        x = self.data[name]["t"]     
+        x = np.array([i.replace(day=1,month=1,year=1900) for i in self.data[name]["t"]])   
         
         if kwargs["masknan"]:
             m = np.isfinite(y)

@@ -637,3 +637,28 @@
     label (str) ... gives the plot a label used in a legend
     color (str) ... changes the color of the plot, default-"tab:orange"
     secondary (bool) ... should be toggled if the plot uses the right-hand yaxis, default-False
+
+
+7.    weather.py
+
+7.1   WeatherData(file)
+
+    creates a WeatherData-object
+    
+    file (str) ... takes a csv-file created by the weatherstation
+    
+7.1.1 WeatherData.plot(ax,y,**kwargs)
+
+    draws a plot of y on an existing mpl-axis
+    
+    y (str) ... decides which data should be plotted
+    ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
+    
+    day (str, optional) ... takes a day in the format ddmmyyyy. If a day is given only data acquired on that day will be plotted
+    setday (str, optional) ... takes a day in the format ddmmyyyy. If a setday is given all data will be changed to this day to make it easier to plot against other data
+    start (str, optional) ... takes a timestamp in the format HHMMSS. if a start is given only data acquired after that timestamp will be plotted
+    end (str, optional) ... takes a timestamp in the format HHMMSS. if a end is given only data acquired before that timestamp will be plotted
+    secondary (bool, optional) ... if True the plot will be drawn on the right y-axis. The default is False
+    color (str, optional) ... decides the color of the plot. The default is "tab:blue"
+    plotlabel (str, optional) ... a label that is used for the plot if a legend is drawn. The default is "no label"
+    ylabel (str,optional) ... a label that is used for the y-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given y
