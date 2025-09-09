@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: agg-dim
-Version: 0.1.6
+Version: 0.1.7
 Summary: Data import modules for instruments used by AG Grothe
 Home-page: https://github.com/matrup01/data_import_modules/
 Author: Matthäus Rupprecht, Florian Wieland
@@ -53,6 +53,7 @@ Supported instruments:
 - WIBS
 - SEN55
 - CCS811
+- Weatherstation
 
 ## Documentation
 

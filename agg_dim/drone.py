@@ -477,6 +477,14 @@ class DroneWrapper:
             if True the plot will be drawn on the right y-axis. The default is False.
         masknan : bool, optional
             if True NaN values are masked out to draw a uninterupted plot. The default is True.
+        targetfunc : func, optional
+            decides how to check target1, target2 and targety (only works if these variables are given). The default checks for if the target value lies between target1 and target2. consult docu to see correct function layout.
+        target1 : float, optional
+            takes a value that is checked in targetfunc
+        target2 : float, optional
+            takes a value taht is checked in targetfunc
+        targety : str, optional
+            takes a legal y-string (depends on wrapped objects) and hands the corresponding data to targetfunc
         
 
         Returns
@@ -493,7 +501,12 @@ class DroneWrapper:
                     "plotlabel" : "no label",
                     "ylabel" : "*",
                     "secondary" : False,
-                    "masknan" : True}
+                    "masknan" : True,
+                    "targetfunc" : None,
+                    "target1" : None,
+                    "target2" : None,
+                    "targety" : None}
+        
         for key,default in zip(defaults.keys(),defaults.values()):
             kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
         self.hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.plot()")
@@ -501,6 +514,47 @@ class DroneWrapper:
         name,yy = y.split("_")
         y = self.data[name][yy]
         x = np.array([i.replace(day=1,month=1,year=1900) for i in self.data[name]["t"]])   
+        
+        if kwargs["target1"] != None and kwargs["target2"] != None and kwargs["targety"] != None:
+            if kwargs["targetfunc"] == None:
+                def default(t1,t2,ty):
+                    m = np.where(t1<ty,True,False)
+                    m = np.where(ty<t2,m,False)
+                    return m
+                kwargs["targetfunc"] = default
+                
+            ty1,ty2 = kwargs["targety"].split("_")
+                
+            xt = [i.time() for i in x]
+            yt = [self.data[ty1]["t"][i].time() for i in range(len(self.data[ty1]["t"]))]
+            
+            if xt[0] in yt:
+                x_start = 0
+                y_start = yt.index(xt[0])
+                if len(yt) >= y_start + len(xt):
+                    x_end = len(xt)
+                    y_end = y_start + len(xt)
+                else:
+                    y_end = len(yt)
+                    x_end = x_start + (y_end - y_start)
+            else:
+                y_start = 0
+                x_start = xt.index(yt[0])
+                if len(xt) >= x_start + len(yt):
+                    y_end = len(yt)
+                    x_end = x_start + len(yt)
+                else:
+                    x_end = len(xt)
+                    y_end = y_start + (x_end - x_start)
+                    
+            x = x[x_start:x_end]
+            y = y[x_start:x_end]
+            
+            ty = self.data[ty1][ty2][y_start:y_end]
+                
+            m = kwargs["targetfunc"](kwargs["target1"],kwargs["target2"],ty)
+            y = y[m]
+            x = x[m]
         
         if kwargs["masknan"]:
             m = np.isfinite(y)
@@ -554,6 +608,14 @@ class DroneWrapper:
             if True NaN values are masked out to draw a uninterupted plot. The default is True
         showpearsonr : bool, optional
             if True Pearsons R will be calculated. The default is True
+        targetfunc : func, optional
+            decides how to check target1, target2 and targety (only works if these variables are given). The default checks for if the target value lies between target1 and target2. consult docu to see correct function layout.
+        target1 : float, optional
+            takes a value that is checked in targetfunc
+        target2 : float, optional
+            takes a value taht is checked in targetfunc
+        targety : str, optional
+            takes a legal y-string (depends on wrapped objects) and hands the corresponding data to targetfunc
 
         Returns
         -------
@@ -569,7 +631,12 @@ class DroneWrapper:
                     "scatter" : False,
                     "secondary" : False,
                     "masknan" : True,
-                    "showpearsonr" : True}
+                    "showpearsonr" : True,
+                    "targetfunc" : None,
+                    "target1" : None,
+                    "target2" : None,
+                    "targety" : None}
+        
         for key,default in zip(defaults.keys(),defaults.values()):
             kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
         self.hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.advancedplot()")
@@ -600,6 +667,48 @@ class DroneWrapper:
                 
         x = self.data[xname][xx][x_start:x_end]
         y = self.data[yname][yy][y_start:y_end]
+        
+        if kwargs["target1"] != None and kwargs["target2"] != None and kwargs["targety"] != None:
+            if kwargs["targetfunc"] == None:
+                def default(t1,t2,ty):
+                    m = np.where(t1<ty,True,False)
+                    m = np.where(ty<t2,m,False)
+                    return m
+                kwargs["targetfunc"] = default
+                
+            ty1,ty2 = kwargs["targety"].split("_")
+                
+            xt = xt[x_start:x_end]
+            yt = [self.data[ty1]["t"][i].time() for i in range(len(self.data[ty1]["t"]))]
+            
+            if xt[0] in yt:
+                x_start = 0
+                y_start = yt.index(xt[0])
+                if len(yt) >= y_start + len(xt):
+                    x_end = len(xt)
+                    y_end = y_start + len(xt)
+                else:
+                    y_end = len(yt)
+                    x_end = x_start + (y_end - y_start)
+            else:
+                y_start = 0
+                x_start = xt.index(yt[0])
+                if len(xt) >= x_start + len(yt):
+                    y_end = len(yt)
+                    x_end = x_start + len(yt)
+                else:
+                    x_end = len(xt)
+                    y_end = y_start + (x_end - x_start)
+                    
+            x = x[x_start:x_end]
+            y = y[x_start:x_end]
+            
+            ty = self.data[ty1][ty2][y_start:y_end]
+                
+            m = kwargs["targetfunc"](kwargs["target1"],kwargs["target2"],ty)
+            y = y[m]
+            x = x[m]
+        
         if kwargs["masknan"]:
             xmask = np.isfinite(x)
             ymask = np.isfinite(y)

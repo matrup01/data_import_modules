@@ -1,3 +1,12 @@
+######################### MR 09.09.2025 #########################
+#                   "added target plotting"                     #
+#                                                               #
+# - added DroneWrapper.returntarget()                           #
+# - added target-kwargs to DroneWrapper.plot() and              #
+#   DroneWrapper.advancedplot()                                 #
+# - fixed WeatherData import                                    #
+#################################################################
+
 ######################### MR 08.09.2025 #########################
 #                     "added WeatherData"                       #
 #                                                               #

@@ -558,6 +558,16 @@
    ylabel (str, optional) ... a label that is used for the y-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given y
    secondary (bool, optional) ... if True the plot will be drawn on the right y-axis - default: False
    masknan (bool, optional) ... if True NaN values are masked out to draw a uninterupted plot - default: True
+   targetfunc (func, optional) ... decides how to check target1, target2 and targety (only works if these variables are given). the function must take two floats and an np array of floats and it must output an array of bools (mask) Default:
+                                           ```python
+                                           def targetfunc(target1,target2,ty): #ty is the data corresponding to targety
+                                               m = np.where(target1<ty,True,False)
+                                               m = np.where(ty<target2,m,False)
+                                               return m
+                                           ```
+   target1 (float, optional) ... takes a value that is checked in targetfunc
+   target2 (float, optional) ... takes a value that is checked in targetfunc
+   targety (str, optional) ... takes a legal y-string (depends on wrapped objects) and hands the corresponding data to targetfunc
 
 4.2.7 DroneWrapper.advancedplot(ax,x,y,kwargs)
 
@@ -573,12 +583,39 @@
    secondary (bool, optional) ... if True the plot will be drawn on the right y-axis - default: False
    masknan (bool, optional) ... if True NaN values are masked out to draw a uninterupted plot - default: True
    showpearsonr (bool, optional) ... if True Pearsons R is calculated and shown in the plot - default: True
+   targetfunc (func, optional) ... decides how to check target1, target2 and targety (only works if these variables are given). the function must take two floats and an np array of floats and it must output an array of bools (mask) Default:
+                                           ```python
+                                           def targetfunc(target1,target2,ty): #ty is the data corresponding to targety
+                                               m = np.where(target1<ty,True,False)
+                                               m = np.where(ty<target2,m,False)
+                                               return m
+                                           ```
+   target1 (float, optional) ... takes a value that is checked in targetfunc
+   target2 (float, optional) ... takes a value that is checked in targetfunc
+   targety (str, optional) ... takes a legal y-string (depends on wrapped objects) and hands the corresponding data to targetfunc
    
 4.2.8 DroneWrapper.save(filename)
 
     saves the DroneWrapper object as a .flight file
     
     filename (str) ... determines the filename of the outputted file
+    
+4.2.9 DroneWrapper.returntarget(y,**kwargs)
+
+    returns target array
+    
+    y (str) ... decides which data should be returned
+    
+    targetfunc (func, optional) ... decides how to check target1, target2 and targety (only works if these variables are given). the function must take two floats and an np array of floats and it must output an array of bools (mask) Default:
+                                            ```python
+                                            def targetfunc(target1,target2,ty): #ty is the data corresponding to targety
+                                                m = np.where(target1<ty,True,False)
+                                                m = np.where(ty<target2,m,False)
+                                                return m
+                                            ```
+    target1 (float, optional) ... takes a value that is checked in targetfunc
+    target2 (float, optional) ... takes a value that is checked in targetfunc
+    targety (str, optional) ... takes a legal y-string (depends on wrapped objects) and hands the corresponding data to targetfunc
 
 	
 6.    wibs.py

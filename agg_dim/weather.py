@@ -36,20 +36,20 @@ class WeatherData:
         
         self.data = {
             "t" : np.array([dt.datetime.strptime(data[i][0],"%Y/%m/%d %H:%M") for i in range(1,len(data))]),
-            "indoortemp" : np.array([data[i][1] for i in range(1,len(data))]),
-            "indoorhum" : np.array([data[i][2] for i in range(1,len(data))]),
-            "outdoortemp" : np.array([data[i][3] for i in range(1,len(data))]),
-            "outdoorhum" : np.array([data[i][4] for i in range(1,len(data))]),
-            "dewpoint" : np.array([data[i][5] for i in range(1,len(data))]),
-            "felttemp" : np.array([data[i][6] for i in range(1,len(data))]),
-            "wind" : np.array([data[i][7] for i in range(1,len(data))]),
-            "gust" : np.array([data[i][8] for i in range(1,len(data))]),
-            "winddir" : np.array([data[i][9] for i in range(1,len(data))]),
-            "abspress" : np.array([data[i][10] for i in range(1,len(data))]),
-            "relpress" : np.array([data[i][11] for i in range(1,len(data))]),
-            "solarrad" : np.array([data[i][12] for i in range(1,len(data))]),
-            "uvi" : np.array([data[i][13] for i in range(1,len(data))]),
-            "rain" : np.array([data[i][14] for i in range(1,len(data))])
+            "indoortemp" : np.array([float(data[i][1]) for i in range(1,len(data))]),
+            "indoorhum" : np.array([float(data[i][2]) for i in range(1,len(data))]),
+            "outdoortemp" : np.array([float(data[i][3]) for i in range(1,len(data))]),
+            "outdoorhum" : np.array([float(data[i][4]) for i in range(1,len(data))]),
+            "dewpoint" : np.array([float(data[i][5]) for i in range(1,len(data))]),
+            "felttemp" : np.array([float(data[i][6]) for i in range(1,len(data))]),
+            "wind" : np.array([float(data[i][7]) for i in range(1,len(data))]),
+            "gust" : np.array([float(data[i][8]) for i in range(1,len(data))]),
+            "winddir" : np.array([float(data[i][9]) for i in range(1,len(data))]),
+            "abspress" : np.array([float(data[i][10]) for i in range(1,len(data))]),
+            "relpress" : np.array([float(data[i][11]) for i in range(1,len(data))]),
+            "solarrad" : np.array([float(data[i][12]) for i in range(1,len(data))]),
+            "uvi" : np.array([float(data[i][13]) for i in range(1,len(data))]),
+            "rain" : np.array([float(data[i][14]) for i in range(1,len(data))])
             }
         self.details = {
             "indoortemp" : ["temperature (indoors)","°C"],

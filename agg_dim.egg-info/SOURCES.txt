@@ -7,6 +7,7 @@ agg_dim/drone.py
 agg_dim/fluoreszenz.py
 agg_dim/lowcostsensors.py
 agg_dim/pops.py
+agg_dim/weather.py
 agg_dim/wibs.py
 agg_dim.egg-info/PKG-INFO
 agg_dim.egg-info/SOURCES.txt
