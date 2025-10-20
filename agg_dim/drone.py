@@ -9,6 +9,8 @@ from .ErrorHandler import IllegalArgument, IllegalFileFormat
 import numpy as np
 from numba import njit, prange, float64
 import pickle
+from PIL import Image
+import utm
 
 class Dronedata:
     
@@ -268,6 +270,83 @@ class DroneWrapper:
             return self.data["Drone"],self.details["Drone"]
         
         
+    def returntarget(self,y,**kwargs):
+        """
+        returns target array
+
+        Parameters
+        ----------
+        y : str
+           decides which data should be returned.
+        targetfunc : func, optional
+            decides how to check target1, target2 and targety (only works if these variables are given). The default checks for if the target value lies between target1 and target2. consult docu to see correct function layout.
+        target1 : float, optional
+            takes a value that is checked in targetfunc
+        target2 : float, optional
+            takes a value taht is checked in targetfunc
+        targety : str, optional
+            takes a legal y-string (depends on wrapped objects) and hands the corresponding data to targetfunc
+
+        Returns
+        -------
+        np array of floats.
+
+        """
+        
+        #import kwargs
+        defaults = {"targetfunc" : None,
+                    "target1" : None,
+                    "target2" : None,
+                    "targety" : None
+            }
+        for key,default in zip(defaults.keys(),defaults.values()):
+            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        self.hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.returntarget()")
+        
+        y1,y2 = y.split("_")
+        op = self.data[y1][y2]
+        
+        if kwargs["target1"] != None and kwargs["target2"] != None and kwargs["targety"] != None:
+            if kwargs["targetfunc"] == None:
+                def default(t1,t2,ty):
+                    m = np.where(t1<ty,True,False)
+                    m = np.where(ty<t2,m,False)
+                    return m
+                kwargs["targetfunc"] = default
+                
+            ty1,ty2 = kwargs["targety"].split("_")
+                
+            xt = [self.data[y1]["t"][i].time() for i in range(len(self.data[y1]["t"]))]
+            yt = [self.data[ty1]["t"][i].time() for i in range(len(self.data[ty1]["t"]))]
+            
+            if xt[0] in yt:
+                x_start = 0
+                y_start = yt.index(xt[0])
+                if len(yt) >= y_start + len(xt):
+                    x_end = len(xt)
+                    y_end = y_start + len(xt)
+                else:
+                    y_end = len(yt)
+                    x_end = x_start + (y_end - y_start)
+            else:
+                y_start = 0
+                x_start = xt.index(yt[0])
+                if len(xt) >= x_start + len(yt):
+                    y_end = len(yt)
+                    x_end = x_start + len(yt)
+                else:
+                    x_end = len(xt)
+                    y_end = y_start + (x_end - x_start)
+                    
+            op = op[x_start:x_end]
+            ty = self.data[ty1][ty2][y_start:y_end]
+                
+            m = kwargs["targetfunc"](kwargs["target1"],kwargs["target2"],ty)
+            op = op[m]
+            
+        return op
+        
+        
     def flightmap(self,zoomstart=21,colors=["brown","white","blue"]):
         """
         plots the height AGL of the drone over an OSM Map in your browser
@@ -328,6 +407,10 @@ class DroneWrapper:
             if True a grid of the values is calculated and plotted instead of single datapoints. The default is False.
         bettermap_resolution : int, optional
             only usefull if bettermap=True. A grid of bettermap_resolution x bettermap_resolution will be used to plot the data. The default is 15.
+        mapimage : str, optional
+            if a mapimage is given and a mapimage.png and mapimage.tfw exist, the png will be plotted onto the map
+        save_loc : str, optional
+            if a save_loc is given, the map will be saved as a html file and not displayed in the browser
 
         Returns
         -------
@@ -341,7 +424,10 @@ class DroneWrapper:
                     "target_height" : "none",
                     "height_deviation" : 1,
                     "bettermap" : False,
-                    "bettermap_resolution" : 15
+                    "bettermap_resolution" : 15,
+                    "bettermap_minimumcounts" : 0,
+                    "mapimage" : None,
+                    "save_loc" : None
             }
         for key,default in zip(defaults.keys(),defaults.values()):
             kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
@@ -401,13 +487,38 @@ class DroneWrapper:
             
             cmap = cm.LinearColormap(colors=kwargs["colors"],vmin=min(y),vmax=max(y),caption=f"{self.details[name][yy][0]} in {self.details[name][yy][1]}")
             output = folium.Map(location=(x1_start,x2_start),control_scale=True,zoom_start=kwargs["zoomstart"],max_zoom=50)
+            
+            if kwargs["mapimage"] != None:
+                try:
+                    with open(f"{kwargs['mapimage']}.tfw") as f:
+                        tfw = f.read().split("\n")
+                        
+                    png = Image.open(f"{kwargs['mapimage']}.png")
+                    pixelheight = png.height
+                    pixelwidth = png.width
+                        
+                    lowerleft_utm = (float(tfw[4]),float(tfw[5])+pixelheight*float(tfw[3]))
+                    upperright_utm = (float(tfw[4])+pixelwidth*float(tfw[0]),float(tfw[5]))
+    
+                    upper_left_lat,upper_left_long = utm.to_latlon(float(tfw[4]), float(tfw[5]), 33,"T")
+                    lower_left_lat,lower_left_long = utm.to_latlon(lowerleft_utm[0], lowerleft_utm[1], 33,"T")
+                    upper_right_lat,upper_right_long = utm.to_latlon(upperright_utm[0], upperright_utm[1], 33,"T")
+    
+                    img = folium.raster_layers.ImageOverlay("C:/Users/mrupp/OneDrive - TU Wien/Wieland, Florian's files - DATA/Field Measurements/2025-08-05 and 07_Stmk/Orthofoto_DSM/Orthofoto_DSM/Steinalpl_Duerrieglalm-Graben_Orthofoto.png", 
+                                                            [[lower_left_lat,lower_left_long],[upper_right_lat,upper_right_long]])
+                    img.add_to(output)
+                except:
+                    print("Problem with mapimage. Make sure that you give a valid path for .tfw and .png without the file ending.")
     
             for _y,_long,_lat in zip(y,long,lat):
                 folium.Circle(location=[_lat,_long],radius=0.1,fill=True,color=cmap(_y)).add_to(output)
                     
             output.add_child(cmap)
             
-            output.show_in_browser()
+            if kwargs["save_loc"] == None:
+                output.show_in_browser()
+            else:
+                output.save(kwargs["save_loc"])
         else:
             res = kwargs["bettermap_resolution"]
             map_array = np.zeros((res,res,2))
@@ -427,6 +538,7 @@ class DroneWrapper:
                                 if nb_long[i] >= nb_longs[y] and nb_long[i] <= nb_longs[y+1]:
                                     nb_map_array[x][y][0] += nb_y[i]
                                     nb_map_array[x][y][1] += 1
+                                    
                 return nb_map_array
              
             map_array = calcmap(map_array,lats,longs,y,lat,long)
@@ -434,21 +546,48 @@ class DroneWrapper:
             for xx in range(len(map_array)):
                 for yi in range(len(map_array)):
                     map_array_2d[xx][yi] = map_array[xx][yi][0] / map_array[xx][yi][1] if map_array[xx][yi][1] != 0 else 0
+                    if kwargs["bettermap_minimumcounts"] > map_array[xx][yi][1]:
+                        map_array_2d[xx][yi] = 0
                     
             x1_start = (max(lat) + min(lat)) / 2
             x2_start = (max(long) + min(long)) / 2
             
             cmap = cm.LinearColormap(colors=kwargs["colors"],vmin=min(y),vmax=max(y),caption=f"{self.details[name][yy][0]} in {self.details[name][yy][1]}")
             output = folium.Map(location=(x1_start,x2_start),control_scale=True,zoom_start=kwargs["zoomstart"],max_zoom=50)
+            
+            if kwargs["mapimage"] != None:
+                try:
+                    with open(f"{kwargs['mapimage']}.tfw") as f:
+                        tfw = f.read().split("\n")
+                        
+                    png = Image.open(f"{kwargs['mapimage']}.png")
+                    pixelheight = png.height
+                    pixelwidth = png.width
+                        
+                    lowerleft_utm = (float(tfw[4]),float(tfw[5])+pixelheight*float(tfw[3]))
+                    upperright_utm = (float(tfw[4])+pixelwidth*float(tfw[0]),float(tfw[5]))
+    
+                    upper_left_lat,upper_left_long = utm.to_latlon(float(tfw[4]), float(tfw[5]), 33,"T")
+                    lower_left_lat,lower_left_long = utm.to_latlon(lowerleft_utm[0], lowerleft_utm[1], 33,"T")
+                    upper_right_lat,upper_right_long = utm.to_latlon(upperright_utm[0], upperright_utm[1], 33,"T")
+    
+                    img = folium.raster_layers.ImageOverlay("C:/Users/mrupp/OneDrive - TU Wien/Wieland, Florian's files - DATA/Field Measurements/2025-08-05 and 07_Stmk/Orthofoto_DSM/Orthofoto_DSM/Steinalpl_Duerrieglalm-Graben_Orthofoto.png", 
+                                                            [[lower_left_lat,lower_left_long],[upper_right_lat,upper_right_long]])
+                    img.add_to(output)
+                except:
+                    print("Problem with mapimage. Make sure that you give a valid path for .tfw and .png without the file ending.")
     
             for x in range(res):
                 for y in range(res):
                     if map_array_2d[x][y] != 0:
-                        folium.Rectangle([(lats[x],longs[y]),(lats[x+1],longs[y+1])],fill=True,color=cmap(map_array_2d[x][y])).add_to(output)
+                        folium.Rectangle([(lats[x],longs[y]),(lats[x+1],longs[y+1])],fill=True,color=cmap(map_array_2d[x][y]),fill_opacity=1).add_to(output)
                     
             output.add_child(cmap)
             
-            output.show_in_browser()
+            if kwargs["save_loc"] == None:
+                output.show_in_browser()
+            else:
+                output.save(kwargs["save_loc"])
         
         
     def plot(self,ax,y,**kwargs):

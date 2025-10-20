@@ -1,4 +1,4 @@
-1.    pops.py:
+1.    particle_counters.py:
 
 
 1.1   Pops(file,**kwargs)
@@ -167,6 +167,65 @@
 	orientation (str, optional) ... takes a str to change the orientation of the colorbar, default - "horizontal"
 	location (str, optional) ... takes a str to change the location of the colorbar relative to the plot, default-"top"
 	pad (float, optional) ... takes a float and moves the cbar further away from the heatmap the higher the pad is, default-0
+	
+	
+1.2   OPC(file,**kwargs)
+
+    creates an OPC-object
+    
+    file (str) ... takes an OPC-produced ...-C.dat file
+    
+    mfile (str, optional) ... takes an OPC-produced ...-M.dat file (if no mfile is given, the program will replace the C in the ...-C.dat file with an M and look for the filename at the same path)
+    dmfile (str, optional) ... takes an OPC-produced ...-dM.dat file (if no dmfile is given, the program will replace the C in the ...-C.dat file with dM and look for the filename at the same path)
+    start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp
+	end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp
+	bins (list of float, optional) ... takes a list of the geometric means of the bins, if none is given it will assume the standard bins (bins=[0.253,0.298,0.352,0.414,0.488,0.576,0.679,0.8,0.943,1.112,1.31,1.545,1.821,2.146,2.53,2.982,3.515,4.144,4.884,5.757,6.787,8,9.43,11.12,13.1,15.45,18.21,21.46,25.3,29.82,35.15])
+	
+1.2.1 OPC.save(name)
+
+    saves the OPC-object to an .opc file
+    
+    name (str) ... specifies the name and path where the file should be saved to
+    
+1.2.2 OPC.plot(ax,y,**kwargs)
+
+    plots a plot y vs time over an existing mpl axis
+    
+    ax (Axes object of mpl.axes module) ... axis on which the plot should be drawn
+    y (str) ... takes a string to determine which y should be plotted
+    
+    quakes (list of str, optional) ... takes a list of string in the format 'hh:mm:ss' and draws vertical, dashed lines at those timestamps
+	quakeslabel (str, optional) ... takes a str and uses it as a label for the quakes if a legend is used
+	quakecolor (str, optional) ... changes the color of the quakes, default-"tab:purple"
+	color (str, optional) ... changes the color of the plot, default-"tab:orange"
+	plotlabel (str, optional) ... changes label of the plot (used for legend) into the given string. If none is given, default-"no label"
+	ylabel (str, optional) ... changes the label of the y axis, if no ylabel is given it will say the Type of Value that is plotted and which Unit it uses
+	secondary (bool, optional) ... determines which y-axis should be colored (False-left axis/True-right axis), default-False
+	setday (str, optional) ... takes a string in the format "ddmmyy" and changes the date to it
+	
+1.2.3 OPC.heatmap(ax,**kwargs)
+
+    plots a dndlogdp heatmap over an existing mpl axis
+    
+    ax ... (Axes object of mpl.axes module) ... axis on which the plot should be drawn
+    
+    ylabel (str, optional) ... changes the label of the y-axis, if no ylabel is give it will say "dN/dlogDp in ccm^-3"
+    orientation (str, optional) ... takes a str to change the orientation of the colorbar, default - "horizontal"
+	location (str, optional) ... takes a str to change the location of the colorbar relative to the plot, default-"top"
+	pad (float, optional) ... takes a float and moves the cbar further away from the heatmap the higher the pad is, default-0
+	cbar (str, optional) ... decides which colormap should be used, default-"RdYlBu_r"
+	
+1.2.4 OPC.dndlogdp(ax, **kwargs)
+
+    plots a bar plot of the average dndlogdp numbe size distribution
+    
+    ax ... (Axes obj of mpl.axes module)
+    
+    start (str, optional) ... takes a str of the form "HH:MM:SS" and only uses data acquired after this time for the average distribution
+    end (str, optional) ... takes a str of the form "HH:MM:SS" and only uses data acquired before this time for the average distribution
+    logy (bool, optional) ... if True, only the y axis is scaled logarithmicly, default-False
+    ylabel (str, optional) ... changes the label of the y-axis, if no ylabel is give it will say "dN/dlogDp in ccm^-3"
+    scatter (bool, optional) ... if True, the plot will be a scatter plot rather than a bar plot, default-False
 
 
 2.    fluoreszenz.py
@@ -427,33 +486,33 @@
     
 	creates a FlyingFlo_USB object
     
-   file (str) ... takes a FlyingFlo_USB-produced csv-file
+    file (str) ... takes a FlyingFlo_USB-produced csv-file
+    
+    start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp
+    end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp
+    title (str, optional) ... takes a str and uses it as a title for quickplots
+    deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False 
    
-   start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp
-   end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp
-   title (str, optional) ... takes a str and uses it as a title for quickplots
-   deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False 
-   
-   FlyingFlo_USB.title (str) ... Title used for quickplots
-   FlyingFlo_USB.deviated (bool) ... Stores if the data is expressed relative to mean
-   FlyingFlo_USB.t (np.array of dt.datetime) ... Time array
-   FlyingFlo_USB.y (dict of str : [np.array,str,str]) ... Dictionary with Datatypes as keys storing lists in the form of [data-array, full data name, unit]
-   
+    FlyingFlo_USB.title (str) ... Title used for quickplots
+    FlyingFlo_USB.deviated (bool) ... Stores if the data is expressed relative to mean
+    FlyingFlo_USB.t (np.array of dt.datetime) ... Time array
+    FlyingFlo_USB.y (dict of str : [np.array,str,str]) ... Dictionary with Datatypes as keys storing lists in the form of [data-array, full data name, unit]
+
 3.3.1 FlyingFlo_USB.quickplot(y)
 
-   draws a plot y vs time
-   
-   y (str) ... plottype
+    draws a plot y vs time
+    
+    y (str) ... plottype
 
 3.3.2 FlyingFlo_USB.plot(ax,y,kwargs)
 
-   draws a plot of y time on an existing matplotlib-axis
-
-   ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
-   y (str) ... determines which plot should be drawn (legal strings: 'pm1','pm25','pm4','pm10','tempbme','humbme','gas','co2','tvoc','press','humsen','tempsen','vocsen','nox') (up to v0.1.2.1 some were different: 'temp_bme', 'hum_bme', 'temp_sen', 'hum_sen', 'voc_sen')
-
-   color (str, optional) ... changes the color of the plot, default-"tab:brown"
-   secondary (bool, optional) ... determines which y-axis should be colored (False-left axis/True-right axis), default-False 
+    draws a plot of y time on an existing matplotlib-axis
+    
+    ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
+    y (str) ... determines which plot should be drawn (legal strings: 'pm1','pm25','pm4','pm10','tempbme','humbme','gas','co2','tvoc','press','humsen','tempsen','vocsen','nox') (up to v0.1.2.1 some were different: 'temp_bme', 'hum_bme', 'temp_sen', 'hum_sen', 'voc_sen')
+    
+    color (str, optional) ... changes the color of the plot, default-"tab:brown"
+    secondary (bool, optional) ... determines which y-axis should be colored (False-left axis/True-right axis), default-False 
    
 3.3.3 FlyingFlo_USB.average()  
 
@@ -500,99 +559,101 @@
 	
 	obj (Dronedata-obj) ... takes a Dronedata-Object whichs data should be appended
 	
-4.2   DroneWrapper(file,kwargs)
+4.2     DroneWrapper(file,kwargs)
 
-   creates a DroneWrapper object
-   
-   file (str) ... takes a Drone produced csv file
-   
-   dronetype (str, optional) ... specifies which drone was used to read csv correctly (currently implemented: "BladeScapes","Own") - default: "BladeScapes"
-   start (str, optional) ... if a str of the form "HH:MM:SS" is given, all data acquired before this timestamp wont be used
-   end (str, optional) ... if a str of the form "HH:MM:SS" ist given, all data acquired after this timestamp wont be used
+    creates a DroneWrapper object
+    
+    file (str) ... takes a Drone produced csv file
+    
+    dronetype (str, optional) ... specifies which drone was used to read csv correctly (currently implemented: "BladeScapes","Own") - default: "BladeScapes"
+    start (str, optional) ... if a str of the form "HH:MM:SS" is given, all data acquired before this timestamp wont be used
+    end (str, optional) ... if a str of the form "HH:MM:SS" ist given, all data acquired after this timestamp wont be used
 
-4.2.1 DroneWrapper.wrap(name,obj,kwargs)
+4.2.1   DroneWrapper.wrap(name,obj,kwargs)
 
-   adds an instance of a data class (Pops,NewFData or FlyingFlo_USB) to the DroneWrapper
+    adds an instance of a data class (Pops,NewFData or FlyingFlo_USB) to the DroneWrapper
+    
+    name (str) ... name that is used to find the data from the wrapped object   
+    obj (Pops|NewFData|FlyingFlo_USB) ... obj that should be wrapped
 
-   name (str) ... name that is used to find the data from the wrapped object   
-   obj (Pops|NewFData|FlyingFlo_USB) ... obj that should be wrapped
+4.2.2   DroneWrapper.returndata(kwargs)
 
-4.2.2 DroneWrapper.returndata(kwargs)
+    returns a dict of the Drone-produced data or all the Drone data and all the wrapped data if nested=True
+    
+    nested (bool, optional) ... if nested, the wrapped data of other objects is also returned
 
-   returns a dict of the Drone-produced data or all the Drone data and all the wrapped data if nested=True
+4.2.3   DroneWrapper.flightmap(kwargs)
 
-   nested (bool, optional) ... if nested, the wrapped data of other objects is also returned
+    plots the height AGL of the drone over an OSM Map in your browser
+    
+    zoomstart (int, optional) ... decides on which zoomlevel the map should be rendered (can be changed while using the map by turning the mousewheel) - default: 21
+    colors (list of str, optional) ... changes the color used for the colormap - default: ["brown","white","blue"]
 
-4.2.3 DroneWrapper.flightmap(kwargs)
+4.2.5   DroneWrapper.advancedflightmap(y,kwargs)
 
-   plots the height AGL of the drone over an OSM Map in your browser
+    plots data of any wrapped obj over an OSM Map in your browser
+    
+    y (str) ... decides which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of)
+    
+    zoomstart (int, optional) ... decides on which zoomlevel the map should be rendered (can be changed while using the map by turning the mousewheel) - default: 21
+    colors (list of str, optional, optional) ... changes the color used for the colormap - default: ["brown","white","blue"]
+    target_height (int|float, optional) ... if a target height is given, only data in the height-range of target_height+-height_deviation is plotted
+    height_deviation (int|float, optional) ... specifies the range for the target height (only usefull if a target_height is given) - default: 1
+    bettermap (bool, optional) ... if True a grid of the values is calculated and plotted instead of single datapoints
+    bettermap_resolution (int, optional) ... only usefull if bettermap=True. A grid of bettermap_resolution x bettermap_resolution will be used to plot the data - default: 15
+    mapimage (str, optional) ... draws a picture on the map. The str must contain a path to a file without a file ending, but a .png and a .tfw have to exist. e.g mapimage="mypath/myfilename" to import mypath/myfilename.png and mypath/myfilename.tfw
+    save_loc (str, optional) ... if a path (with filename) is given, the map will be saved as an .html rather than printed in the browser
 
-   zoomstart (int, optional) ... decides on which zoomlevel the map should be rendered (can be changed while using the map by turning the mousewheel) - default: 21
-   colors (list of str, optional) ... changes the color used for the colormap - default: ["brown","white","blue"]
+4.2.6   DroneWrapper.plot(ax,y,**kwargs)
 
-4.2.5 DroneWrapper.advancedflightmap(y,kwargs)
+    plots Drone-produced data over time on an mpl-axis
+    
+    ax (mpl-axis) ... takes a mpl-axis on which the data will be plotted
+    y (str) ... decides which data will be plotted (legal: "height", "long", "lat")
+    
+    quakes (list of str, optional) ... takes a list of "HH:MM:SS"-strings and draws vertical lines at these times
+    quakeslabel (str, optional) ... a label that is used for the quakes if a legend is drawn
+    quakecolor (str, optional) ... decides the color of the quake-lines - default: "tab:purple"
+    color (str, optional) ... decides the color of the plot - default: "tab:green"
+    plotlabel (str, optional) ... a label that is used for the plot if a legend is drawn
+    ylabel (str, optional) ... a label that is used for the y-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given y
+    secondary (bool, optional) ... if True the plot will be drawn on the right y-axis - default: False
+    masknan (bool, optional) ... if True NaN values are masked out to draw a uninterupted plot - default: True
+    targetfunc (func, optional) ... decides how to check target1, target2 and targety (only works if these variables are given). the function must take two floats and an np array of floats and it must output an array of bools (mask) Default:
+                                            ```python
+                                            def targetfunc(target1,target2,ty): #ty is the data corresponding to targety
+                                                m = np.where(target1<ty,True,False)
+                                                m = np.where(ty<target2,m,False)
+                                                return m
+                                            ```
+    target1 (float, optional) ... takes a value that is checked in targetfunc
+    target2 (float, optional) ... takes a value that is checked in targetfunc
+    targety (str, optional) ... takes a legal y-string (depends on wrapped objects) and hands the corresponding data to targetfunc
 
-   plots data of any wrapped obj over an OSM Map in your browser
+4.2.7   DroneWrapper.advancedplot(ax,x,y,kwargs)
 
-   y (str) ... decides which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of)
-
-   zoomstart (int, optional) ... decides on which zoomlevel the map should be rendered (can be changed while using the map by turning the mousewheel) - default: 21
-   colors (list of str, optional, optional) ... changes the color used for the colormap - default: ["brown","white","blue"]
-   target_height (int|float, optional) ... if a target height is given, only data in the height-range of target_height+-height_deviation is plotted
-   height_deviation (int|float, optional) ... specifies the range for the target height (only usefull if a target_height is given) - default: 1
-   bettermap (bool, optional) ... if True a grid of the values is calculated and plotted instead of single datapoints
-   bettermap_resolution (int, optional) ... only usefull if bettermap=True. A grid of bettermap_resolution x bettermap_resolution will be used to plot the data - default: 15
-
-4.2.6 DroneWrapper.plot(ax,y,**kwargs)
-
-   plots Drone-produced data over time on an mpl-axis
-
-   ax (mpl-axis) ... takes a mpl-axis on which the data will be plotted
-   y (str) ... decides which data will be plotted (legal: "height", "long", "lat")
-
-   quakes (list of str, optional) ... takes a list of "HH:MM:SS"-strings and draws vertical lines at these times
-   quakeslabel (str, optional) ... a label that is used for the quakes if a legend is drawn
-   quakecolor (str, optional) ... decides the color of the quake-lines - default: "tab:purple"
-   color (str, optional) ... decides the color of the plot - default: "tab:green"
-   plotlabel (str, optional) ... a label that is used for the plot if a legend is drawn
-   ylabel (str, optional) ... a label that is used for the y-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given y
-   secondary (bool, optional) ... if True the plot will be drawn on the right y-axis - default: False
-   masknan (bool, optional) ... if True NaN values are masked out to draw a uninterupted plot - default: True
-   targetfunc (func, optional) ... decides how to check target1, target2 and targety (only works if these variables are given). the function must take two floats and an np array of floats and it must output an array of bools (mask) Default:
-                                           ```python
-                                           def targetfunc(target1,target2,ty): #ty is the data corresponding to targety
-                                               m = np.where(target1<ty,True,False)
-                                               m = np.where(ty<target2,m,False)
-                                               return m
-                                           ```
-   target1 (float, optional) ... takes a value that is checked in targetfunc
-   target2 (float, optional) ... takes a value that is checked in targetfunc
-   targety (str, optional) ... takes a legal y-string (depends on wrapped objects) and hands the corresponding data to targetfunc
-
-4.2.7 DroneWrapper.advancedplot(ax,x,y,kwargs)
-
-   ax (mpl-axis) ... takes a mpl-axis on which the data will be plotted
-   y (str) ... decides which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of)
-   x (str) ... decides over which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of; if the plot should be over time use "name_t")
-
-   color (str, optional) ... decides the color of the plot - default: "tab:green"
-   plotlabel (str, optional) ... a label that is used for the plot if a legend is drawn
-   xlabel (str, optional) ... a label that is used for the x-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given x
-   ylabel (str, optional) ... a label that is used for the y-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given y
-   scatter (bool, optional) ... if True the data is plotted as a scatterplot - default: False
-   secondary (bool, optional) ... if True the plot will be drawn on the right y-axis - default: False
-   masknan (bool, optional) ... if True NaN values are masked out to draw a uninterupted plot - default: True
-   showpearsonr (bool, optional) ... if True Pearsons R is calculated and shown in the plot - default: True
-   targetfunc (func, optional) ... decides how to check target1, target2 and targety (only works if these variables are given). the function must take two floats and an np array of floats and it must output an array of bools (mask) Default:
-                                           ```python
-                                           def targetfunc(target1,target2,ty): #ty is the data corresponding to targety
-                                               m = np.where(target1<ty,True,False)
-                                               m = np.where(ty<target2,m,False)
-                                               return m
-                                           ```
-   target1 (float, optional) ... takes a value that is checked in targetfunc
-   target2 (float, optional) ... takes a value that is checked in targetfunc
-   targety (str, optional) ... takes a legal y-string (depends on wrapped objects) and hands the corresponding data to targetfunc
+    ax (mpl-axis) ... takes a mpl-axis on which the data will be plotted
+    y (str) ... decides which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of)
+    x (str) ... decides over which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of; if the plot should be over time use "name_t")
+    
+    color (str, optional) ... decides the color of the plot - default: "tab:green"
+    plotlabel (str, optional) ... a label that is used for the plot if a legend is drawn
+    xlabel (str, optional) ... a label that is used for the x-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given x
+    ylabel (str, optional) ... a label that is used for the y-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given y
+    scatter (bool, optional) ... if True the data is plotted as a scatterplot - default: False
+    secondary (bool, optional) ... if True the plot will be drawn on the right y-axis - default: False
+    masknan (bool, optional) ... if True NaN values are masked out to draw a uninterupted plot - default: True
+    showpearsonr (bool, optional) ... if True Pearsons R is calculated and shown in the plot - default: True
+    targetfunc (func, optional) ... decides how to check target1, target2 and targety (only works if these variables are given). the function must take two floats and an np array of floats and it must output an array of bools (mask) Default:
+                                            ```python
+                                            def targetfunc(target1,target2,ty): #ty is the data corresponding to targety
+                                                m = np.where(target1<ty,True,False)
+                                                m = np.where(ty<target2,m,False)
+                                                return m
+                                            ```
+    target1 (float, optional) ... takes a value that is checked in targetfunc
+    target2 (float, optional) ... takes a value that is checked in targetfunc
+    targety (str, optional) ... takes a legal y-string (depends on wrapped objects) and hands the corresponding data to targetfunc
    
 4.2.8 DroneWrapper.save(filename)
 
@@ -664,7 +725,7 @@
     togglecbar (bool) ... toggles colorbar, default-True
     xlims (list of str) ... takes 2 strings in "H:M:S"-format and uses them as xlims
     
-6.1.4 WIBS.plot(ax,y,**kwargs)
+6.1.4   WIBS.plot(ax,y,**kwargs)
 
     draws a plot of y on an existing mpl-axis
     

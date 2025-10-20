@@ -1,3 +1,15 @@
+######################### MR 20.10.2025 #########################
+#                      "added.OPC class"                        #
+#                                                               #
+# - added doctrsings to Pops                                    #
+# - added OPC object                                            #
+# - fixed display bug of the Unit Ohm for the gas resistance of #
+#   FlyingFlo_USB object                                        #
+# - renamed pops.py to particle_counters.py                     #
+# - added kwargs mapimage and save_loc to                       #
+#   DroneWrapper.advancedflightmap()                            #
+#################################################################
+
 ######################### MR 09.09.2025 #########################
 #                   "added target plotting"                     #
 #                                                               #

@@ -5,7 +5,7 @@ with open("docu/pypi_descr.md","r") as f:
 
 setup(
     name = "agg_dim",
-    version = "0.1.8",
+    version = "0.1.9",
     description="Data import modules for instruments used by AG Grothe",
     packages = find_packages(),
     long_description = long_description,
@@ -36,15 +36,16 @@ setup(
                         "numba>=0.59.0",
                         "numpy>=1.26.4",
                         "packaging>=23.2",
-                        "pillow>=10.3.0",
+                        "pillow>=11.1.0",
                         "pyparsing>=3.1.2",
                         "python-dateutil>=2.8.2",
                         "requests>=2.31.0",
                         "six>=1.16.0",
                         "urllib3>=2.0.7",
+                        "utm>=0.8.1",
                         "xyzservices>=2022.9.0",
                         ],
     extras_require={"dev" : ["twine>=6.1.0"]},
     python_requires=">=3.11.7",
-    keywords = ["POPS","WIBS","SEN55","CCS811"]
+    keywords = ["POPS","WIBS","SEN55","CCS811","OPC"]
     )
