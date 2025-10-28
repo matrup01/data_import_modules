@@ -6,618 +6,572 @@ Created on Tue Nov 26 08:26:00 2024
 """
 
 
-from datetime import datetime
+from datetime import datetime,timezone
 import h5py
 import numpy as np
 import math
-from copy import deepcopy
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
-from matplotlib.colors import LogNorm
-from .ErrorHandler import IllegalValue,NotPlottable,IllegalArgument
+import pickle
+
+from .ErrorHandler import IllegalValue,IllegalArgument
 
 class WIBS:
     
-    """full documentation see https://github.com/matrup01/data_import_modules \n
-    
-    file (str or list of str) ... takes a WIBS-produced h5-file or a list of WIBS-produced H5-files\n
-    FT_file (str) ... takes a WIBS-produced h5-file and uses the FluorPeaks to calculate a background (give "none" if no FT was made)\n\n
-    
-    FT_sigma (int, optional) ... decides how many times std should be added to mean in FT, default-3\n
-    timecorr (int, optional) ... takes an int and corrects the time by it (should be used for time differences between WIBS-computer and real time; weird WIBS time format should automatically be corrected)\n
-    bin_borders (list of int, optional) ... takes a list of ints and uses them as bin borders in micro meters, default-[0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,1.7,2,2.5,3,3.5,4,5,10,15,20]\n
-    flow (float) ... takes the volumetric flow rate in l/min, default-0.3\n
-    loadexcited (bool) ... decides if excited particles are loaded (untoggle if facing performance issues), default-True\n
-    loadfl1 (bool) ... decides if Fluorescence_1 is loaded (untoggle if facing performance issues), default-True\n
-    loadfl2 (bool) ... decides if Fluorescence_2 is loaded (untoggle if facing performance issues), default-True\n
-    loadfl3 (bool) ... decides if Fluorescence_3 is loaded (untoggle if facing performance issues), default-True\n
-    FixedFT (list of int with len=3) ... takes 3 ints and takes them as FT-backgrounds, default values are completely random, default-[1000000,500000,300000]\n
-    wintertime (bool) ... if True 3600s are taken from wibstime, default-True\n
-    channels (list of str, optional) ... takes a list of strings to decide which channels should be loaded (loadfl,loadfl2 and loadfl3 need to be true), eg.: channels=["a","ac","abc"]"""
-    
-    def __init__(self,file,FT_file,**kwargs):
-        
-        #import kwargs
-        self.sigma = kwargs["FT_sigma"] if "FT_sigma" in kwargs else 3
-        self.bin_borders = kwargs["bin_borders"] if "bin_borders" in kwargs else [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,1.7,2,2.5,3,3.5,4,5,10,15,20]
-        self.flow = kwargs["flow"]*1000/60 if "flow" in kwargs else 0.3*1000/60
-        
-        timecorr = kwargs["timecorr"] if "timecorr" in kwargs else 0
-        wintertime = kwargs["wintertime"] if "wintertime" in kwargs else True
-        loadexcited = kwargs["loadexcited"] if "loadexcited" in kwargs else False
-        loadfl1 = kwargs["loadfl1"] if "loadfl1" in kwargs else True
-        loadfl2 = kwargs["loadfl2"] if "loadfl2" in kwargs else True
-        loadfl3 = kwargs["loadfl3"] if "loadfl3" in kwargs else True
-        fixed = kwargs["FixedFT"] if "FixedFT" in kwargs else [100000,500000,300000]
-        channels = kwargs["channels"] if "channels" in kwargs else "none"
-        FT_time = kwargs["FT_time"] if "FT_time" in kwargs else "none"
-        
-        #make sure fluorescence data is loaded when channels are given
-        if type(channels) == list:
-            loadfl1 = True
-            loadfl2 = True
-            loadfl3 = True
-        
-        #setup variables
-        self.bins = len(self.bin_borders)-1
-        self.bin_means = [math.sqrt(self.bin_borders[i] * self.bin_borders[i+1]) for i in range(self.bins)]
-        self.data = {}
-        self.processed_data = {}
-        self.misc = {} #[name,unit,plotable]
-        
-        #error handling
-        for key in kwargs:
-            if key not in ["FT_sigma","bin_borders","flow","timecorr","loadexcited","loadfl1","loadfl2","loadfl3","FixedFT","channels","FT_time"]:
-                raise IllegalArgument(key,"WIBS")
-        
-        
-        #load Forced Trigger
-        if loadfl1 or loadfl2 or loadfl3 or FT_time != "none":
-            if FT_file == "none":
-                
-                #random values, load FT for accurate results
-                self.fl1_FTbg,self.fl2_FTbg,self.fl3_FTbg = fixed
-                
-            else:
-                ft = h5py.File(FT_file,"r")
-                ft2 = ft["NEO"]
-                ft3 = ft2["ParticleData"]
-                
-                ft_xe1 = np.transpose(list(ft3["Xe1_FluorPeak"]))
-                ft_xe2 = np.transpose(list(ft3["Xe2_FluorPeak"]))
-                self.start_FT = list(ft3["Seconds"])[0]
-                self.start_FT = self.start_FT- 3810797754 + 1727952954 - timecorr + 3600 if wintertime else self.start_FT- 3810797754 + 1727952954 - timecorr + 7200
-                self.start_FT = datetime.utcfromtimestamp(self.start_FT)
-                
-                if FT_time != "none":
-                    
-                    FT_time = datetime.strptime(FT_time,"%H:%M:%S")
-                    self.FT_timecorrection = FT_time - self.start_FT
-                    
-                else:
-                    self.FT_timecorrection = self.start_FT - self.start_FT
-                
-                if loadfl1: self.fl1_FTbg = np.mean(ft_xe1[0]) + self.sigma * np.std(ft_xe1[0])
-                if loadfl2: self.fl2_FTbg = np.mean(ft_xe1[1]) + self.sigma * np.std(ft_xe1[1])
-                if loadfl3: self.fl3_FTbg = np.mean(ft_xe2[1]) + self.sigma * np.std(ft_xe2[1])
-        
-        
-        #load file
-        if type(file) == str:
-            f = h5py.File(file,"r")
-            f2 = f["NEO"]
-            f3 = f2['ParticleData']
-            
-            wibstime = list(f3["Seconds"])
-            wibstime = [wibstime[i] - 3810797754 + 1727952954 for i in range(len(wibstime))] #correct weird WIBS dataformat
-            if wintertime:
-                wibstime = [wibstime[i] + 3600 - timecorr for i in range(len(wibstime))] #correct timezone and WIBS-computer time error
-            else:
-                wibstime = [wibstime[i] + 7200 - timecorr for i in range(len(wibstime))] #correct timezone and WIBS-computer time error
-            self.wibstime = [datetime.utcfromtimestamp(wibstime[i]) + self.FT_timecorrection for i in range(len(wibstime))] #convert to datetime
-            
-            xe1 = np.transpose(list(f3["Xe1_FluorPeak"]))
-            xe2 = np.transpose(list(f3["Xe2_FluorPeak"]))
-            
-            self.data["size"] = list(f3["Size_um"])
-            if loadexcited: self.data["excited"] = [bool(ex) for ex in list(f3["Flag_Excited"])]
-            if loadfl1: self.data["Fl1"] = [False if np.isnan(i) or self.fl1_FTbg > i else True for i in xe1[0]]
-            if loadfl2: self.data["Fl2"] = [False if np.isnan(i) or self.fl2_FTbg > i else True for i in xe1[1]]
-            if loadfl3: self.data["Fl3"] = [False if np.isnan(i) or self.fl3_FTbg > i else True for i in xe2[1]]
-            
+    """
+    Inits the WIBS obj
 
-        #load files
-        if type(file) == list:
-            wibstime = []
-            sizes = []
-            exs = []
-            fl1 = []
-            fl2 = []
-            fl3 = []
+    Parameters
+    ----------
+    file : str or list of str
+        Either the path to a wibs produced .h5 file or to a preprocessed .wibs file or a list of paths to wibs produced .h5 files.
+    FT_file : str
+        Path to a wibs produced forcedtrigger-file. Can be left if a preprocessed .wibs file is passed as file.
+    FT_time : str
+        String in the form of 'hh:mm:ss' of the time when the forced trigger was started, which is used to correct the time. Can be left if a preprocessed .wibs file is passed as file.
+    FT_sigma : int or float, optional
+        Will be used as sigma for data processing. The default is 3.
+    bin_borders : list of float, optional
+        Particles will be classified according to the bins given here (in micrometers). The default is [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,1.7,2,2.5,3,3.5,4,5,10,15,20]
+    flow : float, optional
+        Flow in ccm/s. Will be used to calculate partconc and dndlogdp. The default is 0.018 ccm/s (=0.3 lpm).
+    fixed : list of floats with len 3, optional
+        If fixed is passed, the values will be treated as bg and FT_file will only be used for time correction.
+    start : str, optional
+        String in the form 'hh:mm:ss'. If start is given, all data acquired before this timestamp will be ignored.
+    end : str, optional
+        String in the form 'hh:mm:ss'. If end is given, all data acquired after this timestamp will be ignored.
+    FT_date : str, optional
+        Sets the FT_time to be this date (str format: 'dd.mm.yyyy'), only relevant if the data is going to be compared with other data. The default is '01.01.2000'
+
+    Variables
+    ---------
+    WIBS.bins : int
+        Number of bins
+    WIBS.bin_means : list of float
+        Geometric means of bins. Used for dndlogdp stuff.
+    WIBS.data : {str : 1D numpy array}
+        contains all processed data in the form of a dictionary (processed for every second)
+    WIBS.details : {str : [str, str]}
+        contains a description and the unit to each data array
+    WIBS.rawdata : {str : 1D numpy array}
+        conains all the raw data used for data processing
+    WIBS.fl1_FTbg : float
+        Contains the fluorescence of the chamber for fl1, calculated from the forced trigger.
+    WIBS.fl2_FTbg : float
+        Contains the fluorescence of the chamber for fl2, calculated from the forced trigger.
+    WIBS.fl3_FTbg : float
+        Contains the fluorescence of the chamber for fl3, calculated from the forced trigger.
+    """
+    
+    def __init__(self,file,FT_file="",FT_time="hh:mm:ss",**kwargs):
+        """
+        Inits the WIBS obj
+
+        Parameters
+        ----------
+        file : str or list of str
+            Either the path to a wibs produced .h5 file or to a preprocessed .wibs file or a list of paths to wibs produced .h5 files.
+        FT_file : str
+            Path to a wibs produced forcedtrigger-file. Can be left if a preprocessed .wibs file is passed as file.
+        FT_time : str
+            String in the form of 'hh:mm:ss' of the time when the forced trigger was started, which is used to correct the time. Can be left if a preprocessed .wibs file is passed as file.
+        FT_sigma : int or float, optional
+            Will be used as sigma for data processing. The default is 3.
+        bin_borders : list of float, optional
+            Particles will be classified according to the bins given here (in micrometers). The default is [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,1.7,2,2.5,3,3.5,4,5,10,15,20]
+        flow : float, optional
+            Flow in ccm/s. Will be used to calculate partconc and dndlogdp. The default is 0.018 ccm/s (=0.3 lpm).
+        fixed : list of floats with len 3, optional
+            If fixed is passed, the values will be treated as bg and FT_file will only be used for time correction.
+        start : str, optional
+            String in the form 'hh:mm:ss'. If start is given, all data acquired before this timestamp will be ignored.
+        end : str, optional
+            String in the form 'hh:mm:ss'. If end is given, all data acquired after this timestamp will be ignored.
+        FT_date : str, optional
+            Sets the FT_time to be this date (str format: 'dd.mm.yyyy'), only relevant if the data is going to be compared with other data. The default is '01.01.2000'
+
+
+        """
+        
+        if file[-5:] == ".wibs":
             
-            for ff in file:
-                f = h5py.File(ff,"r")
+            ip = pickle.load(open(file,"rb"))
+            
+            for arg in ip.keys():
+                exec(f"self.{arg} = ip[arg]")
+                
+        else:
+        
+            #import kwargs
+            defaults = {
+                "FT_sigma" : 3,
+                "bin_borders" : [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,1.7,2,2.5,3,3.5,4,5,10,15,20],
+                "flow" : 0.3*1000/60,
+                "fixed" : None, #[float,flat,float]
+                "start" : None,
+                "end" : None,
+                "FT_date" : "01.01.2000"
+                }
+            for key,value in defaults.items():
+                self.hk_kwargs(kwargs, key, value)
+            self.hk_errorhandling(kwargs, defaults.keys(), "WIBS")
+            
+            #setup variables
+            self.bins = len(self.bin_borders)-1
+            self.bin_means = [math.sqrt(self.bin_borders[i] * self.bin_borders[i+1]) for i in range(self.bins)]
+            self.data = {}
+            self.rawdata = {}
+            self.details = {} #[name,unit]
+            if self.fixed != None:
+                self.fl1_FTbg = self.fixed[0]
+                self.fl2_FTbg = self.fixed[1]
+                self.fl3_FTbg = self.fixed[2]
+            
+            
+            #load Forced Trigger
+            
+            if FT_file == "":
+                raise KeyError("WIBS needs a FT_file unless preprocessed data (.wibs-file) is used")
+    
+            try:
+                ft = h5py.File(FT_file,"r")
+            except:
+                raise FileNotFoundError("Cant find FT_file at given path")
+            ft2 = ft["NEO"]
+            ft3 = ft2["ParticleData"]
+            
+            ft_xe1 = np.transpose(list(ft3["Xe1_FluorPeak"]))
+            ft_xe2 = np.transpose(list(ft3["Xe2_FluorPeak"]))
+            self.start_FT = datetime.fromtimestamp(list(ft3["Seconds"])[0],tz=timezone.utc)
+            
+            
+            FT_time = datetime.strptime(f"{self.FT_date}-{FT_time}/+0000","%d.%m.%Y-%H:%M:%S/%z")
+            timecorr = FT_time - self.start_FT
+            
+            if self.fixed == None:
+                self.fl1_FTbg = np.mean(ft_xe1[0]) + self.FT_sigma * np.std(ft_xe1[0])
+                self.fl2_FTbg = np.mean(ft_xe1[1]) + self.FT_sigma * np.std(ft_xe1[1])
+                self.fl3_FTbg = np.mean(ft_xe2[1]) + self.FT_sigma * np.std(ft_xe2[1])
+            
+            
+            #load file
+            if type(file) == str:
+                try:
+                    f = h5py.File(file,"r")
+                except:
+                    raise FileNotFoundError("Cant find file at given path")
                 f2 = f["NEO"]
                 f3 = f2['ParticleData']
                 
-                filetime = list(f3["Seconds"])
-                filetime = [filetime[i] - 3810797754 + 1727952954 for i in range(len(filetime))] #correct weird WIBS dataformat
-                if wintertime:
-                    filetime = [filetime[i] + 3600 - timecorr for i in range(len(filetime))] #correct timezone and WIBS-computer time error
-                else:
-                    filetime = [filetime[i] + 7200 - timecorr for i in range(len(filetime))] #correct timezone and WIBS-computer time error
-                filetime = [datetime.utcfromtimestamp(filetime[i]) + self.FT_timecorrection for i in range(len(filetime))] #convert to datetime
+                wibstime = list(f3["Seconds"])
+                self.timehandler = np.array(wibstime).astype(np.uint32)
                 
-                filecounts = list(f3["Size_um"])
                 xe1 = np.transpose(list(f3["Xe1_FluorPeak"]))
                 xe2 = np.transpose(list(f3["Xe2_FluorPeak"]))
-                if loadexcited:
-                    file_exc = list(f3["Flag_Excited"])
-                    for e in file_exc:
-                        exs.append(bool(e))
-                if loadfl1: 
-                    file_fl1 = [False if np.isnan(i) or self.fl1_FTbg > i else True for i in xe1[0]]
-                    for ff1 in file_fl1:
-                        fl1.append(ff1)
-                if loadfl2: 
-                    file_fl2 = [False if np.isnan(i) or self.fl2_FTbg > i else True for i in xe1[1]]
-                    for ff2 in file_fl2:
-                        fl2.append(ff2)
-                if loadfl3: 
-                    file_fl3 = [False if np.isnan(i) or self.fl3_FTbg > i else True for i in xe2[1]]
-                    for ff3 in file_fl3:
-                        fl1.append(ff3)
                 
-                for time,count in zip(filetime,filecounts):
-                    wibstime.append(time)
-                    sizes.append(count)
+                self.rawdata["size"] = np.array(list(f3["Size_um"]))
+                self.rawdata["excited"] = np.array(list(f3["Flag_Excited"])).astype(bool)
+                self.rawdata["Fl1"] = np.where(xe1[0] >= self.fl1_FTbg, True, False)
+                self.rawdata["Fl2"] = np.where(xe1[1] >= self.fl2_FTbg, True, False)
+                self.rawdata["Fl3"] = np.where(xe2[1] >= self.fl3_FTbg, True, False)
+                
+    
+            #load files
+            elif type(file) == list:
+    
+                firstfile = True
+                
+                for ff in file:
+                    f = h5py.File(ff,"r")
+                    f2 = f["NEO"]
+                    f3 = f2['ParticleData']
                     
-            self.wibstime = wibstime
-            self.data["size"] = sizes
-            if loadexcited: self.data["excited"] = exs
-            if loadfl1: self.data["Fl1"] = fl1
-            if loadfl2: self.data["Fl2"] = fl2
-            if loadfl3: self.data["Fl3"] = fl3
-
-            
-        #process data
-        self.t = []
-        self.timehandler = []
-        for i in range(len(self.wibstime)):
-            roundtime = self.wibstime[i].replace(microsecond=0)
-            if roundtime not in self.t:
-                self.t.append(roundtime)
-                self.timehandler.append([i])
-            else:
-                self.timehandler[-1].append(i)
-        self.date = [self.t[0].day,self.t[0].month,self.t[0].year]
+                    filetime = list(f3["Seconds"])
+                    th = np.array(filetime).astype(np.uint32)
+                    
+                    xe1 = np.transpose(list(f3["Xe1_FluorPeak"]))
+                    xe2 = np.transpose(list(f3["Xe2_FluorPeak"]))
+                    if len(xe1) == 0 or len(xe2) == 0:
+                        continue
+                    
+                    filecounts = np.array(list(f3["Size_um"]))
+                    file_excited = np.array(list(f3["Flag_Excited"])).astype(bool)
+                    filefl1 = np.where(xe1[0] >= self.fl1_FTbg, True, False)
+                    filefl2 = np.where(xe1[1] >= self.fl2_FTbg, True, False)
+                    filefl3 = np.where(xe2[1] >= self.fl3_FTbg, True, False)
+                    
+                    if firstfile:
+                        self.timehandler = th.astype(np.uint32)
+                        self.rawdata["size"] = filecounts
+                        self.rawdata["excited"] = file_excited
+                        self.rawdata["Fl1"] = filefl1
+                        self.rawdata["Fl2"] = filefl2
+                        self.rawdata["Fl3"] = filefl3
+                        firstfile = False
+                    else:
+                        self.timehandler = np.append(self.timehandler,th).astype(np.uint32)
+                        self.rawdata["size"] = np.append(self.rawdata["size"],filecounts)
+                        self.rawdata["excited"] = np.append(self.rawdata["excited"],file_excited)
+                        self.rawdata["Fl1"] = np.append(self.rawdata["Fl1"],filefl1)
+                        self.rawdata["Fl2"] = np.append(self.rawdata["Fl2"],filefl2)
+                        self.rawdata["Fl3"] = np.append(self.rawdata["Fl3"],filefl3)
+               
+             
+            if type(self.start) == str:
+                starttime = datetime.strptime(f"{self.FT_date}-{self.start}/+0000","%d.%m.%Y-%H:%M:%S/%z")
+                starttime = int(starttime.replace(year=int(self.FT_date[-4:])).timestamp())
+                start_m = np.where((self.timehandler + int(timecorr.total_seconds())) > starttime, True, False)
+                self.timehandler = self.timehandler[start_m]
+                self.rawdata["size"] = self.rawdata["size"][start_m]
+                self.rawdata["excited"] = self.rawdata["excited"][start_m]
+                self.rawdata["Fl1"] = self.rawdata["Fl1"][start_m]
+                self.rawdata["Fl2"] = self.rawdata["Fl2"][start_m]
+                self.rawdata["Fl3"] = self.rawdata["Fl3"][start_m]
+                del start_m
+            if type(self.end) == str:
+               endtime = datetime.strptime(f"{self.FT_date}-{self.end}/+0000","%d.%m.%Y-%H:%M:%S/%z")
+               endtime = int(endtime.replace(year=int(self.FT_date[-4:])).timestamp())
+               end_m = np.where((self.timehandler + int(timecorr.total_seconds())) < endtime,True,False)
+               self.timehandler = self.timehandler[end_m] 
+               self.rawdata["size"] = self.rawdata["size"][end_m]
+               self.rawdata["excited"] = self.rawdata["excited"][end_m]
+               self.rawdata["Fl1"] = self.rawdata["Fl1"][end_m]
+               self.rawdata["Fl2"] = self.rawdata["Fl2"][end_m]
+               self.rawdata["Fl3"] = self.rawdata["Fl3"][end_m]
+               del end_m
+    
                 
-        #counts per second
-        cps = []
-        for handler in self.timehandler:
-            appender = [0 for i in range(self.bins)]
-            for count in handler:
-                if self.hk_binsorter(self.data["size"][count]) != 123456789:
-                    appender[self.hk_binsorter(self.data["size"][count])] += 1
-            cps.append(np.array(appender))
-        self.processed_data["cps"] = cps
-        self.misc["cps"] = ["Counts","#/s",False]
-        
-        #particle concentration
-        partconc = []
-        for dataset in self.processed_data["cps"]:
-            conc = sum(dataset) / self.flow
-            partconc.append(conc)
-        self.processed_data["partconc"] = partconc
-        self.misc["partconc"] = ["Particle Concentration","#/cm${}^3$",True]
-            
-        #dndlogdp
-        dndlogdp = []
-        for dataset in self.processed_data["cps"]:
-            dat = self.hk_dndlogdp(dataset)
-            dndlogdp.append(dat)
-        self.processed_data["dndlogdp"] = dndlogdp
-        self.misc["dndlogdp"] = ["dN/dlog$D_p$","cm${}^{-3}$",False]
-        
-        if loadexcited:
-        
-            #counts per second
-            cps = []
-            for handler in self.timehandler:
-                appender = [0 for i in range(self.bins)]
-                for count in handler:
-                    if self.data["excited"][count]:
-                        if self.hk_binsorter(self.data["size"][count]) != 123456789:
-                            appender[self.hk_binsorter(self.data["size"][count])] += 1
-                cps.append(np.array(appender))
-            self.processed_data["ex_cps"] = cps
-            self.misc["ex_cps"] = ["Counts (excited)","#/s",False]
-            
-            #particle concentration
-            partconc = []
-            for dataset in self.processed_data["ex_cps"]:
-                conc = sum(dataset) / self.flow
-                partconc.append(conc)
-            self.processed_data["ex_partconc"] = partconc
-            self.misc["ex_partconc"] = ["Particle Concentration (excited)","#/cm${}^3$",True]
-                
-            #dndlogdp
-            dndlogdp = []
-            for dataset in self.processed_data["ex_cps"]:
-                dat = self.hk_dndlogdp(dataset)
-                dndlogdp.append(dat)
-            self.processed_data["ex_dndlogdp"] = dndlogdp
-            self.misc["ex_dndlogdp"] = ["dN/dlog$D_p$ (excited)","cm${}^{-3}$",False]
-        
-        if loadfl1:
-        
-            #counts per second
-            cps1 = []
-            for handler in self.timehandler:
-                appender = [0 for i in range(self.bins)]
-                for count in handler:
-                    if self.data["Fl1"][count]:
-                        if self.hk_binsorter(self.data["size"][count]) != 123456789:
-                            appender[self.hk_binsorter(self.data["size"][count])] += 1
-                cps.append(np.array(appender))
-            self.processed_data["fl1_cps"] = cps1
-            self.misc["fl1_cps"] = ["Counts (Fl1)","#/s",False]
-            
-            #particle concentration
-            partconc1 = []
-            for dataset in self.processed_data["fl1_cps"]:
-                conc = sum(dataset) / self.flow
-                partconc1.append(conc)
-            self.processed_data["fl1_partconc"] = partconc1
-            self.misc["fl1_partconc"] = ["Particle Concentration (Fl1)","#/cm${}^3$",True]
+            #process data
+            self.data["t"] = np.array([datetime.utcfromtimestamp(timestamp) for timestamp in range(self.timehandler[0],self.timehandler[-1])]) + timecorr
+            self.date = [self.data["t"][0].day,self.data["t"][0].month,self.data["t"][0].year]
+            time_mask = np.array([np.where(self.timehandler==i,True,False) for i in range(self.timehandler[0],self.timehandler[-1])])
+                    
+            #part_conc & #/s
+            for bin_no in range(self.bins):
+                m = np.where(self.bin_borders[bin_no] < self.rawdata["size"],True,False)
+                m = np.where(self.bin_borders[bin_no+1] > self.rawdata["size"],m,False)
+                bin_handler = time_mask & m
+                self.data[f"bin{bin_no}_cps"] = np.array([np.count_nonzero(arr) for arr in bin_handler])
+                del bin_handler
+                self.data[f"bin{bin_no}_partconc"] = self.data[f"bin{bin_no}_cps"] / self.flow
+                self.details[f"bin{bin_no}_partconc"] = [f"Particle Conc. (bin{bin_no}) ","#/cm${}^3$"]
+                self.details[f"bin{bin_no}_cps"] = [f"Particle Counts (Bin{bin_no})","#/s"]
                 
             #dndlogdp
-            dndlogdp = []
-            for dataset in self.processed_data["fl1_cps"]:
-                dat = self.hk_dndlogdp(dataset)
-                dndlogdp.append(dat)
-            self.processed_data["fl1_dndlogdp"] = dndlogdp
-            self.misc["fl1_dndlogdp"] = ["dN/dlog$D_p$ (Fl1)","cm${}^{-3}$",False]
-            
-        if loadfl2:
-        
-            #counts per second
-            cps = []
-            for handler in self.timehandler:
-                appender = [0 for i in range(self.bins)]
-                for count in handler:
-                    if self.data["Fl2"][count]:
-                        if self.hk_binsorter(self.data["size"][count]) != 123456789:
-                            appender[self.hk_binsorter(self.data["size"][count])] += 1
-                cps.append(np.array(appender))
-            self.processed_data["fl2_cps"] = cps
-            self.misc["fl2_cps"] = ["Counts (Fl2)","#/s",False]
-            
-            #particle concentration
-            partconc = []
-            for dataset in self.processed_data["fl2_cps"]:
-                conc = sum(dataset) / self.flow
-                partconc.append(conc)
-            self.processed_data["fl2_partconc"] = partconc
-            self.misc["fl2_partconc"] = ["Particle Concentration (Fl2)","#/cm${}^3$",True]
+            for bin_no in range(self.bins):
+                log_binwidth = np.log10(self.bin_borders[bin_no+1])-np.log10(self.bin_borders[bin_no])
+                self.data[f"bin{bin_no}_dndlogdp"] = self.data[f"bin{bin_no}_partconc"] / log_binwidth
+                self.details[f"bin{bin_no}_dndlogdp"] = [f"dN/dlog$D_P$ (Bin{bin_no})","$\mu$m${}^{-1}$"]
                 
-            #dndlogdp
-            dndlogdp = []
-            for dataset in self.processed_data["fl2_cps"]:
-                dat = self.hk_dndlogdp(dataset)
-                dndlogdp.append(dat)
-            self.processed_data["fl2_dndlogdp"] = dndlogdp
-            self.misc["fl2_dndlogdp"] = ["dN/dlog$D_p$ (Fl2)","cm${}^{-3}$",False]
+            #total
+            self.data["total_cps"] = np.sum([self.data[f"bin{i}_cps"] for i in range(self.bins)],axis=0)
+            self.data["total_partconc"] = self.data["total_cps"] / self.flow
+            self.details["total_cps"] = ["Particle Counts","#/s"]
+            self.details["total_partconc"] = ["Particle Conc.","#/cm${}^3$"]
             
-        if loadfl3:
-        
-            #counts per second
-            cps = []
-            for handler in self.timehandler:
-                appender = [0 for i in range(self.bins)]
-                for count in handler:
-                    if self.data["Fl3"][count]:
-                        if self.hk_binsorter(self.data["size"][count]) != 123456789:
-                            appender[self.hk_binsorter(self.data["size"][count])] += 1
-                cps.append(np.array(appender))
-            self.processed_data["fl3_cps"] = cps
-            self.misc["fl3_cps"] = ["Counts (Fl3)","#/s",False]
             
-            #particle concentration
-            partconc = []
-            for dataset in self.processed_data["fl3_cps"]:
-                conc = sum(dataset) / self.flow
-                partconc.append(conc)
-            self.processed_data["fl3_partconc"] = partconc
-            self.misc["fl3_partconc"] = ["Particle Concentration (Fl3)","#/cm${}^3$",True]
+            #excited
+            ex_handler = time_mask & self.rawdata["excited"]
+            self.data["excited"] = np.array([np.count_nonzero(arr) for arr in ex_handler])
+            del ex_handler
+            self.data["excited_fraction"] = np.divide(self.data["excited"],self.data["total_cps"],out=np.zeros(self.data["excited"].shape,dtype=float),where=self.data["total_cps"]!=0)
+            self.details["excited"] = ["Particle Counts (excited)","#/s"]
+            self.details["excited_fraction"] = ["Fraction of excited Particles", "No Unit"]
+            
+            
+            #fluorescence channels
+            fl1_handler = time_mask & self.rawdata["Fl1"]
+            fl2_handler = time_mask & self.rawdata["Fl2"]
+            fl3_handler = time_mask & self.rawdata["Fl3"]
+            
+            self.data["fl1"] = np.array([np.count_nonzero(arr) for arr in fl1_handler])
+            self.data["fl2"] = np.array([np.count_nonzero(arr) for arr in fl2_handler])
+            self.data["fl3"] = np.array([np.count_nonzero(arr) for arr in fl3_handler])
+            self.data["fl1_fraction"] = np.divide(self.data["fl1"],self.data["total_cps"],out=np.zeros(self.data["fl1"].shape,dtype=float),where=self.data["total_cps"]!=0)
+            self.data["fl2_fraction"] = np.divide(self.data["fl2"],self.data["total_cps"],out=np.zeros(self.data["fl2"].shape,dtype=float),where=self.data["total_cps"]!=0)
+            self.data["fl3_fraction"] = np.divide(self.data["fl3"],self.data["total_cps"],out=np.zeros(self.data["fl3"].shape,dtype=float),where=self.data["total_cps"]!=0)
+            for i in [1,2,3]:
+                self.details[f"fl{i}"] = [f"Particle Counts (Fl{i})","#/s"]
+                self.details[f"fl{i}_fraction"] = [f"Fluorescent Fraction (Fl{i})", "No Unit"]
+            
+            def createmask(a,b,c,string):
+                a = a if "a" in string else ~a
+                b = b if "b" in string else ~b
+                c = c if "c" in string else ~c
                 
-            #dndlogdp
-            dndlogdp = []
-            for dataset in self.processed_data["fl3_cps"]:
-                dat = self.hk_dndlogdp(dataset)
-                dndlogdp.append(dat)
-            self.processed_data["fl3_dndlogdp"] = dndlogdp
-            self.misc["fl3_dndlogdp"] = ["dN/dlog$D_p$ (Fl3)","cm${}^{-3}$",False]
+                op = a&b
+                return op&c
             
-        #get channels
-        if type(channels) == list:
-            for string in channels:
-                self.hk_getchannels(string)
+            for channel in ["a","b","c","ab","ac","bc","abc"]:
+                channel_mask = createmask(fl1_handler,fl2_handler,fl3_handler,channel)
+                for bin_no in range(self.bins):
+                    m =np.where(self.bin_borders[bin_no] < self.rawdata["size"],True,False)
+                    m = np.where(self.bin_borders[bin_no+1] > self.rawdata["size"],m,False)
+                    m = channel_mask & m
+                    self.data[f"{channel}_bin{bin_no}_cps"] = np.array([np.count_nonzero(arr) for arr in m])
+                    self.data[f"{channel}_bin{bin_no}_partconc"] = self.data[f"{channel}_bin{bin_no}_cps"] / self.flow
+                    self.details[f"{channel}_bin{bin_no}_partconc"] = [f"Particle Conc. of {channel}-Particles (bin{bin_no}) ","#/cm${}^3$"]
+                    self.details[f"{channel}_bin{bin_no}_cps"] = [f"Particle Counts of {channel}-Particles (Bin{bin_no})","#/s"]
+                    
+                    log_binwidth = np.log10(self.bin_borders[bin_no+1])-np.log10(self.bin_borders[bin_no])
+                    self.data[f"{channel}_bin{bin_no}_dndlogdp"] = self.data[f"{channel}_bin{bin_no}_partconc"] / log_binwidth
+                    self.details[f"{channel}_bin{bin_no}_dndlogdp"] = [f"dN/dlog$D_P$ of {channel}-Particles (Bin{bin_no})","$\mu$m${}^{-1}$"]
+                    
+                self.data[f"{channel}_total_cps"] = np.sum([self.data[f"{channel}_bin{i}_cps"] for i in range(self.bins)],axis=0)
+                self.data[f"{channel}_total_partconc"] = self.data[f"{channel}_total_cps"] / self.flow
+                self.data[f"{channel}_fraction"] = np.divide(self.data[f"{channel}_total_cps"],self.data["total_cps"],out=np.zeros(self.data[f"{channel}_total_cps"].shape,dtype=float),where=self.data["total_cps"]!=0)
+                self.details[f"{channel}_total_cps"] = [f"Particle Counts of {channel}-Particles","#/s"]
+                self.details[f"{channel}_total_partconc"] = [f"Particle Conc. of {channel}-Particles","#/cm${}^3$"]
+                self.details[f"{channel}_fraction"] = [f"Fluorescent Fraction ({channel})", "No Unit"]
+                
+            del self.timehandler
+            del self.start
+            del self.end
+            del self.FT_date
             
     
     def quickplot(self,y):
+        """
+        Plots the given y over time
+
+        Parameters
+        ----------
+        y : str
+            Determines which data should be plotted.
+
+        Returns
+        -------
+        None.
+
+        """
         
         #error handling
-        try: 
-            ylabel = self.misc[y][0] + " in " + self.misc[y][1]
+        xx = self.data["t"]
+        try:
+            yy = self.data[y]
         except KeyError:
-            legallist = []
-            keys = self.misc.keys()
-            for key in keys:
-                if self.misc[key][2] == True:
-                    legallist.append(key)
-            raise IllegalValue("y","quickplot",legallist)
-        if self.misc[y][2] == False:
-            legallist = []
-            keys = self.misc.keys()
-            for key in keys:
-                if self.misc[key][2] == True:
-                    legallist.append(key)
-            raise NotPlottable(y,"quickplot",legallist)
+            raise IllegalValue(y, "WIBS.quickplot()",[key for key in self.data])
                 
         #draw plot
         fig,ax = plt.subplots()
 
         ax.set_xlabel("CET")
+        ylabel = f"{self.details[y][0]} in {self.details[y][1]}" if self.details[y][1] != "No Unit" else self.details[y][0]
         ax.set_ylabel(ylabel)
-
         
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         
-        ax.plot(self.t,self.processed_data[y])
+        ax.plot(xx,yy)
         
         plt.show()
         
         
     def quickheatmap(self,y):
+        """
+        Draws a dndlogdp number size distribution heatmap
+
+        Parameters
+        ----------
+        y : str
+            Determines which data should be plotted.
+
+        Returns
+        -------
+        None.
+
+        """
         
         #error handling
-        try: 
-            ylabel = self.misc[y][0] + " in " + self.misc[y][1]
+        try:
+            yy = np.array([self.data[f"{y}_bin{i}_dndlogdp"] for i in range(self.bins)]) if y != "allparticles" else np.array([self.data[f"bin{i}_dndlogdp"] for i in range(self.bins)])
         except KeyError:
-            legallist = []
-            keys = self.misc.keys()
-            for key in keys:
-                if self.misc[key][2] == False:
-                    legallist.append(key)
-            raise IllegalValue("y","quickheatmap",legallist)
-        if self.misc[y][2] == True:
-            legallist = []
-            keys = self.misc.keys()
-            for key in keys:
-                if self.misc[key][2] == False:
-                    legallist.append(key)
-            raise NotPlottable(y,"quickheatmap",legallist)
-            
-        #prepare data
-        heatmap_t = deepcopy(self.t)
-        newsec = heatmap_t[-1].second + 1
-        heatmap_t.append(heatmap_t[-1].replace(second=newsec))
-        xx,yy = np.meshgrid(heatmap_t,list(range(len(self.bin_borders))))
+            raise IllegalValue(y, "WIBS.quickheatmap", ["allparticles","a","b","c","ab","ac","bc","abc"])
         
-        heatmap_data = deepcopy(self.processed_data[y])
-        heatmap_data = self.hk_replacezeros(heatmap_data)
-        heatmap_data = np.ma.masked_where(np.isnan(heatmap_data),heatmap_data)
-        heatmap_data = np.transpose(heatmap_data)
+        xlims = [self.data["t"][0],self.data["t"][-1]]
+        xlims = md.date2num(xlims)
             
         #draw plot
         fig,ax = plt.subplots()
         
-        im = ax.pcolormesh(xx,yy,heatmap_data,cmap="RdYlBu_r",norm=LogNorm(),shading="flat")
+        im = ax.imshow(yy,aspect="auto",norm="log",extent=[xlims[0],xlims[1],0,self.bins],cmap="RdYlBu_r",interpolation="none",origin="lower")
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
-        #ax.set_yscale("log")
-        ax.set_ylabel("optical diamter in $\mu$m")
+        ax.set_ylabel("$D_P$ in $\mu$m")
         ax.set_xlabel("CET")
-        labels = [math.sqrt(self.bin_borders[i]*self.bin_borders[i+1]) for i in range(self.bins)]
-        labels = [str(round(label,2)) for label in labels]
-        ticks = list(range(self.bins))
-        ticks = [tick+0.5 for tick in ticks]
+        
+        labels = [str(round(label,2)) for label in self.bin_means]
+        ticks = [tick+0.5 for tick in range(self.bins)]
         ax.set_yticks(ticks,labels=labels)
+        
         ax.yaxis.set_tick_params(which='minor', size=0)
         ax.yaxis.set_tick_params(which='minor', width=0)
-        plt.colorbar(im,ax=ax,label=ylabel)
+        plt.colorbar(im,ax=ax,label="dN/dlog$D_P$ in cm${}^{-3}$")
         
         plt.show()
         
         
     def heatmap(self,ax,y,**kwargs):
-        
-        #import kwargs
-        smooth = kwargs["smooth"] if "smooth" in kwargs else True
-        cmap = kwargs["cmap"] if "cmap" in kwargs else "RdYlBu_r"
-        pad = kwargs["pad"] if "pad" in kwargs else 0.01
-        togglecbar = kwargs["togglecbar"] if "togglecbar" in kwargs else True
-        xlims = kwargs["xlims"] if "xlims" in kwargs else "none"
-        
-        #error handling
-        try: 
-            ylabel = self.misc[y][0] + " in " + self.misc[y][1]
-        except KeyError:
-            legallist = []
-            keys = self.misc.keys()
-            for key in keys:
-                if self.misc[key][2] == False:
-                    legallist.append(key)
-            raise IllegalValue("y","quickheatmap",legallist)
-        if self.misc[y][2] == True:
-            legallist = []
-            keys = self.misc.keys()
-            for key in keys:
-                if self.misc[key][2] == False:
-                    legallist.append(key)
-            raise NotPlottable(y,"quickheatmap",legallist)
-        for key in kwargs.keys():
-            if key not in ["smooth","cmap","pad","togglecbar","xlims"]:
-                raise IllegalArgument(key,"WIBS.heatmap()")
-            
-        #prepare data
-        heatmap_t = deepcopy(self.t)
-        if smooth:
-            xx,yy = np.meshgrid(heatmap_t,[i+0.5 for i in range(self.bins)])
-        else:
-            newsec = heatmap_t[-1].second + 1
-            heatmap_t.append(heatmap_t[-1].replace(second=newsec))
-            xx,yy = np.meshgrid(heatmap_t,list(range(len(self.bin_borders))))
+        """
+        Draws a dndlogdp number size distribution heatmap over an existing mpl axis
 
-        heatmap_data = deepcopy(self.processed_data[y])
-        heatmap_data = self.hk_replacezeros(heatmap_data)
-        #heatmap_data = np.ma.masked_where(np.isnan(heatmap_data),heatmap_data)
-        heatmap_data = np.transpose(heatmap_data)
-        if type(xlims) == list:
-            day,month,year = self.date
-            ax.set_xlim([datetime.strptime(element,"%H:%M:%S").replace(day=day,month=month,year=year) for element in xlims])
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The heatmap will be drawn on this axis.
+        y : str
+            Determines which data should be plotted.
+        cmap : str, optional
+            Changes the colormap. The default is 'RdYlBu_r'
+        pad : float, optional
+            Changes the padding between colorbar and plot. The default is 0.
+        orientation : str, optional
+            Changes the orientation of the colorbar.
+        location : str, optional
+            Changes the location of the colorbar. The default is 'top'.
+        togglecbar : bool, optional
+            If False, the colorbar wont be shown. The default is True.
+
+        Returns
+        -------
+        None.
+
+        """
+        
+        defaults = {"cmap" : "RdYlBu_r",
+                    "pad" : 0,
+                    "orientation" : "horizontal",
+                    "location" : "top",
+                    "togglecbar" : True}
+        for key,default in defaults.items():
+            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+        self.hk_errorhandling(kwargs, defaults.keys(), "WIBS.heatmap()")
+        
+        try:
+            yy = np.array([self.data[f"{y}_bin{i}_dndlogdp"] for i in range(self.bins)]) if y != "allparticles" else np.array([self.data[f"bin{i}_dndlogdp"] for i in range(self.bins)])
+        except KeyError:
+            raise IllegalValue(y, "WIBS.heatmap()", ["allparticles","a","b","c","ab","ac","bc","abc"])
+        
+        xlims = [self.data["t"][0],self.data["t"][-1]]
+        xlims = md.date2num(xlims)
             
         #draw plot
-        if smooth:
-            im = ax.pcolormesh(xx,yy,heatmap_data,cmap=cmap,norm=LogNorm(),shading="gouraud")
-        else:
-            im = ax.pcolormesh(xx,yy,heatmap_data,cmap=cmap,norm=LogNorm(),shading="flat")
+        im = ax.imshow(yy,aspect="auto",norm="log",extent=[xlims[0],xlims[1],0,self.bins],cmap=kwargs["cmap"],interpolation="none",origin="lower")
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
-        ax.set_ylabel("optical diamter in $\mu$m")
+        ax.set_ylabel("$D_P$ in $\mu$m")
         ax.set_xlabel("CET")
-        labels = [math.sqrt(self.bin_borders[i]*self.bin_borders[i+1]) for i in range(self.bins)]
-        labels = [str(round(label,2)) for label in labels]
-        ticks = list(range(self.bins))
-        ticks = [tick+0.5 for tick in ticks]
+        
+        labels = [str(round(label,2)) for label in self.bin_means]
+        ticks = [tick+0.5 for tick in range(self.bins)]
         ax.set_yticks(ticks,labels=labels)
+        
         ax.yaxis.set_tick_params(which='minor', size=0)
         ax.yaxis.set_tick_params(which='minor', width=0)
-        if togglecbar:
-            plt.colorbar(im,ax=ax,label=ylabel,pad=pad)
+        plt.colorbar(im,ax=ax,label="dN/dlog$D_P$ in cm${}^{-3}$",pad=kwargs["pad"],orientation=kwargs["orientation"],location=kwargs["location"])
         
     
     def plot(self,ax,y,**kwargs):
+        """
+        Plots y over time on an existing mpl axis.
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        y : str
+            Determines which data should be plotted.
+        label : str, optional
+            Changes the label of the plot. If a legend is created, this label will be shown there. The default is 'no label'.
+        color : str
+            Changes the color of the plot. The default is 'tab:purple'.
+        secondary : bool, optional
+            If True, the plot will draw the axis on the right-hand side. Should be used if the given ax is a twinx(). The default is False.
         
-        label = kwargs["label"] if "label" in kwargs else "no label"
-        color = kwargs["color"] if "color" in kwargs else "tab:orange"
-        secondary = kwargs["secondary"] if "secondary" in kwargs else False
+        Returns
+        -------
+        None.
+
+        """
+
+        defaults = {"label" : "no label",
+                    "color" : "tab:purple",
+                    "secondary" : False}
+        for key,default in defaults.items():
+            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+        self.hk_errorhandling(kwargs, defaults.keys(), "WIBS.plot()")
         
-        #error handling
-        try: 
-            ylabel = self.misc[y][0] + " in " + self.misc[y][1]
+        xx = self.data["t"]
+        try:
+            yy = self.data[y]
         except KeyError:
-            legallist = []
-            keys = self.misc.keys()
-            for key in keys:
-                if self.misc[key][2] == True:
-                    legallist.append(key)
-            raise IllegalValue("y","WIBS.plot()",legallist)
-        if self.misc[y][2] == False:
-            legallist = []
-            keys = self.misc.keys()
-            for key in keys:
-                if self.misc[key][2] == True:
-                    legallist.append(key)
-            raise NotPlottable(y,"WIBS.plot()",legallist)
-        for key in kwargs.keys():
-            if key not in ["label","color","secondary"]:
-                raise IllegalArgument(key,"WIBS.plot()")
+            raise IllegalValue(y, "WIBS.plot()",[key for key in self.data])
+            
+        ylabel = f"{self.details[y][0]} in {self.details[y][1]}" if self.details[y][1] != "No Unit" else self.details[y][0]
             
         #draw plot
-        ax.plot(self.t,self.processed_data[y],label=label,color=color)
+        ax.plot(xx,yy,label=kwargs["label"],color=kwargs["color"])
         
         ax.set_xlabel("CET")
         ax.set_ylabel(ylabel)
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         
-        ax.tick_params(axis='y', colors=color)
-        ax.axes.yaxis.label.set_color(color)
-        if not secondary:
-            ax.spines["left"].set_color(color)
+        ax.tick_params(axis='y', colors=kwargs["color"])
+        ax.axes.yaxis.label.set_color(kwargs["color"])
+        if not kwargs["secondary"]:
+            ax.spines["left"].set_color(kwargs["color"])
         else:
-            ax.spines["right"].set_color(color)
+            ax.spines["right"].set_color(kwargs["color"])
             ax.spines["left"].set_alpha(0)
+            
+    def save(self, path):
+        """
+        Saves the obj as a preprocessed .wibs file
+
+        Parameters
+        ----------
+        path : str
+            Determines the path and name, where the .wibs file should be saved.
+
+        Returns
+        -------
+        None.
+
+        """
+        
+        op = {
+            "bins" : self.bins,
+            "bin_means" : self.bin_means,
+            "data" : self.data,
+            "rawdata" : self.rawdata,
+            "details" : self.details,
+            "fl1_FTbg" : self.fl1_FTbg,
+            "fl2_FTbg" : self.fl2_FTbg,
+            "fl3_FTbg" : self.fl3_FTbg,
+            "FT_sigma" : self.FT_sigma,
+            "flow" : self.flow
+            }
+        
+        if path[-5:] != ".wibs":
+            path.append(".wibs")
+            
+        pickle.dump(op,open(path,"wb"),4)
+
     
     #housekeeping funcs
     
-    def hk_binsorter(self,size):
+    def hk_kwargs(self,kwargs,key,default):
         
-        op = 123456789
+        op = kwargs[key] if key in kwargs else default
+        exec(f"self.{key} = op")
         
-        for i in range(self.bins):
-            if self.bin_borders[i] <= size and self.bin_borders[i+1] > size:
-                op = i
-                
+        
+    def hk_func_kwargs(self,kwargs,key,default):
+        
+        op = kwargs[key] if key in kwargs else default
         return op
     
-    def hk_dndlogdp(self,arr):
-        
-        array = deepcopy(arr)
-        
-        for i in range(len(array)):
-            array[i] = array[i] / (math.log10(self.bin_borders[i+1])-math.log10(self.bin_borders[i]))
-            
-        return array
     
-    def hk_replacezeros(self,arr):
+    def hk_errorhandling(self,kwargs,legallist,funcname):
         
-        array = deepcopy(arr)
-        
-        smallest = 10000
-        for row in array:
-            for element in row:
-                if element < smallest and element > 0:
-                    smallest = element
-        for i in range(len(array)):
-            for j in range(len(array[i])):
-                if array[i][j] <= 0:
-                    array[i][j] += smallest
-                    
-        return array
-    
-    def hk_getchannels(self,ip_str):
-        
-        a = True if "a" in ip_str else False
-        b = True if "b" in ip_str else False
-        c = True if "c" in ip_str else False
-        
-        checker = [False for i in range(len(self.data["Fl1"]))]
-        for i in range(len(self.data["Fl1"])):
-            if self.data["Fl1"][i] == a:
-                if self.data["Fl2"][i] == b:
-                    if self.data["Fl3"][i] == c:
-                        checker[i] = True
-        
-        self.checker = checker
-        
-        #counts per second
-        op_key = ip_str + "_cps"
-        cps = []
-        for handler in self.timehandler:
-            appender = [0 for i in range(self.bins)]
-            for count in handler:
-                #if self.data["Fl1"][count] == a and self.data["Fl2"][count] == b and self.data["Fl3"] == c:
-                if checker[count] == True:
-                    if self.hk_binsorter(self.data["size"][count]) != 123456789:
-                        appender[self.hk_binsorter(self.data["size"][count])] += 1
-            cps.append(np.array(appender))
-        self.processed_data[op_key] = cps
-        self.misc[op_key] = ["Counts ("+ip_str+")","#/s",False]
-        
-        #particle concentration
-        op_key2 = ip_str + "_partconc"
-        partconc = []
-        for dataset in self.processed_data[op_key]:
-            conc = sum(dataset) / self.flow
-            partconc.append(conc)
-        self.processed_data[op_key2] = partconc
-        self.misc[op_key2] = ["Particle Concentration ("+ip_str+")","#/cm${}^3$",True]
-            
-        #dndlogdp
-        op_key3 = ip_str + "_dndlogdp"
-        dndlogdp = []
-        for dataset in self.processed_data[op_key]:
-            dat = self.hk_dndlogdp(dataset)
-            dndlogdp.append(dat)
-        self.processed_data[op_key3] = dndlogdp
-        self.misc[op_key3] = ["dN/dlog$D_p$ ("+ip_str+")","cm${}^{-3}$",False]
+        for key in kwargs:
+            if key not in legallist:
+                raise IllegalArgument(key,funcname,legallist)

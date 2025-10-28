@@ -330,19 +330,36 @@ class SEN55:
 
 class FlyingFlo_USB:
     
-    """full documentation see https://github.com/matrup01/data_import_modules \n\n
-    
-    file (str) ... takes a FlyingFlo_USB-produced csv-file\n\n
-	
-    start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp\n
-	end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp\n
-	title (str, optional) ... takes a str and uses it as a title for quickplots\n
-	deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False\n\n
-    
-    FlyingFlo_USB.title (str) ... Title used for quickplots\n
-    FlyingFlo_USB.deviated (bool) ... Stores if the data is expressed relative to mean\n
-    FlyingFlo_USB.t (np.array of dt.datetime) ... Time array\n
-    FlyingFlo_USB.y (dict of str : [np.array,str,str]) ... Dictionary with Datatypes as keys storing lists in the form of [data-array, full data name, unit]"""
+    """
+    inits FlyingFlo_USB object
+
+    Parameters
+    ----------
+    file : str
+        takes a FlyingFlo_USB-produced csv-file.
+    start : str, optional
+        takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp. The default is "none".
+    end : str, optional
+        takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp. The default is "none".
+    title : str, optional
+        takes a str and uses it as a title for quickplots. The default is "no title".
+    deviate : bool, optional
+        takes a bool to decide if the data should be expressed relative to mean. The default is False.
+
+    Variables
+    ---------
+    FlyingFlo_USB.title : str
+        Contains the title that is used for quickplots.
+    FlyingFlo_USB.deviated : bool
+        True if the data is epressed relative to a mean.
+    FlyingFlo_USB.averaged : bool
+        True if the data is averaged minutewise (through FlyingFlo.average() method).
+    FlyingFlo_USB.t : np.array of datetime obj of datetime module
+        Contains the timestamps of all datapoints.
+    FlyingFlo_USB.y : {str : np.array}
+        Contains all data in the form of a dict.
+
+    """
     
     def __init__(self,file,start="none",end="none",title="no title",deviate=False):
         """

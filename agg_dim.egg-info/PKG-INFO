@@ -1,13 +1,13 @@
 Metadata-Version: 2.1
 Name: agg-dim
-Version: 0.1.8
+Version: 0.1.9
 Summary: Data import modules for instruments used by AG Grothe
 Home-page: https://github.com/matrup01/data_import_modules/
 Author: Matthäus Rupprecht, Florian Wieland
 Maintainer: Matthäus Rupprecht
 Maintainer-email: e12102474@student.tuwien.ac.at
 License: MIT
-Keywords: POPS,WIBS,SEN55,CCS811
+Keywords: POPS,WIBS,SEN55,CCS811,OPC
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
 Classifier: Programming Language :: Python
@@ -31,12 +31,13 @@ Requires-Dist: matplotlib>=3.6.0
 Requires-Dist: numba>=0.59.0
 Requires-Dist: numpy>=1.26.4
 Requires-Dist: packaging>=23.2
-Requires-Dist: pillow>=10.3.0
+Requires-Dist: pillow>=11.1.0
 Requires-Dist: pyparsing>=3.1.2
 Requires-Dist: python-dateutil>=2.8.2
 Requires-Dist: requests>=2.31.0
 Requires-Dist: six>=1.16.0
 Requires-Dist: urllib3>=2.0.7
+Requires-Dist: utm>=0.8.1
 Requires-Dist: xyzservices>=2022.9.0
 Provides-Extra: dev
 Requires-Dist: twine>=6.1.0; extra == "dev"

@@ -233,8 +233,83 @@ class FData:
             
             
 class NewFData:
+    """
+    inits NewFData
+
+    Parameters
+    ----------
+    file : str
+        Either the path to a FSpec-produced .csv file or a preprocessed .fspec file.
+    bg_file : str
+        Either the path to a FSpec-produced .csv file or a preprocessed .fspec file. Can be left if a preprocessed .fspec file is passed as file.
+    sigma : float or int, optional
+        Will be used as sigma for data processing. The default is 1.
+    measurement_frequency : int, optional
+        Measurement Frequency in Hz which is used to calculate the fluorescence index. The default is 100.
+    start : str, optional
+        String in the form 'hh:mm:ss'. If start is given, all data acquired before this timestamp will be ignored.
+    end : str, optional
+        String in the form 'hh:mm:ss'. If end is given, all data acquired after this timestamp will be ignored.
+    jit : bool, optional
+        If True the data processing is done using the just in time compiler numba. The default is True.
+    bg_start : str, optional
+        String in the form 'hh:mm:ss'. If bg_start is given, all data acquired befor this timestamp will be ignored for the background. Only works if a .csv file is passed as bg_file.
+    bg_end : str, optional
+        String in the form 'hh:mm:ss'. If bg_end is given, all data acquired after this timestamp will be ignored for the background. Only works if a .csv file is passed as bg_file.
+    layout : list of int with len 2
+        Decides which columns of the .csv files should be used for the channels.
+
+    Variables
+    ---------
+    NewFData.sigma : int or float
+        Sigma wich was used for data processing
+    NewFData.measurement_frequency : int
+        Measurement Frequency in Hz which has been used for data processing
+    NewFData.bg : np.array of float with len 16
+        Contains the mean+std*sigma threshhold for each channel
+    NewFData.rawtime : np.array of dt.datetime obj
+        Contains the timestamp of each dataset recorded (of each row of .csv file)
+    NewFData.rawchannels : 2D np.array of int
+        Contains the raw fluorescence intesities of each channel for all recorded datasets
+    NewFData.t : np.array of dt.datetime obj
+        Contains the time for each datapoint of the processed data
+    NewFData.channels : 2D np.array of float
+        Contains the porcessed fluorescence index values of each channel
+
+    """
     
     def __init__(self,file,bg_file="blank.blank",**kwargs):
+        """
+        inits NewFData obj
+
+        Parameters
+        ----------
+        file : str
+            Either the path to a FSpec-produced .csv file or a preprocessed .fspec file.
+        bg_file : str
+            Either the path to a FSpec-produced .csv file or a preprocessed .fspec file. Can be left if a preprocessed .fspec file is passed as file.
+        sigma : float or int, optional
+            Will be used as sigma for data processing. The default is 1.
+        measurement_frequency : int, optional
+            Measurement Frequency in Hz which is used to calculate the fluorescence index. The default is 100.
+        start : str, optional
+            String in the form 'hh:mm:ss'. If start is given, all data acquired before this timestamp will be ignored.
+        end : str, optional
+            String in the form 'hh:mm:ss'. If end is given, all data acquired after this timestamp will be ignored.
+        jit : bool, optional
+            If True the data processing is done using the just in time compiler numba. The default is True.
+        bg_start : str, optional
+            String in the form 'hh:mm:ss'. If bg_start is given, all data acquired befor this timestamp will be ignored for the background. Only works if a .csv file is passed as bg_file.
+        bg_end : str, optional
+            String in the form 'hh:mm:ss'. If bg_end is given, all data acquired after this timestamp will be ignored for the background. Only works if a .csv file is passed as bg_file.
+        layout : list of int with len 2
+            Decides which columns of the .csv files should be used for the channels.
+
+        Returns
+        -------
+        None.
+
+        """
         
         #check if data is loaded from .csv or .fspec
         filetype = file.split(".")[-1]
@@ -246,7 +321,6 @@ class NewFData:
                         "start" : "none",
                         "end" : "none",
                         "jit" : True,
-                        "debugging" : False,
                         "bg_start" : "*",
                         "bg_end" : "*",
                         "layout" : [3,18]}
@@ -256,7 +330,7 @@ class NewFData:
             
             #error handling
             for key in kwargs:
-                if key not in ["sigma","measurement_frequency","start","end","debugging","jit","bg_start","bg_end"]:
+                if key not in ["sigma","measurement_frequency","start","end","jit","bg_start","bg_end"]:
                     raise IllegalArgument(key,"NewFData")
             
             #import background-data
@@ -413,6 +487,23 @@ class NewFData:
                    
     
     def save(self,filename,**kwargs):
+        """
+        Saves the obj in a preprocessed .fspec file
+
+        Parameters
+        ----------
+        filename : str
+            Determines path and filename where the obj will be saved to.
+        start : str, optional
+            String of the form 'hh:mm:ss'. If start is given all data before it wont be saved.
+        end : str, optional
+            String of the form 'hh:mm:ss'. If end is given all data after it wont be saved.
+
+        Returns
+        -------
+        None.
+
+        """
         
         #kwargs
         defaults = {"start" : "none",
@@ -479,6 +570,22 @@ class NewFData:
         
         
     def quickplot(self,channelno):
+        """
+        Draws a plot of the given channel
+
+        Parameters
+        ----------
+        channelno : int
+            Decides which Channel should be plotted.
+
+        Returns
+        -------
+        None.
+
+        """
+        
+        if channelno > len(self.channels):
+            raise ValueError(f"The channel {channelno} doesnt exist. Try a channelno 1 <= channelno <= {len(self.channels)}")
         
         channelname = "ch" + str(channelno)
         channelno -= 1
@@ -494,6 +601,14 @@ class NewFData:
         
         
     def quickheatmap(self):
+        """
+        Draws a fluorescence index heatmap over time
+
+        Returns
+        -------
+        None.
+
+        """
         
         xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
         heatmap_data = deepcopy(self.channels)
@@ -518,6 +633,29 @@ class NewFData:
         
         
     def plot(self,channelno,ax,**kwargs):
+        """
+        Draws a plot of the given channelno vs time on an existing mpl axis.
+
+        Parameters
+        ----------
+        channelno : int
+            Decides which Channel should be plotted.
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        quakes : list of str, optional
+            Takes times in the form of "HH:MM:SS" and draws vertical lines on the plot at these times. The default is []
+        quakeslabel : str, optional
+            If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is "no label"
+        quakecolor : str, optional
+            Determines which color the quake-lines should have. The default is "tab:purple"
+        color : str, optional
+            Changes the color of the plot. The default is "tab:green"
+
+        Returns
+        -------
+        None.
+
+        """
         
         #import kwargs   
         defaults = {"quakes" : [],
@@ -542,13 +680,38 @@ class NewFData:
         ax.axes.yaxis.label.set_color(kwargs["color"])
         
         
-    def meanplot(self,ax,min_ch=1,max_ch=15,**kwargs):
+    def meanplot(self,ax,**kwargs):
+        """
+        Draws a plot of the mean fluorescence index over time on a given mpl axis
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        min_ch : int, optional
+            Lower Channels than this will be ignored when the mean is calculated. The default is 1.
+        max_ch : int, optional
+            Higher Channels than this will be ignored when the mean is calculated. The default is 15.
+        quakes : list of str, optional
+            Takes times in the form of "HH:MM:SS" and draws vertical lines on the plot at these times. The default is []
+        quakeslabel : str, optional
+            If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is "no label"
+        quakecolor : str, optional
+            Determines which color the quake-lines should have. The default is "tab:purple"
+        color : str, optional
+            Changes the color of the plot. The default is "tab:green"
+
+        Returns
+        -------
+        None.
+
+        """
         
         #import kwargs
         defaults = {"min_ch" : 1,
                     "max_ch" : 16,
                     "quakes" : [],
-                    "quakeslabel" : "tab:purple",
+                    "quakeslabel" : "no label",
                     "quakecolor" : "tab:purple",
                     "color" : "tab:green"}
         for key,default in zip(defaults.keys(),defaults.values()):
@@ -557,20 +720,20 @@ class NewFData:
         
         meanchannel = [0 for i in range(len(self.t))]
         
-        min_ch -= 1
-        ch_len = len(list(range(min_ch,max_ch)))
+        kwargs["min_ch"] -= 1
+        ch_len = len(list(range(kwargs["min_ch"],kwargs["max_ch"])))
         
         for i in range(len(self.t)):
-            for ch in range(min_ch,max_ch):
+            for ch in range(kwargs["min_ch"],kwargs["max_ch"]):
                 meanchannel[i] += self.channels[ch][i]
         for i in range(len(meanchannel)):
             meanchannel[i] /= ch_len
                 
         #draw plot
-        label = "mean of channels " + str(min_ch + 1) + " - " + str(max_ch)
+        label = f"mean of channels {kwargs['min_ch']+1} - {kwargs['max_ch']}"
         ax.plot(self.t,meanchannel,label=label,color=kwargs["color"])
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
-        ax.set_ylabel("Fluorescence Index (" + label + ")")
+        ax.set_ylabel(f"Fluorescence Index ({label})")
         if len(kwargs["quakes"]) != 0:
             ax.vlines(x=[dt.datetime.strptime(element, "%H:%M:%S")for element in kwargs["quakes"]],ymin=min(meanchannel),ymax=max(meanchannel),color=kwargs["quakecolor"],ls="dashed",label=kwargs["quakeslabel"])
         ax.tick_params(axis='y', colors=kwargs["color"])
@@ -578,6 +741,29 @@ class NewFData:
         
         
     def heatmap(self,ax,**kwargs):
+        """
+        Draws a fluorescence index heatmap over time on a given mpl axis
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The heatmap will be drawn on this axis.
+        smooth : bool, optional
+            If True, the heatmap will be gouraud smoothed. The default is True.
+        cmap : str, optional
+            Changes the colormap. The default is 'RdYlBu_r'.
+        pad : float, optional
+            Changes the padding between heatmap and colorbar. The default is 0.01.
+        togglecbar : bool, optional
+            If True the colorbar will be shown. the default is True
+        xlims : list of str with len = 2
+            Takes timestamps in the format 'hh:mm:ss'. If xlims are given, only data between the two timestamps is used.
+
+        Returns
+        -------
+        None.
+
+        """
         
         #import kwargs
         defaults = {"smooth" : True,

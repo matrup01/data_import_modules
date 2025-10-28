@@ -5,7 +5,7 @@ with open("docu/pypi_descr.md","r") as f:
 
 setup(
     name = "agg_dim",
-    version = "0.1.9",
+    version = "0.1.10",
     description="Data import modules for instruments used by AG Grothe",
     packages = find_packages(),
     long_description = long_description,
@@ -15,8 +15,9 @@ setup(
                    "Operating System :: OS Independent",
                    "Programming Language :: Python"],
     author = "Matthäus Rupprecht, Florian Wieland",
+    author_email= "matthaeus.rupprecht@tuwien.ac.at",
     maintainer = "Matthäus Rupprecht",
-    maintainer_email = "e12102474@student.tuwien.ac.at",
+    maintainer_email = "matthaeus.rupprecht@tuwien.ac.at",
     license = "MIT",
     licence_files = ("LICENSE"),
     install_requires = ["branca>=0.7.2",

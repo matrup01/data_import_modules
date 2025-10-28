@@ -1,5 +1,14 @@
+######################### MR 28.10.2025 #########################
+#                    "revamped WIBS class"                      #
+#                                                               #
+# - Completely revamped WIBS class (check out docu, bc code     #
+#   written for older versions is very likely to break)         #
+# - Removed debugging kwarg from NewFData.__init__()            #
+# - Added docstrings for NewFData class                         #
+#################################################################
+
 ######################### MR 20.10.2025 #########################
-#                      "added.OPC class"                        #
+#                      "added OPC class"                        #
 #                                                               #
 # - added doctrsings to Pops                                    #
 # - added OPC object                                            #

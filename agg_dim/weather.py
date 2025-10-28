@@ -13,6 +13,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class WeatherData:
+    """
+    inits WeatherData object
+
+    Parameters
+    ----------
+    file : str
+        takes a csv-file created by the weatherstation
+        
+    Variables
+    ---------
+    WeatherData.data : {str : 1D numpy array}
+        contains all data in the form of a dictionary
+    WeatherData.details : {str : [str, str]}
+        contains a description and the unit to each data array
+
+    """
     
     def __init__(self,file,**kwargs):
         """

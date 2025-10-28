@@ -326,7 +326,6 @@
     jit (bool, optional) ... decides if Numba JIT-compiler should be used, default-True
     bg_start (str,optional) ... only uses data from bg_file which was acquired after bg_start (only works if a csv-bg_file is used, format:"HH:MM:SS")
     bg_end (str,optional) ... only uses data from bg_file which was acquired before bg_start (only works if a csv-bg_file is used, format:"HH:MM:SS")
-    debugging (bool,optional) ... for debugging purposes, if you dont know what its doing, leave it , default-False
     layout (list,optional) ... decides which columns from the csv should be taken (Syntax: [firstcolumn,lastcolumn]), default-[3,18]
         Layout-Lookuptable:
             FlyingFlo 1.0 (Peter) ... [3,18]
@@ -685,56 +684,59 @@
 
     creates a WIBS-object
     
-    file (str or list of str) ... takes a WIBS-produced h5-file or a list of WIBS-produced H5-files
-    FT_file (str) ... takes a WIBS-produced h5-file and uses the FluorPeaks to calculate a background (give "none" if no FT was made)
+    file (str or list of str) ... Either the path to a wibs produced .h5 file or to a preprocessed .wibs file or a list of paths to wibs produced .h5 files.
+    FT_file (str) ... Path to a wibs produced forcedtrigger-file. Can be left if a preprocessed .wibs file is passed as file
+    FT_time (str) ... String in the form of 'hh:mm:ss' of the time when the forced trigger was started, which is used to correct the time. Can be left if a preprocessed .wibs file is passed as file.
     
-    FT_sigma (int, optional) ... decides how many times std should be added to mean in FT, default-3
-    timecorr (int, optional) ... takes an int and corrects the time by it (should be used for time differences between WIBS-computer and real time; weird WIBS time format should automatically be corrected)
-    bin_borders (list of int, optional) ... takes a list of ints and uses them as bin borders in micro meters, default-[0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,1.7,2,2.5,3,3.5,4,5,10,15,20]
-    flow (float,optional) ... takes the volumetric flow rate in l/min, default-0.3
-    loadexcited (bool, optional) ... decides if excited particles are loaded (untoggle if facing performance issues), default-False
-    loadfl1 (bool, optional) ... decides if Fluorescence_1 is loaded (untoggle if facing performance issues), default-True
-    loadfl2 (bool, optional) ... decides if Fluorescence_2 is loaded (untoggle if facing performance issues), default-True
-    loadfl3 (bool, optional) ... decides if Fluorescence_3 is loaded (untoggle if facing performance issues), default-True
-    FixedFT (list of int with len=3, optional) ... takes 3 ints and takes them as FT-backgrounds (only applies if FT_file = "none"), default values are completely random, default-[1000000,500000,300000]
-    wintertime (bool, optional) ... if True 3600s are taken from wibstime, default-True
-    channels (list of str, optional) ... takes a list of strings to decide which channels should be loaded (loadfl,loadfl2 and loadfl3 need to be true), eg.: channels=["a","ac","abc"]
+    FT_sigma (int or float, optional) ... Will be used as sigma for data processing, default-3
+    bin_borders (list of int, optional) ... Particles will be classified according to the bins given here (in micrometers), default-[0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,1.7,2,2.5,3,3.5,4,5,10,15,20]
+    flow (float,optional) ... Flow in ccm/s. Will be used to calculate partconc and dndlogdp, default-0.018
+    fixed (list of float with len=3, optional) ... If fixed is passed, the values will be treated as bg and FT_file will only be used for time correction
+    start (str, optional) ... String in the form 'hh:mm:ss'. If start is given, all data acquired before this timestamp will be ignored
+    end (str, optional) ... String in the form 'hh:mm:ss'. If end is given, all data acquired after this timestamp will be ignored
+    FT_date (str, optional) ... Sets the FT_time to be this date (str format: 'dd.mm.yyyy'), only relevant if the data is going to be compared with other data, default-'01.01.2000'
     
 6.1.1   WIBS.quickplot(y)
 
     draws a plot of y vs time
     
-    y (str) ... decides which variable y should be plotted, legal strings depend on loaded data
+    y (str) ... decides which variable y should be plotted
     
 6.1.2   WIBS.quickheatmap(y)
 
-    draws a heatmap of y1
+    draws a heatmap of y
     
-    y (str) ... decides which variable y should be plotted, legal strings depend on loaded data
+    y (str) ... decides which variable y should be plotted
     
 6.1.3   WIBS.heatmap(ax,y,**kwargs)
 
-    draws a heatmap on an existing mpl-axis
+    Draws a dndlogdp number size distribution heatmap over an existing mpl axis
     
-    ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
-    y (str) ... decides which variable y should be plotted, legal strings depend on loaded data
+    ax (Axes obj of mpl.axes module) ... takes a matplotlib-axis, on which the graph will be drawn
+    y (str) ... decides which variable y should be plotted
     
-    smooth (bool) ... decides if heatmap should be smoothed (gouraud) or show raw data, default-True
-    cmap (str) ... decides which colormap should be used, default-"RdYlBu_r"
-    pad (float) ... moves the colormap away from the axis, default-0
-    togglecbar (bool) ... toggles colorbar, default-True
-    xlims (list of str) ... takes 2 strings in "H:M:S"-format and uses them as xlims
+    cmap (str, optional) ... decides which colormap should be used, default-"RdYlBu_r"
+    pad (int or float, optional) ... moves the colormap away from the axis, default-0
+    togglecbar (bool, optional) ... toggles colorbar, default-True
+    orientation (str, optional) ... changes the colorbars orientation, default-'horizontal'
+    location (str, optional) ... changes the colorbars location, default-'top'
     
 6.1.4   WIBS.plot(ax,y,**kwargs)
 
     draws a plot of y on an existing mpl-axis
     
-    y (str) ... decides which variable y should be plotted, legal strings depend on loaded data
-    ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
+    ax (Axes obj of mpl.axes module) ... takes a matplotlib-axis, on which the graph will be drawn
+    y (str) ... decides which variable y should be plotted
     
-    label (str) ... gives the plot a label used in a legend
-    color (str) ... changes the color of the plot, default-"tab:orange"
-    secondary (bool) ... should be toggled if the plot uses the right-hand yaxis, default-False
+    label (str,optional) ... gives the plot a label used in a legend, default-'no label'
+    color (str, optional) ... changes the color of the plot, default-"tab:purple"
+    secondary (bool, optional) ... should be toggled if the plot uses the right-hand yaxis, default-False
+    
+6.1.5   WIBS.save(path)
+
+    Saves the obj as a preprocessed .wibs file
+    
+    path (str) ... Determines the path and name, where the .wibs file should be saved
 
 
 7.    weather.py
