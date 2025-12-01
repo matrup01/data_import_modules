@@ -320,7 +320,7 @@
     bg_file (str) ... takes a FSpec-produced .csv-file or a .fspec-file
     
     sigma (float) ... decides when a count differs from background (similar to WIBS), default-CCS811
-    measurement_frequency (int) ... default-100
+    measurement_frequency (int) ... if none is given, it uses calculates it
     start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp
     end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp
     jit (bool, optional) ... decides if Numba JIT-compiler should be used, default-True
@@ -374,6 +374,7 @@
     quakeslabel (str, optional) ... takes a str and uses it as a label for the quakes if a legend is used
     quakecolor (str, optional) ... changes the color of the quakes, default-"tab:purple"
     color (str, optional) ... changes the color of the plot, default-"tab:green"
+    rolling (int, optional) ... if a positive int is given, the plot will show the rolling average of rolling values, default-0
     
 2.2.6 NewFData.heatmap(ax,**kwargs)
 

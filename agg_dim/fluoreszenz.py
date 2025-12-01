@@ -245,7 +245,7 @@ class NewFData:
     sigma : float or int, optional
         Will be used as sigma for data processing. The default is 1.
     measurement_frequency : int, optional
-        Measurement Frequency in Hz which is used to calculate the fluorescence index. The default is 100.
+        Measurement Frequency in Hz which is used to calculate the fluorescence index. The default is None
     start : str, optional
         String in the form 'hh:mm:ss'. If start is given, all data acquired before this timestamp will be ignored.
     end : str, optional
@@ -291,7 +291,7 @@ class NewFData:
         sigma : float or int, optional
             Will be used as sigma for data processing. The default is 1.
         measurement_frequency : int, optional
-            Measurement Frequency in Hz which is used to calculate the fluorescence index. The default is 100.
+            Measurement Frequency in Hz which is used to calculate the fluorescence index. The default is None.
         start : str, optional
             String in the form 'hh:mm:ss'. If start is given, all data acquired before this timestamp will be ignored.
         end : str, optional
@@ -317,7 +317,7 @@ class NewFData:
         
             #kwargs
             defaults = {"sigma" : 1,
-                        "measurement_frequency" : 100,
+                        "measurement_frequency" : None,
                         "start" : "none",
                         "end" : "none",
                         "jit" : True,
@@ -367,7 +367,7 @@ class NewFData:
                             bgdata[i] = bgdata[i][:-j]
                 bgdata = np.array(bgdata).transpose()
                 bgdata = bgdata[3:].astype("int")
-                self.bg = np.array([np.mean(channel)+np.std(channel)*self.sigma for channel in bgdata])
+                self.bg = np.array([np.nanmean(channel)+np.nanstd(channel)*self.sigma for channel in bgdata])
                 self.bg = self.bg - 1000
             elif bg_filetype == "fspec":
                 bg_ip = pickle.load(open(bg_file,"rb"))
@@ -434,8 +434,14 @@ class NewFData:
                 numba_bg = np.array(self.bg,float)
                 numba_ch = np.array([[float(0) for j in range(len(numba_t))] for i in range(len(numba_rc))])
                 self.channels = self.hk_process_data(numba_t,numba_rc,numba_bg,numba_rt,numba_ch)
-                self.channels /= self.measurement_frequency
+                if self.measurement_frequency != None:
+                    self.channels /= self.measurement_frequency
+                else:
+                    m_f = np.array([np.count_nonzero(~np.isnan(np.where(self.rawtime == s,self.rawchannels[0],np.nan))) for s in secs])
+                    self.channels /= m_f
             else:
+                if self.measurement_frequency == None:
+                    self.measurement_frequency = 100
                 self.channels = np.array([[0 for j in range(len(self.t))] for i in range(len(self.rawchannels))],float)
                 for t in range(len(self.t)):
                     for channel in range(len(self.rawchannels)):
@@ -479,7 +485,7 @@ class NewFData:
                         t_end = tcounter
             
             self.t = self.t[t_start:t_end]
-            self.channels = [channel[t_start:t_end] for channel in self.channels]
+            self.channels = np.array([channel[t_start:t_end] for channel in self.channels])
             
         else:
             raise IllegalFileFormat(filetype, "csv-file or .fspec", file)
@@ -700,6 +706,8 @@ class NewFData:
             Determines which color the quake-lines should have. The default is "tab:purple"
         color : str, optional
             Changes the color of the plot. The default is "tab:green"
+        rolling : int, optional
+            If a positive int is given, the rolling average of 'rolling' values is plotted. The default is 0.
 
         Returns
         -------
@@ -709,25 +717,22 @@ class NewFData:
         
         #import kwargs
         defaults = {"min_ch" : 1,
-                    "max_ch" : 16,
+                    "max_ch" : 15,
                     "quakes" : [],
                     "quakeslabel" : "no label",
                     "quakecolor" : "tab:purple",
-                    "color" : "tab:green"}
+                    "color" : "tab:green",
+                    "rolling" : 0}
         for key,default in zip(defaults.keys(),defaults.values()):
             kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
         self.hk_errorhandling(kwargs, defaults.keys(), "NewFData.meanplot()")
         
-        meanchannel = [0 for i in range(len(self.t))]
-        
         kwargs["min_ch"] -= 1
-        ch_len = len(list(range(kwargs["min_ch"],kwargs["max_ch"])))
+        #ch_len = len(list(range(kwargs["min_ch"],kwargs["max_ch"])))
         
-        for i in range(len(self.t)):
-            for ch in range(kwargs["min_ch"],kwargs["max_ch"]):
-                meanchannel[i] += self.channels[ch][i]
-        for i in range(len(meanchannel)):
-            meanchannel[i] /= ch_len
+        meanchannel = np.mean(self.channels[kwargs["min_ch"]:kwargs["max_ch"]],axis=0)
+        if kwargs["rolling"] > 0 and type(kwargs["rolling"]) == int:
+            meanchannel = np.convolve(meanchannel, np.ones(kwargs["rolling"]),mode="same") / kwargs["rolling"]
                 
         #draw plot
         label = f"mean of channels {kwargs['min_ch']+1} - {kwargs['max_ch']}"

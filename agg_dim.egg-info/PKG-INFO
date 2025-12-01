@@ -1,11 +1,12 @@
 Metadata-Version: 2.1
 Name: agg-dim
-Version: 0.1.9
+Version: 0.1.10
 Summary: Data import modules for instruments used by AG Grothe
 Home-page: https://github.com/matrup01/data_import_modules/
 Author: Matthäus Rupprecht, Florian Wieland
+Author-email: matthaeus.rupprecht@tuwien.ac.at
 Maintainer: Matthäus Rupprecht
-Maintainer-email: e12102474@student.tuwien.ac.at
+Maintainer-email: matthaeus.rupprecht@tuwien.ac.at
 License: MIT
 Keywords: POPS,WIBS,SEN55,CCS811,OPC
 Classifier: License :: OSI Approved :: MIT License

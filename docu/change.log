@@ -1,3 +1,15 @@
+######################### MR 01.12.2025 #########################
+#                      "prepared for LED"                       #
+#                                                               #
+# - changed the default of measurement_frequency kwarg in       #
+#   NewFData to None, which now triggers outomatic counting     #
+# - changed the background calculation in NewFData to nanmean   #
+#   and nanstd to make the code work with the LED pattern       #
+# - Fixed max_ch kwarg for NewFData.meanplot() back to 15       #
+# - Improved NewFData.meanplot() performance and added rolling  #
+#   kwarg                                                       #
+#################################################################
+
 ######################### MR 28.10.2025 #########################
 #                    "revamped WIBS class"                      #
 #                                                               #
@@ -10,7 +22,7 @@
 ######################### MR 20.10.2025 #########################
 #                      "added OPC class"                        #
 #                                                               #
-# - added doctrsings to Pops                                    #
+# - added docstrings to Pops                                    #
 # - added OPC object                                            #
 # - fixed display bug of the Unit Ohm for the gas resistance of #
 #   FlyingFlo_USB object                                        #
