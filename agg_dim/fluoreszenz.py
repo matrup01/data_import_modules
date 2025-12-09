@@ -367,6 +367,7 @@ class NewFData:
                             bgdata[i] = bgdata[i][:-j]
                 bgdata = np.array(bgdata).transpose()
                 bgdata = bgdata[3:].astype("int")
+                bgdata = np.where(bgdata != 1000,bgdata,np.nan)
                 self.bg = np.array([np.nanmean(channel)+np.nanstd(channel)*self.sigma for channel in bgdata])
                 self.bg = self.bg - 1000
             elif bg_filetype == "fspec":
@@ -399,6 +400,11 @@ class NewFData:
                         self.rawchannels[i][j] = 1000
             self.rawchannels = np.array(self.rawchannels,int)
             self.rawchannels = self.rawchannels - 1000
+            self.rawchannels = self.rawchannels.T
+            rows,cols = np.where(self.rawchannels == 0)
+            m = [i for i in range(len(self.rawchannels)) if i not in rows]
+            self.rawchannels = self.rawchannels[m].T
+            self.rawtime = self.rawtime[m]
             
             #crop
             t_start = 0
@@ -874,4 +880,4 @@ class NewFData:
                         channels[channel][t] += 1
              
         return channels
-        
+      

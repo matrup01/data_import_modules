@@ -1,3 +1,10 @@
+######################### MR 09.12.2025 #########################
+#              "measurement_frequency bug fixed"                #
+#                                                               #
+# - fixed the calculation for the measurement_frequency default #
+#   introduced in MR 01.12.2025                                 #
+#################################################################
+
 ######################### MR 01.12.2025 #########################
 #                      "prepared for LED"                       #
 #                                                               #

@@ -1,6 +1,6 @@
-Metadata-Version: 2.1
-Name: agg-dim
-Version: 0.1.10
+Metadata-Version: 2.4
+Name: agg_dim
+Version: 0.1.11
 Summary: Data import modules for instruments used by AG Grothe
 Home-page: https://github.com/matrup01/data_import_modules/
 Author: Matthäus Rupprecht, Florian Wieland
@@ -42,6 +42,21 @@ Requires-Dist: utm>=0.8.1
 Requires-Dist: xyzservices>=2022.9.0
 Provides-Extra: dev
 Requires-Dist: twine>=6.1.0; extra == "dev"
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: maintainer
+Dynamic: maintainer-email
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
 
 # Welcome to the data import modules of AG Grothe
 
