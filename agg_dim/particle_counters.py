@@ -124,7 +124,7 @@ class Pops:
                 case "FlyingFlo2.0":
                     self.layout = {"bins" : [pbin for pbin in range(36,52)],
                                    "ydata" : "NULL",
-                                   "ydata2" : [6,21,12],
+                                   "ydata2" : [8,23,14],
                                    "popstime" : 3,
                                    "t" : 1,
                                    "flow" : 18}
@@ -510,7 +510,7 @@ class Pops:
         heatmapdata = [[self.pops_bins[j][i] / (math.log10(self.d_categories[j+1])-math.log10(self.d_categories[j])) for i in range(len(self.pops_bins[0])-1)] for j in range(len(self.pops_bins))]
         heatmapdata = self.hk_replacezeros(heatmapdata)
         
-        xlims = [self.popstime[0],self.popstime[-1]]
+        xlims = [self.t[0],self.t[-1]]
         xlims = md.date2num(xlims)
         
         im = ax.imshow(heatmapdata,aspect="auto",cmap="RdYlBu_r",norm=LogNorm(vmin=1,vmax=10000),extent=[xlims[0],xlims[1],0,len(self.d_categories)-1],origin="lower",interpolation="none")

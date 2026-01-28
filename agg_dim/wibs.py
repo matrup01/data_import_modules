@@ -90,7 +90,8 @@ class WIBS:
             String in the form 'hh:mm:ss'. If end is given, all data acquired after this timestamp will be ignored.
         FT_date : str, optional
             Sets the FT_time to be this date (str format: 'dd.mm.yyyy'), only relevant if the data is going to be compared with other data. The default is '01.01.2000'
-
+        channels : list of str, optional
+            Decides which channels should be processed, by default all channels are processed, but it can be reduced for large files. The default is  ["a","b","c","ab","ac","bc","abc"].
 
         """
         
@@ -111,7 +112,8 @@ class WIBS:
                 "fixed" : None, #[float,flat,float]
                 "start" : None,
                 "end" : None,
-                "FT_date" : "01.01.2000"
+                "FT_date" : "01.01.2000",
+                "channels" :  ["a","b","c","ab","ac","bc","abc"]
                 }
             for key,value in defaults.items():
                 self.hk_kwargs(kwargs, key, value)
@@ -143,7 +145,7 @@ class WIBS:
             
             ft_xe1 = np.transpose(list(ft3["Xe1_FluorPeak"]))
             ft_xe2 = np.transpose(list(ft3["Xe2_FluorPeak"]))
-            self.start_FT = datetime.fromtimestamp(list(ft3["Seconds"])[0],tz=timezone.utc)
+            self.start_FT = datetime.fromtimestamp(list(ft3["Seconds"])[0],tz=timezone.utc).replace(year=int(self.FT_date[-4:]),month=int(self.FT_date[3:5]),day=int(self.FT_date[:2]))
             
             
             FT_time = datetime.strptime(f"{self.FT_date}-{FT_time}/+0000","%d.%m.%Y-%H:%M:%S/%z")
@@ -221,7 +223,11 @@ class WIBS:
             if type(self.start) == str:
                 starttime = datetime.strptime(f"{self.FT_date}-{self.start}/+0000","%d.%m.%Y-%H:%M:%S/%z")
                 starttime = int(starttime.replace(year=int(self.FT_date[-4:])).timestamp())
-                start_m = np.where((self.timehandler + int(timecorr.total_seconds())) > starttime, True, False)
+                if int(timecorr.total_seconds()) >= 0:
+                    start_m = np.where((self.timehandler + int(timecorr.total_seconds())) > starttime, True, False)
+                else:
+                    offset = abs(int(timecorr.total_seconds()))
+                    start_m = np.where((self.timehandler - offset) > starttime, True, False)
                 self.timehandler = self.timehandler[start_m]
                 self.rawdata["size"] = self.rawdata["size"][start_m]
                 self.rawdata["excited"] = self.rawdata["excited"][start_m]
@@ -232,7 +238,13 @@ class WIBS:
             if type(self.end) == str:
                endtime = datetime.strptime(f"{self.FT_date}-{self.end}/+0000","%d.%m.%Y-%H:%M:%S/%z")
                endtime = int(endtime.replace(year=int(self.FT_date[-4:])).timestamp())
-               end_m = np.where((self.timehandler + int(timecorr.total_seconds())) < endtime,True,False)
+               if int(timecorr.total_seconds()) >= 0:
+                   end_m = np.where((self.timehandler + int(timecorr.total_seconds())) < endtime,True,False)
+               else:
+                   offset = abs(int(timecorr.total_seconds()))
+                   end_m = np.where((self.timehandler - offset) < endtime,True,False)
+                   print(self.timehandler[0] - offset)
+                   print(endtime)
                self.timehandler = self.timehandler[end_m] 
                self.rawdata["size"] = self.rawdata["size"][end_m]
                self.rawdata["excited"] = self.rawdata["excited"][end_m]
@@ -285,9 +297,9 @@ class WIBS:
             fl2_handler = time_mask & self.rawdata["Fl2"]
             fl3_handler = time_mask & self.rawdata["Fl3"]
             
-            self.data["fl1"] = np.array([np.count_nonzero(arr) for arr in fl1_handler])
-            self.data["fl2"] = np.array([np.count_nonzero(arr) for arr in fl2_handler])
-            self.data["fl3"] = np.array([np.count_nonzero(arr) for arr in fl3_handler])
+            self.data["fl1"] = np.array([np.count_nonzero(arr) for arr in fl1_handler])/self.data["excited_fraction"]
+            self.data["fl2"] = np.array([np.count_nonzero(arr) for arr in fl2_handler])/self.data["excited_fraction"]
+            self.data["fl3"] = np.array([np.count_nonzero(arr) for arr in fl3_handler])/self.data["excited_fraction"]
             self.data["fl1_fraction"] = np.divide(self.data["fl1"],self.data["total_cps"],out=np.zeros(self.data["fl1"].shape,dtype=float),where=self.data["total_cps"]!=0)
             self.data["fl2_fraction"] = np.divide(self.data["fl2"],self.data["total_cps"],out=np.zeros(self.data["fl2"].shape,dtype=float),where=self.data["total_cps"]!=0)
             self.data["fl3_fraction"] = np.divide(self.data["fl3"],self.data["total_cps"],out=np.zeros(self.data["fl3"].shape,dtype=float),where=self.data["total_cps"]!=0)
@@ -303,13 +315,14 @@ class WIBS:
                 op = a&b
                 return op&c
             
-            for channel in ["a","b","c","ab","ac","bc","abc"]:
+            for channel in self.channels:
                 channel_mask = createmask(fl1_handler,fl2_handler,fl3_handler,channel)
                 for bin_no in range(self.bins):
                     m =np.where(self.bin_borders[bin_no] < self.rawdata["size"],True,False)
                     m = np.where(self.bin_borders[bin_no+1] > self.rawdata["size"],m,False)
                     m = channel_mask & m
                     self.data[f"{channel}_bin{bin_no}_cps"] = np.array([np.count_nonzero(arr) for arr in m])
+                    del m
                     self.data[f"{channel}_bin{bin_no}_partconc"] = self.data[f"{channel}_bin{bin_no}_cps"] / self.flow
                     self.details[f"{channel}_bin{bin_no}_partconc"] = [f"Particle Conc. of {channel}-Particles (bin{bin_no}) ","#/cm${}^3$"]
                     self.details[f"{channel}_bin{bin_no}_cps"] = [f"Particle Counts of {channel}-Particles (Bin{bin_no})","#/s"]
@@ -317,7 +330,8 @@ class WIBS:
                     log_binwidth = np.log10(self.bin_borders[bin_no+1])-np.log10(self.bin_borders[bin_no])
                     self.data[f"{channel}_bin{bin_no}_dndlogdp"] = self.data[f"{channel}_bin{bin_no}_partconc"] / log_binwidth
                     self.details[f"{channel}_bin{bin_no}_dndlogdp"] = [f"dN/dlog$D_P$ of {channel}-Particles (Bin{bin_no})","$\mu$m${}^{-1}$"]
-                    
+                   
+                del channel_mask
                 self.data[f"{channel}_total_cps"] = np.sum([self.data[f"{channel}_bin{i}_cps"] for i in range(self.bins)],axis=0)
                 self.data[f"{channel}_total_partconc"] = self.data[f"{channel}_total_cps"] / self.flow
                 self.data[f"{channel}_fraction"] = np.divide(self.data[f"{channel}_total_cps"],self.data["total_cps"],out=np.zeros(self.data[f"{channel}_total_cps"].shape,dtype=float),where=self.data["total_cps"]!=0)

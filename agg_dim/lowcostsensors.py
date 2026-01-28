@@ -408,7 +408,7 @@ class FlyingFlo_USB:
             "gas" : [np.array([float(data[i][5]) for i in range(1,len(data)-2)]),"gas resistance","$\Omega$"],
             "co2" : [np.array([float(data[i][2]) for i in range(1,len(data)-2)]),r"$CO_2$","ppm"],
             "tvoc" : [np.array([float(data[i][3]) for i in range(1,len(data)-2)]),"TVOC","ppb"],
-            "press" : [np.array([float(data[i][7]) for i in range(1,len(data)-2)]),"$ambient pressure","hPa"],
+            "press" : [np.array([float(data[i][7]) for i in range(1,len(data)-2)]),"ambient pressure","hPa"],
             "humsen" : [np.array([float(data[i][12]) for i in range(1,len(data)-2)]),"humidity","%"],
             "tempsen" : [np.array([float(data[i][13]) for i in range(1,len(data)-2)]),"temperature","°C"],
             "vocsen" : [np.array([float(data[i][14]) for i in range(1,len(data)-2)]),"VOC-Index","a.u"],

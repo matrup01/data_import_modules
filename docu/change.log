@@ -1,3 +1,16 @@
+######################### MR 28.01.2026 #########################
+#                    "bugfixes at WIBS obj"                     #
+#                                                               #
+# - Fixed WIBS fl concentraion (multiplied with total particles)#
+# - Reintroduced the option to not process all channels in the  #
+#   WIBS-obj (new kwarg: 'channels')                            #
+# - Changed Pops.newheatmap() to use Pops.t instead of          #
+#   Pops.popstime                                               #
+# - Removed a random '$' from FlyingFlo_USB.y                   #
+# - Fixed 'ydata2' key in 'FlyingFlo2.0' dict in the 'layout'   #
+#   kwarg for NewFData (old: [6,21,12], new: [8,23,14])         #
+#################################################################
+
 ######################### MR 09.12.2025 #########################
 #              "measurement_frequency bug fixed"                #
 #                                                               #

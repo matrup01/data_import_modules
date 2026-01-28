@@ -696,6 +696,7 @@
     start (str, optional) ... String in the form 'hh:mm:ss'. If start is given, all data acquired before this timestamp will be ignored
     end (str, optional) ... String in the form 'hh:mm:ss'. If end is given, all data acquired after this timestamp will be ignored
     FT_date (str, optional) ... Sets the FT_time to be this date (str format: 'dd.mm.yyyy'), only relevant if the data is going to be compared with other data, default-'01.01.2000'
+    channels (list of str, optional) ... Decides which channels should be processed, by default all channels are processed, but it can be reduced for large files (give [] if no channels should be processed). default - ["a","b","c","ab","ac","bc","abc"]
     
 6.1.1   WIBS.quickplot(y)
 

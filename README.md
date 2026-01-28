@@ -20,6 +20,7 @@ Enter the following command in your console:
 ```
 pip install -i https://test.pypi.org/simple/ agg-dim
 ```
+For upgrading add the `--upgrade` flag before `-i`
 
 ### Manual installation
 
