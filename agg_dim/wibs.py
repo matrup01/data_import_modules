@@ -107,7 +107,7 @@ class WIBS:
             #import kwargs
             defaults = {
                 "FT_sigma" : 3,
-                "bin_borders" : [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,1.7,2,2.5,3,3.5,4,5,10,15,20],
+                "bin_borders" : [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,1.7,2,2.5,3,3.5,4,5,10,15,20,100],
                 "flow" : 0.3*1000/60,
                 "fixed" : None, #[float,flat,float]
                 "start" : None,
@@ -152,9 +152,9 @@ class WIBS:
             timecorr = FT_time - self.start_FT
             
             if self.fixed == None:
-                self.fl1_FTbg = np.mean(ft_xe1[0]) + self.FT_sigma * np.std(ft_xe1[0])
-                self.fl2_FTbg = np.mean(ft_xe1[1]) + self.FT_sigma * np.std(ft_xe1[1])
-                self.fl3_FTbg = np.mean(ft_xe2[1]) + self.FT_sigma * np.std(ft_xe2[1])
+                self.fl1_FTbg = np.nanmean(ft_xe1[0]) + self.FT_sigma * np.nanstd(ft_xe1[0])
+                self.fl2_FTbg = np.nanmean(ft_xe1[1]) + self.FT_sigma * np.nanstd(ft_xe1[1])
+                self.fl3_FTbg = np.nanmean(ft_xe2[1]) + self.FT_sigma * np.nanstd(ft_xe2[1])
             
             
             #load file
@@ -277,7 +277,7 @@ class WIBS:
                 self.details[f"bin{bin_no}_dndlogdp"] = [f"dN/dlog$D_P$ (Bin{bin_no})","$\mu$m${}^{-1}$"]
                 
             #total
-            self.data["total_cps"] = np.sum([self.data[f"bin{i}_cps"] for i in range(self.bins)],axis=0)
+            self.data["total_cps"] = np.array([np.count_nonzero(arr) for arr in time_mask])
             self.data["total_partconc"] = self.data["total_cps"] / self.flow
             self.details["total_cps"] = ["Particle Counts","#/s"]
             self.details["total_partconc"] = ["Particle Conc.","#/cm${}^3$"]
@@ -287,7 +287,7 @@ class WIBS:
             ex_handler = time_mask & self.rawdata["excited"]
             self.data["excited"] = np.array([np.count_nonzero(arr) for arr in ex_handler])
             del ex_handler
-            self.data["excited_fraction"] = np.divide(self.data["excited"],self.data["total_cps"],out=np.zeros(self.data["excited"].shape,dtype=float),where=self.data["total_cps"]!=0)
+            self.data["excited_fraction"] = np.divide(self.data["excited"],self.data["total_cps"],out=np.ones(self.data["excited"].shape,dtype=float),where=self.data["total_cps"]!=0)
             self.details["excited"] = ["Particle Counts (excited)","#/s"]
             self.details["excited_fraction"] = ["Fraction of excited Particles", "No Unit"]
             

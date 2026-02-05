@@ -1,3 +1,12 @@
+######################### MR 05.02.2026 #########################
+#                       "WIBS cps bugfix"                       #
+#                                                               #
+# - slightly changed the way the excited fraction is calculated #
+#   in WIBS.__init__ and added an extra upper default bin       #
+# - changed the way total cps are calculated in WIBS.__init__   #
+# - changed WIBS FT handling to handle nan values correctly     #
+#################################################################
+
 ######################### MR 28.01.2026 #########################
 #                    "bugfixes at WIBS obj"                     #
 #                                                               #
