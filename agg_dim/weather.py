@@ -7,10 +7,9 @@ Created on Mon Sep  8 15:02:42 2025
 
 import csv
 import datetime as dt
-from .ErrorHandler import IllegalFileFormat, IllegalArgument
 import matplotlib.dates as md
-import matplotlib.pyplot as plt
 import numpy as np
+from .ErrorHandler import IllegalFileFormat, IllegalArgument
 
 class WeatherData:
     """
@@ -30,7 +29,7 @@ class WeatherData:
 
     """
     
-    def __init__(self,file,**kwargs):
+    def __init__(self,file):
         """
         inits WeatherData object
 
@@ -47,7 +46,8 @@ class WeatherData:
         
         if file.split(".")[1].lower() != "csv":
             raise IllegalFileFormat(file.split(".")[1], "csv","WeatherData argument")
-        data = csv.reader(open(file),delimiter=",")
+        with open(file) as f:
+            data = csv.reader(f,delimiter=",")
         data = list(data)
         
         self.data = {
@@ -133,14 +133,14 @@ class WeatherData:
         self.hk_errorhandling(kwargs, defaults.keys(), "WeatherData.plot()")
         
         mask = np.full(len(self.data["t"]),True)
-        if type(kwargs["day"]) == str:
+        if isinstance(kwargs["day"],str):
             day = kwargs["day"]
             day = ".".join([day[:2],day[2:4],day[4:]])
             correctdate = dt.datetime.strptime(day, "%d.%m.%Y").date()
             for i in range(len(self.data["t"])):
                 if self.data["t"][i].date() != correctdate:
                     mask[i] = False
-        if type(kwargs["start"]) == str:
+        if isinstance(kwargs["start"],str):
             starthour,startminute,startsecond = int(kwargs["start"][:2]),int(kwargs["start"][2:4]),int(kwargs["start"][4:])
             for i in range(len(self.data["t"])):
                 if self.data["t"][i].hour < starthour:
@@ -149,7 +149,7 @@ class WeatherData:
                     mask[i] = False
                 elif self.data["t"][i].hour == starthour and self.data["t"][i].minute == startminute and self.data["t"][i].second < startsecond:
                     mask[i] = False
-        if type(kwargs["end"]) == str:
+        if isinstance(kwargs["end"],str):
             endhour,endminute,endsecond = int(kwargs["end"][:2]),int(kwargs["end"][2:4]),int(kwargs["end"][4:])
             for i in range(len(self.data["t"])):
                 if self.data["t"][i].hour > endhour:
@@ -162,11 +162,11 @@ class WeatherData:
         xx = self.data["t"][mask]
         yy = self.data[y][mask]
         
-        if type(kwargs["setday"]) == str:
+        if isinstance(kwargs["setday"],str):
             date = [kwargs["setday"][:2],kwargs["setday"][2:4],kwargs["setday"][4:]]
             xx = np.array([d.replace(day=int(date[0]),month=int(date[1]),year=int(date[2])) for d in xx])
             
-        if type(kwargs["ylabel"]) != str:
+        if not isinstance(kwargs["ylabel"],str):
             kwargs["ylabel"] = f"{self.details[y][0]} in {self.details[y][1]}"
         
         ax.plot(xx,yy,label=kwargs["plotlabel"],color=kwargs["color"])
@@ -185,12 +185,15 @@ class WeatherData:
     #housekeeping funcs
     
     def hk_errorhandling(self,kwargs,legallist,funcname):
-        
+        """Checks if all passed kwargs are legal"""
+
         for key in kwargs:
             if key not in legallist:
                 raise IllegalArgument(key,funcname,legallist)
                 
     def hk_func_kwargs(self,kwargs,key,default):
-        
+        """Gives kwargs a default value if they are not passed"""
+ 
         op = kwargs[key] if key in kwargs else default
         return op
+    

@@ -4,18 +4,16 @@ Created on Wed Feb 26 15:52:29 2025
 
 @author: mrupp
 """
-
+import csv
+import datetime as dt
+import math
 import numpy as np
 import matplotlib.dates as md
-import datetime as dt
-import csv
 import matplotlib.pyplot as plt
-import math
 from .ErrorHandler import IllegalArgument
 
 
 class CCS811:
-    
     """full documentation see https://github.com/matrup01/data_import_modules \n
     
     file (str) ... takes a ccs811-produced csv-file\n
@@ -26,13 +24,34 @@ class CCS811:
 	deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False\n"""
     
     def __init__(self,file,start="none",end="none",title="no title",deviate=False):
+        """
+
+        Parameters
+        ----------
+        file : str
+            Takes a ccs811-produced csv-file.
+        start : str, optional
+            Takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp.
+        end : str, optional
+            Takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp.
+        title : str, optional
+            Takes a str and uses it as a title for quickplots. The default is "no title".
+        deviate : bool, optional
+            If True, all data is expressed relative to mean. The default is False.
+
+        Returns
+        -------
+        None.
+
+        """
         
         #init
         self.title = title
         self.deviated = False
         
         #read data from csv to list
-        data = csv.reader(open(file),delimiter=",")
+        with open(file) as f:
+            data = csv.reader(f,delimiter=",")
         data = list(data)
         
         #extract x and y values from list
@@ -71,6 +90,7 @@ class CCS811:
             
             
     def findplot(self,y):
+        """Returns the plotdata for a given y"""
         
         try:
             loc = self.finder[y]
@@ -78,15 +98,23 @@ class CCS811:
             
             if self.deviated:
                 yy[2] = "%  deviation from mean"
-        except:
-            raise ValueError("Invalid plottype: plot has to be one of the following strings: pm1,pm25,pm4,pm10,temp,hum")
+        except Exception as exc:
+            raise ValueError("Invalid plottype: plot has to be one of the following strings: pm1,pm25,pm4,pm10,temp,hum") from exc
             
         return yy
     
     
     def quickplot(self):
+        """
+        Draws a plot y vs time
+
+        Returns
+        -------
+        None.
+
+        """
         
-        fig,ax = plt.subplots()
+        _,ax = plt.subplots()
         plt.title(self.title)
         yy = self.findplot("tvoc")
 
@@ -98,6 +126,25 @@ class CCS811:
         
         
     def plot(self,ax,y,color="tab:brown",secondary=False):
+        """
+        Plots y over time on an existing mpl axis
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        y : str
+            Determines which data should be plotted.
+        color : str, optional
+            Determines the color of the plot. The default is "tab:brown".
+        secondary : bool, optional
+            If True the plot uses the y-axis on the right-hand side. Should be used if the axis is a twinx. The default is False.
+
+        Returns
+        -------
+        None.
+
+        """
         
         #get plotdata
         yy = self.findplot(y)
@@ -116,6 +163,15 @@ class CCS811:
             
             
     def returndata(self,y):
+        """
+        Returns a data array of a given y.
+
+        Returns
+        -------
+        yy : list(float)
+            List conatining all the data 'y'.
+
+        """
         
         yy = self.findplot(y)[0]
         
@@ -123,6 +179,14 @@ class CCS811:
     
     
     def average(self):
+        """
+        Averages all data minutewise
+
+        Returns
+        -------
+        None.
+
+        """
         
         meant,meany = [],[]
         
@@ -155,6 +219,14 @@ class CCS811:
             
     
     def deviatefrommean(self):
+        """
+        Changes all values to be expressed relative to the mean.
+
+        Returns
+        -------
+        None.
+
+        """
         
         for element in self.y:
             
@@ -167,7 +239,6 @@ class CCS811:
         
         
 class SEN55:
-    
     """full documentation see https://github.com/matrup01/data_import_modules \n
     
     file (str) ... takes a sen55-produced csv-file\n
@@ -178,13 +249,34 @@ class SEN55:
 	deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False"""
     
     def __init__(self,file,start="none",end="none",title="no title",deviate=False):
+        """
+
+        Parameters
+        ----------
+        file : str
+            Takes a sen55-produced csv-file.
+        start : str, optional
+            Takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp.
+        end : str, optional
+            Takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp.
+        title : str, optional
+            Takes a str and uses it as a title for quickplots. The default is "no title".
+        deviate : bool, optional
+            If True, all data is expressed relative to mean. The default is False.
+
+        Returns
+        -------
+        None.
+
+        """
         
         #init
         self.title = title
         self.deviated = False
         
         #read data from csv to list
-        data = csv.reader(open(file),delimiter=",")
+        with open(file) as f:
+            data = csv.reader(f,delimiter=",")
         data = list(data)
         
         
@@ -234,6 +326,20 @@ class SEN55:
             self.deviatefrommean()
             
     def findplot(self,y):
+        """
+        Matches the given str with the correct data and returns it.
+
+        Parameters
+        ----------
+        y : str
+            Decides which data to plot.
+
+        Returns
+        -------
+        yy : list(list(float),str,str)
+            List of values of the data 'y' and some metadata.
+
+        """
         
         try:
             loc = self.finder[y]
@@ -241,15 +347,23 @@ class SEN55:
             
             if self.deviated:
                 yy[2] = "%  deviation from mean"
-        except:
-            raise ValueError("Invalid plottype: plot has to be one of the following strings: pm1,pm25,pm4,pm10,temp,hum")
+        except Exception as exc:
+            raise ValueError("Invalid plottype: plot has to be one of the following strings: pm1,pm25,pm4,pm10,temp,hum") from exc
             
         return yy
             
     
     def quickplot(self):
+        """
+        Draws a plot of PM25 vs time
+
+        Returns
+        -------
+        None.
+
+        """
         
-        fig,ax = plt.subplots()
+        _,ax = plt.subplots()
         plt.title(self.title)
 
         ax.plot(self.t,self.y[1][0])
@@ -260,6 +374,25 @@ class SEN55:
         
         
     def plot(self,ax,y,color="tab:red",secondary=False):
+        """
+        Draws a plot of 'y' vs time on a given mpl axis
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        y : str
+            Decides which data to plot.
+        color : str, optional
+            Changes the plot color. The default is "tab:red".
+        secondary : bool, optional
+            If True the plot uses the y-axis on the right-hand side. Should be used if the axis is a twinx. The default is False.
+
+        Returns
+        -------
+        None.
+
+        """
         
         #get plotdata
         yy = self.findplot(y)
@@ -278,6 +411,20 @@ class SEN55:
             
             
     def returndata(self,y):
+        """
+        Returns a list of the data y
+
+        Parameters
+        ----------
+        y : str
+            Decides which data should be returned.
+
+        Returns
+        -------
+        yy : list(float)
+            List of values of the data 'y.
+
+        """
         
         yy = self.findplot(y)[0]
         
@@ -285,6 +432,14 @@ class SEN55:
     
     
     def average(self):
+        """
+        Averages the data minutewise
+
+        Returns
+        -------
+        None.
+
+        """
         
         meant,meany = [],[]
         
@@ -317,6 +472,14 @@ class SEN55:
             
                 
     def deviatefrommean(self):
+        """
+        Changes all data to be expressed relative to mean.
+
+        Returns
+        -------
+        None.
+
+        """
         
         for element in self.y:
             
@@ -328,8 +491,7 @@ class SEN55:
         self.deviated = True
     
 
-class FlyingFlo_USB:
-    
+class FlyingFlo_USB:  
     """
     inits FlyingFlo_USB object
 
@@ -387,14 +549,13 @@ class FlyingFlo_USB:
         #init
         self.title = title
         self.deviated = False
-        self.averaged = False
-        
+        self.averaged = False 
         
         #read data from csv to list
-        data = csv.reader(open(file),delimiter=",")
+        with open(file) as f:
+            data = csv.reader(f,delimiter=",")
         data = list(data)
-        
-        
+              
         #extract x and y values from list
         self.t = np.array([dt.datetime.strptime(data[i][1],"%H:%M:%S.%f") for i in range(1,len(data)-2)])
         
@@ -414,8 +575,7 @@ class FlyingFlo_USB:
             "vocsen" : [np.array([float(data[i][14]) for i in range(1,len(data)-2)]),"VOC-Index","a.u"],
             "nox" : [np.array([float(data[i][15]) for i in range(1,len(data)-2)]),r"$NO_X$-Index","a.u."]
             }
-        
-        
+              
         #crop
         if start != "none":
             indices = []
@@ -465,10 +625,10 @@ class FlyingFlo_USB:
         
         try:
             yy = self.y[y]
-        except:
-            raise ValueError(f"{y} cant be plotted! Plottable data: {', '.join([key for key in self.y])}")
+        except Exception as exc:
+            raise ValueError(f"{y} cant be plotted! Plottable data: {', '.join(list(self.y))}") from exc
         
-        fig,ax = plt.subplots()
+        _,ax = plt.subplots()
         plt.title(self.title)
 
         ax.plot(self.t,yy[0])
@@ -517,8 +677,8 @@ class FlyingFlo_USB:
         #get plotdata
         try:
             yy = self.y[y]
-        except:
-            raise ValueError(f"{y} cant be plotted! Plottable data: {', '.join([key for key in self.y])}")
+        except Exception as exc:
+            raise ValueError(f"{y} cant be plotted! Plottable data: {', '.join(list(self.y))}") from exc
         
         #draw plot
         ax.plot(self.t,yy[0],color=kwargs["color"])
@@ -548,7 +708,7 @@ class FlyingFlo_USB:
         minutes = np.array([timestamp.minute for timestamp in self.t])
         hours = np.array([timestamp.hour for timestamp in self.t])
         
-        for key,val in self.y.items():
+        for key in self.y:
             new_array = []
             minute = None
             for m,h in zip(minutes,hours):
@@ -597,6 +757,17 @@ class FlyingFlo_USB:
         self.deviated = True
         
     def returndata(self):
+        """
+        Returns a dict of all data (important for use with DroneWrapper)
+
+        Returns
+        -------
+        op : dict(str:np.array)
+            dict containing data of all 'y's.
+        op_details : dict(str:str)
+            Contains metadata for all 'y's.
+
+        """
         
         op_t = []
         new_t = self.t[0].replace(microsecond=0)
@@ -626,22 +797,25 @@ class FlyingFlo_USB:
     #Housekeeping funcs
     
     def hk_kwargs(self,kwargs,key,default):
+        """Turns kwargs into attributes"""
         
         op = kwargs[key] if key in kwargs else default
         if type(op) == str:
             if op =="null":
                 print("WARNING: Loaded file seems to have been produced either from another object than NewFData or another version of NewFData. Some functions may not be available.")
-        exec(f"self.{key} = op")
+        setattr(self, key, op)
         
         
     def hk_func_kwargs(self,kwargs,key,default):
-        
+        """Gives kwargs a default value if they are not passed"""
+
         op = kwargs[key] if key in kwargs else default
         return op
     
     
     def hk_errorhandling(self,kwargs,legallist,funcname):
-        
+        """Checks if all passed kwargs are legal"""
+
         for key in kwargs:
             if key not in legallist:
                 raise IllegalArgument(key,funcname,legallist)

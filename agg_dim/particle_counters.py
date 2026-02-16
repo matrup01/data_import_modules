@@ -8,10 +8,9 @@ from matplotlib.colors import LogNorm
 import numpy as np
 import pickle
 
-from .ErrorHandler import *
+from .ErrorHandler import IllegalArgument,SensorNotMounted,IllegalFileFormat,IllegalValue,UnknownLayoutError
 
-class Pops:
-    
+class Pops:    
     """full documentation see https://github.com/matrup01/data_import_modules
     
     Parameters
@@ -86,9 +85,42 @@ class Pops:
         self.filename = file
         self.relative = False
         self.deviated = False
-        self.d_categories = [element * 1000 for element in [0.115,0.125,0.135,0.150,0.165,0.185,0.210,0.250,0.350,0.475,0.575,0.855,1.220,1.53,1.99,2.585,3.37]]
-        self.plottypes = [["temp_bm680","temperature (bm680)","°C"],["hum_bm680","rel. humidity (bm680)","%"],["temp_sen55","temperature","°C"],["hum_sen55","rel. humidity","%"],["press","ambient pressure","hPa"],["gas","Gaswiderstand",r"$\Ohm$"],["pm1","PM1.0",r"$\mu$g/$m^3$"],["pm25","PM2.5",r"$\mu$g/$m^3$"],["pm4","PM4.0",r"$\mu$g/$m^3$"],["pm10","PM10.0",r"$\mu$g/$m^3$"],["voc","VOC-Index",""],["nox",r"$NO_X$-Index",""],["co2",r"$CO_2$","ppm"],["tvoc","TVOC","ppb"]]
-        self.plottypes2 = [["total","part. conc." , r"Counts/$cm^3$"],["popstemp","temperature inside POPS-box","°C"],["boardtemp","boardtemp","°C"],["overpm25","PM2.5 from POPS",r"Counts/$cm^3$"],["underpm25","particles smaller than 350 nm",r"Counts/$cm^3$"]]
+        self.d_categories = [element * 1000 for element in [0.115,
+                                                            0.125,
+                                                            0.135,
+                                                            0.150,
+                                                            0.165,
+                                                            0.185,
+                                                            0.210,
+                                                            0.250,
+                                                            0.350,
+                                                            0.475,
+                                                            0.575,
+                                                            0.855,
+                                                            1.220,
+                                                            1.53,
+                                                            1.99,
+                                                            2.585,
+                                                            3.37]]
+        self.plottypes = [["temp_bm680","temperature (bm680)","°C"],
+                          ["hum_bm680","rel. humidity (bm680)","%"],
+                          ["temp_sen55","temperature","°C"],
+                          ["hum_sen55","rel. humidity","%"],
+                          ["press","ambient pressure","hPa"],
+                          ["gas","Gaswiderstand",r"$\Ohm$"],
+                          ["pm1","PM1.0",r"$\mu$g/$m^3$"],
+                          ["pm25","PM2.5",r"$\mu$g/$m^3$"],
+                          ["pm4","PM4.0",r"$\mu$g/$m^3$"],
+                          ["pm10","PM10.0",r"$\mu$g/$m^3$"],
+                          ["voc","VOC-Index",""],
+                          ["nox",r"$NO_X$-Index",""],
+                          ["co2",r"$CO_2$","ppm"],
+                          ["tvoc","TVOC","ppb"]]
+        self.plottypes2 = [["total","part. conc." , r"Counts/$cm^3$"],
+                           ["popstemp","temperature inside POPS-box","°C"],
+                           ["boardtemp","boardtemp","°C"],
+                           ["overpm25","PM2.5 from POPS",r"Counts/$cm^3$"],
+                           ["underpm25","particles smaller than 350 nm",r"Counts/$cm^3$"]]
         
         #kwargs
         defaults = {"title" : "no title",
@@ -105,24 +137,24 @@ class Pops:
         self.hk_errorhandling(kwargs, defaults.keys(), "Pops")
         
         #fix layout
-        if type(self.layout) == str:
+        if isinstance(self.layout,str):
             match self.layout:
                 case "desktopmode":
-                    self.layout = {"bins" : [pbin for pbin in range(33,49)],
+                    self.layout = {"bins" : list(range(33,49)),
                                    "ydata" : "NULL",
                                    "ydata2" : [5,20,11],
                                    "popstime" : 1,
                                    "t" : -1,
                                    "flow" : 15}
                 case "box_pallnsdorfer":
-                    self.layout = {"bins" : [pbin for pbin in range(56,72)],
+                    self.layout = {"bins" : list(range(56,72)),
                                    "ydata" : [2,3,11,10,4,5,6,7,8,9,12,13,14,15],
                                    "ydata2" : [28,43,34],
                                    "popstime" : 23,
                                    "t" : 1,
                                    "flow" : 38}
                 case "FlyingFlo2.0":
-                    self.layout = {"bins" : [pbin for pbin in range(36,52)],
+                    self.layout = {"bins" : list((36,52)),
                                    "ydata" : "NULL",
                                    "ydata2" : [8,23,14],
                                    "popstime" : 3,
@@ -133,7 +165,8 @@ class Pops:
         
         
         #reads data from csv to list
-        data = csv.reader(open(file),delimiter=",")
+        with open(file) as openfile:
+            data = csv.reader(openfile,delimiter=",")
         data = list(data)
         newdata = []
         for dat in data:
@@ -156,7 +189,7 @@ class Pops:
             self.t = [dt.datetime.strptime(data[i][self.layout["t"]],"%H:%M:%S") for i in range(1,len(data))]
         self.pops_bins_raw = [[float(data[i][j]) for i in range(1,len(data))]for j in self.layout["bins"]]
         self.pops_bins = [[self.pops_bins_raw[j][i] / float(data[i+1][self.layout["flow"]]) for i in range(len(data)-1)] for j in range(len(self.pops_bins_raw))]
-        if type(self.layout["ydata"]) == str:
+        if isinstance(self.layout["ydata"],str):
             self.ydata = "NULL"
         else:
             self.ydata = [[float(data[i][j]) for i in range(1,len(data))]for j in self.layout["ydata"]]
@@ -172,7 +205,7 @@ class Pops:
             for element in [data[i][self.layout["t"]] for i in range(1,len(data))]:
                 tcounter += 1
                 if self.start == element:
-                  t_start = tcounter
+                    t_start = tcounter
             popscounter = -1
             unixstart = str(int(self.start[0:2])*3600+int(self.start[3:5])*60+int(self.start[6:8])-7200 + self.timecorr)
             for element in [data[i][self.layout["popstime"]][0:5] for i in range(1,len(data))]:
@@ -188,7 +221,7 @@ class Pops:
             for element in [data[i][self.layout["t"]] for i in range(1,len(data))]:
                 tcounter += 1
                 if self.end == element:
-                  t_end = tcounter
+                    t_end = tcounter
             popscounter = -1
             unixend = str(int(self.end[0:2])*3600+int(self.end[3:5])*60+int(self.end[6:8])-7200 + self.timecorr)
             for element in [data[i][self.layout["popstime"]][0:5] for i in range(1,len(data))]:
@@ -203,18 +236,18 @@ class Pops:
         self.popstime = [self.popstime[i] for i in range(pops_start,pops_end)]
         for i in range(len(self.ydata2)):
             self.ydata2[i] = [self.ydata2[i][j] for j in range(pops_start,pops_end)]
-        if type(self.ydata) != str:
+        if not isinstance(self.ydata,str):
             for i in range(len(self.ydata)):
                 self.ydata[i] = [self.ydata[i][j] for j in range(t_start,t_end)]
         for i in range(len(self.pops_bins)):
             self.pops_bins[i] = [self.pops_bins[i][j] for j in range(pops_start,pops_end)]
             
         #correctbg
-        if type(self.bgobj) == Pops:
+        if isinstance(self.bgobj,Pops):
             self.importbg(self.bgobj.exportbg())
             
         #make values relative
-        if type(self.relobj) == Pops:
+        if isinstance(self.relobj,Pops):
             self.relativevals(self.relobj)
             self.relative = True
             
@@ -295,7 +328,7 @@ class Pops:
         ploty = [ploty[i] for i in range(kwargs["startcrop"],len(ploty)-kwargs["endcrop"])]
             
         #draw plot
-        fig,ax = plt.subplots()
+        _,ax = plt.subplots()
         ax.plot(plotx,ploty,label=label)
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         ax.set_ylabel(ylabel)
@@ -313,7 +346,7 @@ class Pops:
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
         y : str
-            Determines which data should be plotted..
+            Determines which data should be plotted.
         startcrop : int, optional
             rops the data by startcrop seconds starting from the beginning.
         endcrop : int, optional
@@ -411,7 +444,7 @@ class Pops:
         xx,yy = np.meshgrid(self.popstime,self.d_categories)
         
         #draw plot
-        fig,ax = plt.subplots()
+        _,ax = plt.subplots()
         im = ax.pcolormesh(xx,yy,heatmapdata,cmap="RdYlBu_r",norm=LogNorm())
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         ax.set_yscale("log")
@@ -577,7 +610,7 @@ class Pops:
         print(*dndlogdp)
         
         #draw
-        fig,ax = plt.subplots()
+        _,ax = plt.subplots()
         ax.bar(x=xvals,width=widths,align="edge",height=dndlogdp)
         ax.set_yscale("log")
         ax.set_ylabel("dN/dlog$D_p$")
@@ -650,7 +683,7 @@ class Pops:
 
         """
         
-        placeholder1,data,label,unit = self.hk_findplottype(y)
+        _,data,label,unit = self.hk_findplottype(y)
         mean = np.mean(data)
         std = np.std(data,ddof=1)
         var = np.var(data,ddof=1)
@@ -677,7 +710,7 @@ class Pops:
 
         """
         
-        placeholder1,data,label,unit = self.hk_findplottype(y)
+        _,data,_,_ = self.hk_findplottype(y)
         mean = np.mean(data)
         std = np.std(data,ddof=1)
         var = np.var(data,ddof=1)
@@ -703,10 +736,10 @@ class Pops:
         self.popstime += obj.popstime
         self.t += obj.t
             
-        if type(self.ydata) != str and type(obj.ydata) != str:
+        if not isinstance(self.ydata,str) and not isinstance(obj.ydata,str):
             for i in range(len(self.ydata)):
                 self.ydata[i] += obj.ydata[i]
-        elif type(self.ydata) == str and type(obj.ydata) != str:
+        elif isinstance(self.ydata,str) and not isinstance(obj.ydata,str):
             self.ydata = obj.ydata
                 
         for i in range(len(self.ydata2)):
@@ -738,10 +771,10 @@ class Pops:
         newpops.ydata = copy(self.ydata)
         newpops.ydata2 = copy(self.ydata2)
             
-        if type(newpops.ydata) != str and type(obj.ydata) != str:
+        if not isinstance(newpops.ydata,str) and not isinstance(obj.ydata,str):
             for i in range(len(newpops.ydata)):
                 newpops.ydata[i] += obj.ydata[i]
-        elif type(newpops.ydata) == str and type(obj.ydata) != str:
+        elif isinstance(newpops.ydata,str) and not isinstance(obj.ydata,str):
             newpops.ydata = obj.ydata
                 
         for i in range(len(newpops.ydata2)):
@@ -854,7 +887,7 @@ class Pops:
         
         meant,meanydata,meanpopst,meanydata2,meanpopsbins = [],[],[],[],[]
         
-        if type(self.ydata) != str:
+        if not isinstance(self.ydata,str):
             for i in range(len(self.ydata)):
                 meanydata.append([])
         for i in range(len(self.ydata2)):
@@ -878,7 +911,7 @@ class Pops:
                 
                 meant.append(self.t[minute_vals[math.ceil(len(minute_vals)/2)]])
                 meanpopst.append(self.popstime[minute_vals[math.ceil(len(minute_vals)/2)]])
-                if type(self.ydata) != str:
+                if not isinstance(self.ydata,str):
                     for j in range(len(self.ydata)):
                         meanydata[j].append(np.mean([self.ydata[j][k] for k in minute_vals]))
                 for j in range(len(self.ydata2)):
@@ -942,21 +975,24 @@ class Pops:
         
     #housekeeping funcs    
     def hk_kwargs(self,kwargs,key,default):
+        """Turns kwargs into attributes"""
         
         op = kwargs[key] if key in kwargs else default
-        if type(op) == str:
+        if isinstance(op,str):
             if op =="null":
                 print("WARNING: Loaded file seems to have been produced either from another object than NewFData or another version of NewFData. Some functions may not be available.")
-        exec(f"self.{key} = op")
+        setattr(self, key, op)
         
         
     def hk_func_kwargs(self,kwargs,key,default):
+        """Gives kwargs a default value if they are not passed"""
         
         op = kwargs[key] if key in kwargs else default
         return op
     
     
     def hk_errorhandling(self,kwargs,legallist,funcname):
+        """Checks if all passed kwargs are legal"""
         
         for key in kwargs:
             if key not in legallist:
@@ -964,11 +1000,12 @@ class Pops:
         
         
     def hk_findplottype(self,y):
+        """Finds plotdata for a given y"""
         
         #find correct plottype
         for i in range(len(self.plottypes)):
             if self.plottypes[i][0] == y:
-                if type(self.ydata) == str:
+                if isinstance(self.ydata,str):
                     raise SensorNotMounted(y, "POPS")
                 plotx = self.t
                 ploty = self.ydata[i]
@@ -1012,6 +1049,7 @@ class Pops:
         
         
     def hk_replacezeros(self,data):
+        """replaces zeros for a logarithmic scale"""
         
         smallest = 10000
         for element in data:
@@ -1124,8 +1162,8 @@ class OPC:
                     mdata = list(f)[14:]
                     mhelper = mdata[0].replace(",",".").split("\t")[1:]
                     mdata = mdata[1:]
-            except FileNotFoundError:
-                raise FileNotFoundError(f"File {self.mfile} not found. If it has been renamed or moved, pass the new name/path as 'mfile' to OPC.__init__()")
+            except Exception as exc:
+                raise FileNotFoundError(f"File {self.mfile} not found. If it has been renamed or moved, pass the new name/path as 'mfile' to OPC.__init__()") from exc
             for i,row in enumerate(mdata):
                 mdata[i] = row.replace(",",".").split("\t")[1:]
             mdata = np.array(mdata).transpose().astype(float)
@@ -1138,10 +1176,9 @@ class OPC:
             try:
                 with open(self.dmfile) as f:
                     dmdata = list(f)[14:]
-                    dmhelper = dmdata[0].replace(",",".").split("\t")[1:]
                     dmdata = dmdata[1:]
-            except FileNotFoundError:
-                raise FileNotFoundError(f"File {self.dmfile} not found. If it has been renamed or moved, pass the new name/path as 'dmfile' to OPC.__init__()")
+            except Exception as exc:
+                raise FileNotFoundError(f"File {self.dmfile} not found. If it has been renamed or moved, pass the new name/path as 'dmfile' to OPC.__init__()") from exc
             for i,row in enumerate(dmdata):
                 dmdata[i] = row.replace(",",".").split("\t")[1:]
             dmdata = np.array(dmdata).transpose().astype(float)
@@ -1163,7 +1200,8 @@ class OPC:
                 self.data[key] = self.data[key][m]
                 
         elif file[-4:] == ".opc":
-            self.data,self.details = pickle.load(open(file,"rb"))
+            with open(file,"rb") as openfile:
+                self.data,self.details = pickle.load(openfile)
             
             #crop
             m = np.full(len(self.data["t_noday"]),True)
@@ -1255,14 +1293,14 @@ class OPC:
         
         #draw plot
         x = self.data["t"]
-        if type(kwargs["setday"]) == str:
+        if isinstance(kwargs["setday"],str):
             date = [int(kwargs["setday"][:2]),int(kwargs["setday"][2:4]),int(kwargs["setday"][4:])]
             for i in range(len(x)):
                 x[i] = x[i].replace(day=date[0],month=date[1],year=date[2])
         try:
             y = self.data[y]
-        except KeyError:
-            raise IllegalValue(y, "OPC.plot()", [key for key in self.data])
+        except KeyError as kerr:
+            raise IllegalValue(y, "OPC.plot()", list(self.data)) from kerr
         ax.plot(x,y,label=kwargs["plotlabel"],color=kwargs["color"])
         ax.set_ylabel(kwargs["ylabel"])
         ax.set_xlabel("CET")
@@ -1373,10 +1411,10 @@ class OPC:
         
         #draw plot
         m = np.full(len(self.data["t"]),True)
-        if type(kwargs["start"]) == str:
+        if isinstance(kwargs["start"],str):
             kwargs["start"] = dt.datetime.strptime(kwargs["start"], "%H:%M:%S").time()
             m = np.where(self.data["t_noday"] > kwargs["start"],m,False)
-        if type(kwargs["end"]) == str:
+        if isinstance(kwargs["end"],str):
             kwargs["end"] = dt.datetime.strptime(kwargs["end"], "%H:%M:%S").time()
             m = np.where(self.data["t_noday"] < kwargs["end"],m,False)
         
@@ -1396,7 +1434,7 @@ class OPC:
             ax.set_yscale("log")
             
         ax.set_xlabel("$D_P$ in $\mu$m")
-        if type(kwargs["ylabel"]) == str:
+        if isinstance(kwargs["ylabel"],str):
             ax.set_ylabel(kwargs["ylabel"])
         else:
             ax.set_ylabel("dN/dlog$D_P$ in cm${}^{-3}$")
@@ -1404,18 +1442,21 @@ class OPC:
         
     #housekeeping funcs    
     def hk_kwargs(self,kwargs,key,default):
+        """Turns kwargs into attributes"""
         
         op = kwargs[key] if key in kwargs else default
-        exec(f"self.{key} = op")
+        setattr(self,key,op)
         
         
     def hk_func_kwargs(self,kwargs,key,default):
-        
+        """Gives kwargs a default value if they are not passed"""
+ 
         op = kwargs[key] if key in kwargs else default
         return op
     
     
     def hk_errorhandling(self,kwargs,legallist,funcname):
+        """Checks if all passed kwargs are legal"""
         
         for key in kwargs:
             if key not in legallist:

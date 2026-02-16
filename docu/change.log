@@ -1,3 +1,15 @@
+######################### MR 16.02.2026 #########################
+#                      "Code Refactoring"                       #
+#                                                               #
+# - Refactored and decluttered code                             #
+# - Added missing docstrings                                    #
+# - Changed 'plot' kwarg in Dronedata.plot() to 'y' to match    #
+#   convention.                                                 #
+# - Removed Dronedata.heightVSws() bc it is a highly specific   #
+#   analysis and not documented in docu.md                      #
+# - Replaced execs to avoid arbitrary code execution            #
+#################################################################
+
 ######################### MR 05.02.2026 #########################
 #                       "WIBS cps bugfix"                       #
 #                                                               #

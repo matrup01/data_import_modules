@@ -542,7 +542,7 @@
 
 	ax (axis) ... takes a matplotlib-axis, on which the graph will be drawn
 	
-	plot (str) ... decides which data should be drawn (height,lat,long,ws), default - height
+	y (str) ... decides which data should be drawn (height,lat,long,ws), default - height
 	color (str, optional) ... changes the color of the plot, default-"tab:purple"
 	secondary (bool, optional) ... determines which y-axis should be colored (False-left axis/True-right axis), default-False
 	

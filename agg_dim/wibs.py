@@ -5,19 +5,17 @@ Created on Tue Nov 26 08:26:00 2024
 @author: mrupp
 """
 
-
+import math
+import pickle
 from datetime import datetime,timezone
 import h5py
 import numpy as np
-import math
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
-import pickle
 
 from .ErrorHandler import IllegalValue,IllegalArgument
 
 class WIBS:
-    
     """
     Inits the WIBS obj
 
@@ -97,7 +95,8 @@ class WIBS:
         
         if file[-5:] == ".wibs":
             
-            ip = pickle.load(open(file,"rb"))
+            with open(file,"rb") as openfile:
+                ip = pickle.load(openfile)
             
             for arg in ip.keys():
                 exec(f"self.{arg} = ip[arg]")
@@ -129,8 +128,7 @@ class WIBS:
                 self.fl1_FTbg = self.fixed[0]
                 self.fl2_FTbg = self.fixed[1]
                 self.fl3_FTbg = self.fixed[2]
-            
-            
+                      
             #load Forced Trigger
             
             if FT_file == "":
@@ -138,8 +136,8 @@ class WIBS:
     
             try:
                 ft = h5py.File(FT_file,"r")
-            except:
-                raise FileNotFoundError("Cant find FT_file at given path")
+            except Exception as exc:
+                raise FileNotFoundError("Cant find FT_file at given path") from exc
             ft2 = ft["NEO"]
             ft3 = ft2["ParticleData"]
             
@@ -158,11 +156,11 @@ class WIBS:
             
             
             #load file
-            if type(file) == str:
+            if isinstance(file,str):
                 try:
                     f = h5py.File(file,"r")
-                except:
-                    raise FileNotFoundError("Cant find file at given path")
+                except Exception as exc:
+                    raise FileNotFoundError("Cant find file at given path") from exc
                 f2 = f["NEO"]
                 f3 = f2['ParticleData']
                 
@@ -180,7 +178,7 @@ class WIBS:
                 
     
             #load files
-            elif type(file) == list:
+            elif isinstance(file,list):
     
                 firstfile = True
                 
@@ -220,7 +218,7 @@ class WIBS:
                         self.rawdata["Fl3"] = np.append(self.rawdata["Fl3"],filefl3)
                
              
-            if type(self.start) == str:
+            if isinstance(self.start,str):
                 starttime = datetime.strptime(f"{self.FT_date}-{self.start}/+0000","%d.%m.%Y-%H:%M:%S/%z")
                 starttime = int(starttime.replace(year=int(self.FT_date[-4:])).timestamp())
                 if int(timecorr.total_seconds()) >= 0:
@@ -235,23 +233,23 @@ class WIBS:
                 self.rawdata["Fl2"] = self.rawdata["Fl2"][start_m]
                 self.rawdata["Fl3"] = self.rawdata["Fl3"][start_m]
                 del start_m
-            if type(self.end) == str:
-               endtime = datetime.strptime(f"{self.FT_date}-{self.end}/+0000","%d.%m.%Y-%H:%M:%S/%z")
-               endtime = int(endtime.replace(year=int(self.FT_date[-4:])).timestamp())
-               if int(timecorr.total_seconds()) >= 0:
-                   end_m = np.where((self.timehandler + int(timecorr.total_seconds())) < endtime,True,False)
-               else:
-                   offset = abs(int(timecorr.total_seconds()))
-                   end_m = np.where((self.timehandler - offset) < endtime,True,False)
-                   print(self.timehandler[0] - offset)
-                   print(endtime)
-               self.timehandler = self.timehandler[end_m] 
-               self.rawdata["size"] = self.rawdata["size"][end_m]
-               self.rawdata["excited"] = self.rawdata["excited"][end_m]
-               self.rawdata["Fl1"] = self.rawdata["Fl1"][end_m]
-               self.rawdata["Fl2"] = self.rawdata["Fl2"][end_m]
-               self.rawdata["Fl3"] = self.rawdata["Fl3"][end_m]
-               del end_m
+            if isinstance(self.end,str):
+                endtime = datetime.strptime(f"{self.FT_date}-{self.end}/+0000","%d.%m.%Y-%H:%M:%S/%z")
+                endtime = int(endtime.replace(year=int(self.FT_date[-4:])).timestamp())
+                if int(timecorr.total_seconds()) >= 0:
+                    end_m = np.where((self.timehandler + int(timecorr.total_seconds())) < endtime,True,False)
+                else:
+                    offset = abs(int(timecorr.total_seconds()))
+                    end_m = np.where((self.timehandler - offset) < endtime,True,False)
+                    print(self.timehandler[0] - offset)
+                    print(endtime)
+                self.timehandler = self.timehandler[end_m] 
+                self.rawdata["size"] = self.rawdata["size"][end_m]
+                self.rawdata["excited"] = self.rawdata["excited"][end_m]
+                self.rawdata["Fl1"] = self.rawdata["Fl1"][end_m]
+                self.rawdata["Fl2"] = self.rawdata["Fl2"][end_m]
+                self.rawdata["Fl3"] = self.rawdata["Fl3"][end_m]
+                del end_m
     
                 
             #process data
@@ -364,11 +362,11 @@ class WIBS:
         xx = self.data["t"]
         try:
             yy = self.data[y]
-        except KeyError:
-            raise IllegalValue(y, "WIBS.quickplot()",[key for key in self.data])
+        except KeyError as kerr:
+            raise IllegalValue(y, "WIBS.quickplot()",list(self.data)) from kerr
                 
         #draw plot
-        fig,ax = plt.subplots()
+        _,ax = plt.subplots()
 
         ax.set_xlabel("CET")
         ylabel = f"{self.details[y][0]} in {self.details[y][1]}" if self.details[y][1] != "No Unit" else self.details[y][0]
@@ -399,14 +397,14 @@ class WIBS:
         #error handling
         try:
             yy = np.array([self.data[f"{y}_bin{i}_dndlogdp"] for i in range(self.bins)]) if y != "allparticles" else np.array([self.data[f"bin{i}_dndlogdp"] for i in range(self.bins)])
-        except KeyError:
-            raise IllegalValue(y, "WIBS.quickheatmap", ["allparticles","a","b","c","ab","ac","bc","abc"])
+        except KeyError as kerr:
+            raise IllegalValue(y, "WIBS.quickheatmap", ["allparticles","a","b","c","ab","ac","bc","abc"]) from kerr
         
         xlims = [self.data["t"][0],self.data["t"][-1]]
         xlims = md.date2num(xlims)
             
         #draw plot
-        fig,ax = plt.subplots()
+        _,ax = plt.subplots()
         
         im = ax.imshow(yy,aspect="auto",norm="log",extent=[xlims[0],xlims[1],0,self.bins],cmap="RdYlBu_r",interpolation="none",origin="lower")
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
@@ -462,8 +460,8 @@ class WIBS:
         
         try:
             yy = np.array([self.data[f"{y}_bin{i}_dndlogdp"] for i in range(self.bins)]) if y != "allparticles" else np.array([self.data[f"bin{i}_dndlogdp"] for i in range(self.bins)])
-        except KeyError:
-            raise IllegalValue(y, "WIBS.heatmap()", ["allparticles","a","b","c","ab","ac","bc","abc"])
+        except KeyError as kerr:
+            raise IllegalValue(y, "WIBS.heatmap()", ["allparticles","a","b","c","ab","ac","bc","abc"]) from kerr
         
         xlims = [self.data["t"][0],self.data["t"][-1]]
         xlims = md.date2num(xlims)
@@ -516,8 +514,8 @@ class WIBS:
         xx = self.data["t"]
         try:
             yy = self.data[y]
-        except KeyError:
-            raise IllegalValue(y, "WIBS.plot()",[key for key in self.data])
+        except KeyError as kerr:
+            raise IllegalValue(y, "WIBS.plot()",list(self.data)) from kerr
             
         ylabel = f"{self.details[y][0]} in {self.details[y][1]}" if self.details[y][1] != "No Unit" else self.details[y][0]
             
@@ -566,26 +564,30 @@ class WIBS:
         
         if path[-5:] != ".wibs":
             path.append(".wibs")
-            
-        pickle.dump(op,open(path,"wb"),4)
+          
+        with open(path,"wb") as dumppath:
+            pickle.dump(op,dumppath,4)
 
     
     #housekeeping funcs
     
     def hk_kwargs(self,kwargs,key,default):
-        
+        """Turns kwargs into attributes"""
+
         op = kwargs[key] if key in kwargs else default
-        exec(f"self.{key} = op")
+        setattr(self,key,op)
         
         
     def hk_func_kwargs(self,kwargs,key,default):
-        
+        """Gives kwargs a default value if they are not passed"""
+
         op = kwargs[key] if key in kwargs else default
         return op
     
     
     def hk_errorhandling(self,kwargs,legallist,funcname):
-        
+        """Checks if all passed kwargs are legal"""
+
         for key in kwargs:
             if key not in legallist:
                 raise IllegalArgument(key,funcname,legallist)

@@ -1,25 +1,50 @@
+from copy import deepcopy
 import csv
 import datetime as dt
+import pickle
 import numpy as np
-from copy import deepcopy
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
 from matplotlib.colors import LogNorm
-from .ErrorHandler import IllegalArgument, IllegalFileFormat
-import pickle
 from numba import njit, prange, float64
+from .ErrorHandler import IllegalArgument, IllegalFileFormat
 
 
-class FData:
-    
+class FData:    
     """full documentation see https://github.com/matrup01/data_import_modules"""
     
-    def __init__(self,file,title="kein Titel",encoding_artifacts=True,start="none",end="none",skiprows=0,layout=[3,18]):
+    def __init__(self,file,title="no title",encoding_artifacts=True,start="none",end="none",skiprows=0,layout=[3,18]):
+        """
+        Initialises an FData obj
+
+        Parameters
+        ----------
+        file : str
+            Takes an FSpec-produced csv-file.
+        title : str, optional
+            Takes a str and uses it as a title for quickplots. The default is "kein Titel".
+        encoding_artifacts : bool, optional
+            If True, encoding artefacts are removed. The default is True.
+        start : str, optional
+            Takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp. The default is "none".
+        end : str, optional
+            Takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp. The default is "none".
+        skiprows : int, optional
+            takes an int and skips the first rows (may be used if the first rows are corrupted). The default is 0.
+        layout : list(int), optional
+            Decides which columns from the csv should be taken. The default is [3,18].
+
+        Returns
+        -------
+        None.
+
+        """
         
         #reads data from csv to list
         self.title = title
         self.file = file
-        data = csv.reader(open(file,encoding="ansi"),delimiter=";")
+        with open(file,encoding="ansi") as openfile:
+            data = csv.reader(openfile,delimiter=";")
         data = list(data)
         
         #get rid of encoding-artifacts
@@ -59,19 +84,34 @@ class FData:
             for element in self.t:
                 tcounter += 1
                 if str(element)[11:19] == start:
-                  t_start = tcounter
+                    t_start = tcounter
             
         if end != "none":
             tcounter = -1
             for element in self.t:
                 tcounter += 1
                 if str(element)[11:19] == end:
-                  t_end = tcounter
+                    t_end = tcounter
 
         self.crop(t_start,len(self.t)-t_end)
         
         
     def internalbg(self,startmeasurementtime,bgcrop=0):
+        """
+        Takes data before startmeasurementtime-timestamp and treats it as bg to correct the data after it (crops bg in the process)
+
+        Parameters
+        ----------
+        startmeasurementtime : str
+            Takes a str in 'hh:mm:ss'-format and uses it to split the data from the bg.
+        bgcrop : int, optional
+            Takes an int and crops the start of the background by its amount datapoints. The default is 0.
+
+        Returns
+        -------
+        None.
+
+        """
         
         #find point in list where measurement starts
         for i in range(len(self.t)):
@@ -88,9 +128,27 @@ class FData:
             
         
     def externalbg(self,bgfile,startcrop=0,endcrop=0):
+        """
+        Takes data from another file and treats it as bg to correct the data from the FData-object
+
+        Parameters
+        ----------
+        bgfile : str
+            Takes a FSpec-produced csv-file.
+        startcrop : int, optional
+            Takes an int and crops the start of the background by its amount datapoints. The default is 0.
+        endcrop : int, optional
+            Takes an int and crops the end of the background by its amount datapoints. The default is 0.
+
+        Returns
+        -------
+        None.
+
+        """
         
         #reads data from csv to list
-        data = csv.reader(open(bgfile),delimiter=";")
+        with open(bgfile) as openbg:
+            data = csv.reader(openbg,delimiter=";")
         data = list(data)
             
         #get rid of encoding-artifacts
@@ -109,6 +167,23 @@ class FData:
             
             
     def quickplot(self,channelno,startcrop=0,endcrop=0):
+        """
+        Draws a plot of the intensity of the given channel vs time
+
+        Parameters
+        ----------
+        channelno : int
+            Decides which channel should be plotted.
+        startcrop : int, optional
+            Takes an int and crops the beginning of the plot by its amount datapoints. The default is 0.
+        endcrop : int, optional
+            Takes an int and crops the end of the plot by its amount datapoints. The default is 0.
+
+        Returns
+        -------
+        None.
+
+        """
         
         channelname = "ch" + str(channelno)
         channelno -= 1
@@ -117,7 +192,7 @@ class FData:
         self.crop(startcrop,endcrop)
         
         #draw plot        
-        fig,ax = plt.subplots()
+        _,ax = plt.subplots()
         plt.title(self.title)
         ax.plot(self.t,self.channels[channelno],label=channelname)
         ax.set_ylabel("Intensität")
@@ -127,6 +202,33 @@ class FData:
         
         
     def plot(self,channelno,ax,quakes=[],quakeslabel="kein Label",quakecolor="tab:purple",color="tab:green",startcrop=0,endcrop=0):
+        """
+        raws a plot of the intensity of the given channel vs time on an existing mpl-axis
+
+        Parameters
+        ----------
+        channelno : int
+            Decides which channel should be plotted.
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        quakes : list(str), optional
+            Takes a list of string in the format 'hh:mm:ss' and draws vertical, dashed lines at those timestamps. The default is [].
+        quakeslabel : str, optional
+            Takes a str and uses it as a label for the quakes if a legend is used. The default is "kein Label".
+        quakecolor : str, optional
+            Changes the color of the quakes. The default is "tab:purple".
+        color : str, optional
+            Changes the plot color. The default is "tab:green".
+        startcrop : int, optional
+            Takes an int and crops the beginning of the plot by its amount datapoints. The default is 0.
+        endcrop : int, optional
+            Takes an int and crops the end of the plot by its amount datapoints. The default is 0.
+
+        Returns
+        -------
+        None.
+
+        """
         
         channelname = "ch" + str(channelno)
         channelno -= 1
@@ -143,6 +245,22 @@ class FData:
             
             
     def crop(self,startcrop,endcrop):
+        """
+        Legacy function --> use start/end in init
+        Crops the data by startcrop datapoints at the start and endrop datapoints at the end
+
+        Parameters
+        ----------
+        startcrop : int
+            Takes an int and crops the beginning of the plot by its amount datapoints.
+        endcrop : int
+            Takes an int and crops the end of the plot by its amount datapoints.
+
+        Returns
+        -------
+        None.
+
+        """
         length = len(self.t)
         self.t = [self.t[i] for i in range(startcrop,length-endcrop)]
         for i in range(len(self.channels)):
@@ -150,12 +268,20 @@ class FData:
             
             
     def quickheatmap(self):
+        """
+        Draws a heatmap of fluorescence intensity over all channels
+
+        Returns
+        -------
+        None.
+
+        """
         
         xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
         heatmap_data = deepcopy(self.channels)
         heatmap_data = self.hk_replacezeros(heatmap_data)
         
-        fig,ax = plt.subplots()
+        _,ax = plt.subplots()
         
         im = ax.pcolormesh(xx,yy,heatmap_data,cmap="RdYlBu_r",norm=LogNorm(),shading="nearest")
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
@@ -174,6 +300,29 @@ class FData:
             
         
     def heatmap(self,ax,**kwargs):
+        """
+        Draws a heatmap of fluorescence intensity over all channels on an existing mpl-axis
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        smooth : bool, optional
+            Decides if heatmap should be smoothed (gouraud) or show raw data. The default is True.
+        cmap : str, optional
+            Decides which colormap should be used. The default is "RdYlBu_r".
+        pad : float, optional
+            Adds a padding between colorbar and plot. The default is 0.
+        togglecbar : bool, optional
+            Toggles the colorbar. The default is True.
+        xlims : list(str), optional
+            Takes two str in 'HH:MM:SS' format and uses them as xlims
+
+        Returns
+        -------
+        None.
+
+        """
         
         #import kwargs
         smooth = kwargs["smooth"] if "smooth" in kwargs else True
@@ -183,7 +332,7 @@ class FData:
         xlims = kwargs["xlims"] if "xlims" in kwargs else "none"
         
         #error handling
-        for key in kwargs.keys():
+        for key in kwargs:
             if key not in ["smooth","cmap","pad","togglecbar","xlims"]:
                 raise IllegalArgument(key,"FData.heatmap()")
         
@@ -191,7 +340,7 @@ class FData:
         xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
         heatmap_data = deepcopy(self.channels)
         heatmap_data = self.hk_replacezeros(heatmap_data)
-        if type(xlims) == list:
+        if isinstance(xlims,list):
             ax.set_xlim([dt.datetime.strptime(element, "%H:%M:%S") for element in xlims])
         
         #draw
@@ -215,7 +364,8 @@ class FData:
         
     #housekeeping funcs
     def hk_replacezeros(self,arr):
-        
+        """replaces zeros for a logarithmic scale"""
+
         array = deepcopy(arr)
         
         smallest = 10000
@@ -371,7 +521,8 @@ class NewFData:
                 self.bg = np.array([np.nanmean(channel)+np.nanstd(channel)*self.sigma for channel in bgdata])
                 self.bg = self.bg - 1000
             elif bg_filetype == "fspec":
-                bg_ip = pickle.load(open(bg_file,"rb"))
+                with open(bg_file,"rb") as openbg:
+                    bg_ip = pickle.load(openbg)
                 self.bg = np.array([mean+std*self.sigma for mean,std in zip(bg_ip["bg_means"],bg_ip["bg_stds"])])
             else:
                 raise IllegalFileFormat(bg_filetype, "csv or .fspec", "bg_file")
@@ -401,7 +552,7 @@ class NewFData:
             self.rawchannels = np.array(self.rawchannels,int)
             self.rawchannels = self.rawchannels - 1000
             self.rawchannels = self.rawchannels.T
-            rows,cols = np.where(self.rawchannels == 0)
+            rows,_ = np.where(self.rawchannels == 0)
             m = [i for i in range(len(self.rawchannels)) if i not in rows]
             self.rawchannels = self.rawchannels[m].T
             self.rawtime = self.rawtime[m]
@@ -460,7 +611,8 @@ class NewFData:
                     
         elif filetype == "fspec":
                 
-            ip = pickle.load(open(file,"rb"))
+            with open(file,"rb") as openfile:
+                ip = pickle.load(openfile)
             
             self.hk_kwargs(ip,"sigma",1)
             self.hk_kwargs(ip,"measurement_frequency", 100)
@@ -578,7 +730,8 @@ class NewFData:
         if filename[-6:] != ".fspec":
             filename += ".fspec"
         
-        pickle.dump(op,open(filename,"wb"),4)
+        with open(filename,"wb") as writefile:
+            pickle.dump(op,writefile,4)
         
         
     def quickplot(self,channelno):
@@ -603,7 +756,7 @@ class NewFData:
         channelno -= 1
         
         #draw plot        
-        fig,ax = plt.subplots()
+        _,ax = plt.subplots()
         ax.plot(self.t,self.channels[channelno],label=channelname)
         ax.set_xlabel("CET")
         ax.set_ylabel("Fluorescence Index")
@@ -626,7 +779,7 @@ class NewFData:
         heatmap_data = deepcopy(self.channels)
         heatmap_data = self.hk_replacezeros(heatmap_data)
         
-        fig,ax = plt.subplots()
+        _,ax = plt.subplots()
         
         im = ax.pcolormesh(xx,yy,heatmap_data,cmap="RdYlBu_r",norm=LogNorm(),shading="nearest")
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
@@ -737,7 +890,7 @@ class NewFData:
         #ch_len = len(list(range(kwargs["min_ch"],kwargs["max_ch"])))
         
         meanchannel = np.mean(self.channels[kwargs["min_ch"]:kwargs["max_ch"]],axis=0)
-        if kwargs["rolling"] > 0 and type(kwargs["rolling"]) == int:
+        if kwargs["rolling"] > 0 and isinstance(kwargs["rolling"],int):
             meanchannel = np.convolve(meanchannel, np.ones(kwargs["rolling"]),mode="same") / kwargs["rolling"]
                 
         #draw plot
@@ -790,7 +943,7 @@ class NewFData:
         xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
         heatmap_data = deepcopy(self.channels)
         heatmap_data = self.hk_replacezeros(heatmap_data)
-        if type(kwargs["xlims"]) == list:
+        if isinstance(kwargs["xlims"],list):
             ax.set_xlim([dt.datetime.strptime(element, "%H:%M:%S") for element in kwargs["xlims"]])
         
         #draw
@@ -812,7 +965,17 @@ class NewFData:
             
             
     def returndata(self):
-        
+        """
+        Returns a tuple containing all data in a standardized form. Important for communication with DroneWrapper objs.
+
+        Returns
+        -------
+        op : dict {str : np.array}
+            This dict contains all data in the form of np.arrays indexed by their name.
+        op_details : dict {str : [str,str]}
+            This dict contains a description and a unit for all the data saved in op.
+
+        """        
         op = {}
         op_details = {}
         op_t = np.array([t.replace(microsecond=0) for t in self.t])
@@ -820,7 +983,7 @@ class NewFData:
             name = f"ch{i+1}"
             op[name] = ch
         op["meanchannel"] = np.mean(self.channels,axis=0)
-        for key,val in op.items():
+        for key in op:
             if key[-1] != "l":
                 op_details[key] = [f"Channel {key[2:]}","Fluorescence Index"]
             else:
@@ -831,22 +994,25 @@ class NewFData:
         
     #housekeeping funcs    
     def hk_kwargs(self,kwargs,key,default):
-        
+        """Turns kwargs into attributes"""
+
         op = kwargs[key] if key in kwargs else default
         if type(op) == str:
             if op =="null":
                 print("WARNING: Loaded file seems to have been produced either from another object than NewFData or another version of NewFData. Some functions may not be available.")
-        exec(f"self.{key} = op")
+        setattr(self,key,op)
         
         
     def hk_func_kwargs(self,kwargs,key,default):
-        
+        """Gives kwargs a default value if they are not passed"""
+
         op = kwargs[key] if key in kwargs else default
         return op
         
         
     def hk_replacezeros(self,arr):
-        
+        """replaces zeros for a logarithmic scale"""
+
         array = deepcopy(arr)
         
         smallest = 10000
@@ -863,7 +1029,8 @@ class NewFData:
     
     
     def hk_errorhandling(self,kwargs,legallist,funcname):
-        
+        """Checks if all passed kwargs are legal"""
+
         for key in kwargs:
             if key not in legallist:
                 raise IllegalArgument(key,funcname,legallist)
@@ -872,6 +1039,7 @@ class NewFData:
     @staticmethod
     @njit(float64[:,:](float64[:],float64[:,:],float64[:],float64[:],float64[:,:]))
     def hk_process_data(tt,rc,bg,rt,channels):
+        """Numba compiled method to calculate fluorescence indices"""
 
         for t in prange(len(tt)):
             for channel in prange(len(rc)):

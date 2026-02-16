@@ -1,26 +1,35 @@
 import csv
+import pickle
 import datetime as dt
-import matplotlib.pyplot as plt
 import matplotlib.dates as md
 import folium
-from folium.plugins import HeatMap
 import branca.colormap as cm
-from .ErrorHandler import IllegalArgument, IllegalFileFormat
 import numpy as np
-from numba import njit, prange, float64
-import pickle
 from PIL import Image
 import utm
+from .ErrorHandler import IllegalArgument, IllegalFileFormat
 
-class Dronedata:
-    
+class Dronedata: 
     """full documentation see https://github.com/matrup01/data_import_modules \n
     
     file (str) ... takes a drone-produced csv-file"""
     
     def __init__(self,file):
-        
-        data = csv.reader(open(file),delimiter=",")
+        """
+        Initialises a Dronedata obj.
+
+        Parameters
+        ----------
+        file : str
+            Takes a drone produced csv file (TU Drone).
+
+        Returns
+        -------
+        None.
+
+        """
+        with open(file) as f:
+            data = csv.reader(f,delimiter=",")
         data = list(data)
         
         self.t = [dt.datetime.strptime(data[i][1].replace(",","."),"%I:%M:%S.%f %p") for i in range(1,len(data))]
@@ -30,16 +39,34 @@ class Dronedata:
                      [float(data[i][4].replace(",",".")) for i in range(1,len(data))],
                      [data[i][192].replace(",",".") for i in range(1,len(data))]]
         
-        #correct empty parts in ws-data:
-        
+        #correct empty parts in ws-data:     
         for i in range(len(self.data[3])):
             if self.data[3][i] == "":
                 self.data[3][i] = "0"
         self.data[3] = [float(self.data[3][i]) for i in range(len(self.data[3]))]
         
-    def plot(self,ax,plot="height",color="tab:purple",secondary=False):
+    def plot(self,ax,y="height",color="tab:purple",secondary=False):
+        """
+        Draws a plot of data vs time on an existing matplotlib-axis.
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        y : str, optional
+            Decides which data should be plotted. The default is "height".
+        color : str, optional
+            Changes the plot's color. The default is "tab:purple".
+        secondary : bool, optional
+            If True the plot uses the y-axis on the right-hand side. Should be used if the axis is a twinx. The default is False.
+
+        Returns
+        -------
+        None.
+
+        """
         
-        plotx,ploty,label,ylabel = self.findplottype(plot)
+        plotx,ploty,label,ylabel = self.findplottype(y)
         
         ax.plot(plotx,ploty,label=label,color=color)
         ax.set_ylabel(ylabel)
@@ -53,9 +80,21 @@ class Dronedata:
             
             
     def flightmap(self,zoomstart=21,colors=["brown","white","blue"]):
-        
-        #im = ax.scatter(x=self.data[1],y=self.data[2],c=self.data[0],cmap="terrain")
-        #plt.colorbar(im,ax=ax,label="Drone height",orientation="horizontal",location="top")
+        """
+        Opens your flight in openstreetmap in the browser with colors indicating height.
+
+        Parameters
+        ----------
+        zoomstart : int, optional
+            Changes the zoomlevel of the map (can be further changed manually once the map is opened). The default is 21.
+        colors : str, optional
+            Changes the colors for the height colormap. The default is ["brown","white","blue"].
+
+        Returns
+        -------
+        None.
+
+        """
         
         x_start = (max(self.data[2]) + min(self.data[2])) / 2
         y_start = (max(self.data[1]) + min(self.data[1])) / 2
@@ -72,6 +111,26 @@ class Dronedata:
         output.show_in_browser()
         
     def findplottype(self,y):
+        """
+        Returns data and metadata of 'y'.
+
+        Parameters
+        ----------
+        y : str
+            Determines the type of data.
+
+        Returns
+        -------
+        plotx : list(dt.datetime)
+            list of timestamps of the datapoints.
+        ploty : list(float)
+            List of values of dataset 'y'.
+        label : str
+            Short description of the data type.
+        ylabel : str
+            Unit of the data.
+
+        """
         
         plottypes = [["height","Drone height","height AGL in m"],["long","Drone longitude","Drone longitude"],["lat","Drone latitude","Drone latitude"],["ws","wind speed","wind speed in km/h"]]
         
@@ -83,26 +142,29 @@ class Dronedata:
                 label = plottypes[i][1]
                 ylabel = plottypes[i][2]
                 
-                return plotx,ploty,label,ylabel
+                return (plotx,ploty,label,ylabel)
             
     def append(self,obj):
+        """
+        Takes another Dronedata-Object and appends its data to the first one to create one object that contains all data
+
+        Parameters
+        ----------
+        obj : Dronedata
+            Takes a Dronedata-Object whichs data should be appended.
+
+        Returns
+        -------
+        None.
+
+        """
         
         for i in obj.t:
             self.t.append(i)
             
         for i in range(len(self.data)):
             for j in obj.data[i]:
-                self.data[i].append(j)
-                
-                
-    def heightVSws(self):
-        
-        fig,ax = plt.subplots()
-        
-        ax.scatter(x=self.data[0],y=self.data[3])
-        
-        plt.show()
-        
+                self.data[i].append(j)      
         
         
 class DroneWrapper:
@@ -154,12 +216,15 @@ class DroneWrapper:
         
         #variables
         self.data = {}
-        self.details = {"Drone" : {"height" : ["Height AGL","m AGL"], "long" : ["longitude","eastern longitude"], "lat" : ["latitude","nothern latitude"]}}
+        self.details = {"Drone" : {"height" : ["Height AGL","m AGL"],
+                                   "long" : ["longitude","eastern longitude"], 
+                                   "lat" : ["latitude","nothern latitude"]}}
          
         match file.split(".")[-1]:
             case "csv":
         
-                data = csv.reader(open(file),delimiter=",")
+                with open(file) as f:
+                    data = csv.reader(f,delimiter=",")
                 data = list(data)
                     
                 match self.dronetype.lower():
@@ -217,7 +282,8 @@ class DroneWrapper:
                     self.data["Drone"][key] = self.data["Drone"][key][start_i:end_i]
             
             case "flight":
-                self.data, self.details = pickle.load(open(file,"rb"))
+                with open(file,"rb") as openfile:
+                    self.data, self.details = pickle.load(openfile)
             
             case _:
                 raise IllegalFileFormat(file.split(".")[-1], ".csv or .flight", "DroneWrapper arguments")
@@ -266,8 +332,7 @@ class DroneWrapper:
         
         if nested:
             return self.data,self.details
-        else:
-            return self.data["Drone"],self.details["Drone"]
+        return self.data["Drone"],self.details["Drone"]
         
         
     def returntarget(self,y,**kwargs):
@@ -299,8 +364,8 @@ class DroneWrapper:
                     "target2" : None,
                     "targety" : None
             }
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        for key,def_val in zip(defaults.keys(),defaults.values()):
+            kwargs[key] = self.hk_func_kwargs(kwargs,key,def_val)
         self.hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.returntarget()")
         
         y1,y2 = y.split("_")
@@ -471,7 +536,7 @@ class DroneWrapper:
         long = long[m]
         y = y[m]
         
-        if type(kwargs["target_height"]) != str:
+        if not isinstance(kwargs["target_height"],str):
             height = self.data["Drone"]["height"][x_start:x_end]
             height = height[m]
             m1 = np.greater_equal(height,kwargs["target_height"]-kwargs["height_deviation"])
@@ -500,14 +565,13 @@ class DroneWrapper:
                     lowerleft_utm = (float(tfw[4]),float(tfw[5])+pixelheight*float(tfw[3]))
                     upperright_utm = (float(tfw[4])+pixelwidth*float(tfw[0]),float(tfw[5]))
     
-                    upper_left_lat,upper_left_long = utm.to_latlon(float(tfw[4]), float(tfw[5]), 33,"T")
                     lower_left_lat,lower_left_long = utm.to_latlon(lowerleft_utm[0], lowerleft_utm[1], 33,"T")
                     upper_right_lat,upper_right_long = utm.to_latlon(upperright_utm[0], upperright_utm[1], 33,"T")
     
                     img = folium.raster_layers.ImageOverlay("C:/Users/mrupp/OneDrive - TU Wien/Wieland, Florian's files - DATA/Field Measurements/2025-08-05 and 07_Stmk/Orthofoto_DSM/Orthofoto_DSM/Steinalpl_Duerrieglalm-Graben_Orthofoto.png", 
                                                             [[lower_left_lat,lower_left_long],[upper_right_lat,upper_right_long]])
                     img.add_to(output)
-                except:
+                except Exception:
                     print("Problem with mapimage. Make sure that you give a valid path for .tfw and .png without the file ending.")
     
             for _y,_long,_lat in zip(y,long,lat):
@@ -567,14 +631,13 @@ class DroneWrapper:
                     lowerleft_utm = (float(tfw[4]),float(tfw[5])+pixelheight*float(tfw[3]))
                     upperright_utm = (float(tfw[4])+pixelwidth*float(tfw[0]),float(tfw[5]))
     
-                    upper_left_lat,upper_left_long = utm.to_latlon(float(tfw[4]), float(tfw[5]), 33,"T")
                     lower_left_lat,lower_left_long = utm.to_latlon(lowerleft_utm[0], lowerleft_utm[1], 33,"T")
                     upper_right_lat,upper_right_long = utm.to_latlon(upperright_utm[0], upperright_utm[1], 33,"T")
     
                     img = folium.raster_layers.ImageOverlay("C:/Users/mrupp/OneDrive - TU Wien/Wieland, Florian's files - DATA/Field Measurements/2025-08-05 and 07_Stmk/Orthofoto_DSM/Orthofoto_DSM/Steinalpl_Duerrieglalm-Graben_Orthofoto.png", 
                                                             [[lower_left_lat,lower_left_long],[upper_right_lat,upper_right_long]])
                     img.add_to(output)
-                except:
+                except Exception:
                     print("Problem with mapimage. Make sure that you give a valid path for .tfw and .png without the file ending.")
     
             for x in range(res):
@@ -646,8 +709,8 @@ class DroneWrapper:
                     "target2" : None,
                     "targety" : None}
         
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        for key,def_val in zip(defaults.keys(),defaults.values()):
+            kwargs[key] = self.hk_func_kwargs(kwargs,key,def_val)
         self.hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.plot()")
         
         name,yy = y.split("_")
@@ -776,8 +839,8 @@ class DroneWrapper:
                     "target2" : None,
                     "targety" : None}
         
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        for key,def_val in zip(defaults.keys(),defaults.values()):
+            kwargs[key] = self.hk_func_kwargs(kwargs,key,def_val)
         self.hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.advancedplot()")
         
         xname,xx = x.split("_")
@@ -906,8 +969,8 @@ class DroneWrapper:
         op = (self.data,self.details)
         if filename[-7:] != ".flight":
             filename += ".flight"
-            
-        pickle.dump(op,open(filename,"wb"),4)
+        with open(filename,"wb") as openfile:    
+            pickle.dump(op,openfile,4)
         
         
     def returnattime(self, y, timestamp):
@@ -937,24 +1000,26 @@ class DroneWrapper:
                 break
         if found:
             return self.data[y1][y.split("_")[1]][i]
-        else:
-            raise IndexError("given timestamp wasnt found in dataset")
+        raise IndexError("given timestamp wasnt found in dataset")
         
             
     #housekeeping funcs
     def hk_kwargs(self,kwargs,key,default):
-        
+        """Turns kwargs into attributes"""
+
         op = kwargs[key] if key in kwargs else default
-        exec(f"self.{key} = op")
+        setattr(self, key, op)
         
     def hk_errorhandling(self,kwargs,legallist,funcname):
-        
+        """Checks if all passed kwargs are legal"""
+
         for key in kwargs:
             if key not in legallist:
                 raise IllegalArgument(key,funcname,legallist)
                 
     def hk_func_kwargs(self,kwargs,key,default):
-        
+        """Gives kwargs a default value if they are not passed"""
+
         op = kwargs[key] if key in kwargs else default
         return op
             
