@@ -166,8 +166,7 @@ class Pops:
         
         #reads data from csv to list
         with open(file) as openfile:
-            data = csv.reader(openfile,delimiter=",")
-        data = list(data)
+            data = list(csv.reader(openfile,delimiter=","))
         newdata = []
         for dat in data:
             if dat[0][0] == "2": #only works for the next 975 years

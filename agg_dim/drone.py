@@ -29,8 +29,7 @@ class Dronedata:
 
         """
         with open(file) as f:
-            data = csv.reader(f,delimiter=",")
-        data = list(data)
+            data = list(csv.reader(f,delimiter=","))
         
         self.t = [dt.datetime.strptime(data[i][1].replace(",","."),"%I:%M:%S.%f %p") for i in range(1,len(data))]
         #data: [height,long,lat,ws]
@@ -224,8 +223,7 @@ class DroneWrapper:
             case "csv":
         
                 with open(file) as f:
-                    data = csv.reader(f,delimiter=",")
-                data = list(data)
+                    data = list(csv.reader(f,delimiter=","))
                     
                 match self.dronetype.lower():
                     case "own":

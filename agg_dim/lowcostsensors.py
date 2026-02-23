@@ -51,8 +51,7 @@ class CCS811:
         
         #read data from csv to list
         with open(file) as f:
-            data = csv.reader(f,delimiter=",")
-        data = list(data)
+            data = list(csv.reader(f,delimiter=","))
         
         #extract x and y values from list
         self.t = [dt.datetime.strptime(data[i][1],"%H:%M:%S") for i in range(1,len(data))]
@@ -276,8 +275,7 @@ class SEN55:
         
         #read data from csv to list
         with open(file) as f:
-            data = csv.reader(f,delimiter=",")
-        data = list(data)
+            data = list(csv.reader(f,delimiter=","))
         
         
         #extract x and y values from list
@@ -553,8 +551,7 @@ class FlyingFlo_USB:
         
         #read data from csv to list
         with open(file) as f:
-            data = csv.reader(f,delimiter=",")
-        data = list(data)
+            data = list(csv.reader(f,delimiter=","))
               
         #extract x and y values from list
         self.t = np.array([dt.datetime.strptime(data[i][1],"%H:%M:%S.%f") for i in range(1,len(data)-2)])

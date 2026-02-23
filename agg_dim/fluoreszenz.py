@@ -45,7 +45,7 @@ class FData:
         self.file = file
         with open(file,encoding="ansi") as openfile:
             data = csv.reader(openfile,delimiter=";")
-        data = list(data)
+            data = list(data)
         
         #get rid of encoding-artifacts
         if encoding_artifacts:
@@ -149,7 +149,7 @@ class FData:
         #reads data from csv to list
         with open(bgfile) as openbg:
             data = csv.reader(openbg,delimiter=";")
-        data = list(data)
+            data = list(data)
             
         #get rid of encoding-artifacts
         for i in range(len(data)):

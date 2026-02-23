@@ -47,8 +47,7 @@ class WeatherData:
         if file.split(".")[1].lower() != "csv":
             raise IllegalFileFormat(file.split(".")[1], "csv","WeatherData argument")
         with open(file) as f:
-            data = csv.reader(f,delimiter=",")
-        data = list(data)
+            data = list(csv.reader(f,delimiter=","))
         
         self.data = {
             "t" : np.array([dt.datetime.strptime(data[i][0],"%Y/%m/%d %H:%M") for i in range(1,len(data))]),
