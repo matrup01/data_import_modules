@@ -944,7 +944,8 @@ class Pops:
         op_details = {}
         for i in range(len(self.plottypes2)):
             y[self.plottypes2[i][0]] = self.ydata2[i]
-            op_details[self.plottypes2[i][0]] = [self.plottypes2[i][1],self.plottypes2[i][2]]
+            op_details[self.plottypes2[i][0]] = [self.plottypes2[i][1],
+                                                 self.plottypes2[i][2]]
         for i in range(16):
             y[f"b{i}"] = self.pops_bins[i]
             op_details[f"b{i}"] = [f"Bin {i}",r"Counts/$cm^3$"]
@@ -1437,6 +1438,42 @@ class OPC:
             ax.set_ylabel(kwargs["ylabel"])
         else:
             ax.set_ylabel("dN/dlog$D_P$ in cm${}^{-3}$")
+            
+            
+    def returndata(self):
+        """
+        Returns a tuple containing all data in a standardized form. Important 
+        for communication with DroneWrapper or Wrapper objs.
+
+        Returns
+        -------
+        data : dict {str : np.array}
+            This dict contains all data in the form of np.arrays indexed by 
+            their name.
+        details : dict {str : [str,str]}
+            This dict contains a description and a unit for all the 
+            exported data.
+        """
+        
+        op_t = [self.data["t"][0]]
+        ts = op_t[0]
+        while ts < self.data["t"][-1]:
+            ts = op_t[-1] + dt.timedelta(seconds=1)
+            op_t.append(ts)
+        op_dict = {"t" : np.array(op_t)}
+        
+        for key in self.data.keys():
+            if key == "t" or key == "t_noday":
+                continue
+            op = []
+            for t in op_t:
+                if t in self.data["t"]:
+                    op_item = self.data[key][np.where(self.data["t"]==t)[0][0]]
+                    op.append(op_item)
+                else:
+                    op.append(np.nan)
+            op_dict[key] = np.array(op)
+        return op_dict,self.details
         
         
     #housekeeping funcs    

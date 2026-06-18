@@ -515,7 +515,7 @@ class WIBS:
         try:
             yy = self.data[y]
         except KeyError as kerr:
-            raise IllegalValue(y, "WIBS.plot()",list(self.data)) from kerr
+            raise IllegalValue("y", "WIBS.plot()",list(self.data)) from kerr
             
         ylabel = f"{self.details[y][0]} in {self.details[y][1]}" if self.details[y][1] != "No Unit" else self.details[y][0]
             
@@ -533,6 +533,92 @@ class WIBS:
         else:
             ax.spines["right"].set_color(kwargs["color"])
             ax.spines["left"].set_alpha(0)
+            
+    
+    ## needs docstring and improvement and testing
+    def stackedplot(self,ax,**kwargs):
+        """
+        Creates a Stacked Plot on an existing axis.
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        
+        Kwargs
+        ------
+        start : str
+            Takes a str in the format "HH:MM:SS" and only plots data acquired
+            after it.
+        end : str, optional
+            Takes a str in the format "HH:MM:SS" and only plots data acquired
+            before it.
+        log : bool, optional
+            If True the x-axis of the plot will be scaled logarithmicly
+        xlabel : str, optional
+            Sets the xlabel of the plot. The default is "D$_p$ in $\mu$m".
+        ylabel : str, optional
+            Sets the xlabel of the plot. The default is "Fraction".
+        legend : bool, optional
+            If True a Legend will be drawn on the upper right. The default is 
+            True.
+
+        Returns
+        -------
+        None
+        """
+        
+        
+        defaults = {"start" : None,
+                    "end" : None,
+                    "log" : True,
+                    "xlabel" : "D$_p$ in $\mu$m",
+                    "ylabel" : "Fraction",
+                    "legend" : True}
+        for key,default in defaults.items():
+            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+        self.hk_errorhandling(kwargs, defaults.keys(), "WIBS.stackedplot()")
+        
+        m = np.array([True for i in self.data["t"]])
+        if isinstance(kwargs["start"],str):
+            kwargs["start"] = datetime.strptime(kwargs["start"],"%H:%M:%S")
+            kwargs["start"] = kwargs["start"].replace(
+                year=self.data["t"][0].year,
+                month = self.data["t"][0].month,
+                day = self.data["t"][0].day
+                )
+            m = np.where(kwargs["start"]<self.data["t"],m,False)
+        if isinstance(kwargs["end"],str):
+            kwargs["end"] = datetime.strptime(kwargs["end"],"%H:%M:%S")
+            kwargs["end"] = kwargs["end"].replace(
+                year = self.data["t"][0].year,
+                month = self.data["t"][0].month,
+                day = self.data["t"][0].day
+                )
+            m = np.where(kwargs["end"]>self.data["t"],m,False)
+        
+        xx = self.bin_means
+        totals = []
+        for i in range(len(xx)):
+            totals.append(np.nanmean(self.data[f"bin{i}_partconc"][m]))
+            totals[i] = 1 if totals[i] == 0 else totals[i]
+        vals = np.array([0 for i in xx])
+        for ch in ["a","b","c","ab","bc","ac","abc"]:
+            new_vals = []
+            debug = self.data["t"]
+            for i in range(len(xx)):
+                new_vals.append(np.nanmean(self.data[f"{ch}_bin{i}_partconc"][m]))
+            new_vals = np.array(new_vals) + vals
+            ax.fill_between(xx,vals/totals,new_vals/totals,label=ch)
+            vals = new_vals
+        ax.fill_between(xx,vals/totals,[1 for i in xx],label="non fluorescent")
+        
+        if kwargs["log"]:
+            ax.set_xscale("log")
+        if kwargs["legend"]:
+            ax.legend(loc="upper right")
+        ax.set_xlabel(kwargs["xlabel"])
+        ax.set_ylabel(kwargs["ylabel"])
             
     def save(self, path):
         """
@@ -567,6 +653,34 @@ class WIBS:
           
         with open(path,"wb") as dumppath:
             pickle.dump(op,dumppath,4)
+            
+            
+    def returndata(self):
+        """
+        Returns a tuple containing all data in a standardized form. Important 
+        for communication with DroneWrapper or Wrapper objs.
+
+        Returns
+        -------
+        data : dict {str : np.array}
+            This dict contains all data in the form of np.arrays indexed by 
+            their name.
+        details : dict {str : [str,str]}
+            This dict contains a description and a unit for all the 
+            exported data.
+        """
+        
+        
+        op_t = []
+        for t in self.data["t"]:
+            op_t.append(t.replace(microsecond=0))
+        op_data = {"t":np.array(op_t)}
+        for key in self.data.keys():
+            if key == "t":
+                continue
+            op_data[key] = self.data[key]
+        
+        return op_data,self.details
 
     
     #housekeeping funcs
@@ -591,3 +705,4 @@ class WIBS:
         for key in kwargs:
             if key not in legallist:
                 raise IllegalArgument(key,funcname,legallist)
+                

@@ -1,3 +1,11 @@
+######################### MR 18.06.2026 #########################
+#                      "new Wrapper object"                     #
+#                                                               #
+# - added experimet submodule and Wrapper obj                   #
+# - added the stackedplot method to WIBS                        #
+# - added returndata methods to WeatherData, WIBS and OPC       #
+#################################################################
+
 ######################### MR 23.02.2026 #########################
 #                      "csv import hotfix"                      #
 #                                                               #

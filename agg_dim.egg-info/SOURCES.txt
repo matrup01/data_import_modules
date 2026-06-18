@@ -4,6 +4,7 @@ setup.py
 agg_dim/ErrorHandler.py
 agg_dim/__init__.py
 agg_dim/drone.py
+agg_dim/experiment.py
 agg_dim/fluoreszenz.py
 agg_dim/lowcostsensors.py
 agg_dim/particle_counters.py

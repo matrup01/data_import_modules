@@ -1,3 +1,6 @@
+The docu is not up to date!!!
+It does NOT contain infos from commit MR 18.06.2026 upwards!
+
 1.    particle_counters.py:
 
 

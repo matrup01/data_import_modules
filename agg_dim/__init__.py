@@ -4,3 +4,4 @@ from .lowcostsensors import CCS811, SEN55, FlyingFlo_USB
 from .particle_counters import Pops, OPC
 from .wibs import WIBS
 from .weather import WeatherData
+from .experiment import Wrapper, save_experiment, load_experiment
