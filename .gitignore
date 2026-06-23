@@ -20,3 +20,6 @@
 !docs
 !docs/agg_dim
 !docs/agg_dim/*
+!.github/
+!.github/workflows
+!.github/workflows/*

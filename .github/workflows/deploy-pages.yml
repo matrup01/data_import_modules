@@ -1,0 +1,44 @@
+name: Deploy Static Content to GitHub Pages
+
+on:
+  # Trigger den Workflow bei jedem Push auf den dev-Branch
+  push:
+    branches:
+      - dev
+
+  # Erlaubt es dir, den Workflow manuell über den "Actions"-Tab zu starten
+  workflow_dispatch:
+
+# Setze die nötigen Berechtigungen für das GitHub Pages Deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Erlaubt nur ein gleichzeitiges Deployment, um Konflikte zu vermeiden
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Hier wird genau dein /release Ordner angegeben!
+          path: './docs/agg_dim'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
