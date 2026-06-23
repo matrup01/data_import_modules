@@ -1,0 +1,1342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>agg_dim.experiment API documentation</title>
+<meta name="description" content="Created on Thu Jun 18 14:36:26 2026 …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>agg_dim.experiment</code></h1>
+</header>
+<section id="section-intro">
+<p>Created on Thu Jun 18 14:36:26 2026</p>
+<p>@author: mrupp</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="agg_dim.experiment.load_experiment"><code class="name flex">
+<span>def <span class="ident">load_experiment</span></span>(<span>path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_experiment(path):
+    &#34;&#34;&#34;
+    Loads a .experiment file and returns a Wrapper obj.
+
+    Parameters
+    ----------
+    path : str
+        Path from where the .experiment file should be loaded.
+
+    Returns
+    -------
+    Wrapper
+        Wrapper obj that is loaded from the file.
+    &#34;&#34;&#34;
+    
+    
+    if path[-11:] != &#34;.experiment&#34;:
+        raise ValueError(&#34;This is not a .experiment file!&#34;)
+    with open(path,&#34;rb&#34;) as loadpath:
+        return pickle.load(loadpath)</code></pre>
+</details>
+<div class="desc"><p>Loads a .experiment file and returns a Wrapper obj.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path from where the .experiment file should be loaded.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="agg_dim.experiment.Wrapper" href="#agg_dim.experiment.Wrapper">Wrapper</a></code></dt>
+<dd>Wrapper obj that is loaded from the file.</dd>
+</dl></div>
+</dd>
+<dt id="agg_dim.experiment.save_experiment"><code class="name flex">
+<span>def <span class="ident">save_experiment</span></span>(<span>wrapper, path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_experiment(wrapper,path):
+    &#34;&#34;&#34;
+    Saves a Wrapper object into a .experiment file.
+
+    Parameters
+    ----------
+    wrapper : Wrapper
+        Wrapper object that should be saved.
+    path : str
+        Path where the obj should be saved.
+
+    Returns
+    -------
+    None
+    &#34;&#34;&#34;
+    
+    if path[-11:] != &#34;.experiment&#34;:
+        path.append(&#34;.experiment&#34;)
+    with open(path,&#34;wb&#34;) as dumppath:
+        pickle.dump(wrapper,dumppath,4)</code></pre>
+</details>
+<div class="desc"><p>Saves a Wrapper object into a .experiment file.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>wrapper</code></strong> :&ensp;<code><a title="agg_dim.experiment.Wrapper" href="#agg_dim.experiment.Wrapper">Wrapper</a></code></dt>
+<dd>Wrapper object that should be saved.</dd>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path where the obj should be saved.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="agg_dim.experiment.Wrapper"><code class="flex name class">
+<span>class <span class="ident">Wrapper</span></span>
+<span>(</span><span>day=1, month=1, year=1900)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Wrapper:
+    
+    def __init__(self,day=1,month=1,year=1900):
+        &#34;&#34;&#34;
+        inits a Wrapper object.
+
+        Parameters
+        ----------
+        day : int, optional
+            Sets the day in all time arrays that will be loaded to its value. 
+            The default is 1.
+        month : int, optional
+            Sets the month in all time arrays that will be loaded to its value. 
+            The default is 1.
+        year : int, optional
+            Sets the year in all time arrays that will be loaded to its value. 
+            The default is 1900.
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        
+        self.data = {}
+        self.details = {}
+        
+        self.day = day
+        self.month = month
+        self.year = year
+        
+        
+    def wrap(self,obj,name):
+        &#34;&#34;&#34;
+        Includes an Object into the Wrapper, by including its data and details
+        into the corresponding dicts and saving the object in Wrapper.name
+
+        Parameters
+        ----------
+        obj : WIBS, OPC, POPS, Weatherdata or FlyingFloUSB
+            This object will be included in the Wrapper.
+        name : str
+            This str will be used as a key in Wrapper.data and Wrapper.details
+            and it will be the attribute name for the object.
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        
+        
+        data,details = obj.returndata()
+        self.data[name] = data
+        self.details[name] = details
+        for i in range(len(self.data[name][&#34;t&#34;])):
+            self.data[name][&#34;t&#34;][i] = self.data[name][&#34;t&#34;][i].replace(
+                day = self.day,
+                month = self.month,
+                year = self.year
+                )
+        
+        setattr(self,name,obj)
+        
+    def plot(self,ax,x,y,**kwargs):
+        &#34;&#34;&#34;
+        Plots two data arrays against each other.
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        x : str
+            Takes a str in the format &#34;plottype@instrument&#34; and uses it on the 
+            x-axis. E.g.: &#34;total_partconc@wibs&#34;
+        y : str
+            Takes a str in the format &#34;plottype@instrument&#34; and uses it on the 
+            y-axis. E.g.: &#34;total_partconc@wibs&#34;
+            
+        Kwargs
+        ------
+        start : str, optional
+            Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
+            after it.
+        end : str, optional
+            Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
+            before it.
+        scatter : bool, optonal
+            If True a scatter plot will be drawn, else a line plot will be 
+            drawn. The default is True.
+        color : str, optional
+            The plot will be drawn in this color. The default is &#34;tab:blue&#34;.
+        pearson : bool, optional
+            If True Pearsons R for the given data will be printed to console.
+            The default is True.
+        return_arrs : bool, optional
+            If True, the function will return the arrays for the x and the y
+            axis. The default is False.
+
+        Returns
+        -------
+        xx : np array
+            Array that contains the data from the x-axis. Will only be returned
+            if the kwarg &#34;return_arrs&#34; is True.
+        yy : np array
+            Array that contains the data from the y-axis. Will only be returned
+            if the kwarg &#34;return_arrs&#34; is True.
+        &#34;&#34;&#34;
+        
+        
+        #kwargs
+        defaults = {
+            &#34;start&#34; : None,
+            &#34;end&#34; : None,
+            &#34;scatter&#34;: True,
+            &#34;color&#34; : &#34;tab:blue&#34;,
+            &#34;pearson&#34; : True,
+            &#34;return_arrs&#34; : False
+            }
+        for key,default in defaults.items():
+            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+        self.hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.plot()&#34;)
+        
+        x_val,x_instrument = x.split(&#34;@&#34;)
+        y_val,y_instrument = y.split(&#34;@&#34;)
+        
+        # check x and y
+        if x_instrument not in self.data.keys():
+            loaded = &#34;,&#34;.join(list(self.data.keys()))
+            raise KeyError(f&#34;{x_instrument} is not loaded. Try one of: &#34;
+                           + loaded)
+        if x_val not in self.data[x_instrument].keys():
+            loaded = &#34;,&#34;.join(list(self.data[x_instrument].keys()))
+            raise KeyError(f&#34;{x_val} is not legal for {x_instrument}. Try: &#34;
+                           + loaded)
+        if y_instrument not in self.data.keys():
+            loaded = &#34;,&#34;.join(list(self.data.keys()))
+            raise KeyError(f&#34;{y_instrument} is not loaded. Try one of: &#34;
+                           + loaded)
+        if y_val not in self.data[y_instrument].keys():
+            loaded = &#34;,&#34;.join(list(self.data[y_instrument].keys()))
+            raise KeyError(f&#34;{y_val} is not legal for {y_instrument}. Try: &#34;
+                           + loaded)
+            
+        # crop
+        kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self.hk_checktime(
+            x_instrument, 
+            y_instrument, 
+            kwargs[&#34;start&#34;], 
+            kwargs[&#34;end&#34;])
+        if isinstance(kwargs[&#34;start&#34;],str) or isinstance(kwargs[&#34;end&#34;],str):
+            xm = self.hk_timemask(x_instrument, 
+                                  kwargs[&#34;start&#34;], 
+                                  kwargs[&#34;end&#34;])
+            ym = self.hk_timemask(y_instrument,
+                                  kwargs[&#34;start&#34;],
+                                  kwargs[&#34;end&#34;])
+        else:
+            xm = np.array([True for t in self.data[x_instrument][&#34;t&#34;]])
+            ym = np.array([True for t in self.data[y_instrument][&#34;t&#34;]])
+            
+        # find x and y data
+        if x_instrument == y_instrument:
+            xx = self.data[x_instrument][x_val][xm]
+            yy = self.data[y_instrument][y_val][ym]
+        else:
+            xt = self.data[x_instrument][&#34;t&#34;][xm]
+            yt = self.data[y_instrument][&#34;t&#34;][ym]
+            xdata = self.data[x_instrument][x_val][xm]
+            ydata = self.data[y_instrument][y_val][ym]
+            xm = np.isin(xt,yt)
+            ym = np.isin(yt,xt)
+            
+            xx = xdata[xm]
+            yy = ydata[ym]
+            
+        # plot
+        if kwargs[&#34;scatter&#34;]:
+            ax.scatter(xx,yy,color=kwargs[&#34;color&#34;])
+        else:
+            ax.plot(xx,yy,color=kwargs[&#34;color&#34;])
+        ax.set_xlabel(self.details[x_instrument][x_val][0]
+                      + &#34; in &#34;
+                      + self.details[x_instrument][x_val][1])
+        ax.set_ylabel(self.details[y_instrument][y_val][0]
+                      + &#34; in &#34;
+                      + self.details[y_instrument][y_val][1])
+            
+        if kwargs[&#34;pearson&#34;]:
+            x = xx - np.mean(xx)
+            y = yy - np.mean(yy)
+            sp = np.sum(x*y)
+            sqx = np.sum(x**2)
+            sqy = np.sum(y**2)
+            r = sp/(np.sqrt(sqx*sqy))
+            print(f&#34;Pearson&#39;s R: {r:.3f}&#34;)
+            
+        if kwargs[&#34;return_arrs&#34;]:
+            return xx,yy
+        
+        
+    def windrose(self,ax,y,**kwargs):
+        &#34;&#34;&#34;
+        Plots a heatmap of y on a windrose plot, where the theta angle
+        corresponds to the cardinal direction and the radius corresponds to 
+        the wind speed.
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis. This axis has to be of the 
+            projection &#39;polar&#39;.
+        y : str
+            Takes a str in the format &#34;plottype@instrument&#34; and uses it to
+            determine which data shold be plotted. E.g.: &#39;total_partconc@wibs&#39;
+
+        Kwargs
+        ------
+        weatherdata : str, optional
+            The given str is used as the instrument name of the weatherstation,
+            which is expected to have the data rows &#39;wind&#39; and &#39;winddir&#39;.
+            The default is &#39;weather&#39;.
+        start : str, optional
+            Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
+            after it.
+        end : str, optional
+            Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
+            before it.
+        scatter : bool, optional
+            If True, a scatter plot of the raw winddata is plotted over the 
+            heatmap, which can be used to get an overview over how dense the 
+            data is. The default is True.
+        scatter_color : str, optional
+            Changes the color of the scatter plot (only in effect if scatter
+            is True). The default is &#39;tab:blue&#39;.
+        colormap : str, optional
+            Changes the colormap, that is used for the heatmap. The default is
+            &#39;viridis&#39;.
+        min_threshold : int, optional
+            If a min_threshold is given, only bins with at least min_threshold
+            are shown. The default is 0.
+        sectors : int, optional
+            The windrose will be devided into this many sectors along the 
+            theta axis. The default is 4.
+        bins : int, optional
+            The windrose will be devided into this many bins along the radius.
+            The default is 3.
+        heatmap_lim : list or tuple of float with len 2, optional
+            If a heatmap_lim is given, the limits of the colorbar will be set
+            to its values. If no heatmap_lim is given, the minimum and the 
+            maximum values will be used as limits.
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        
+        
+        #kwargs
+        defaults = {
+            &#34;weatherdata&#34; : &#34;weather&#34;,
+            &#34;start&#34; : None,
+            &#34;end&#34; : None,
+            &#34;scatter&#34;: True,
+            &#34;scatter_color&#34; : &#34;tab:blue&#34;,
+            &#34;colormap&#34; : &#34;viridis&#34;,
+            &#34;min_threshold&#34; : 0,
+            &#34;sectors&#34; : 4,
+            &#34;bins&#34; : 3,
+            &#34;heatmap_lim&#34; : None
+            }
+        for key,default in defaults.items():
+            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+        self.hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.windrose()&#34;)
+        
+        #check ax and y
+        if ax.name != &#34;polar&#34;:
+            msg = &#34;The passed ax has to be polar for Wrapper.windrose() to&#34;
+            msg += &#34; work properly.&#34;
+            raise ValueError(msg)
+        y_data,y_instrument = y.split(&#34;@&#34;)
+        try:
+            self.data[y_instrument][y_data]
+        except:
+            legallist = []
+            for key in self.data:
+                for data in self.data[key]:
+                    if data != &#34;t&#34;:
+                        legallist.append(f&#34;{data}@{key}&#34;)
+            legalstr = &#34;,&#34;.join(legallist)
+            raise ValueError(f&#34;{y} is no legal y. Try one of {legalstr}&#34;)
+
+        #crop
+        kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self.hk_checktime(
+            kwargs[&#34;weatherdata&#34;], 
+            y_instrument, 
+            kwargs[&#34;start&#34;], 
+            kwargs[&#34;end&#34;])
+        if isinstance(kwargs[&#34;start&#34;],str) or isinstance(kwargs[&#34;end&#34;],str):
+            wind_m = self.hk_timemask(kwargs[&#34;weatherdata&#34;], 
+                                      kwargs[&#34;start&#34;],
+                                      kwargs[&#34;end&#34;])
+            y_m = self.hk_timemask(y_instrument, 
+                                   kwargs[&#34;start&#34;], 
+                                   kwargs[&#34;end&#34;])
+        else:
+            wind_m = np.array(
+                [True for i in self.data[kwargs[&#34;weatherdata&#34;]][&#34;t&#34;]]
+                )
+            y_m = np.array(
+                [True for i in self.data[y_instrument][&#34;t&#34;]]
+                )
+        
+        #load data
+        if self.details[kwargs[&#34;weatherdata&#34;]][&#34;winddir&#34;][1] == &#34;°&#34;:
+            theta = np.radians(
+                self.data[kwargs[&#34;weatherdata&#34;]][&#34;winddir&#34;][wind_m]
+                )
+        else:
+            theta = self.data[kwargs[&#34;weatherdata&#34;]][&#34;winddir&#34;][wind_m]
+        r = self.data[kwargs[&#34;weatherdata&#34;]][&#34;wind&#34;][wind_m]
+        z = self.data[y_instrument][y_data][y_m]
+        
+        if (np.count_nonzero(wind_m) == 0 
+            or np.count_nonzero(y_m) == 0):
+            raise ValueError(&#34;There are no values in the given timeframe&#34;)
+        
+        #transform data an plot
+        sector_borders = np.linspace(0, 2*np.pi,kwargs[&#34;sectors&#34;]+1)
+        bin_borders = np.linspace(0,np.max(r),kwargs[&#34;bins&#34;]+1)
+        
+        darr = np.zeros((kwargs[&#34;bins&#34;],kwargs[&#34;sectors&#34;]))
+        for b in range(kwargs[&#34;bins&#34;]):
+            bm = np.where(r&gt;=bin_borders[b],True,False)
+            bm = np.where(r&lt;=bin_borders[b+1],bm,False)
+            for sec in range(kwargs[&#34;sectors&#34;]):
+                sm = np.where(theta&gt;=sector_borders[sec],bm,False)
+                sm = np.where(theta&lt;=sector_borders[sec+1],sm,False)
+                
+                if np.count_nonzero(sm) &lt; kwargs[&#34;min_threshold&#34;]:
+                    darr[b][sec] = np.nan
+                else:
+                    darr[b][sec] = np.nanmean(z[sm])
+        cm = colormaps[kwargs[&#34;colormap&#34;]]
+        if (kwargs[&#34;heatmap_lim&#34;] is not None 
+            and len(kwargs[&#34;heatmap_lim&#34;]) == 2):
+            minval = kwargs[&#34;heatmap_lim&#34;][0]
+            maxval = kwargs[&#34;heatmap_lim&#34;][1]
+            print(&#34;besn&#34;)
+        else:
+            minval = np.nanmin(darr)
+            maxval = np.nanmax(darr)
+        
+        for b in range(kwargs[&#34;bins&#34;]):
+            for sec in range(kwargs[&#34;sectors&#34;]):
+                color = (darr[b][sec]-minval)/(maxval-minval)
+                ax.bar(
+                    x=(sector_borders[sec]+sector_borders[sec+1])/2, 
+                    height=bin_borders[b+1]-bin_borders[b], 
+                    width=sector_borders[sec+1]-sector_borders[sec], 
+                    bottom=bin_borders[b], 
+                    color=cm(color)
+                )
+                    
+        #misc plotting
+        if kwargs[&#34;scatter&#34;]:
+            ax.scatter(theta,r,color=kwargs[&#34;scatter_color&#34;])
+        ax.set_thetagrids([0,90,180,270],[&#34;N&#34;,&#34;E&#34;,&#34;S&#34;,&#34;W&#34;])
+        ax.set_theta_direction(-1)
+        ax.set_theta_zero_location(&#34;N&#34;)
+        ffig = ax.figure
+        c = ScalarMappable(Normalize(minval,maxval),kwargs[&#34;colormap&#34;])
+        label = self.details[y_instrument][y_data][0] 
+        label += &#34; in &#34;
+        label += self.details[y_instrument][y_data][1]
+        ffig.colorbar(c,
+                      ax=ax,
+                      label=label)
+        ffig.tight_layout()
+        
+            
+    ## Housekeeping Funcs
+    
+    def hk_func_kwargs(self,kwargs,key,default):
+        &#34;&#34;&#34;
+        Housekeeping Func --&gt; Should not be used outside the object
+        Gives kwargs a default value if they are not passed
+        &#34;&#34;&#34;
+
+        op = kwargs[key] if key in kwargs else default
+        return op
+    
+    def hk_errorhandling(self,kwargs,legallist,funcname):
+        &#34;&#34;&#34;
+        Housekeeping Func --&gt; Should not be used outside the object
+        Checks if all passed kwargs are legal
+        &#34;&#34;&#34;
+
+        for key in kwargs:
+            if key not in legallist:
+                raise IllegalArgument(key,funcname,legallist)
+                
+    def hk_checktime(self,x_instrument,y_instrument,start_str,end_str):
+        &#34;&#34;&#34;
+        Housekeeping Func --&gt; Should not be used outside the object
+        Checks if the given time window is outside one of the instruments
+        time windows and returns corrected start and end strings
+        &#34;&#34;&#34;
+        
+        x_t = self.data[x_instrument][&#34;t&#34;]
+        y_t = self.data[y_instrument][&#34;t&#34;]
+        
+        if start_str is not None:
+            start = dt.datetime.strptime(start_str, &#34;%H:%M:%S&#34;).replace(
+                year = x_t[0].year,
+                month = x_t[0].month,
+                day = x_t[0].month
+                )
+        else:
+            start = x_t[0]
+        if end_str is not None:
+            end = dt.datetime.strptime(end_str, &#34;%H:%M:%S&#34;).replace(
+                year = x_t[0].year,
+                month = x_t[0].month,
+                day = x_t[0].month
+                )
+        else:
+            end = x_t[-1]
+        if start &lt; x_t[0]:
+            start = x_t[0]
+        if end &gt; x_t[-1]:
+            end = x_t[-1]
+            
+        start = start.replace(
+            year = y_t[0].year,
+            month = y_t[0].month,
+            day = y_t[0].month
+            )
+        end = end.replace(
+            year = y_t[0].year,
+            month = y_t[0].month,
+            day = y_t[0].month
+            )
+        if start &lt; y_t[0]:
+            start = y_t[0]
+        if end &gt; y_t[-1]:
+            end = y_t[-1]
+        
+        return start.strftime(&#34;%H:%M:%S&#34;),end.strftime(&#34;%H:%M:%S&#34;)
+                
+                
+    def hk_timemask(self,y,start_str,end_str):
+        &#34;&#34;&#34;
+        Housekeeping Func --&gt; Should not be used outside the object
+        Returns a mask within start and end for an instrument y
+        &#34;&#34;&#34;
+        
+        try:
+            t = self.data[y][&#34;t&#34;]
+        except:
+            raise ValueError(f&#34;Instrument {y} is not loaded.&#34;)
+            
+        try:
+            if start_str is None:
+                start = t[0]
+            else:
+                start = dt.datetime.strptime(start_str,&#34;%H:%M:%S&#34;).replace(
+                    year = t[0].year,
+                    month = t[0].month,
+                    day = t[0].day
+                    )
+        except:
+            msg = f&#34;{start_str} is no legal format for the &#39;start&#39; &#34;
+            msg += &#34;kwarg. It needs to be &#39;HH:MM:SS&#39;.&#34;
+            raise ValueError(msg)
+        try:
+            if end_str is None:
+                end = t[-1]
+            else:
+                end = dt.datetime.strptime(end_str,&#34;%H:%M:%S&#34;).replace(
+                    year = t[0].year,
+                    month = t[0].month,
+                    day = t[0].day
+                    )
+        except:
+            msg = f&#34;{end_str} is no legal format for the &#39;end&#39; &#34;
+            msg += &#34;kwarg. It needs to be &#39;HH:MM:SS&#39;.&#34;
+            raise ValueError(msg)
+        
+        m = np.where(t&gt;=start,
+                     True,
+                     False)
+        m = np.where(t&lt;=end,
+                     m,
+                     False)
+        return m</code></pre>
+</details>
+<div class="desc"><p>inits a Wrapper object.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>day</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Sets the day in all time arrays that will be loaded to its value.
+The default is 1.</dd>
+<dt><strong><code>month</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Sets the month in all time arrays that will be loaded to its value.
+The default is 1.</dd>
+<dt><strong><code>year</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Sets the year in all time arrays that will be loaded to its value.
+The default is 1900.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<h3>Methods</h3>
+<dl>
+<dt id="agg_dim.experiment.Wrapper.hk_checktime"><code class="name flex">
+<span>def <span class="ident">hk_checktime</span></span>(<span>self, x_instrument, y_instrument, start_str, end_str)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_checktime(self,x_instrument,y_instrument,start_str,end_str):
+    &#34;&#34;&#34;
+    Housekeeping Func --&gt; Should not be used outside the object
+    Checks if the given time window is outside one of the instruments
+    time windows and returns corrected start and end strings
+    &#34;&#34;&#34;
+    
+    x_t = self.data[x_instrument][&#34;t&#34;]
+    y_t = self.data[y_instrument][&#34;t&#34;]
+    
+    if start_str is not None:
+        start = dt.datetime.strptime(start_str, &#34;%H:%M:%S&#34;).replace(
+            year = x_t[0].year,
+            month = x_t[0].month,
+            day = x_t[0].month
+            )
+    else:
+        start = x_t[0]
+    if end_str is not None:
+        end = dt.datetime.strptime(end_str, &#34;%H:%M:%S&#34;).replace(
+            year = x_t[0].year,
+            month = x_t[0].month,
+            day = x_t[0].month
+            )
+    else:
+        end = x_t[-1]
+    if start &lt; x_t[0]:
+        start = x_t[0]
+    if end &gt; x_t[-1]:
+        end = x_t[-1]
+        
+    start = start.replace(
+        year = y_t[0].year,
+        month = y_t[0].month,
+        day = y_t[0].month
+        )
+    end = end.replace(
+        year = y_t[0].year,
+        month = y_t[0].month,
+        day = y_t[0].month
+        )
+    if start &lt; y_t[0]:
+        start = y_t[0]
+    if end &gt; y_t[-1]:
+        end = y_t[-1]
+    
+    return start.strftime(&#34;%H:%M:%S&#34;),end.strftime(&#34;%H:%M:%S&#34;)</code></pre>
+</details>
+<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object
+Checks if the given time window is outside one of the instruments
+time windows and returns corrected start and end strings</p></div>
+</dd>
+<dt id="agg_dim.experiment.Wrapper.hk_errorhandling"><code class="name flex">
+<span>def <span class="ident">hk_errorhandling</span></span>(<span>self, kwargs, legallist, funcname)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
+    &#34;&#34;&#34;
+    Housekeeping Func --&gt; Should not be used outside the object
+    Checks if all passed kwargs are legal
+    &#34;&#34;&#34;
+
+    for key in kwargs:
+        if key not in legallist:
+            raise IllegalArgument(key,funcname,legallist)</code></pre>
+</details>
+<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object
+Checks if all passed kwargs are legal</p></div>
+</dd>
+<dt id="agg_dim.experiment.Wrapper.hk_func_kwargs"><code class="name flex">
+<span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
+    &#34;&#34;&#34;
+    Housekeeping Func --&gt; Should not be used outside the object
+    Gives kwargs a default value if they are not passed
+    &#34;&#34;&#34;
+
+    op = kwargs[key] if key in kwargs else default
+    return op</code></pre>
+</details>
+<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object
+Gives kwargs a default value if they are not passed</p></div>
+</dd>
+<dt id="agg_dim.experiment.Wrapper.hk_timemask"><code class="name flex">
+<span>def <span class="ident">hk_timemask</span></span>(<span>self, y, start_str, end_str)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_timemask(self,y,start_str,end_str):
+    &#34;&#34;&#34;
+    Housekeeping Func --&gt; Should not be used outside the object
+    Returns a mask within start and end for an instrument y
+    &#34;&#34;&#34;
+    
+    try:
+        t = self.data[y][&#34;t&#34;]
+    except:
+        raise ValueError(f&#34;Instrument {y} is not loaded.&#34;)
+        
+    try:
+        if start_str is None:
+            start = t[0]
+        else:
+            start = dt.datetime.strptime(start_str,&#34;%H:%M:%S&#34;).replace(
+                year = t[0].year,
+                month = t[0].month,
+                day = t[0].day
+                )
+    except:
+        msg = f&#34;{start_str} is no legal format for the &#39;start&#39; &#34;
+        msg += &#34;kwarg. It needs to be &#39;HH:MM:SS&#39;.&#34;
+        raise ValueError(msg)
+    try:
+        if end_str is None:
+            end = t[-1]
+        else:
+            end = dt.datetime.strptime(end_str,&#34;%H:%M:%S&#34;).replace(
+                year = t[0].year,
+                month = t[0].month,
+                day = t[0].day
+                )
+    except:
+        msg = f&#34;{end_str} is no legal format for the &#39;end&#39; &#34;
+        msg += &#34;kwarg. It needs to be &#39;HH:MM:SS&#39;.&#34;
+        raise ValueError(msg)
+    
+    m = np.where(t&gt;=start,
+                 True,
+                 False)
+    m = np.where(t&lt;=end,
+                 m,
+                 False)
+    return m</code></pre>
+</details>
+<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object
+Returns a mask within start and end for an instrument y</p></div>
+</dd>
+<dt id="agg_dim.experiment.Wrapper.plot"><code class="name flex">
+<span>def <span class="ident">plot</span></span>(<span>self, ax, x, y, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot(self,ax,x,y,**kwargs):
+    &#34;&#34;&#34;
+    Plots two data arrays against each other.
+
+    Parameters
+    ----------
+    ax : Axes obj of mpl.axes module
+        The plot will be drawn on this axis.
+    x : str
+        Takes a str in the format &#34;plottype@instrument&#34; and uses it on the 
+        x-axis. E.g.: &#34;total_partconc@wibs&#34;
+    y : str
+        Takes a str in the format &#34;plottype@instrument&#34; and uses it on the 
+        y-axis. E.g.: &#34;total_partconc@wibs&#34;
+        
+    Kwargs
+    ------
+    start : str, optional
+        Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
+        after it.
+    end : str, optional
+        Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
+        before it.
+    scatter : bool, optonal
+        If True a scatter plot will be drawn, else a line plot will be 
+        drawn. The default is True.
+    color : str, optional
+        The plot will be drawn in this color. The default is &#34;tab:blue&#34;.
+    pearson : bool, optional
+        If True Pearsons R for the given data will be printed to console.
+        The default is True.
+    return_arrs : bool, optional
+        If True, the function will return the arrays for the x and the y
+        axis. The default is False.
+
+    Returns
+    -------
+    xx : np array
+        Array that contains the data from the x-axis. Will only be returned
+        if the kwarg &#34;return_arrs&#34; is True.
+    yy : np array
+        Array that contains the data from the y-axis. Will only be returned
+        if the kwarg &#34;return_arrs&#34; is True.
+    &#34;&#34;&#34;
+    
+    
+    #kwargs
+    defaults = {
+        &#34;start&#34; : None,
+        &#34;end&#34; : None,
+        &#34;scatter&#34;: True,
+        &#34;color&#34; : &#34;tab:blue&#34;,
+        &#34;pearson&#34; : True,
+        &#34;return_arrs&#34; : False
+        }
+    for key,default in defaults.items():
+        kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+    self.hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.plot()&#34;)
+    
+    x_val,x_instrument = x.split(&#34;@&#34;)
+    y_val,y_instrument = y.split(&#34;@&#34;)
+    
+    # check x and y
+    if x_instrument not in self.data.keys():
+        loaded = &#34;,&#34;.join(list(self.data.keys()))
+        raise KeyError(f&#34;{x_instrument} is not loaded. Try one of: &#34;
+                       + loaded)
+    if x_val not in self.data[x_instrument].keys():
+        loaded = &#34;,&#34;.join(list(self.data[x_instrument].keys()))
+        raise KeyError(f&#34;{x_val} is not legal for {x_instrument}. Try: &#34;
+                       + loaded)
+    if y_instrument not in self.data.keys():
+        loaded = &#34;,&#34;.join(list(self.data.keys()))
+        raise KeyError(f&#34;{y_instrument} is not loaded. Try one of: &#34;
+                       + loaded)
+    if y_val not in self.data[y_instrument].keys():
+        loaded = &#34;,&#34;.join(list(self.data[y_instrument].keys()))
+        raise KeyError(f&#34;{y_val} is not legal for {y_instrument}. Try: &#34;
+                       + loaded)
+        
+    # crop
+    kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self.hk_checktime(
+        x_instrument, 
+        y_instrument, 
+        kwargs[&#34;start&#34;], 
+        kwargs[&#34;end&#34;])
+    if isinstance(kwargs[&#34;start&#34;],str) or isinstance(kwargs[&#34;end&#34;],str):
+        xm = self.hk_timemask(x_instrument, 
+                              kwargs[&#34;start&#34;], 
+                              kwargs[&#34;end&#34;])
+        ym = self.hk_timemask(y_instrument,
+                              kwargs[&#34;start&#34;],
+                              kwargs[&#34;end&#34;])
+    else:
+        xm = np.array([True for t in self.data[x_instrument][&#34;t&#34;]])
+        ym = np.array([True for t in self.data[y_instrument][&#34;t&#34;]])
+        
+    # find x and y data
+    if x_instrument == y_instrument:
+        xx = self.data[x_instrument][x_val][xm]
+        yy = self.data[y_instrument][y_val][ym]
+    else:
+        xt = self.data[x_instrument][&#34;t&#34;][xm]
+        yt = self.data[y_instrument][&#34;t&#34;][ym]
+        xdata = self.data[x_instrument][x_val][xm]
+        ydata = self.data[y_instrument][y_val][ym]
+        xm = np.isin(xt,yt)
+        ym = np.isin(yt,xt)
+        
+        xx = xdata[xm]
+        yy = ydata[ym]
+        
+    # plot
+    if kwargs[&#34;scatter&#34;]:
+        ax.scatter(xx,yy,color=kwargs[&#34;color&#34;])
+    else:
+        ax.plot(xx,yy,color=kwargs[&#34;color&#34;])
+    ax.set_xlabel(self.details[x_instrument][x_val][0]
+                  + &#34; in &#34;
+                  + self.details[x_instrument][x_val][1])
+    ax.set_ylabel(self.details[y_instrument][y_val][0]
+                  + &#34; in &#34;
+                  + self.details[y_instrument][y_val][1])
+        
+    if kwargs[&#34;pearson&#34;]:
+        x = xx - np.mean(xx)
+        y = yy - np.mean(yy)
+        sp = np.sum(x*y)
+        sqx = np.sum(x**2)
+        sqy = np.sum(y**2)
+        r = sp/(np.sqrt(sqx*sqy))
+        print(f&#34;Pearson&#39;s R: {r:.3f}&#34;)
+        
+    if kwargs[&#34;return_arrs&#34;]:
+        return xx,yy</code></pre>
+</details>
+<div class="desc"><p>Plots two data arrays against each other.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
+<dd>The plot will be drawn on this axis.</dd>
+<dt><strong><code>x</code></strong> :&ensp;<code>str</code></dt>
+<dd>Takes a str in the format "plottype@instrument" and uses it on the
+x-axis. E.g.: "total_partconc@wibs"</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
+<dd>Takes a str in the format "plottype@instrument" and uses it on the
+y-axis. E.g.: "total_partconc@wibs"</dd>
+</dl>
+<h2 id="kwargs">Kwargs</h2>
+<p>start : str, optional
+Takes a str in the format "HH:MM:SS" and only plots data acquired
+after it.
+end : str, optional
+Takes a str in the format "HH:MM:SS" and only plots data acquired
+before it.
+scatter : bool, optonal
+If True a scatter plot will be drawn, else a line plot will be
+drawn. The default is True.
+color : str, optional
+The plot will be drawn in this color. The default is "tab:blue".
+pearson : bool, optional
+If True Pearsons R for the given data will be printed to console.
+The default is True.
+return_arrs : bool, optional
+If True, the function will return the arrays for the x and the y
+axis. The default is False.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>xx</code></strong> :&ensp;<code>np array</code></dt>
+<dd>Array that contains the data from the x-axis. Will only be returned
+if the kwarg "return_arrs" is True.</dd>
+<dt><strong><code>yy</code></strong> :&ensp;<code>np array</code></dt>
+<dd>Array that contains the data from the y-axis. Will only be returned
+if the kwarg "return_arrs" is True.</dd>
+</dl></div>
+</dd>
+<dt id="agg_dim.experiment.Wrapper.windrose"><code class="name flex">
+<span>def <span class="ident">windrose</span></span>(<span>self, ax, y, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def windrose(self,ax,y,**kwargs):
+    &#34;&#34;&#34;
+    Plots a heatmap of y on a windrose plot, where the theta angle
+    corresponds to the cardinal direction and the radius corresponds to 
+    the wind speed.
+
+    Parameters
+    ----------
+    ax : Axes obj of mpl.axes module
+        The plot will be drawn on this axis. This axis has to be of the 
+        projection &#39;polar&#39;.
+    y : str
+        Takes a str in the format &#34;plottype@instrument&#34; and uses it to
+        determine which data shold be plotted. E.g.: &#39;total_partconc@wibs&#39;
+
+    Kwargs
+    ------
+    weatherdata : str, optional
+        The given str is used as the instrument name of the weatherstation,
+        which is expected to have the data rows &#39;wind&#39; and &#39;winddir&#39;.
+        The default is &#39;weather&#39;.
+    start : str, optional
+        Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
+        after it.
+    end : str, optional
+        Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
+        before it.
+    scatter : bool, optional
+        If True, a scatter plot of the raw winddata is plotted over the 
+        heatmap, which can be used to get an overview over how dense the 
+        data is. The default is True.
+    scatter_color : str, optional
+        Changes the color of the scatter plot (only in effect if scatter
+        is True). The default is &#39;tab:blue&#39;.
+    colormap : str, optional
+        Changes the colormap, that is used for the heatmap. The default is
+        &#39;viridis&#39;.
+    min_threshold : int, optional
+        If a min_threshold is given, only bins with at least min_threshold
+        are shown. The default is 0.
+    sectors : int, optional
+        The windrose will be devided into this many sectors along the 
+        theta axis. The default is 4.
+    bins : int, optional
+        The windrose will be devided into this many bins along the radius.
+        The default is 3.
+    heatmap_lim : list or tuple of float with len 2, optional
+        If a heatmap_lim is given, the limits of the colorbar will be set
+        to its values. If no heatmap_lim is given, the minimum and the 
+        maximum values will be used as limits.
+
+    Returns
+    -------
+    None
+    &#34;&#34;&#34;
+    
+    
+    #kwargs
+    defaults = {
+        &#34;weatherdata&#34; : &#34;weather&#34;,
+        &#34;start&#34; : None,
+        &#34;end&#34; : None,
+        &#34;scatter&#34;: True,
+        &#34;scatter_color&#34; : &#34;tab:blue&#34;,
+        &#34;colormap&#34; : &#34;viridis&#34;,
+        &#34;min_threshold&#34; : 0,
+        &#34;sectors&#34; : 4,
+        &#34;bins&#34; : 3,
+        &#34;heatmap_lim&#34; : None
+        }
+    for key,default in defaults.items():
+        kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+    self.hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.windrose()&#34;)
+    
+    #check ax and y
+    if ax.name != &#34;polar&#34;:
+        msg = &#34;The passed ax has to be polar for Wrapper.windrose() to&#34;
+        msg += &#34; work properly.&#34;
+        raise ValueError(msg)
+    y_data,y_instrument = y.split(&#34;@&#34;)
+    try:
+        self.data[y_instrument][y_data]
+    except:
+        legallist = []
+        for key in self.data:
+            for data in self.data[key]:
+                if data != &#34;t&#34;:
+                    legallist.append(f&#34;{data}@{key}&#34;)
+        legalstr = &#34;,&#34;.join(legallist)
+        raise ValueError(f&#34;{y} is no legal y. Try one of {legalstr}&#34;)
+
+    #crop
+    kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self.hk_checktime(
+        kwargs[&#34;weatherdata&#34;], 
+        y_instrument, 
+        kwargs[&#34;start&#34;], 
+        kwargs[&#34;end&#34;])
+    if isinstance(kwargs[&#34;start&#34;],str) or isinstance(kwargs[&#34;end&#34;],str):
+        wind_m = self.hk_timemask(kwargs[&#34;weatherdata&#34;], 
+                                  kwargs[&#34;start&#34;],
+                                  kwargs[&#34;end&#34;])
+        y_m = self.hk_timemask(y_instrument, 
+                               kwargs[&#34;start&#34;], 
+                               kwargs[&#34;end&#34;])
+    else:
+        wind_m = np.array(
+            [True for i in self.data[kwargs[&#34;weatherdata&#34;]][&#34;t&#34;]]
+            )
+        y_m = np.array(
+            [True for i in self.data[y_instrument][&#34;t&#34;]]
+            )
+    
+    #load data
+    if self.details[kwargs[&#34;weatherdata&#34;]][&#34;winddir&#34;][1] == &#34;°&#34;:
+        theta = np.radians(
+            self.data[kwargs[&#34;weatherdata&#34;]][&#34;winddir&#34;][wind_m]
+            )
+    else:
+        theta = self.data[kwargs[&#34;weatherdata&#34;]][&#34;winddir&#34;][wind_m]
+    r = self.data[kwargs[&#34;weatherdata&#34;]][&#34;wind&#34;][wind_m]
+    z = self.data[y_instrument][y_data][y_m]
+    
+    if (np.count_nonzero(wind_m) == 0 
+        or np.count_nonzero(y_m) == 0):
+        raise ValueError(&#34;There are no values in the given timeframe&#34;)
+    
+    #transform data an plot
+    sector_borders = np.linspace(0, 2*np.pi,kwargs[&#34;sectors&#34;]+1)
+    bin_borders = np.linspace(0,np.max(r),kwargs[&#34;bins&#34;]+1)
+    
+    darr = np.zeros((kwargs[&#34;bins&#34;],kwargs[&#34;sectors&#34;]))
+    for b in range(kwargs[&#34;bins&#34;]):
+        bm = np.where(r&gt;=bin_borders[b],True,False)
+        bm = np.where(r&lt;=bin_borders[b+1],bm,False)
+        for sec in range(kwargs[&#34;sectors&#34;]):
+            sm = np.where(theta&gt;=sector_borders[sec],bm,False)
+            sm = np.where(theta&lt;=sector_borders[sec+1],sm,False)
+            
+            if np.count_nonzero(sm) &lt; kwargs[&#34;min_threshold&#34;]:
+                darr[b][sec] = np.nan
+            else:
+                darr[b][sec] = np.nanmean(z[sm])
+    cm = colormaps[kwargs[&#34;colormap&#34;]]
+    if (kwargs[&#34;heatmap_lim&#34;] is not None 
+        and len(kwargs[&#34;heatmap_lim&#34;]) == 2):
+        minval = kwargs[&#34;heatmap_lim&#34;][0]
+        maxval = kwargs[&#34;heatmap_lim&#34;][1]
+        print(&#34;besn&#34;)
+    else:
+        minval = np.nanmin(darr)
+        maxval = np.nanmax(darr)
+    
+    for b in range(kwargs[&#34;bins&#34;]):
+        for sec in range(kwargs[&#34;sectors&#34;]):
+            color = (darr[b][sec]-minval)/(maxval-minval)
+            ax.bar(
+                x=(sector_borders[sec]+sector_borders[sec+1])/2, 
+                height=bin_borders[b+1]-bin_borders[b], 
+                width=sector_borders[sec+1]-sector_borders[sec], 
+                bottom=bin_borders[b], 
+                color=cm(color)
+            )
+                
+    #misc plotting
+    if kwargs[&#34;scatter&#34;]:
+        ax.scatter(theta,r,color=kwargs[&#34;scatter_color&#34;])
+    ax.set_thetagrids([0,90,180,270],[&#34;N&#34;,&#34;E&#34;,&#34;S&#34;,&#34;W&#34;])
+    ax.set_theta_direction(-1)
+    ax.set_theta_zero_location(&#34;N&#34;)
+    ffig = ax.figure
+    c = ScalarMappable(Normalize(minval,maxval),kwargs[&#34;colormap&#34;])
+    label = self.details[y_instrument][y_data][0] 
+    label += &#34; in &#34;
+    label += self.details[y_instrument][y_data][1]
+    ffig.colorbar(c,
+                  ax=ax,
+                  label=label)
+    ffig.tight_layout()</code></pre>
+</details>
+<div class="desc"><p>Plots a heatmap of y on a windrose plot, where the theta angle
+corresponds to the cardinal direction and the radius corresponds to
+the wind speed.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
+<dd>The plot will be drawn on this axis. This axis has to be of the
+projection 'polar'.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
+<dd>Takes a str in the format "plottype@instrument" and uses it to
+determine which data shold be plotted. E.g.: 'total_partconc@wibs'</dd>
+</dl>
+<h2 id="kwargs">Kwargs</h2>
+<p>weatherdata : str, optional
+The given str is used as the instrument name of the weatherstation,
+which is expected to have the data rows 'wind' and 'winddir'.
+The default is 'weather'.
+start : str, optional
+Takes a str in the format "HH:MM:SS" and only plots data acquired
+after it.
+end : str, optional
+Takes a str in the format "HH:MM:SS" and only plots data acquired
+before it.
+scatter : bool, optional
+If True, a scatter plot of the raw winddata is plotted over the
+heatmap, which can be used to get an overview over how dense the
+data is. The default is True.
+scatter_color : str, optional
+Changes the color of the scatter plot (only in effect if scatter
+is True). The default is 'tab:blue'.
+colormap : str, optional
+Changes the colormap, that is used for the heatmap. The default is
+'viridis'.
+min_threshold : int, optional
+If a min_threshold is given, only bins with at least min_threshold
+are shown. The default is 0.
+sectors : int, optional
+The windrose will be devided into this many sectors along the
+theta axis. The default is 4.
+bins : int, optional
+The windrose will be devided into this many bins along the radius.
+The default is 3.
+heatmap_lim : list or tuple of float with len 2, optional
+If a heatmap_lim is given, the limits of the colorbar will be set
+to its values. If no heatmap_lim is given, the minimum and the
+maximum values will be used as limits.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+</dd>
+<dt id="agg_dim.experiment.Wrapper.wrap"><code class="name flex">
+<span>def <span class="ident">wrap</span></span>(<span>self, obj, name)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wrap(self,obj,name):
+    &#34;&#34;&#34;
+    Includes an Object into the Wrapper, by including its data and details
+    into the corresponding dicts and saving the object in Wrapper.name
+
+    Parameters
+    ----------
+    obj : WIBS, OPC, POPS, Weatherdata or FlyingFloUSB
+        This object will be included in the Wrapper.
+    name : str
+        This str will be used as a key in Wrapper.data and Wrapper.details
+        and it will be the attribute name for the object.
+
+    Returns
+    -------
+    None
+    &#34;&#34;&#34;
+    
+    
+    data,details = obj.returndata()
+    self.data[name] = data
+    self.details[name] = details
+    for i in range(len(self.data[name][&#34;t&#34;])):
+        self.data[name][&#34;t&#34;][i] = self.data[name][&#34;t&#34;][i].replace(
+            day = self.day,
+            month = self.month,
+            year = self.year
+            )
+    
+    setattr(self,name,obj)</code></pre>
+</details>
+<div class="desc"><p>Includes an Object into the Wrapper, by including its data and details
+into the corresponding dicts and saving the object in Wrapper.name</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>obj</code></strong> :&ensp;<code>WIBS, OPC, POPS, Weatherdata</code> or <code>FlyingFloUSB</code></dt>
+<dd>This object will be included in the Wrapper.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>This str will be used as a key in Wrapper.data and Wrapper.details
+and it will be the attribute name for the object.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="agg_dim" href="index.html">agg_dim</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="agg_dim.experiment.load_experiment" href="#agg_dim.experiment.load_experiment">load_experiment</a></code></li>
+<li><code><a title="agg_dim.experiment.save_experiment" href="#agg_dim.experiment.save_experiment">save_experiment</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="agg_dim.experiment.Wrapper" href="#agg_dim.experiment.Wrapper">Wrapper</a></code></h4>
+<ul class="two-column">
+<li><code><a title="agg_dim.experiment.Wrapper.hk_checktime" href="#agg_dim.experiment.Wrapper.hk_checktime">hk_checktime</a></code></li>
+<li><code><a title="agg_dim.experiment.Wrapper.hk_errorhandling" href="#agg_dim.experiment.Wrapper.hk_errorhandling">hk_errorhandling</a></code></li>
+<li><code><a title="agg_dim.experiment.Wrapper.hk_func_kwargs" href="#agg_dim.experiment.Wrapper.hk_func_kwargs">hk_func_kwargs</a></code></li>
+<li><code><a title="agg_dim.experiment.Wrapper.hk_timemask" href="#agg_dim.experiment.Wrapper.hk_timemask">hk_timemask</a></code></li>
+<li><code><a title="agg_dim.experiment.Wrapper.plot" href="#agg_dim.experiment.Wrapper.plot">plot</a></code></li>
+<li><code><a title="agg_dim.experiment.Wrapper.windrose" href="#agg_dim.experiment.Wrapper.windrose">windrose</a></code></li>
+<li><code><a title="agg_dim.experiment.Wrapper.wrap" href="#agg_dim.experiment.Wrapper.wrap">wrap</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

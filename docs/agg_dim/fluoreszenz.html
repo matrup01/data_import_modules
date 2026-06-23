@@ -1,0 +1,2226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>agg_dim.fluoreszenz API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>agg_dim.fluoreszenz</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="agg_dim.fluoreszenz.FData"><code class="flex name class">
+<span>class <span class="ident">FData</span></span>
+<span>(</span><span>file,<br>title='no title',<br>encoding_artifacts=True,<br>start='none',<br>end='none',<br>skiprows=0,<br>layout=[3, 18])</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FData:    
+    &#34;&#34;&#34;full documentation see https://github.com/matrup01/data_import_modules&#34;&#34;&#34;
+    
+    def __init__(self,file,title=&#34;no title&#34;,encoding_artifacts=True,start=&#34;none&#34;,end=&#34;none&#34;,skiprows=0,layout=[3,18]):
+        &#34;&#34;&#34;
+        Initialises an FData obj
+
+        Parameters
+        ----------
+        file : str
+            Takes an FSpec-produced csv-file.
+        title : str, optional
+            Takes a str and uses it as a title for quickplots. The default is &#34;kein Titel&#34;.
+        encoding_artifacts : bool, optional
+            If True, encoding artefacts are removed. The default is True.
+        start : str, optional
+            Takes a str in &#39;hh:mm:ss&#39;-format and only imports data acquired after that timestamp. The default is &#34;none&#34;.
+        end : str, optional
+            Takes a str in &#39;hh:mm:ss&#39;-format and only imports data acquired before that timestamp. The default is &#34;none&#34;.
+        skiprows : int, optional
+            takes an int and skips the first rows (may be used if the first rows are corrupted). The default is 0.
+        layout : list(int), optional
+            Decides which columns from the csv should be taken. The default is [3,18].
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        #reads data from csv to list
+        self.title = title
+        self.file = file
+        with open(file,encoding=&#34;ansi&#34;) as openfile:
+            data = csv.reader(openfile,delimiter=&#34;;&#34;)
+            data = list(data)
+        
+        #get rid of encoding-artifacts
+        if encoding_artifacts:
+            for i in range(len(data)):
+                for j in range(len(data[i])):
+                    data[i][j] = data[i][j].replace(&#39;\x00&#39;,&#39;&#39;)
+                    #if j == 2 and i &gt; 0:
+                        #data[i][j] = data[i][j][126:130]
+        
+        #extract x and y values from list
+        faulty_lines = []
+        for i in range(len(data)):
+            if len(data[i]) != 19:
+                faulty_lines.append(i)
+        newdata = []
+        for i in range(len(data)):
+            if i not in faulty_lines:
+                newdata.append(data[i])
+        data = newdata
+        del newdata
+        del faulty_lines
+        self.t = [dt.datetime.strptime(data[i][1],&#34;%H:%M:%S.%f&#34;) for i in range(1+skiprows,len(data))]
+        self.channels = [[data[i][j] for i in range(1+skiprows,len(data))] for j in range(layout[0],layout[1]+1)]
+        for i in range(len(self.channels)):
+            for j in range(len(self.channels[i])):
+                try:
+                    self.channels[i][j] = int(self.channels[i][j]) - 1000
+                except ValueError:
+                    self.channels[i][j] = 0
+        
+        #crop
+        t_start = 0
+        t_end = len(self.t)
+        if start != &#34;none&#34;:
+            tcounter = -1
+            for element in self.t:
+                tcounter += 1
+                if str(element)[11:19] == start:
+                    t_start = tcounter
+            
+        if end != &#34;none&#34;:
+            tcounter = -1
+            for element in self.t:
+                tcounter += 1
+                if str(element)[11:19] == end:
+                    t_end = tcounter
+
+        self.crop(t_start,len(self.t)-t_end)
+        
+        
+    def internalbg(self,startmeasurementtime,bgcrop=0):
+        &#34;&#34;&#34;
+        Takes data before startmeasurementtime-timestamp and treats it as bg to correct the data after it (crops bg in the process)
+
+        Parameters
+        ----------
+        startmeasurementtime : str
+            Takes a str in &#39;hh:mm:ss&#39;-format and uses it to split the data from the bg.
+        bgcrop : int, optional
+            Takes an int and crops the start of the background by its amount datapoints. The default is 0.
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        #find point in list where measurement starts
+        for i in range(len(self.t)):
+            if str(self.t[i])[11:19].rsplit(&#34;.&#34;)[0] == startmeasurementtime:
+                startmeasurement = i
+        
+        #correct bg
+        length = len(self.t)
+        for i in range(len(self.channels)):
+            correctorarray = np.array([self.channels[i][j] for j in range(bgcrop,startmeasurement)])
+            corrector = np.mean(correctorarray)
+            self.channels[i] = np.array([self.channels[i][j]-corrector for j in range(startmeasurement,length)])
+        self.t = [self.t[i] for i in range(startmeasurement,length)]
+            
+        
+    def externalbg(self,bgfile,startcrop=0,endcrop=0):
+        &#34;&#34;&#34;
+        Takes data from another file and treats it as bg to correct the data from the FData-object
+
+        Parameters
+        ----------
+        bgfile : str
+            Takes a FSpec-produced csv-file.
+        startcrop : int, optional
+            Takes an int and crops the start of the background by its amount datapoints. The default is 0.
+        endcrop : int, optional
+            Takes an int and crops the end of the background by its amount datapoints. The default is 0.
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        #reads data from csv to list
+        with open(bgfile) as openbg:
+            data = csv.reader(openbg,delimiter=&#34;;&#34;)
+            data = list(data)
+            
+        #get rid of encoding-artifacts
+        for i in range(len(data)):
+            for j in range(len(data[i])):
+                if j == 2 and i &gt; 0:
+                    data[i][j] = data[i][j][126:130]
+        
+        #extract data from list
+        bgdata = np.array([[int(data[i][j])-1000 for i in range(1+startcrop,len(data)-endcrop)] for j in range(2,18)])
+        bg = np.array([np.mean(element) for element in bgdata])
+        
+        #correct bg
+        for i in range(len(self.channels)):
+            self.channels[i] = [self.channels[i][j]-bg for j in range(len(self.channels[i]))]
+            
+            
+    def quickplot(self,channelno,startcrop=0,endcrop=0):
+        &#34;&#34;&#34;
+        Draws a plot of the intensity of the given channel vs time
+
+        Parameters
+        ----------
+        channelno : int
+            Decides which channel should be plotted.
+        startcrop : int, optional
+            Takes an int and crops the beginning of the plot by its amount datapoints. The default is 0.
+        endcrop : int, optional
+            Takes an int and crops the end of the plot by its amount datapoints. The default is 0.
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        channelname = &#34;ch&#34; + str(channelno)
+        channelno -= 1
+        
+        #crop data
+        self.crop(startcrop,endcrop)
+        
+        #draw plot        
+        _,ax = plt.subplots()
+        plt.title(self.title)
+        ax.plot(self.t,self.channels[channelno],label=channelname)
+        ax.set_ylabel(&#34;Intensität&#34;)
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        plt.legend()
+        plt.show()
+        
+        
+    def plot(self,channelno,ax,quakes=[],quakeslabel=&#34;kein Label&#34;,quakecolor=&#34;tab:purple&#34;,color=&#34;tab:green&#34;,startcrop=0,endcrop=0):
+        &#34;&#34;&#34;
+        raws a plot of the intensity of the given channel vs time on an existing mpl-axis
+
+        Parameters
+        ----------
+        channelno : int
+            Decides which channel should be plotted.
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        quakes : list(str), optional
+            Takes a list of string in the format &#39;hh:mm:ss&#39; and draws vertical, dashed lines at those timestamps. The default is [].
+        quakeslabel : str, optional
+            Takes a str and uses it as a label for the quakes if a legend is used. The default is &#34;kein Label&#34;.
+        quakecolor : str, optional
+            Changes the color of the quakes. The default is &#34;tab:purple&#34;.
+        color : str, optional
+            Changes the plot color. The default is &#34;tab:green&#34;.
+        startcrop : int, optional
+            Takes an int and crops the beginning of the plot by its amount datapoints. The default is 0.
+        endcrop : int, optional
+            Takes an int and crops the end of the plot by its amount datapoints. The default is 0.
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        channelname = &#34;ch&#34; + str(channelno)
+        channelno -= 1
+        
+        #crop data
+        self.crop(startcrop,endcrop)
+        
+        #draw plot
+        ax.plot(self.t,self.channels[channelno],label=channelname,color=color)
+        ax.set_ylabel(&#34;Intensität in &#34; + channelname)
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        if len(quakes) != 0:
+            ax.vlines(x=[dt.datetime.strptime(element, &#34;%H:%M:%S&#34;)for element in quakes],ymin=min(self.channels[channelno]),ymax=max(self.channels[channelno]),color=quakecolor,ls=&#34;dashed&#34;,label=quakeslabel)
+            
+            
+    def crop(self,startcrop,endcrop):
+        &#34;&#34;&#34;
+        Legacy function --&gt; use start/end in init
+        Crops the data by startcrop datapoints at the start and endrop datapoints at the end
+
+        Parameters
+        ----------
+        startcrop : int
+            Takes an int and crops the beginning of the plot by its amount datapoints.
+        endcrop : int
+            Takes an int and crops the end of the plot by its amount datapoints.
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        length = len(self.t)
+        self.t = [self.t[i] for i in range(startcrop,length-endcrop)]
+        for i in range(len(self.channels)):
+            self.channels[i] = [self.channels[i][j] for j in range(startcrop,length-endcrop)]
+            
+            
+    def quickheatmap(self):
+        &#34;&#34;&#34;
+        Draws a heatmap of fluorescence intensity over all channels
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+        heatmap_data = deepcopy(self.channels)
+        heatmap_data = self.hk_replacezeros(heatmap_data)
+        
+        _,ax = plt.subplots()
+        
+        im = ax.pcolormesh(xx,yy,heatmap_data,cmap=&#34;RdYlBu_r&#34;,norm=LogNorm(),shading=&#34;nearest&#34;)
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        ax.set_ylabel(&#34;Channels&#34;)
+        ax.set_xlabel(&#34;CET&#34;)
+        
+        ticks = [i+0.5 for i in range(len(self.channels))]
+        ticklabels = [i+1 for i in range(len(ticks))]
+        ax.set_yticks(ticks,labels=ticklabels)
+        ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
+        ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
+        
+        plt.colorbar(im,ax=ax,label=&#34;Fluorescence Intensity&#34;)
+        
+        plt.show()
+            
+        
+    def heatmap(self,ax,**kwargs):
+        &#34;&#34;&#34;
+        Draws a heatmap of fluorescence intensity over all channels on an existing mpl-axis
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        smooth : bool, optional
+            Decides if heatmap should be smoothed (gouraud) or show raw data. The default is True.
+        cmap : str, optional
+            Decides which colormap should be used. The default is &#34;RdYlBu_r&#34;.
+        pad : float, optional
+            Adds a padding between colorbar and plot. The default is 0.
+        togglecbar : bool, optional
+            Toggles the colorbar. The default is True.
+        xlims : list(str), optional
+            Takes two str in &#39;HH:MM:SS&#39; format and uses them as xlims
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        #import kwargs
+        smooth = kwargs[&#34;smooth&#34;] if &#34;smooth&#34; in kwargs else True
+        cmap = kwargs[&#34;cmap&#34;] if &#34;cmap&#34; in kwargs else &#34;RdYlBu_r&#34;
+        pad = kwargs[&#34;pad&#34;] if &#34;pad&#34; in kwargs else 0.01
+        togglecbar = kwargs[&#34;togglecbar&#34;] if &#34;togglecbar&#34; in kwargs else True
+        xlims = kwargs[&#34;xlims&#34;] if &#34;xlims&#34; in kwargs else &#34;none&#34;
+        
+        #error handling
+        for key in kwargs:
+            if key not in [&#34;smooth&#34;,&#34;cmap&#34;,&#34;pad&#34;,&#34;togglecbar&#34;,&#34;xlims&#34;]:
+                raise IllegalArgument(key,&#34;FData.heatmap()&#34;)
+        
+        #prepare data
+        xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+        heatmap_data = deepcopy(self.channels)
+        heatmap_data = self.hk_replacezeros(heatmap_data)
+        if isinstance(xlims,list):
+            ax.set_xlim([dt.datetime.strptime(element, &#34;%H:%M:%S&#34;) for element in xlims])
+        
+        #draw
+        if smooth:
+            im = ax.pcolormesh(xx,yy,heatmap_data,cmap=cmap,norm=LogNorm(),shading=&#34;gouraud&#34;)
+        else:
+            im = ax.pcolormesh(xx,yy,heatmap_data,cmap=cmap,norm=LogNorm(),shading=&#34;nearest&#34;)
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        ax.set_ylabel(&#34;Channels&#34;)
+        ax.set_xlabel(&#34;CET&#34;)
+        
+        ticks = [i+0.5 for i in range(len(self.channels))]
+        ticklabels = [i+1 for i in range(len(ticks))]
+        ax.set_yticks(ticks,labels=ticklabels)
+        ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
+        ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
+        if togglecbar:
+            plt.colorbar(im,ax=ax,label=&#34;Fluorescence Intensity&#34;,pad=pad)
+        
+        
+        
+    #housekeeping funcs
+    def hk_replacezeros(self,arr):
+        &#34;&#34;&#34;replaces zeros for a logarithmic scale&#34;&#34;&#34;
+
+        array = deepcopy(arr)
+        
+        smallest = 10000
+        for row in array:
+            for element in row:
+                if element &lt; smallest and element &gt; 0:
+                    smallest = element
+        for i in range(len(array)):
+            for j in range(len(array[i])):
+                if array[i][j] == 0:
+                    array[i][j] += smallest
+                    
+        return array</code></pre>
+</details>
+<div class="desc"><p>full documentation see <a href="https://github.com/matrup01/data_import_modules">https://github.com/matrup01/data_import_modules</a></p>
+<p>Initialises an FData obj</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>file</code></strong> :&ensp;<code>str</code></dt>
+<dd>Takes an FSpec-produced csv-file.</dd>
+<dt><strong><code>title</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Takes a str and uses it as a title for quickplots. The default is "kein Titel".</dd>
+<dt><strong><code>encoding_artifacts</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, encoding artefacts are removed. The default is True.</dd>
+<dt><strong><code>start</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp. The default is "none".</dd>
+<dt><strong><code>end</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp. The default is "none".</dd>
+<dt><strong><code>skiprows</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>takes an int and skips the first rows (may be used if the first rows are corrupted). The default is 0.</dd>
+<dt><strong><code>layout</code></strong> :&ensp;<code>list(int)</code>, optional</dt>
+<dd>Decides which columns from the csv should be taken. The default is [3,18].</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="agg_dim.fluoreszenz.FData.crop"><code class="name flex">
+<span>def <span class="ident">crop</span></span>(<span>self, startcrop, endcrop)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def crop(self,startcrop,endcrop):
+    &#34;&#34;&#34;
+    Legacy function --&gt; use start/end in init
+    Crops the data by startcrop datapoints at the start and endrop datapoints at the end
+
+    Parameters
+    ----------
+    startcrop : int
+        Takes an int and crops the beginning of the plot by its amount datapoints.
+    endcrop : int
+        Takes an int and crops the end of the plot by its amount datapoints.
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    length = len(self.t)
+    self.t = [self.t[i] for i in range(startcrop,length-endcrop)]
+    for i in range(len(self.channels)):
+        self.channels[i] = [self.channels[i][j] for j in range(startcrop,length-endcrop)]</code></pre>
+</details>
+<div class="desc"><p>Legacy function &ndash;&gt; use start/end in init
+Crops the data by startcrop datapoints at the start and endrop datapoints at the end</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>startcrop</code></strong> :&ensp;<code>int</code></dt>
+<dd>Takes an int and crops the beginning of the plot by its amount datapoints.</dd>
+<dt><strong><code>endcrop</code></strong> :&ensp;<code>int</code></dt>
+<dd>Takes an int and crops the end of the plot by its amount datapoints.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.FData.externalbg"><code class="name flex">
+<span>def <span class="ident">externalbg</span></span>(<span>self, bgfile, startcrop=0, endcrop=0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def externalbg(self,bgfile,startcrop=0,endcrop=0):
+    &#34;&#34;&#34;
+    Takes data from another file and treats it as bg to correct the data from the FData-object
+
+    Parameters
+    ----------
+    bgfile : str
+        Takes a FSpec-produced csv-file.
+    startcrop : int, optional
+        Takes an int and crops the start of the background by its amount datapoints. The default is 0.
+    endcrop : int, optional
+        Takes an int and crops the end of the background by its amount datapoints. The default is 0.
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    #reads data from csv to list
+    with open(bgfile) as openbg:
+        data = csv.reader(openbg,delimiter=&#34;;&#34;)
+        data = list(data)
+        
+    #get rid of encoding-artifacts
+    for i in range(len(data)):
+        for j in range(len(data[i])):
+            if j == 2 and i &gt; 0:
+                data[i][j] = data[i][j][126:130]
+    
+    #extract data from list
+    bgdata = np.array([[int(data[i][j])-1000 for i in range(1+startcrop,len(data)-endcrop)] for j in range(2,18)])
+    bg = np.array([np.mean(element) for element in bgdata])
+    
+    #correct bg
+    for i in range(len(self.channels)):
+        self.channels[i] = [self.channels[i][j]-bg for j in range(len(self.channels[i]))]</code></pre>
+</details>
+<div class="desc"><p>Takes data from another file and treats it as bg to correct the data from the FData-object</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>bgfile</code></strong> :&ensp;<code>str</code></dt>
+<dd>Takes a FSpec-produced csv-file.</dd>
+<dt><strong><code>startcrop</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Takes an int and crops the start of the background by its amount datapoints. The default is 0.</dd>
+<dt><strong><code>endcrop</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Takes an int and crops the end of the background by its amount datapoints. The default is 0.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.FData.heatmap"><code class="name flex">
+<span>def <span class="ident">heatmap</span></span>(<span>self, ax, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def heatmap(self,ax,**kwargs):
+    &#34;&#34;&#34;
+    Draws a heatmap of fluorescence intensity over all channels on an existing mpl-axis
+
+    Parameters
+    ----------
+    ax : Axes obj of mpl.axes module
+        The plot will be drawn on this axis.
+    smooth : bool, optional
+        Decides if heatmap should be smoothed (gouraud) or show raw data. The default is True.
+    cmap : str, optional
+        Decides which colormap should be used. The default is &#34;RdYlBu_r&#34;.
+    pad : float, optional
+        Adds a padding between colorbar and plot. The default is 0.
+    togglecbar : bool, optional
+        Toggles the colorbar. The default is True.
+    xlims : list(str), optional
+        Takes two str in &#39;HH:MM:SS&#39; format and uses them as xlims
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    #import kwargs
+    smooth = kwargs[&#34;smooth&#34;] if &#34;smooth&#34; in kwargs else True
+    cmap = kwargs[&#34;cmap&#34;] if &#34;cmap&#34; in kwargs else &#34;RdYlBu_r&#34;
+    pad = kwargs[&#34;pad&#34;] if &#34;pad&#34; in kwargs else 0.01
+    togglecbar = kwargs[&#34;togglecbar&#34;] if &#34;togglecbar&#34; in kwargs else True
+    xlims = kwargs[&#34;xlims&#34;] if &#34;xlims&#34; in kwargs else &#34;none&#34;
+    
+    #error handling
+    for key in kwargs:
+        if key not in [&#34;smooth&#34;,&#34;cmap&#34;,&#34;pad&#34;,&#34;togglecbar&#34;,&#34;xlims&#34;]:
+            raise IllegalArgument(key,&#34;FData.heatmap()&#34;)
+    
+    #prepare data
+    xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+    heatmap_data = deepcopy(self.channels)
+    heatmap_data = self.hk_replacezeros(heatmap_data)
+    if isinstance(xlims,list):
+        ax.set_xlim([dt.datetime.strptime(element, &#34;%H:%M:%S&#34;) for element in xlims])
+    
+    #draw
+    if smooth:
+        im = ax.pcolormesh(xx,yy,heatmap_data,cmap=cmap,norm=LogNorm(),shading=&#34;gouraud&#34;)
+    else:
+        im = ax.pcolormesh(xx,yy,heatmap_data,cmap=cmap,norm=LogNorm(),shading=&#34;nearest&#34;)
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    ax.set_ylabel(&#34;Channels&#34;)
+    ax.set_xlabel(&#34;CET&#34;)
+    
+    ticks = [i+0.5 for i in range(len(self.channels))]
+    ticklabels = [i+1 for i in range(len(ticks))]
+    ax.set_yticks(ticks,labels=ticklabels)
+    ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
+    ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
+    if togglecbar:
+        plt.colorbar(im,ax=ax,label=&#34;Fluorescence Intensity&#34;,pad=pad)</code></pre>
+</details>
+<div class="desc"><p>Draws a heatmap of fluorescence intensity over all channels on an existing mpl-axis</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
+<dd>The plot will be drawn on this axis.</dd>
+<dt><strong><code>smooth</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Decides if heatmap should be smoothed (gouraud) or show raw data. The default is True.</dd>
+<dt><strong><code>cmap</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Decides which colormap should be used. The default is "RdYlBu_r".</dd>
+<dt><strong><code>pad</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Adds a padding between colorbar and plot. The default is 0.</dd>
+<dt><strong><code>togglecbar</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Toggles the colorbar. The default is True.</dd>
+<dt><strong><code>xlims</code></strong> :&ensp;<code>list(str)</code>, optional</dt>
+<dd>Takes two str in 'HH:MM:SS' format and uses them as xlims</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.FData.hk_replacezeros"><code class="name flex">
+<span>def <span class="ident">hk_replacezeros</span></span>(<span>self, arr)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_replacezeros(self,arr):
+    &#34;&#34;&#34;replaces zeros for a logarithmic scale&#34;&#34;&#34;
+
+    array = deepcopy(arr)
+    
+    smallest = 10000
+    for row in array:
+        for element in row:
+            if element &lt; smallest and element &gt; 0:
+                smallest = element
+    for i in range(len(array)):
+        for j in range(len(array[i])):
+            if array[i][j] == 0:
+                array[i][j] += smallest
+                
+    return array</code></pre>
+</details>
+<div class="desc"><p>replaces zeros for a logarithmic scale</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.FData.internalbg"><code class="name flex">
+<span>def <span class="ident">internalbg</span></span>(<span>self, startmeasurementtime, bgcrop=0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def internalbg(self,startmeasurementtime,bgcrop=0):
+    &#34;&#34;&#34;
+    Takes data before startmeasurementtime-timestamp and treats it as bg to correct the data after it (crops bg in the process)
+
+    Parameters
+    ----------
+    startmeasurementtime : str
+        Takes a str in &#39;hh:mm:ss&#39;-format and uses it to split the data from the bg.
+    bgcrop : int, optional
+        Takes an int and crops the start of the background by its amount datapoints. The default is 0.
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    #find point in list where measurement starts
+    for i in range(len(self.t)):
+        if str(self.t[i])[11:19].rsplit(&#34;.&#34;)[0] == startmeasurementtime:
+            startmeasurement = i
+    
+    #correct bg
+    length = len(self.t)
+    for i in range(len(self.channels)):
+        correctorarray = np.array([self.channels[i][j] for j in range(bgcrop,startmeasurement)])
+        corrector = np.mean(correctorarray)
+        self.channels[i] = np.array([self.channels[i][j]-corrector for j in range(startmeasurement,length)])
+    self.t = [self.t[i] for i in range(startmeasurement,length)]</code></pre>
+</details>
+<div class="desc"><p>Takes data before startmeasurementtime-timestamp and treats it as bg to correct the data after it (crops bg in the process)</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>startmeasurementtime</code></strong> :&ensp;<code>str</code></dt>
+<dd>Takes a str in 'hh:mm:ss'-format and uses it to split the data from the bg.</dd>
+<dt><strong><code>bgcrop</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Takes an int and crops the start of the background by its amount datapoints. The default is 0.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.FData.plot"><code class="name flex">
+<span>def <span class="ident">plot</span></span>(<span>self,<br>channelno,<br>ax,<br>quakes=[],<br>quakeslabel='kein Label',<br>quakecolor='tab:purple',<br>color='tab:green',<br>startcrop=0,<br>endcrop=0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot(self,channelno,ax,quakes=[],quakeslabel=&#34;kein Label&#34;,quakecolor=&#34;tab:purple&#34;,color=&#34;tab:green&#34;,startcrop=0,endcrop=0):
+    &#34;&#34;&#34;
+    raws a plot of the intensity of the given channel vs time on an existing mpl-axis
+
+    Parameters
+    ----------
+    channelno : int
+        Decides which channel should be plotted.
+    ax : Axes obj of mpl.axes module
+        The plot will be drawn on this axis.
+    quakes : list(str), optional
+        Takes a list of string in the format &#39;hh:mm:ss&#39; and draws vertical, dashed lines at those timestamps. The default is [].
+    quakeslabel : str, optional
+        Takes a str and uses it as a label for the quakes if a legend is used. The default is &#34;kein Label&#34;.
+    quakecolor : str, optional
+        Changes the color of the quakes. The default is &#34;tab:purple&#34;.
+    color : str, optional
+        Changes the plot color. The default is &#34;tab:green&#34;.
+    startcrop : int, optional
+        Takes an int and crops the beginning of the plot by its amount datapoints. The default is 0.
+    endcrop : int, optional
+        Takes an int and crops the end of the plot by its amount datapoints. The default is 0.
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    channelname = &#34;ch&#34; + str(channelno)
+    channelno -= 1
+    
+    #crop data
+    self.crop(startcrop,endcrop)
+    
+    #draw plot
+    ax.plot(self.t,self.channels[channelno],label=channelname,color=color)
+    ax.set_ylabel(&#34;Intensität in &#34; + channelname)
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    if len(quakes) != 0:
+        ax.vlines(x=[dt.datetime.strptime(element, &#34;%H:%M:%S&#34;)for element in quakes],ymin=min(self.channels[channelno]),ymax=max(self.channels[channelno]),color=quakecolor,ls=&#34;dashed&#34;,label=quakeslabel)</code></pre>
+</details>
+<div class="desc"><p>raws a plot of the intensity of the given channel vs time on an existing mpl-axis</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>channelno</code></strong> :&ensp;<code>int</code></dt>
+<dd>Decides which channel should be plotted.</dd>
+<dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
+<dd>The plot will be drawn on this axis.</dd>
+<dt><strong><code>quakes</code></strong> :&ensp;<code>list(str)</code>, optional</dt>
+<dd>Takes a list of string in the format 'hh:mm:ss' and draws vertical, dashed lines at those timestamps. The default is [].</dd>
+<dt><strong><code>quakeslabel</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Takes a str and uses it as a label for the quakes if a legend is used. The default is "kein Label".</dd>
+<dt><strong><code>quakecolor</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Changes the color of the quakes. The default is "tab:purple".</dd>
+<dt><strong><code>color</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Changes the plot color. The default is "tab:green".</dd>
+<dt><strong><code>startcrop</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Takes an int and crops the beginning of the plot by its amount datapoints. The default is 0.</dd>
+<dt><strong><code>endcrop</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Takes an int and crops the end of the plot by its amount datapoints. The default is 0.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.FData.quickheatmap"><code class="name flex">
+<span>def <span class="ident">quickheatmap</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def quickheatmap(self):
+    &#34;&#34;&#34;
+    Draws a heatmap of fluorescence intensity over all channels
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+    heatmap_data = deepcopy(self.channels)
+    heatmap_data = self.hk_replacezeros(heatmap_data)
+    
+    _,ax = plt.subplots()
+    
+    im = ax.pcolormesh(xx,yy,heatmap_data,cmap=&#34;RdYlBu_r&#34;,norm=LogNorm(),shading=&#34;nearest&#34;)
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    ax.set_ylabel(&#34;Channels&#34;)
+    ax.set_xlabel(&#34;CET&#34;)
+    
+    ticks = [i+0.5 for i in range(len(self.channels))]
+    ticklabels = [i+1 for i in range(len(ticks))]
+    ax.set_yticks(ticks,labels=ticklabels)
+    ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
+    ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
+    
+    plt.colorbar(im,ax=ax,label=&#34;Fluorescence Intensity&#34;)
+    
+    plt.show()</code></pre>
+</details>
+<div class="desc"><p>Draws a heatmap of fluorescence intensity over all channels</p>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.FData.quickplot"><code class="name flex">
+<span>def <span class="ident">quickplot</span></span>(<span>self, channelno, startcrop=0, endcrop=0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def quickplot(self,channelno,startcrop=0,endcrop=0):
+    &#34;&#34;&#34;
+    Draws a plot of the intensity of the given channel vs time
+
+    Parameters
+    ----------
+    channelno : int
+        Decides which channel should be plotted.
+    startcrop : int, optional
+        Takes an int and crops the beginning of the plot by its amount datapoints. The default is 0.
+    endcrop : int, optional
+        Takes an int and crops the end of the plot by its amount datapoints. The default is 0.
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    channelname = &#34;ch&#34; + str(channelno)
+    channelno -= 1
+    
+    #crop data
+    self.crop(startcrop,endcrop)
+    
+    #draw plot        
+    _,ax = plt.subplots()
+    plt.title(self.title)
+    ax.plot(self.t,self.channels[channelno],label=channelname)
+    ax.set_ylabel(&#34;Intensität&#34;)
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    plt.legend()
+    plt.show()</code></pre>
+</details>
+<div class="desc"><p>Draws a plot of the intensity of the given channel vs time</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>channelno</code></strong> :&ensp;<code>int</code></dt>
+<dd>Decides which channel should be plotted.</dd>
+<dt><strong><code>startcrop</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Takes an int and crops the beginning of the plot by its amount datapoints. The default is 0.</dd>
+<dt><strong><code>endcrop</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Takes an int and crops the end of the plot by its amount datapoints. The default is 0.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="agg_dim.fluoreszenz.NewFData"><code class="flex name class">
+<span>class <span class="ident">NewFData</span></span>
+<span>(</span><span>file, bg_file='blank.blank', **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NewFData:
+    
+    def __init__(self,file,bg_file=&#34;blank.blank&#34;,**kwargs):
+        &#34;&#34;&#34;
+        inits NewFData obj
+
+        Parameters
+        ----------
+        file : str
+            Either the path to a FSpec-produced .csv file or a preprocessed .fspec file.
+        bg_file : str
+            Either the path to a FSpec-produced .csv file or a preprocessed .fspec file. Can be left if a preprocessed .fspec file is passed as file.
+        sigma : float or int, optional
+            Will be used as sigma for data processing. The default is 1.
+        measurement_frequency : int, optional
+            Measurement Frequency in Hz which is used to calculate the fluorescence index. The default is None.
+        start : str, optional
+            String in the form &#39;hh:mm:ss&#39;. If start is given, all data acquired before this timestamp will be ignored.
+        end : str, optional
+            String in the form &#39;hh:mm:ss&#39;. If end is given, all data acquired after this timestamp will be ignored.
+        jit : bool, optional
+            If True the data processing is done using the just in time compiler numba. The default is True.
+        bg_start : str, optional
+            String in the form &#39;hh:mm:ss&#39;. If bg_start is given, all data acquired befor this timestamp will be ignored for the background. Only works if a .csv file is passed as bg_file.
+        bg_end : str, optional
+            String in the form &#39;hh:mm:ss&#39;. If bg_end is given, all data acquired after this timestamp will be ignored for the background. Only works if a .csv file is passed as bg_file.
+        layout : list of int with len 2
+            Decides which columns of the .csv files should be used for the channels.
+
+        Attributes
+        ----------
+        sigma : int or float
+            Sigma wich was used for data processing
+        measurement_frequency : int
+            Measurement Frequency in Hz which has been used for data processing
+        bg : np.array of float with len 16
+            Contains the mean+std*sigma threshhold for each channel
+        rawtime : np.array of dt.datetime obj
+            Contains the timestamp of each dataset recorded (of each row of .csv file)
+        rawchannels : 2D np.array of int
+            Contains the raw fluorescence intesities of each channel for all recorded datasets
+        t : np.array of dt.datetime obj
+            Contains the time for each datapoint of the processed data
+        channels : 2D np.array of float
+            Contains the porcessed fluorescence index values of each channel
+
+        &#34;&#34;&#34;
+        
+        #check if data is loaded from .csv or .fspec
+        filetype = file.split(&#34;.&#34;)[-1]
+        if filetype == &#34;csv&#34;:
+        
+            #kwargs
+            defaults = {&#34;sigma&#34; : 1,
+                        &#34;measurement_frequency&#34; : None,
+                        &#34;start&#34; : &#34;none&#34;,
+                        &#34;end&#34; : &#34;none&#34;,
+                        &#34;jit&#34; : True,
+                        &#34;bg_start&#34; : &#34;*&#34;,
+                        &#34;bg_end&#34; : &#34;*&#34;,
+                        &#34;layout&#34; : [3,18]}
+            for key,value in zip(defaults.keys(),defaults.values()):
+                self.hk_kwargs(kwargs, key, value)
+            self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData&#34;)
+            
+            #error handling
+            for key in kwargs:
+                if key not in [&#34;sigma&#34;,&#34;measurement_frequency&#34;,&#34;start&#34;,&#34;end&#34;,&#34;jit&#34;,&#34;bg_start&#34;,&#34;bg_end&#34;]:
+                    raise IllegalArgument(key,&#34;NewFData&#34;)
+            
+            #import background-data
+            bg_filetype = bg_file.split(&#34;.&#34;)[-1]
+            if bg_filetype == &#34;csv&#34;:
+                with open(bg_file,&#34;r&#34;,encoding=&#34;ansi&#34;) as f:
+                    bgdata_all = list(f)[1:-1]
+                for i in range(len(bgdata_all)):
+                    bgdata_all[i] = bgdata_all[i].split(&#34;;&#34;)
+                    if len(bgdata_all[i]) &lt; 2:
+                        print(bgdata_all[i])
+                bgdata_time = [bgdata_all[i][1] for i in range(len(bgdata_all))]
+                bgdata = bgdata_all[1:]
+                bg_start_index = 100
+                bg_end_index = len(bgdata)
+                if self.bg_start != &#34;*&#34; or self.bg_end != &#34;*&#34;:
+                   
+                    for i in range(len(bgdata_time)):
+                        match bgdata_time[i][:8]:
+                            case self.bg_start:
+                                bg_start_index = i
+                            case self.bg_end:
+                                bg_end_index = i
+                            case _:
+                                pass
+                bgdata = bgdata[bg_start_index:bg_end_index]
+                for i in range(len(bgdata)):
+                    if len(bgdata[i]) != 19:
+                        if len(bgdata[i]) &lt; 19:
+                            for j in range(19-len(bgdata[i])):
+                                bgdata[i].append(0)
+                        elif len(bgdata[i]) &gt; 19:
+                            j = len(bgdata[i]) - 19
+                            bgdata[i] = bgdata[i][:-j]
+                bgdata = np.array(bgdata).transpose()
+                bgdata = bgdata[3:].astype(&#34;int&#34;)
+                bgdata = np.where(bgdata != 1000,bgdata,np.nan)
+                self.bg = np.array([np.nanmean(channel)+np.nanstd(channel)*self.sigma for channel in bgdata])
+                self.bg = self.bg - 1000
+            elif bg_filetype == &#34;fspec&#34;:
+                with open(bg_file,&#34;rb&#34;) as openbg:
+                    bg_ip = pickle.load(openbg)
+                self.bg = np.array([mean+std*self.sigma for mean,std in zip(bg_ip[&#34;bg_means&#34;],bg_ip[&#34;bg_stds&#34;])])
+            else:
+                raise IllegalFileFormat(bg_filetype, &#34;csv or .fspec&#34;, &#34;bg_file&#34;)
+            
+            #import raw data
+            with open(file,&#34;r&#34;,encoding=&#34;ansi&#34;) as f:
+                data = list(f)[1:-1]
+            for i in range(len(data)):
+                data[i] = data[i].split(&#34;;&#34;)
+                if len(data[i]) != 19:
+                    if len(data[i]) &lt; 19:
+                        for j in range(19-len(data[i])):
+                            data[i].append(0)
+                    elif len(data[i]) &gt; 19:
+                        j = len(data[i]) - 19
+                        data[i] = data[i][:-j]
+            #data = np.array(data).transpose()
+            data = [list(row) for row in zip(*data)] #transpose without np
+            self.rawtime = np.array([dt.datetime.strptime(time,&#34;%H:%M:%S.%f&#34;).replace(microsecond=0) for time in data[1]])
+            self.rawchannels = data[self.layout[0]:self.layout[1]]
+            for i in range(len(self.rawchannels)):
+                for j in range(len(self.rawchannels[i])):
+                    try:
+                        self.rawchannels[i][j] = int(self.rawchannels[i][j])
+                    except ValueError:
+                        self.rawchannels[i][j] = 1000
+            self.rawchannels = np.array(self.rawchannels,int)
+            self.rawchannels = self.rawchannels - 1000
+            self.rawchannels = self.rawchannels.T
+            rows,_ = np.where(self.rawchannels == 0)
+            m = [i for i in range(len(self.rawchannels)) if i not in rows]
+            self.rawchannels = self.rawchannels[m].T
+            self.rawtime = self.rawtime[m]
+            
+            #crop
+            t_start = 0
+            t_end = len(self.rawtime)
+            if self.start != &#34;none&#34;:
+                tcounter = -1
+                for element in self.rawtime:
+                    tcounter += 1
+                    if str(element)[11:19] == self.start:
+                        t_start = tcounter
+                
+            if self.end != &#34;none&#34;:
+                tcounter = -1
+                for element in self.rawtime:
+                    tcounter += 1
+                    if str(element)[11:19] == self.end:
+                        t_end = tcounter
+            
+            self.rawtime = self.rawtime[t_start:t_end]
+            self.rawchannels = [channel[t_start:t_end] for channel in self.rawchannels]
+            
+            #process data
+            secs = []
+            for t in self.rawtime:
+                if t not in secs:
+                    secs.append(t)
+            self.t = np.array(secs)
+            
+            if self.jit:
+                numba_t = np.array([(i - dt.datetime(1970, 1, 1)).total_seconds() for i in self.t],float)
+                numba_rt = np.array([(i - dt.datetime(1970, 1, 1)).total_seconds() for i in self.rawtime],float)
+                numba_rc = np.array(self.rawchannels,float)
+                numba_bg = np.array(self.bg,float)
+                numba_ch = np.array([[float(0) for j in range(len(numba_t))] for i in range(len(numba_rc))])
+                self.channels = self.hk_process_data(numba_t,numba_rc,numba_bg,numba_rt,numba_ch)
+                if self.measurement_frequency != None:
+                    self.channels /= self.measurement_frequency
+                else:
+                    m_f = np.array([np.count_nonzero(~np.isnan(np.where(self.rawtime == s,self.rawchannels[0],np.nan))) for s in secs])
+                    self.channels /= m_f
+            else:
+                if self.measurement_frequency == None:
+                    self.measurement_frequency = 100
+                self.channels = np.array([[0 for j in range(len(self.t))] for i in range(len(self.rawchannels))],float)
+                for t in range(len(self.t)):
+                    for channel in range(len(self.rawchannels)):
+                        
+                        counter = 0
+                        for val in range(len(self.rawchannels[channel])):
+                            if self.rawchannels[channel][val] &gt; self.bg[channel] and self.rawtime[val] == self.t[t]:
+                                counter += 1
+                        self.channels[channel][t] = counter / self.measurement_frequency
+                    
+        elif filetype == &#34;fspec&#34;:
+                
+            with open(file,&#34;rb&#34;) as openfile:
+                ip = pickle.load(openfile)
+            
+            self.hk_kwargs(ip,&#34;sigma&#34;,1)
+            self.hk_kwargs(ip,&#34;measurement_frequency&#34;, 100)
+            self.hk_kwargs(ip,&#34;bg&#34;, &#34;null&#34;)
+            self.hk_kwargs(ip,&#34;rawtime&#34;, &#34;null&#34;)
+            self.hk_kwargs(ip,&#34;rawchannels&#34;, &#34;null&#34;)
+            self.hk_kwargs(ip,&#34;t&#34;, &#34;null&#34;)
+            self.hk_kwargs(ip,&#34;channels&#34;,&#34;null&#34;)
+            
+            self.hk_kwargs(kwargs, &#34;start&#34;, &#34;none&#34;)
+            self.hk_kwargs(kwargs, &#34;end&#34;, &#34;none&#34;)
+            
+            #crop
+            t_start = 0
+            t_end = len(self.t)
+            if self.start != &#34;none&#34;:
+                tcounter = -1
+                for element in self.t:
+                    tcounter += 1
+                    if str(element)[11:19] == self.start:
+                        t_start = tcounter
+                
+            if self.end != &#34;none&#34;:
+                tcounter = -1
+                for element in self.t:
+                    tcounter += 1
+                    if str(element)[11:19] == self.end:
+                        t_end = tcounter
+            
+            self.t = self.t[t_start:t_end]
+            self.channels = np.array([channel[t_start:t_end] for channel in self.channels])
+            
+        else:
+            raise IllegalFileFormat(filetype, &#34;csv-file or .fspec&#34;, file)
+            
+                   
+    
+    def save(self,filename,**kwargs):
+        &#34;&#34;&#34;
+        Saves the obj in a preprocessed .fspec file
+
+        Parameters
+        ----------
+        filename : str
+            Determines path and filename where the obj will be saved to.
+        start : str, optional
+            String of the form &#39;hh:mm:ss&#39;. If start is given all data before it wont be saved.
+        end : str, optional
+            String of the form &#39;hh:mm:ss&#39;. If end is given all data after it wont be saved.
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        #kwargs
+        defaults = {&#34;start&#34; : &#34;none&#34;,
+                    &#34;end&#34; : &#34;none&#34;}
+        for key,default in zip(defaults.keys(),defaults.values()):
+            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.save()&#34;)
+
+        
+        #crop
+        t_start = 0
+        t_end = len(self.t)
+        if kwargs[&#34;start&#34;] != &#34;none&#34;:
+            tcounter = -1
+            for element in self.t:
+                tcounter += 1
+                if str(element)[11:19] == kwargs[&#34;start&#34;]:
+                    t_start = tcounter
+            
+        if kwargs[&#34;end&#34;] != &#34;none&#34;:
+            tcounter = -1
+            for element in self.t:
+                tcounter += 1
+                if str(element)[11:19] == kwargs[&#34;end&#34;]:
+                    t_end = tcounter
+                    
+        raw_start = 0
+        raw_end = len(self.rawtime)
+        if kwargs[&#34;start&#34;] != &#34;none&#34;:
+            tcounter = -1
+            for element in self.rawtime:
+                tcounter += 1
+                if str(element)[11:19] == kwargs[&#34;start&#34;]:
+                    raw_start = tcounter
+            
+        if kwargs[&#34;end&#34;] != &#34;none&#34;:
+            tcounter = -1
+            for element in self.rawtime:
+                tcounter += 1
+                if str(element)[11:19] == kwargs[&#34;end&#34;]:
+                    raw_end = tcounter
+        
+        save_t = self.t[t_start:t_end]
+        save_channels = [channel[t_start:t_end] for channel in self.channels]
+        
+        #create background params
+        bg_means = np.array([np.mean(channel) for channel in self.rawchannels[raw_start:raw_end]])
+        bg_stds = np.array([np.std(channel) for channel in self.rawchannels[raw_start:raw_end]])
+        
+        op = {&#34;sigma&#34; : self.sigma,
+              &#34;measurement_frequency&#34; : self.measurement_frequency,
+              &#34;bg&#34; : self.bg,
+              &#34;rawtime&#34; : self.rawtime,
+              &#34;rawchannels&#34; : self.rawchannels,
+              &#34;t&#34; : save_t,
+              &#34;channels&#34; : save_channels,
+              &#34;bg_means&#34; : bg_means,
+              &#34;bg_stds&#34; : bg_stds}
+        
+        if filename[-6:] != &#34;.fspec&#34;:
+            filename += &#34;.fspec&#34;
+        
+        with open(filename,&#34;wb&#34;) as writefile:
+            pickle.dump(op,writefile,4)
+        
+        
+    def quickplot(self,channelno):
+        &#34;&#34;&#34;
+        Draws a plot of the given channel
+
+        Parameters
+        ----------
+        channelno : int
+            Decides which Channel should be plotted.
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        if channelno &gt; len(self.channels):
+            raise ValueError(f&#34;The channel {channelno} doesnt exist. Try a channelno 1 &lt;= channelno &lt;= {len(self.channels)}&#34;)
+        
+        channelname = &#34;ch&#34; + str(channelno)
+        channelno -= 1
+        
+        #draw plot        
+        _,ax = plt.subplots()
+        ax.plot(self.t,self.channels[channelno],label=channelname)
+        ax.set_xlabel(&#34;CET&#34;)
+        ax.set_ylabel(&#34;Fluorescence Index&#34;)
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        plt.legend()
+        plt.show()
+        
+        
+    def quickheatmap(self):
+        &#34;&#34;&#34;
+        Draws a fluorescence index heatmap over time
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+        heatmap_data = deepcopy(self.channels)
+        heatmap_data = self.hk_replacezeros(heatmap_data)
+        
+        _,ax = plt.subplots()
+        
+        im = ax.pcolormesh(xx,yy,heatmap_data,cmap=&#34;RdYlBu_r&#34;,norm=LogNorm(),shading=&#34;nearest&#34;)
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        ax.set_ylabel(&#34;Channels&#34;)
+        ax.set_xlabel(&#34;CET&#34;)
+        
+        ticks = [i+0.5 for i in range(len(self.channels))]
+        ticklabels = [i+1 for i in range(len(ticks))]
+        ax.set_yticks(ticks,labels=ticklabels)
+        ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
+        ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
+        
+        plt.colorbar(im,ax=ax,label=&#34;Fluorescence Index&#34;)
+        
+        plt.show()
+        
+        
+    def plot(self,channelno,ax,**kwargs):
+        &#34;&#34;&#34;
+        Draws a plot of the given channelno vs time on an existing mpl axis.
+
+        Parameters
+        ----------
+        channelno : int
+            Decides which Channel should be plotted.
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        quakes : list of str, optional
+            Takes times in the form of &#34;HH:MM:SS&#34; and draws vertical lines on the plot at these times. The default is []
+        quakeslabel : str, optional
+            If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is &#34;no label&#34;
+        quakecolor : str, optional
+            Determines which color the quake-lines should have. The default is &#34;tab:purple&#34;
+        color : str, optional
+            Changes the color of the plot. The default is &#34;tab:green&#34;
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        #import kwargs   
+        defaults = {&#34;quakes&#34; : [],
+                    &#34;quakeslabel&#34; : &#34;no label&#34;,
+                    &#34;quakecolor&#34; : &#34;tab:purple&#34;,
+                    &#34;color&#34; : &#34;tab:green&#34;}
+        for key,default in zip(defaults.keys(),defaults.values()):
+            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.plot()&#34;)
+        
+        
+        channelname = &#34;ch&#34; + str(channelno)
+        channelno -= 1
+        
+        #draw plot
+        ax.plot(self.t,self.channels[channelno],label=channelname,color=kwargs[&#34;color&#34;])
+        ax.set_ylabel(&#34;fluorescence index (channel &#34; + str(channelno+1) + &#34;)&#34;)
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        if len(kwargs[&#34;quakes&#34;]) != 0:
+            ax.vlines(x=[dt.datetime.strptime(element, &#34;%H:%M:%S&#34;)for element in kwargs[&#34;quakes&#34;]],ymin=min(self.channels[channelno]),ymax=max(self.channels[channelno]),color=kwargs[&#34;quakecolor&#34;],ls=&#34;dashed&#34;,label=kwargs[&#34;quakeslabel&#34;])
+        ax.tick_params(axis=&#39;y&#39;, colors=kwargs[&#34;color&#34;])
+        ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])
+        
+        
+    def meanplot(self,ax,**kwargs):
+        &#34;&#34;&#34;
+        Draws a plot of the mean fluorescence index over time on a given mpl axis
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        min_ch : int, optional
+            Lower Channels than this will be ignored when the mean is calculated. The default is 1.
+        max_ch : int, optional
+            Higher Channels than this will be ignored when the mean is calculated. The default is 15.
+        quakes : list of str, optional
+            Takes times in the form of &#34;HH:MM:SS&#34; and draws vertical lines on the plot at these times. The default is []
+        quakeslabel : str, optional
+            If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is &#34;no label&#34;
+        quakecolor : str, optional
+            Determines which color the quake-lines should have. The default is &#34;tab:purple&#34;
+        color : str, optional
+            Changes the color of the plot. The default is &#34;tab:green&#34;
+        rolling : int, optional
+            If a positive int is given, the rolling average of &#39;rolling&#39; values is plotted. The default is 0.
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        #import kwargs
+        defaults = {&#34;min_ch&#34; : 1,
+                    &#34;max_ch&#34; : 15,
+                    &#34;quakes&#34; : [],
+                    &#34;quakeslabel&#34; : &#34;no label&#34;,
+                    &#34;quakecolor&#34; : &#34;tab:purple&#34;,
+                    &#34;color&#34; : &#34;tab:green&#34;,
+                    &#34;rolling&#34; : 0}
+        for key,default in zip(defaults.keys(),defaults.values()):
+            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.meanplot()&#34;)
+        
+        kwargs[&#34;min_ch&#34;] -= 1
+        #ch_len = len(list(range(kwargs[&#34;min_ch&#34;],kwargs[&#34;max_ch&#34;])))
+        
+        meanchannel = np.mean(self.channels[kwargs[&#34;min_ch&#34;]:kwargs[&#34;max_ch&#34;]],axis=0)
+        if kwargs[&#34;rolling&#34;] &gt; 0 and isinstance(kwargs[&#34;rolling&#34;],int):
+            meanchannel = np.convolve(meanchannel, np.ones(kwargs[&#34;rolling&#34;]),mode=&#34;same&#34;) / kwargs[&#34;rolling&#34;]
+                
+        #draw plot
+        label = f&#34;mean of channels {kwargs[&#39;min_ch&#39;]+1} - {kwargs[&#39;max_ch&#39;]}&#34;
+        ax.plot(self.t,meanchannel,label=label,color=kwargs[&#34;color&#34;])
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        ax.set_ylabel(f&#34;Fluorescence Index ({label})&#34;)
+        if len(kwargs[&#34;quakes&#34;]) != 0:
+            ax.vlines(x=[dt.datetime.strptime(element, &#34;%H:%M:%S&#34;)for element in kwargs[&#34;quakes&#34;]],ymin=min(meanchannel),ymax=max(meanchannel),color=kwargs[&#34;quakecolor&#34;],ls=&#34;dashed&#34;,label=kwargs[&#34;quakeslabel&#34;])
+        ax.tick_params(axis=&#39;y&#39;, colors=kwargs[&#34;color&#34;])
+        ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])
+        
+        
+    def heatmap(self,ax,**kwargs):
+        &#34;&#34;&#34;
+        Draws a fluorescence index heatmap over time on a given mpl axis
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The heatmap will be drawn on this axis.
+        smooth : bool, optional
+            If True, the heatmap will be gouraud smoothed. The default is True.
+        cmap : str, optional
+            Changes the colormap. The default is &#39;RdYlBu_r&#39;.
+        pad : float, optional
+            Changes the padding between heatmap and colorbar. The default is 0.01.
+        togglecbar : bool, optional
+            If True the colorbar will be shown. the default is True
+        xlims : list of str with len = 2
+            Takes timestamps in the format &#39;hh:mm:ss&#39;. If xlims are given, only data between the two timestamps is used.
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        #import kwargs
+        defaults = {&#34;smooth&#34; : True,
+                   &#34;cmap&#34; : &#34;RdYlBu_r&#34;,
+                   &#34;pad&#34; : 0.01,
+                   &#34;togglecbar&#34; : True,
+                   &#34;xlims&#34; : &#34;none&#34;}
+        for key,default in zip(defaults.keys(),defaults.values()):
+            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.heatmap()&#34;)
+        
+        #prepare data
+        xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+        heatmap_data = deepcopy(self.channels)
+        heatmap_data = self.hk_replacezeros(heatmap_data)
+        if isinstance(kwargs[&#34;xlims&#34;],list):
+            ax.set_xlim([dt.datetime.strptime(element, &#34;%H:%M:%S&#34;) for element in kwargs[&#34;xlims&#34;]])
+        
+        #draw
+        if kwargs[&#34;smooth&#34;]:
+            im = ax.pcolormesh(xx,yy,heatmap_data,cmap=kwargs[&#34;cmap&#34;],norm=LogNorm(),shading=&#34;gouraud&#34;)
+        else:
+            im = ax.pcolormesh(xx,yy,heatmap_data,cmap=kwargs[&#34;cmap&#34;],norm=LogNorm(),shading=&#34;nearest&#34;)
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        ax.set_ylabel(&#34;Channels&#34;)
+        ax.set_xlabel(&#34;CET&#34;)
+        
+        ticks = [i+0.5 for i in range(len(self.channels))]
+        ticklabels = [i+1 for i in range(len(ticks))]
+        ax.set_yticks(ticks,labels=ticklabels)
+        ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
+        ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
+        if kwargs[&#34;togglecbar&#34;]:
+            plt.colorbar(im,ax=ax,label=&#34;Fluorescence Index&#34;,pad=kwargs[&#34;pad&#34;])
+            
+            
+    def returndata(self):
+        &#34;&#34;&#34;
+        Returns a tuple containing all data in a standardized form. Important for communication with DroneWrapper objs.
+
+        Returns
+        -------
+        op : dict {str : np.array}
+            This dict contains all data in the form of np.arrays indexed by their name.
+        op_details : dict {str : [str,str]}
+            This dict contains a description and a unit for all the data saved in op.
+
+        &#34;&#34;&#34;        
+        op = {}
+        op_details = {}
+        op_t = np.array([t.replace(microsecond=0) for t in self.t])
+        for i,ch in enumerate(self.channels):
+            name = f&#34;ch{i+1}&#34;
+            op[name] = ch
+        op[&#34;meanchannel&#34;] = np.mean(self.channels,axis=0)
+        for key in op:
+            if key[-1] != &#34;l&#34;:
+                op_details[key] = [f&#34;Channel {key[2:]}&#34;,&#34;Fluorescence Index&#34;]
+            else:
+                op_details[key] = [&#34;Mean Channel&#34;,&#34;Fluorescence Index&#34;]
+        op[&#34;t&#34;] = op_t
+        
+        return op,op_details
+        
+    #housekeeping funcs    
+    def hk_kwargs(self,kwargs,key,default):
+        &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
+
+        op = kwargs[key] if key in kwargs else default
+        if type(op) == str:
+            if op ==&#34;null&#34;:
+                print(&#34;WARNING: Loaded file seems to have been produced either from another object than NewFData or another version of NewFData. Some functions may not be available.&#34;)
+        setattr(self,key,op)
+        
+        
+    def hk_func_kwargs(self,kwargs,key,default):
+        &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
+
+        op = kwargs[key] if key in kwargs else default
+        return op
+        
+        
+    def hk_replacezeros(self,arr):
+        &#34;&#34;&#34;replaces zeros for a logarithmic scale&#34;&#34;&#34;
+
+        array = deepcopy(arr)
+        
+        smallest = 10000
+        for row in array:
+            for element in row:
+                if element &lt; smallest and element &gt; 0:
+                    smallest = element
+        for i in range(len(array)):
+            for j in range(len(array[i])):
+                if array[i][j] == 0:
+                    array[i][j] += smallest
+                    
+        return array
+    
+    
+    def hk_errorhandling(self,kwargs,legallist,funcname):
+        &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
+
+        for key in kwargs:
+            if key not in legallist:
+                raise IllegalArgument(key,funcname,legallist)
+    
+    
+    @staticmethod
+    @njit(float64[:,:](float64[:],float64[:,:],float64[:],float64[:],float64[:,:]))
+    def hk_process_data(tt,rc,bg,rt,channels):
+        &#34;&#34;&#34;Numba compiled method to calculate fluorescence indices&#34;&#34;&#34;
+
+        for t in prange(len(tt)):
+            for channel in prange(len(rc)):
+                for val in prange(len(rc[channel])):
+                    if rc[channel][val] &gt; bg[channel] and rt[val] == tt[t]:
+                        channels[channel][t] += 1
+             
+        return channels</code></pre>
+</details>
+<div class="desc"><p>inits NewFData obj</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>file</code></strong> :&ensp;<code>str</code></dt>
+<dd>Either the path to a FSpec-produced .csv file or a preprocessed .fspec file.</dd>
+<dt><strong><code>bg_file</code></strong> :&ensp;<code>str</code></dt>
+<dd>Either the path to a FSpec-produced .csv file or a preprocessed .fspec file. Can be left if a preprocessed .fspec file is passed as file.</dd>
+<dt><strong><code>sigma</code></strong> :&ensp;<code>float</code> or <code>int</code>, optional</dt>
+<dd>Will be used as sigma for data processing. The default is 1.</dd>
+<dt><strong><code>measurement_frequency</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Measurement Frequency in Hz which is used to calculate the fluorescence index. The default is None.</dd>
+<dt><strong><code>start</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>String in the form 'hh:mm:ss'. If start is given, all data acquired before this timestamp will be ignored.</dd>
+<dt><strong><code>end</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>String in the form 'hh:mm:ss'. If end is given, all data acquired after this timestamp will be ignored.</dd>
+<dt><strong><code>jit</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True the data processing is done using the just in time compiler numba. The default is True.</dd>
+<dt><strong><code>bg_start</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>String in the form 'hh:mm:ss'. If bg_start is given, all data acquired befor this timestamp will be ignored for the background. Only works if a .csv file is passed as bg_file.</dd>
+<dt><strong><code>bg_end</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>String in the form 'hh:mm:ss'. If bg_end is given, all data acquired after this timestamp will be ignored for the background. Only works if a .csv file is passed as bg_file.</dd>
+<dt><strong><code>layout</code></strong> :&ensp;<code>list</code> of <code>int with len 2</code></dt>
+<dd>Decides which columns of the .csv files should be used for the channels.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>sigma</code></strong> :&ensp;<code>int</code> or <code>float</code></dt>
+<dd>Sigma wich was used for data processing</dd>
+<dt><strong><code>measurement_frequency</code></strong> :&ensp;<code>int</code></dt>
+<dd>Measurement Frequency in Hz which has been used for data processing</dd>
+<dt><strong><code>bg</code></strong> :&ensp;<code>np.array</code> of <code>float with len 16</code></dt>
+<dd>Contains the mean+std*sigma threshhold for each channel</dd>
+<dt><strong><code>rawtime</code></strong> :&ensp;<code>np.array</code> of <code>dt.datetime obj</code></dt>
+<dd>Contains the timestamp of each dataset recorded (of each row of .csv file)</dd>
+<dt><strong><code>rawchannels</code></strong> :&ensp;<code>2D np.array</code> of <code>int</code></dt>
+<dd>Contains the raw fluorescence intesities of each channel for all recorded datasets</dd>
+<dt><strong><code>t</code></strong> :&ensp;<code>np.array</code> of <code>dt.datetime obj</code></dt>
+<dd>Contains the time for each datapoint of the processed data</dd>
+<dt><strong><code>channels</code></strong> :&ensp;<code>2D np.array</code> of <code>float</code></dt>
+<dd>Contains the porcessed fluorescence index values of each channel</dd>
+</dl></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="agg_dim.fluoreszenz.NewFData.hk_process_data"><code class="name flex">
+<span>def <span class="ident">hk_process_data</span></span>(<span>tt, rc, bg, rt, channels)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+@njit(float64[:,:](float64[:],float64[:,:],float64[:],float64[:],float64[:,:]))
+def hk_process_data(tt,rc,bg,rt,channels):
+    &#34;&#34;&#34;Numba compiled method to calculate fluorescence indices&#34;&#34;&#34;
+
+    for t in prange(len(tt)):
+        for channel in prange(len(rc)):
+            for val in prange(len(rc[channel])):
+                if rc[channel][val] &gt; bg[channel] and rt[val] == tt[t]:
+                    channels[channel][t] += 1
+         
+    return channels</code></pre>
+</details>
+<div class="desc"><p>Numba compiled method to calculate fluorescence indices</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="agg_dim.fluoreszenz.NewFData.heatmap"><code class="name flex">
+<span>def <span class="ident">heatmap</span></span>(<span>self, ax, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def heatmap(self,ax,**kwargs):
+    &#34;&#34;&#34;
+    Draws a fluorescence index heatmap over time on a given mpl axis
+
+    Parameters
+    ----------
+    ax : Axes obj of mpl.axes module
+        The heatmap will be drawn on this axis.
+    smooth : bool, optional
+        If True, the heatmap will be gouraud smoothed. The default is True.
+    cmap : str, optional
+        Changes the colormap. The default is &#39;RdYlBu_r&#39;.
+    pad : float, optional
+        Changes the padding between heatmap and colorbar. The default is 0.01.
+    togglecbar : bool, optional
+        If True the colorbar will be shown. the default is True
+    xlims : list of str with len = 2
+        Takes timestamps in the format &#39;hh:mm:ss&#39;. If xlims are given, only data between the two timestamps is used.
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    #import kwargs
+    defaults = {&#34;smooth&#34; : True,
+               &#34;cmap&#34; : &#34;RdYlBu_r&#34;,
+               &#34;pad&#34; : 0.01,
+               &#34;togglecbar&#34; : True,
+               &#34;xlims&#34; : &#34;none&#34;}
+    for key,default in zip(defaults.keys(),defaults.values()):
+        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+    self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.heatmap()&#34;)
+    
+    #prepare data
+    xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+    heatmap_data = deepcopy(self.channels)
+    heatmap_data = self.hk_replacezeros(heatmap_data)
+    if isinstance(kwargs[&#34;xlims&#34;],list):
+        ax.set_xlim([dt.datetime.strptime(element, &#34;%H:%M:%S&#34;) for element in kwargs[&#34;xlims&#34;]])
+    
+    #draw
+    if kwargs[&#34;smooth&#34;]:
+        im = ax.pcolormesh(xx,yy,heatmap_data,cmap=kwargs[&#34;cmap&#34;],norm=LogNorm(),shading=&#34;gouraud&#34;)
+    else:
+        im = ax.pcolormesh(xx,yy,heatmap_data,cmap=kwargs[&#34;cmap&#34;],norm=LogNorm(),shading=&#34;nearest&#34;)
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    ax.set_ylabel(&#34;Channels&#34;)
+    ax.set_xlabel(&#34;CET&#34;)
+    
+    ticks = [i+0.5 for i in range(len(self.channels))]
+    ticklabels = [i+1 for i in range(len(ticks))]
+    ax.set_yticks(ticks,labels=ticklabels)
+    ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
+    ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
+    if kwargs[&#34;togglecbar&#34;]:
+        plt.colorbar(im,ax=ax,label=&#34;Fluorescence Index&#34;,pad=kwargs[&#34;pad&#34;])</code></pre>
+</details>
+<div class="desc"><p>Draws a fluorescence index heatmap over time on a given mpl axis</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
+<dd>The heatmap will be drawn on this axis.</dd>
+<dt><strong><code>smooth</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, the heatmap will be gouraud smoothed. The default is True.</dd>
+<dt><strong><code>cmap</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Changes the colormap. The default is 'RdYlBu_r'.</dd>
+<dt><strong><code>pad</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Changes the padding between heatmap and colorbar. The default is 0.01.</dd>
+<dt><strong><code>togglecbar</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True the colorbar will be shown. the default is True</dd>
+<dt><strong><code>xlims</code></strong> :&ensp;<code>list</code> of <code>str with len = 2</code></dt>
+<dd>Takes timestamps in the format 'hh:mm:ss'. If xlims are given, only data between the two timestamps is used.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.NewFData.hk_errorhandling"><code class="name flex">
+<span>def <span class="ident">hk_errorhandling</span></span>(<span>self, kwargs, legallist, funcname)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
+    &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
+
+    for key in kwargs:
+        if key not in legallist:
+            raise IllegalArgument(key,funcname,legallist)</code></pre>
+</details>
+<div class="desc"><p>Checks if all passed kwargs are legal</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.NewFData.hk_func_kwargs"><code class="name flex">
+<span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
+    &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
+
+    op = kwargs[key] if key in kwargs else default
+    return op</code></pre>
+</details>
+<div class="desc"><p>Gives kwargs a default value if they are not passed</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.NewFData.hk_kwargs"><code class="name flex">
+<span>def <span class="ident">hk_kwargs</span></span>(<span>self, kwargs, key, default)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_kwargs(self,kwargs,key,default):
+    &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
+
+    op = kwargs[key] if key in kwargs else default
+    if type(op) == str:
+        if op ==&#34;null&#34;:
+            print(&#34;WARNING: Loaded file seems to have been produced either from another object than NewFData or another version of NewFData. Some functions may not be available.&#34;)
+    setattr(self,key,op)</code></pre>
+</details>
+<div class="desc"><p>Turns kwargs into attributes</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.NewFData.hk_replacezeros"><code class="name flex">
+<span>def <span class="ident">hk_replacezeros</span></span>(<span>self, arr)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_replacezeros(self,arr):
+    &#34;&#34;&#34;replaces zeros for a logarithmic scale&#34;&#34;&#34;
+
+    array = deepcopy(arr)
+    
+    smallest = 10000
+    for row in array:
+        for element in row:
+            if element &lt; smallest and element &gt; 0:
+                smallest = element
+    for i in range(len(array)):
+        for j in range(len(array[i])):
+            if array[i][j] == 0:
+                array[i][j] += smallest
+                
+    return array</code></pre>
+</details>
+<div class="desc"><p>replaces zeros for a logarithmic scale</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.NewFData.meanplot"><code class="name flex">
+<span>def <span class="ident">meanplot</span></span>(<span>self, ax, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def meanplot(self,ax,**kwargs):
+    &#34;&#34;&#34;
+    Draws a plot of the mean fluorescence index over time on a given mpl axis
+
+    Parameters
+    ----------
+    ax : Axes obj of mpl.axes module
+        The plot will be drawn on this axis.
+    min_ch : int, optional
+        Lower Channels than this will be ignored when the mean is calculated. The default is 1.
+    max_ch : int, optional
+        Higher Channels than this will be ignored when the mean is calculated. The default is 15.
+    quakes : list of str, optional
+        Takes times in the form of &#34;HH:MM:SS&#34; and draws vertical lines on the plot at these times. The default is []
+    quakeslabel : str, optional
+        If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is &#34;no label&#34;
+    quakecolor : str, optional
+        Determines which color the quake-lines should have. The default is &#34;tab:purple&#34;
+    color : str, optional
+        Changes the color of the plot. The default is &#34;tab:green&#34;
+    rolling : int, optional
+        If a positive int is given, the rolling average of &#39;rolling&#39; values is plotted. The default is 0.
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    #import kwargs
+    defaults = {&#34;min_ch&#34; : 1,
+                &#34;max_ch&#34; : 15,
+                &#34;quakes&#34; : [],
+                &#34;quakeslabel&#34; : &#34;no label&#34;,
+                &#34;quakecolor&#34; : &#34;tab:purple&#34;,
+                &#34;color&#34; : &#34;tab:green&#34;,
+                &#34;rolling&#34; : 0}
+    for key,default in zip(defaults.keys(),defaults.values()):
+        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+    self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.meanplot()&#34;)
+    
+    kwargs[&#34;min_ch&#34;] -= 1
+    #ch_len = len(list(range(kwargs[&#34;min_ch&#34;],kwargs[&#34;max_ch&#34;])))
+    
+    meanchannel = np.mean(self.channels[kwargs[&#34;min_ch&#34;]:kwargs[&#34;max_ch&#34;]],axis=0)
+    if kwargs[&#34;rolling&#34;] &gt; 0 and isinstance(kwargs[&#34;rolling&#34;],int):
+        meanchannel = np.convolve(meanchannel, np.ones(kwargs[&#34;rolling&#34;]),mode=&#34;same&#34;) / kwargs[&#34;rolling&#34;]
+            
+    #draw plot
+    label = f&#34;mean of channels {kwargs[&#39;min_ch&#39;]+1} - {kwargs[&#39;max_ch&#39;]}&#34;
+    ax.plot(self.t,meanchannel,label=label,color=kwargs[&#34;color&#34;])
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    ax.set_ylabel(f&#34;Fluorescence Index ({label})&#34;)
+    if len(kwargs[&#34;quakes&#34;]) != 0:
+        ax.vlines(x=[dt.datetime.strptime(element, &#34;%H:%M:%S&#34;)for element in kwargs[&#34;quakes&#34;]],ymin=min(meanchannel),ymax=max(meanchannel),color=kwargs[&#34;quakecolor&#34;],ls=&#34;dashed&#34;,label=kwargs[&#34;quakeslabel&#34;])
+    ax.tick_params(axis=&#39;y&#39;, colors=kwargs[&#34;color&#34;])
+    ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])</code></pre>
+</details>
+<div class="desc"><p>Draws a plot of the mean fluorescence index over time on a given mpl axis</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
+<dd>The plot will be drawn on this axis.</dd>
+<dt><strong><code>min_ch</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Lower Channels than this will be ignored when the mean is calculated. The default is 1.</dd>
+<dt><strong><code>max_ch</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Higher Channels than this will be ignored when the mean is calculated. The default is 15.</dd>
+<dt><strong><code>quakes</code></strong> :&ensp;<code>list</code> of <code>str</code>, optional</dt>
+<dd>Takes times in the form of "HH:MM:SS" and draws vertical lines on the plot at these times. The default is []</dd>
+<dt><strong><code>quakeslabel</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is "no label"</dd>
+<dt><strong><code>quakecolor</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Determines which color the quake-lines should have. The default is "tab:purple"</dd>
+<dt><strong><code>color</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Changes the color of the plot. The default is "tab:green"</dd>
+<dt><strong><code>rolling</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>If a positive int is given, the rolling average of 'rolling' values is plotted. The default is 0.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.NewFData.plot"><code class="name flex">
+<span>def <span class="ident">plot</span></span>(<span>self, channelno, ax, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot(self,channelno,ax,**kwargs):
+    &#34;&#34;&#34;
+    Draws a plot of the given channelno vs time on an existing mpl axis.
+
+    Parameters
+    ----------
+    channelno : int
+        Decides which Channel should be plotted.
+    ax : Axes obj of mpl.axes module
+        The plot will be drawn on this axis.
+    quakes : list of str, optional
+        Takes times in the form of &#34;HH:MM:SS&#34; and draws vertical lines on the plot at these times. The default is []
+    quakeslabel : str, optional
+        If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is &#34;no label&#34;
+    quakecolor : str, optional
+        Determines which color the quake-lines should have. The default is &#34;tab:purple&#34;
+    color : str, optional
+        Changes the color of the plot. The default is &#34;tab:green&#34;
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    #import kwargs   
+    defaults = {&#34;quakes&#34; : [],
+                &#34;quakeslabel&#34; : &#34;no label&#34;,
+                &#34;quakecolor&#34; : &#34;tab:purple&#34;,
+                &#34;color&#34; : &#34;tab:green&#34;}
+    for key,default in zip(defaults.keys(),defaults.values()):
+        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+    self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.plot()&#34;)
+    
+    
+    channelname = &#34;ch&#34; + str(channelno)
+    channelno -= 1
+    
+    #draw plot
+    ax.plot(self.t,self.channels[channelno],label=channelname,color=kwargs[&#34;color&#34;])
+    ax.set_ylabel(&#34;fluorescence index (channel &#34; + str(channelno+1) + &#34;)&#34;)
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    if len(kwargs[&#34;quakes&#34;]) != 0:
+        ax.vlines(x=[dt.datetime.strptime(element, &#34;%H:%M:%S&#34;)for element in kwargs[&#34;quakes&#34;]],ymin=min(self.channels[channelno]),ymax=max(self.channels[channelno]),color=kwargs[&#34;quakecolor&#34;],ls=&#34;dashed&#34;,label=kwargs[&#34;quakeslabel&#34;])
+    ax.tick_params(axis=&#39;y&#39;, colors=kwargs[&#34;color&#34;])
+    ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])</code></pre>
+</details>
+<div class="desc"><p>Draws a plot of the given channelno vs time on an existing mpl axis.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>channelno</code></strong> :&ensp;<code>int</code></dt>
+<dd>Decides which Channel should be plotted.</dd>
+<dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
+<dd>The plot will be drawn on this axis.</dd>
+<dt><strong><code>quakes</code></strong> :&ensp;<code>list</code> of <code>str</code>, optional</dt>
+<dd>Takes times in the form of "HH:MM:SS" and draws vertical lines on the plot at these times. The default is []</dd>
+<dt><strong><code>quakeslabel</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is "no label"</dd>
+<dt><strong><code>quakecolor</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Determines which color the quake-lines should have. The default is "tab:purple"</dd>
+<dt><strong><code>color</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Changes the color of the plot. The default is "tab:green"</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.NewFData.quickheatmap"><code class="name flex">
+<span>def <span class="ident">quickheatmap</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def quickheatmap(self):
+    &#34;&#34;&#34;
+    Draws a fluorescence index heatmap over time
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+    heatmap_data = deepcopy(self.channels)
+    heatmap_data = self.hk_replacezeros(heatmap_data)
+    
+    _,ax = plt.subplots()
+    
+    im = ax.pcolormesh(xx,yy,heatmap_data,cmap=&#34;RdYlBu_r&#34;,norm=LogNorm(),shading=&#34;nearest&#34;)
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    ax.set_ylabel(&#34;Channels&#34;)
+    ax.set_xlabel(&#34;CET&#34;)
+    
+    ticks = [i+0.5 for i in range(len(self.channels))]
+    ticklabels = [i+1 for i in range(len(ticks))]
+    ax.set_yticks(ticks,labels=ticklabels)
+    ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
+    ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
+    
+    plt.colorbar(im,ax=ax,label=&#34;Fluorescence Index&#34;)
+    
+    plt.show()</code></pre>
+</details>
+<div class="desc"><p>Draws a fluorescence index heatmap over time</p>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.NewFData.quickplot"><code class="name flex">
+<span>def <span class="ident">quickplot</span></span>(<span>self, channelno)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def quickplot(self,channelno):
+    &#34;&#34;&#34;
+    Draws a plot of the given channel
+
+    Parameters
+    ----------
+    channelno : int
+        Decides which Channel should be plotted.
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    if channelno &gt; len(self.channels):
+        raise ValueError(f&#34;The channel {channelno} doesnt exist. Try a channelno 1 &lt;= channelno &lt;= {len(self.channels)}&#34;)
+    
+    channelname = &#34;ch&#34; + str(channelno)
+    channelno -= 1
+    
+    #draw plot        
+    _,ax = plt.subplots()
+    ax.plot(self.t,self.channels[channelno],label=channelname)
+    ax.set_xlabel(&#34;CET&#34;)
+    ax.set_ylabel(&#34;Fluorescence Index&#34;)
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    plt.legend()
+    plt.show()</code></pre>
+</details>
+<div class="desc"><p>Draws a plot of the given channel</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>channelno</code></strong> :&ensp;<code>int</code></dt>
+<dd>Decides which Channel should be plotted.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.NewFData.returndata"><code class="name flex">
+<span>def <span class="ident">returndata</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def returndata(self):
+    &#34;&#34;&#34;
+    Returns a tuple containing all data in a standardized form. Important for communication with DroneWrapper objs.
+
+    Returns
+    -------
+    op : dict {str : np.array}
+        This dict contains all data in the form of np.arrays indexed by their name.
+    op_details : dict {str : [str,str]}
+        This dict contains a description and a unit for all the data saved in op.
+
+    &#34;&#34;&#34;        
+    op = {}
+    op_details = {}
+    op_t = np.array([t.replace(microsecond=0) for t in self.t])
+    for i,ch in enumerate(self.channels):
+        name = f&#34;ch{i+1}&#34;
+        op[name] = ch
+    op[&#34;meanchannel&#34;] = np.mean(self.channels,axis=0)
+    for key in op:
+        if key[-1] != &#34;l&#34;:
+            op_details[key] = [f&#34;Channel {key[2:]}&#34;,&#34;Fluorescence Index&#34;]
+        else:
+            op_details[key] = [&#34;Mean Channel&#34;,&#34;Fluorescence Index&#34;]
+    op[&#34;t&#34;] = op_t
+    
+    return op,op_details</code></pre>
+</details>
+<div class="desc"><p>Returns a tuple containing all data in a standardized form. Important for communication with DroneWrapper objs.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>op</code></strong> :&ensp;<code>dict {str : np.array}</code></dt>
+<dd>This dict contains all data in the form of np.arrays indexed by their name.</dd>
+<dt><strong><code>op_details</code></strong> :&ensp;<code>dict {str : [str,str]}</code></dt>
+<dd>This dict contains a description and a unit for all the data saved in op.</dd>
+</dl></div>
+</dd>
+<dt id="agg_dim.fluoreszenz.NewFData.save"><code class="name flex">
+<span>def <span class="ident">save</span></span>(<span>self, filename, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save(self,filename,**kwargs):
+    &#34;&#34;&#34;
+    Saves the obj in a preprocessed .fspec file
+
+    Parameters
+    ----------
+    filename : str
+        Determines path and filename where the obj will be saved to.
+    start : str, optional
+        String of the form &#39;hh:mm:ss&#39;. If start is given all data before it wont be saved.
+    end : str, optional
+        String of the form &#39;hh:mm:ss&#39;. If end is given all data after it wont be saved.
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    #kwargs
+    defaults = {&#34;start&#34; : &#34;none&#34;,
+                &#34;end&#34; : &#34;none&#34;}
+    for key,default in zip(defaults.keys(),defaults.values()):
+        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+    self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.save()&#34;)
+
+    
+    #crop
+    t_start = 0
+    t_end = len(self.t)
+    if kwargs[&#34;start&#34;] != &#34;none&#34;:
+        tcounter = -1
+        for element in self.t:
+            tcounter += 1
+            if str(element)[11:19] == kwargs[&#34;start&#34;]:
+                t_start = tcounter
+        
+    if kwargs[&#34;end&#34;] != &#34;none&#34;:
+        tcounter = -1
+        for element in self.t:
+            tcounter += 1
+            if str(element)[11:19] == kwargs[&#34;end&#34;]:
+                t_end = tcounter
+                
+    raw_start = 0
+    raw_end = len(self.rawtime)
+    if kwargs[&#34;start&#34;] != &#34;none&#34;:
+        tcounter = -1
+        for element in self.rawtime:
+            tcounter += 1
+            if str(element)[11:19] == kwargs[&#34;start&#34;]:
+                raw_start = tcounter
+        
+    if kwargs[&#34;end&#34;] != &#34;none&#34;:
+        tcounter = -1
+        for element in self.rawtime:
+            tcounter += 1
+            if str(element)[11:19] == kwargs[&#34;end&#34;]:
+                raw_end = tcounter
+    
+    save_t = self.t[t_start:t_end]
+    save_channels = [channel[t_start:t_end] for channel in self.channels]
+    
+    #create background params
+    bg_means = np.array([np.mean(channel) for channel in self.rawchannels[raw_start:raw_end]])
+    bg_stds = np.array([np.std(channel) for channel in self.rawchannels[raw_start:raw_end]])
+    
+    op = {&#34;sigma&#34; : self.sigma,
+          &#34;measurement_frequency&#34; : self.measurement_frequency,
+          &#34;bg&#34; : self.bg,
+          &#34;rawtime&#34; : self.rawtime,
+          &#34;rawchannels&#34; : self.rawchannels,
+          &#34;t&#34; : save_t,
+          &#34;channels&#34; : save_channels,
+          &#34;bg_means&#34; : bg_means,
+          &#34;bg_stds&#34; : bg_stds}
+    
+    if filename[-6:] != &#34;.fspec&#34;:
+        filename += &#34;.fspec&#34;
+    
+    with open(filename,&#34;wb&#34;) as writefile:
+        pickle.dump(op,writefile,4)</code></pre>
+</details>
+<div class="desc"><p>Saves the obj in a preprocessed .fspec file</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code></dt>
+<dd>Determines path and filename where the obj will be saved to.</dd>
+<dt><strong><code>start</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>String of the form 'hh:mm:ss'. If start is given all data before it wont be saved.</dd>
+<dt><strong><code>end</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>String of the form 'hh:mm:ss'. If end is given all data after it wont be saved.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="agg_dim" href="index.html">agg_dim</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="agg_dim.fluoreszenz.FData" href="#agg_dim.fluoreszenz.FData">FData</a></code></h4>
+<ul class="two-column">
+<li><code><a title="agg_dim.fluoreszenz.FData.crop" href="#agg_dim.fluoreszenz.FData.crop">crop</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.FData.externalbg" href="#agg_dim.fluoreszenz.FData.externalbg">externalbg</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.FData.heatmap" href="#agg_dim.fluoreszenz.FData.heatmap">heatmap</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.FData.hk_replacezeros" href="#agg_dim.fluoreszenz.FData.hk_replacezeros">hk_replacezeros</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.FData.internalbg" href="#agg_dim.fluoreszenz.FData.internalbg">internalbg</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.FData.plot" href="#agg_dim.fluoreszenz.FData.plot">plot</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.FData.quickheatmap" href="#agg_dim.fluoreszenz.FData.quickheatmap">quickheatmap</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.FData.quickplot" href="#agg_dim.fluoreszenz.FData.quickplot">quickplot</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="agg_dim.fluoreszenz.NewFData" href="#agg_dim.fluoreszenz.NewFData">NewFData</a></code></h4>
+<ul class="two-column">
+<li><code><a title="agg_dim.fluoreszenz.NewFData.heatmap" href="#agg_dim.fluoreszenz.NewFData.heatmap">heatmap</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.NewFData.hk_errorhandling" href="#agg_dim.fluoreszenz.NewFData.hk_errorhandling">hk_errorhandling</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.NewFData.hk_func_kwargs" href="#agg_dim.fluoreszenz.NewFData.hk_func_kwargs">hk_func_kwargs</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.NewFData.hk_kwargs" href="#agg_dim.fluoreszenz.NewFData.hk_kwargs">hk_kwargs</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.NewFData.hk_process_data" href="#agg_dim.fluoreszenz.NewFData.hk_process_data">hk_process_data</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.NewFData.hk_replacezeros" href="#agg_dim.fluoreszenz.NewFData.hk_replacezeros">hk_replacezeros</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.NewFData.meanplot" href="#agg_dim.fluoreszenz.NewFData.meanplot">meanplot</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.NewFData.plot" href="#agg_dim.fluoreszenz.NewFData.plot">plot</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.NewFData.quickheatmap" href="#agg_dim.fluoreszenz.NewFData.quickheatmap">quickheatmap</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.NewFData.quickplot" href="#agg_dim.fluoreszenz.NewFData.quickplot">quickplot</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.NewFData.returndata" href="#agg_dim.fluoreszenz.NewFData.returndata">returndata</a></code></li>
+<li><code><a title="agg_dim.fluoreszenz.NewFData.save" href="#agg_dim.fluoreszenz.NewFData.save">save</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

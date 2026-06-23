@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>agg_dim.weather API documentation</title>
+<meta name="description" content="Created on Mon Sep
+8 15:02:42 2025 …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>agg_dim.weather</code></h1>
+</header>
+<section id="section-intro">
+<p>Created on Mon Sep
+8 15:02:42 2025</p>
+<p>@author: mrupp</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="agg_dim.weather.WeatherData"><code class="flex name class">
+<span>class <span class="ident">WeatherData</span></span>
+<span>(</span><span>file)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class WeatherData:
+    
+    def __init__(self,file):
+        &#34;&#34;&#34;
+        Object to read data from the Weatherstation
+
+        Parameters
+        ----------
+        file : str
+            takes a csv-file created by the weatherstation
+
+        Attributes
+        ----------
+        data : {str : 1D numpy array}
+            contains all data in the form of a dictionary
+        details : {str : [str, str]}
+            contains a description and the unit to each data array
+
+        &#34;&#34;&#34;
+        
+        if file.split(&#34;.&#34;)[1].lower() != &#34;csv&#34;:
+            raise IllegalFileFormat(file.split(&#34;.&#34;)[1], 
+                                    &#34;csv&#34;,
+                                    &#34;WeatherData argument&#34;)
+        with open(file) as f:
+            data = list(csv.reader(f,delimiter=&#34;,&#34;))
+            
+        datarange = range(1,len(data))
+        def read_date(ip_str):
+            return dt.datetime.strptime(ip_str,&#34;%Y/%m/%d %H:%M&#34;)
+        def float2(ip_str):
+            try:
+                return float(ip_str)
+            except:
+                return np.nan
+        
+        self.data = {
+            &#34;t&#34; : np.array([read_date(data[i][0]) for i in datarange]),
+            &#34;indoortemp&#34; : np.array([float2(data[i][1]) for i in datarange]),
+            &#34;indoorhum&#34; : np.array([float2(data[i][2]) for i in datarange]),
+            &#34;outdoortemp&#34; : np.array([float2(data[i][3]) for i in datarange]),
+            &#34;outdoorhum&#34; : np.array([float2(data[i][4]) for i in datarange]),
+            &#34;dewpoint&#34; : np.array([float2(data[i][5]) for i in datarange]),
+            &#34;felttemp&#34; : np.array([float2(data[i][6]) for i in datarange]),
+            &#34;wind&#34; : np.array([float2(data[i][7]) for i in datarange]),
+            &#34;gust&#34; : np.array([float2(data[i][8]) for i in datarange]),
+            &#34;winddir&#34; : np.array([float2(data[i][9]) for i in datarange]),
+            &#34;abspress&#34; : np.array([float2(data[i][10]) for i in datarange]),
+            &#34;relpress&#34; : np.array([float2(data[i][11]) for i in datarange]),
+            &#34;solarrad&#34; : np.array([float2(data[i][12]) for i in datarange]),
+            &#34;uvi&#34; : np.array([float2(data[i][13]) for i in datarange]),
+            &#34;rain&#34; : np.array([float2(data[i][14]) for i in datarange])
+            }
+        self.details = {
+            &#34;indoortemp&#34; : [&#34;temperature (indoors)&#34;,&#34;°C&#34;],
+            &#34;indoorhum&#34; : [&#34;relative humidity (indoors)&#34;, &#34;%&#34;],
+            &#34;outdoortemp&#34; : [&#34;temperature (outdoors)&#34;,&#34;°C&#34;],
+            &#34;outdoorhum&#34; : [&#34;relative humidity (outdoors)&#34;, &#34;%&#34;],
+            &#34;dewpoint&#34; : [&#34;dewpoint&#34;,&#34;°C&#34;],
+            &#34;felttemp&#34; : [&#34;felt temperature&#34;,&#34;°C&#34;],
+            &#34;wind&#34; : [&#34;windspeed&#34;,&#34;m/s&#34;],
+            &#34;gust&#34; : [&#34;windspeed (gust)&#34;, &#34;m/s&#34;],
+            &#34;winddir&#34; : [&#34;wind direction&#34;,&#34;°&#34;],
+            &#34;abspress&#34; : [&#34;absolute ambient pressure&#34;,&#34;hPa&#34;],
+            &#34;relpress&#34; : [&#34;relative ambient pressure&#34;,&#34;hPa&#34;],
+            &#34;solarrad&#34; : [&#34;solar radiation&#34;,&#34;W/m${}^2$&#34;],
+            &#34;uvi&#34; : [&#34;UV Index&#34;, &#34;A.U.&#34;],
+            &#34;rain&#34; : [&#34;hourly precipitation&#34;,&#34;mm&#34;]
+            }
+        
+        
+    def plot(self,ax,y,**kwargs):
+        &#34;&#34;&#34;
+        
+
+        Parameters
+        ----------
+        ax : mpl-axis
+            takes a mpl-axis on which the data will be plotted.
+        y : str
+            decides which data should be plotted.
+        day : str, optional
+            takes a day in the format ddmmyyyy. If a day is given only data 
+            acquired on that day will be plotted
+        setday : str, optional
+            takes a day in the format ddmmyyyy. If a setday is given all data 
+            will be changed to this day to make it easier to plot against 
+            other data
+        start : str, optional
+            takes a timestamp in the format HHMMSS. if a start is given only 
+            data acquired after that timestamp will be plotted
+        end : str, optional
+            takes a timestamp in the format HHMMSS. if an end is given only 
+            data acquired before that timestamp will be plotted
+        secondary : bool, optional
+            if True the plot will be drawn on the right y-axis. 
+            The default is False.
+        color : str, optional
+            decides the color of the plot. The default is &#34;tab:blue&#34;.
+        plotlabel : str, optional
+            a label that is used for the plot if a legend is drawn. 
+            The default is &#34;no label&#34;.
+        ylabel : str, optional
+            a label that is used for the y-axis, if none is given it will 
+            be &#34;value in unit&#34;, where value and unit are retrieved from 
+            the given y
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        defaults = {
+            &#34;day&#34; : None,
+            &#34;setday&#34; : None,
+            &#34;start&#34; : None,
+            &#34;end&#34; : None,
+            &#34;secondary&#34; : False,
+            &#34;color&#34; : &#34;tab:blue&#34;,
+            &#34;plotlabel&#34; : &#34;no label&#34;,
+            &#34;ylabel&#34; : None
+            }
+        
+        for key,default in zip(defaults.keys(),defaults.values()):
+            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+        self.hk_errorhandling(kwargs, defaults.keys(), &#34;WeatherData.plot()&#34;)
+        
+        mask = np.full(len(self.data[&#34;t&#34;]),True)
+        if isinstance(kwargs[&#34;day&#34;],str):
+            day = kwargs[&#34;day&#34;]
+            day = &#34;.&#34;.join([day[:2],day[2:4],day[4:]])
+            correctdate = dt.datetime.strptime(day, &#34;%d.%m.%Y&#34;).date()
+            for i in range(len(self.data[&#34;t&#34;])):
+                if self.data[&#34;t&#34;][i].date() != correctdate:
+                    mask[i] = False
+        if isinstance(kwargs[&#34;start&#34;],str):
+            starthour = int(kwargs[&#34;start&#34;][:2])
+            startminute = int(kwargs[&#34;start&#34;][2:4])
+            startsecond = int(kwargs[&#34;start&#34;][4:])
+            for i in range(len(self.data[&#34;t&#34;])):
+                if self.data[&#34;t&#34;][i].hour &lt; starthour:
+                    mask[i] = False
+                elif (self.data[&#34;t&#34;][i].hour == starthour and 
+                      self.data[&#34;t&#34;][i].minute &lt; startminute):
+                    mask[i] = False
+                elif (self.data[&#34;t&#34;][i].hour == starthour and 
+                      self.data[&#34;t&#34;][i].minute == startminute and 
+                      self.data[&#34;t&#34;][i].second &lt; startsecond):
+                    mask[i] = False
+        if isinstance(kwargs[&#34;end&#34;],str):
+            endhour = int(kwargs[&#34;end&#34;][:2])
+            endminute = int(kwargs[&#34;end&#34;][2:4])
+            endsecond = int(kwargs[&#34;end&#34;][4:])
+            for i in range(len(self.data[&#34;t&#34;])):
+                if self.data[&#34;t&#34;][i].hour &gt; endhour:
+                    mask[i] = False
+                elif (self.data[&#34;t&#34;][i].hour == endhour and 
+                      self.data[&#34;t&#34;][i].minute &gt; endminute):
+                    mask[i] = False
+                elif (self.data[&#34;t&#34;][i].hour == endhour and 
+                      self.data[&#34;t&#34;][i].minute == endminute and 
+                      self.data[&#34;t&#34;][i].second &gt; endsecond):
+                    mask[i] = False
+                    
+        xx = self.data[&#34;t&#34;][mask]
+        yy = self.data[y][mask]
+        
+        if isinstance(kwargs[&#34;setday&#34;],str):
+            dday = int(kwargs[&#34;setday&#34;][:2])
+            dmonth = int(kwargs[&#34;setday&#34;][2:4])
+            dyear = int(kwargs[&#34;setday&#34;][4:])
+            xx = np.array([d.replace(day=dday,
+                                     month=dmonth,
+                                     year=dyear) for d in xx])
+            
+        if not isinstance(kwargs[&#34;ylabel&#34;],str):
+            kwargs[&#34;ylabel&#34;] = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
+        
+        ax.plot(xx,yy,label=kwargs[&#34;plotlabel&#34;],color=kwargs[&#34;color&#34;])
+        ax.set_ylabel(kwargs[&#34;ylabel&#34;])
+        ax.set_xlabel(&#34;CET&#34;)
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        ax.tick_params(axis=&#39;y&#39;, colors=kwargs[&#34;color&#34;])
+        ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])
+        if not kwargs[&#34;secondary&#34;]:
+            ax.spines[&#34;left&#34;].set_color(kwargs[&#34;color&#34;])
+        else:
+            ax.spines[&#34;right&#34;].set_color(kwargs[&#34;color&#34;])
+            ax.spines[&#34;left&#34;].set_alpha(0)
+        
+    def returndata(self,secondwise=True):
+        &#34;&#34;&#34;
+        Returns a tuple containing all data in a standardized form. Important 
+        for communication with DroneWrapper or Wrapper objs.
+
+        Returns
+        -------
+        data : dict {str : np.array}
+            This dict contains all data in the form of np.arrays indexed by 
+            their name.
+        details : dict {str : [str,str]}
+            This dict contains a description and a unit for all the 
+            exported data.
+        &#34;&#34;&#34;
+        
+        if not secondwise:
+            return self.data,self.details
+        op_t = [self.data[&#34;t&#34;][0]]
+        ts = op_t[0]
+        indices = [0]
+        while ts &lt; self.data[&#34;t&#34;][-1]:
+            ts = op_t[-1] + dt.timedelta(seconds=1)
+            op_t.append(ts)
+            indices.append(np.where(self.data[&#34;t&#34;]==ts.replace(second=0))[0][0])
+        indices = np.array(indices)
+        op_data = {&#34;t&#34; : np.array(op_t)}
+        
+        for key in self.data.keys():
+            if key == &#34;t&#34;:
+                continue
+            op_data[key] = self.data[key][indices]
+        return op_data,self.details
+        
+        
+    #housekeeping funcs
+    
+    def hk_errorhandling(self,kwargs,legallist,funcname):
+        &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
+
+        for key in kwargs:
+            if key not in legallist:
+                raise IllegalArgument(key,funcname,legallist)
+                
+    def hk_func_kwargs(self,kwargs,key,default):
+        &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
+ 
+        op = kwargs[key] if key in kwargs else default
+        return op</code></pre>
+</details>
+<div class="desc"><p>Object to read data from the Weatherstation</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>file</code></strong> :&ensp;<code>str</code></dt>
+<dd>takes a csv-file created by the weatherstation</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>data</code></strong> :&ensp;<code>{str : 1D numpy array}</code></dt>
+<dd>contains all data in the form of a dictionary</dd>
+<dt><strong><code>details</code></strong> :&ensp;<code>{str : [str, str]}</code></dt>
+<dd>contains a description and the unit to each data array</dd>
+</dl></div>
+<h3>Methods</h3>
+<dl>
+<dt id="agg_dim.weather.WeatherData.hk_errorhandling"><code class="name flex">
+<span>def <span class="ident">hk_errorhandling</span></span>(<span>self, kwargs, legallist, funcname)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
+    &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
+
+    for key in kwargs:
+        if key not in legallist:
+            raise IllegalArgument(key,funcname,legallist)</code></pre>
+</details>
+<div class="desc"><p>Checks if all passed kwargs are legal</p></div>
+</dd>
+<dt id="agg_dim.weather.WeatherData.hk_func_kwargs"><code class="name flex">
+<span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
+    &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
+
+    op = kwargs[key] if key in kwargs else default
+    return op</code></pre>
+</details>
+<div class="desc"><p>Gives kwargs a default value if they are not passed</p></div>
+</dd>
+<dt id="agg_dim.weather.WeatherData.plot"><code class="name flex">
+<span>def <span class="ident">plot</span></span>(<span>self, ax, y, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot(self,ax,y,**kwargs):
+    &#34;&#34;&#34;
+    
+
+    Parameters
+    ----------
+    ax : mpl-axis
+        takes a mpl-axis on which the data will be plotted.
+    y : str
+        decides which data should be plotted.
+    day : str, optional
+        takes a day in the format ddmmyyyy. If a day is given only data 
+        acquired on that day will be plotted
+    setday : str, optional
+        takes a day in the format ddmmyyyy. If a setday is given all data 
+        will be changed to this day to make it easier to plot against 
+        other data
+    start : str, optional
+        takes a timestamp in the format HHMMSS. if a start is given only 
+        data acquired after that timestamp will be plotted
+    end : str, optional
+        takes a timestamp in the format HHMMSS. if an end is given only 
+        data acquired before that timestamp will be plotted
+    secondary : bool, optional
+        if True the plot will be drawn on the right y-axis. 
+        The default is False.
+    color : str, optional
+        decides the color of the plot. The default is &#34;tab:blue&#34;.
+    plotlabel : str, optional
+        a label that is used for the plot if a legend is drawn. 
+        The default is &#34;no label&#34;.
+    ylabel : str, optional
+        a label that is used for the y-axis, if none is given it will 
+        be &#34;value in unit&#34;, where value and unit are retrieved from 
+        the given y
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    defaults = {
+        &#34;day&#34; : None,
+        &#34;setday&#34; : None,
+        &#34;start&#34; : None,
+        &#34;end&#34; : None,
+        &#34;secondary&#34; : False,
+        &#34;color&#34; : &#34;tab:blue&#34;,
+        &#34;plotlabel&#34; : &#34;no label&#34;,
+        &#34;ylabel&#34; : None
+        }
+    
+    for key,default in zip(defaults.keys(),defaults.values()):
+        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
+    self.hk_errorhandling(kwargs, defaults.keys(), &#34;WeatherData.plot()&#34;)
+    
+    mask = np.full(len(self.data[&#34;t&#34;]),True)
+    if isinstance(kwargs[&#34;day&#34;],str):
+        day = kwargs[&#34;day&#34;]
+        day = &#34;.&#34;.join([day[:2],day[2:4],day[4:]])
+        correctdate = dt.datetime.strptime(day, &#34;%d.%m.%Y&#34;).date()
+        for i in range(len(self.data[&#34;t&#34;])):
+            if self.data[&#34;t&#34;][i].date() != correctdate:
+                mask[i] = False
+    if isinstance(kwargs[&#34;start&#34;],str):
+        starthour = int(kwargs[&#34;start&#34;][:2])
+        startminute = int(kwargs[&#34;start&#34;][2:4])
+        startsecond = int(kwargs[&#34;start&#34;][4:])
+        for i in range(len(self.data[&#34;t&#34;])):
+            if self.data[&#34;t&#34;][i].hour &lt; starthour:
+                mask[i] = False
+            elif (self.data[&#34;t&#34;][i].hour == starthour and 
+                  self.data[&#34;t&#34;][i].minute &lt; startminute):
+                mask[i] = False
+            elif (self.data[&#34;t&#34;][i].hour == starthour and 
+                  self.data[&#34;t&#34;][i].minute == startminute and 
+                  self.data[&#34;t&#34;][i].second &lt; startsecond):
+                mask[i] = False
+    if isinstance(kwargs[&#34;end&#34;],str):
+        endhour = int(kwargs[&#34;end&#34;][:2])
+        endminute = int(kwargs[&#34;end&#34;][2:4])
+        endsecond = int(kwargs[&#34;end&#34;][4:])
+        for i in range(len(self.data[&#34;t&#34;])):
+            if self.data[&#34;t&#34;][i].hour &gt; endhour:
+                mask[i] = False
+            elif (self.data[&#34;t&#34;][i].hour == endhour and 
+                  self.data[&#34;t&#34;][i].minute &gt; endminute):
+                mask[i] = False
+            elif (self.data[&#34;t&#34;][i].hour == endhour and 
+                  self.data[&#34;t&#34;][i].minute == endminute and 
+                  self.data[&#34;t&#34;][i].second &gt; endsecond):
+                mask[i] = False
+                
+    xx = self.data[&#34;t&#34;][mask]
+    yy = self.data[y][mask]
+    
+    if isinstance(kwargs[&#34;setday&#34;],str):
+        dday = int(kwargs[&#34;setday&#34;][:2])
+        dmonth = int(kwargs[&#34;setday&#34;][2:4])
+        dyear = int(kwargs[&#34;setday&#34;][4:])
+        xx = np.array([d.replace(day=dday,
+                                 month=dmonth,
+                                 year=dyear) for d in xx])
+        
+    if not isinstance(kwargs[&#34;ylabel&#34;],str):
+        kwargs[&#34;ylabel&#34;] = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
+    
+    ax.plot(xx,yy,label=kwargs[&#34;plotlabel&#34;],color=kwargs[&#34;color&#34;])
+    ax.set_ylabel(kwargs[&#34;ylabel&#34;])
+    ax.set_xlabel(&#34;CET&#34;)
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    ax.tick_params(axis=&#39;y&#39;, colors=kwargs[&#34;color&#34;])
+    ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])
+    if not kwargs[&#34;secondary&#34;]:
+        ax.spines[&#34;left&#34;].set_color(kwargs[&#34;color&#34;])
+    else:
+        ax.spines[&#34;right&#34;].set_color(kwargs[&#34;color&#34;])
+        ax.spines[&#34;left&#34;].set_alpha(0)</code></pre>
+</details>
+<div class="desc"><h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>mpl-axis</code></dt>
+<dd>takes a mpl-axis on which the data will be plotted.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
+<dd>decides which data should be plotted.</dd>
+<dt><strong><code>day</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>takes a day in the format ddmmyyyy. If a day is given only data
+acquired on that day will be plotted</dd>
+<dt><strong><code>setday</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>takes a day in the format ddmmyyyy. If a setday is given all data
+will be changed to this day to make it easier to plot against
+other data</dd>
+<dt><strong><code>start</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>takes a timestamp in the format HHMMSS. if a start is given only
+data acquired after that timestamp will be plotted</dd>
+<dt><strong><code>end</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>takes a timestamp in the format HHMMSS. if an end is given only
+data acquired before that timestamp will be plotted</dd>
+<dt><strong><code>secondary</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>if True the plot will be drawn on the right y-axis.
+The default is False.</dd>
+<dt><strong><code>color</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>decides the color of the plot. The default is "tab:blue".</dd>
+<dt><strong><code>plotlabel</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>a label that is used for the plot if a legend is drawn.
+The default is "no label".</dd>
+<dt><strong><code>ylabel</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>a label that is used for the y-axis, if none is given it will
+be "value in unit", where value and unit are retrieved from
+the given y</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.weather.WeatherData.returndata"><code class="name flex">
+<span>def <span class="ident">returndata</span></span>(<span>self, secondwise=True)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def returndata(self,secondwise=True):
+    &#34;&#34;&#34;
+    Returns a tuple containing all data in a standardized form. Important 
+    for communication with DroneWrapper or Wrapper objs.
+
+    Returns
+    -------
+    data : dict {str : np.array}
+        This dict contains all data in the form of np.arrays indexed by 
+        their name.
+    details : dict {str : [str,str]}
+        This dict contains a description and a unit for all the 
+        exported data.
+    &#34;&#34;&#34;
+    
+    if not secondwise:
+        return self.data,self.details
+    op_t = [self.data[&#34;t&#34;][0]]
+    ts = op_t[0]
+    indices = [0]
+    while ts &lt; self.data[&#34;t&#34;][-1]:
+        ts = op_t[-1] + dt.timedelta(seconds=1)
+        op_t.append(ts)
+        indices.append(np.where(self.data[&#34;t&#34;]==ts.replace(second=0))[0][0])
+    indices = np.array(indices)
+    op_data = {&#34;t&#34; : np.array(op_t)}
+    
+    for key in self.data.keys():
+        if key == &#34;t&#34;:
+            continue
+        op_data[key] = self.data[key][indices]
+    return op_data,self.details</code></pre>
+</details>
+<div class="desc"><p>Returns a tuple containing all data in a standardized form. Important
+for communication with DroneWrapper or Wrapper objs.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict {str : np.array}</code></dt>
+<dd>This dict contains all data in the form of np.arrays indexed by
+their name.</dd>
+<dt><strong><code>details</code></strong> :&ensp;<code>dict {str : [str,str]}</code></dt>
+<dd>This dict contains a description and a unit for all the
+exported data.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="agg_dim" href="index.html">agg_dim</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="agg_dim.weather.WeatherData" href="#agg_dim.weather.WeatherData">WeatherData</a></code></h4>
+<ul class="">
+<li><code><a title="agg_dim.weather.WeatherData.hk_errorhandling" href="#agg_dim.weather.WeatherData.hk_errorhandling">hk_errorhandling</a></code></li>
+<li><code><a title="agg_dim.weather.WeatherData.hk_func_kwargs" href="#agg_dim.weather.WeatherData.hk_func_kwargs">hk_func_kwargs</a></code></li>
+<li><code><a title="agg_dim.weather.WeatherData.plot" href="#agg_dim.weather.WeatherData.plot">plot</a></code></li>
+<li><code><a title="agg_dim.weather.WeatherData.returndata" href="#agg_dim.weather.WeatherData.returndata">returndata</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

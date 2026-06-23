@@ -1,3 +1,16 @@
+######################### MR 23.06.2026 #########################
+#                      "windrose and docu"                      #
+#                                                               #
+# - fixed a problem with the start and end kwargs in            #
+#   Wrapper.plot()                                              #
+# - Added Wrapper.windrose() method                             #
+# - added WIBS.dndlogdp() method                                #
+# - added WIBS.bin_borders attribute                            #
+# - Added experiment.py as an exception to .gitignore since it  #
+#   was not commited last time (but it was in the released      #
+#   package)                                                    #
+#################################################################
+
 ######################### MR 18.06.2026 #########################
 #                      "new Wrapper object"                     #
 #                                                               #

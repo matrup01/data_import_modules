@@ -383,50 +383,6 @@ class FData:
             
             
 class NewFData:
-    """
-    inits NewFData
-
-    Parameters
-    ----------
-    file : str
-        Either the path to a FSpec-produced .csv file or a preprocessed .fspec file.
-    bg_file : str
-        Either the path to a FSpec-produced .csv file or a preprocessed .fspec file. Can be left if a preprocessed .fspec file is passed as file.
-    sigma : float or int, optional
-        Will be used as sigma for data processing. The default is 1.
-    measurement_frequency : int, optional
-        Measurement Frequency in Hz which is used to calculate the fluorescence index. The default is None
-    start : str, optional
-        String in the form 'hh:mm:ss'. If start is given, all data acquired before this timestamp will be ignored.
-    end : str, optional
-        String in the form 'hh:mm:ss'. If end is given, all data acquired after this timestamp will be ignored.
-    jit : bool, optional
-        If True the data processing is done using the just in time compiler numba. The default is True.
-    bg_start : str, optional
-        String in the form 'hh:mm:ss'. If bg_start is given, all data acquired befor this timestamp will be ignored for the background. Only works if a .csv file is passed as bg_file.
-    bg_end : str, optional
-        String in the form 'hh:mm:ss'. If bg_end is given, all data acquired after this timestamp will be ignored for the background. Only works if a .csv file is passed as bg_file.
-    layout : list of int with len 2
-        Decides which columns of the .csv files should be used for the channels.
-
-    Variables
-    ---------
-    NewFData.sigma : int or float
-        Sigma wich was used for data processing
-    NewFData.measurement_frequency : int
-        Measurement Frequency in Hz which has been used for data processing
-    NewFData.bg : np.array of float with len 16
-        Contains the mean+std*sigma threshhold for each channel
-    NewFData.rawtime : np.array of dt.datetime obj
-        Contains the timestamp of each dataset recorded (of each row of .csv file)
-    NewFData.rawchannels : 2D np.array of int
-        Contains the raw fluorescence intesities of each channel for all recorded datasets
-    NewFData.t : np.array of dt.datetime obj
-        Contains the time for each datapoint of the processed data
-    NewFData.channels : 2D np.array of float
-        Contains the porcessed fluorescence index values of each channel
-
-    """
     
     def __init__(self,file,bg_file="blank.blank",**kwargs):
         """
@@ -455,9 +411,22 @@ class NewFData:
         layout : list of int with len 2
             Decides which columns of the .csv files should be used for the channels.
 
-        Returns
-        -------
-        None.
+        Attributes
+        ----------
+        sigma : int or float
+            Sigma wich was used for data processing
+        measurement_frequency : int
+            Measurement Frequency in Hz which has been used for data processing
+        bg : np.array of float with len 16
+            Contains the mean+std*sigma threshhold for each channel
+        rawtime : np.array of dt.datetime obj
+            Contains the timestamp of each dataset recorded (of each row of .csv file)
+        rawchannels : 2D np.array of int
+            Contains the raw fluorescence intesities of each channel for all recorded datasets
+        t : np.array of dt.datetime obj
+            Contains the time for each datapoint of the processed data
+        channels : 2D np.array of float
+            Contains the porcessed fluorescence index values of each channel
 
         """
         

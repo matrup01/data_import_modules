@@ -2,6 +2,7 @@
 
 !agg_dim/particle_counters.py
 !agg_dim/weather.py
+!agg_dim/experiment.py
 !docu/
 !.py
 !.md
@@ -16,3 +17,6 @@
 !agg_dim.egg-info
 !PKG-INFO
 !.gitignore
+!docs
+!docs/agg_dim
+!docs/agg_dim/*

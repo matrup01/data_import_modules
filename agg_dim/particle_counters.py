@@ -11,48 +11,10 @@ import pickle
 from .ErrorHandler import IllegalArgument,SensorNotMounted,IllegalFileFormat,IllegalValue,UnknownLayoutError
 
 class Pops:    
-    """full documentation see https://github.com/matrup01/data_import_modules
-    
-    Parameters
-    ----------
-    file : str
-        path to pops produced .csv file.
-    title : str, optional
-        Given str is used as a title for quickplots. The default is "no title".
-    start : str, optional
-        Takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp.
-    end : str, optional
-        Takes a str in 'hh:mm:ss'-format and only import data acquired before that timestamp.
-    bgobj : Pops, optional
-        Takes another Pops object and uses its mean values as background.
-    timecorr : int, optional
-        Takes an int and corrects popstime by it. The default is 23.
-    relobj : Pops, optional
-        Takes a Pops object and displays all data as relative to the mean of it
-    deviate : bool, optional
-        If True, all values are expressed as relative values to the mean. The default is False
-    layout : dict or str
-        Makes sure, the data is read correctly from the .csv-file. Legal strings are "desktopmode", "box_pallnsdorfer" and "FlyingFlo2.0". For custom dicts see documentation. The default is "FlyingFlo2.0".
-        
-    Variables
-    ---------
-    Pops.filename : str
-        Contains the file path
-    Pops.relative : bool
-        True if the data is expressed relatively to another obj
-    Pops.deviated : bool
-        True if the data is expressed relative to the mean
-    Pops.d_categories : list of float
-        Contains the bin borders in nanometers
-    Pops.plottypes : list of lists of str
-        Contains information of the different values measured by the peripheral sensors (even if they arent mounted)
-    Pops.plottypes2 : list of lists of str
-        Contains information of the different values measured by POPS
-        """
     
     def __init__(self,file,**kwargs):
         """
-        inits a Pops obj
+        Obj to read in data produced by Pops
 
         Parameters
         ----------
@@ -75,9 +37,20 @@ class Pops:
         layout : dict or str
             Makes sure, the data is read correctly from the .csv-file. Legal strings are "desktopmode", "box_pallnsdorfer" and "FlyingFlo2.0". For custom dicts see documentation. The default is "FlyingFlo2.0".
 
-        Returns
-        -------
-        None.
+        Attributes
+        ----------
+        filename : str
+            Contains the file path
+        relative : bool
+            True if the data is expressed relatively to another obj
+        deviated : bool
+            True if the data is expressed relative to the mean
+        d_categories : list of float
+            Contains the bin borders in nanometers
+        plottypes : list of lists of str
+            Contains information of the different values measured by the peripheral sensors (even if they arent mounted)
+        plottypes2 : list of lists of str
+            Contains information of the different values measured by POPS
 
         """
 
@@ -1065,35 +1038,6 @@ class Pops:
 
 
 class OPC:
-    
-    """
-    full docu see https://github.com/matrup01/data_import_modules
-    
-    Parameters
-    ----------
-    file : str
-        takes an OPC-produced ...-C.dat file.
-    mfile : str, optional
-        takes an OPC-produced ...-M.dat file (if no mfile is given, the program will replace the C in the ...-C.dat file with an M and look for the filename at the same path).
-    dmfile : str, optional
-        takes an OPC-produced ...-dM.dat file (if no dmfile is given, the program will replace the C in the ...-C.dat file with dM and look for the filename at the same path).
-    start : str, optional
-        takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp.
-    end : str, optional
-        takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp.
-    bins : list of floats, optional
-        takes a list of the geometric means of the bins. The default is [0.253,0.298,0.352,0.414,0.488,0.576,0.679,0.8,0.943,1.112,1.31,1.545,1.821,2.146,2.53,2.982,3.515,4.144,4.884,5.757,6.787,8,9.43,11.12,13.1,15.45,18.21,21.46,25.3,29.82,35.15].
-        
-    Variables
-    ---------
-    OPC.data : {str : 1D numpy array}
-        contains all the acquired data in the form of a dictionary
-    OPC.details : {str : [str, str]}
-        contains a description and the unit to each data array
-        
-    Additionally every kwarg is saved as an object wide variable
-    
-    """
 
     def __init__(self,file,**kwargs):
         """
@@ -1114,9 +1058,12 @@ class OPC:
         bins : list of floats, optional
             takes a list of the geometric means of the bins. The default is [0.253,0.298,0.352,0.414,0.488,0.576,0.679,0.8,0.943,1.112,1.31,1.545,1.821,2.146,2.53,2.982,3.515,4.144,4.884,5.757,6.787,8,9.43,11.12,13.1,15.45,18.21,21.46,25.3,29.82,35.15].
             
-        Returns
-        -------
-        None.
+        Attributes
+        ----------
+        data : {str : 1D numpy array}
+            contains all the acquired data in the form of a dictionary
+        details : {str : [str, str]}
+            contains a description and the unit to each data array
 
         """
         

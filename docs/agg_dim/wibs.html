@@ -1,0 +1,1853 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>agg_dim.wibs API documentation</title>
+<meta name="description" content="Created on Tue Nov 26 08:26:00 2024 …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>agg_dim.wibs</code></h1>
+</header>
+<section id="section-intro">
+<p>Created on Tue Nov 26 08:26:00 2024</p>
+<p>@author: mrupp</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="agg_dim.wibs.WIBS"><code class="flex name class">
+<span>class <span class="ident">WIBS</span></span>
+<span>(</span><span>file, FT_file='', FT_time='hh:mm:ss', **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class WIBS:
+    
+    def __init__(self,file,FT_file=&#34;&#34;,FT_time=&#34;hh:mm:ss&#34;,**kwargs):
+        &#34;&#34;&#34;
+        Inits the WIBS obj
+
+        Parameters
+        ----------
+        file : str or list of str
+            Either the path to a wibs produced .h5 file or to a preprocessed 
+            .wibs file or a list of paths to wibs produced .h5 files.
+        FT_file : str
+            Path to a wibs produced forcedtrigger-file. Can be left if a 
+            preprocessed .wibs file is passed as file.
+        FT_time : str
+            String in the form of &#39;hh:mm:ss&#39; of the time when the forced 
+            trigger was started, which is used to correct the time. Can be 
+            left if a preprocessed .wibs file is passed as file.
+        FT_sigma : int or float, optional
+            Will be used as sigma for data processing. The default is 3.
+        bin_borders : list of float, optional
+            Particles will be classified according to the bins given here 
+            (in micrometers). The default is [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,
+                                              1.4,1.7,2,2.5,3,3.5,4,5,10,15,20]
+        flow : float, optional
+            Flow in ccm/s. Will be used to calculate partconc and dndlogdp. 
+            The default is 0.018 ccm/s (=0.3 lpm).
+        fixed : list of floats with len 3, optional
+            If fixed is passed, the values will be treated as bg and FT_file 
+            will only be used for time correction.
+        start : str, optional
+            String in the form &#39;hh:mm:ss&#39;. If start is given, all data acquired
+            before this timestamp will be ignored.
+        end : str, optional
+            String in the form &#39;hh:mm:ss&#39;. If end is given, all data acquired 
+            after this timestamp will be ignored.
+        FT_date : str, optional
+            Sets the FT_time to be this date (str format: &#39;dd.mm.yyyy&#39;), only 
+            relevant if the data is going to be compared with other data. 
+            The default is &#39;01.01.2000&#39;
+        channels : list of str, optional
+            Decides which channels should be processed, by default all channels
+            are processed, but it can be reduced for large files. 
+            The default is  [&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,&#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;].
+            
+        Attributes
+        ----------
+        bins : int
+            Number of bins
+        bin_means : list of float
+            Geometric means of bins. Used for dndlogdp stuff.
+        bin_borders : list of float
+            The list of bin borders that is passed as a kwarg at init. It is only 
+            saved as an attribute in agg_dim 0.1.18 or higher.
+        data : {str : 1D numpy array}
+            contains all processed data in the form of a dictionary 
+            (processed for every second)
+        details : {str : [str, str]}
+            contains a description and the unit to each data array
+        rawdata : {str : 1D numpy array}
+            conains all the raw data used for data processing
+        fl1_FTbg : float
+            Contains the fluorescence of the chamber for fl1, calculated from the 
+            forced trigger.
+        fl2_FTbg : float
+            Contains the fluorescence of the chamber for fl2, calculated from the 
+            forced trigger.
+        fl3_FTbg : float
+            Contains the fluorescence of the chamber for fl3, calculated from the 
+            forced trigger.    
+        &#34;&#34;&#34;
+        
+        if file[-5:] == &#34;.wibs&#34;:
+            
+            with open(file,&#34;rb&#34;) as openfile:
+                ip = pickle.load(openfile)
+            
+            for arg in ip.keys():
+                setattr(self, arg, ip[arg])
+            
+            #catch legacy .wibs obj that did not save self.bin_borders
+            try:
+                self.bin_borders
+            except AttributeError:
+                msg = &#34;Caution! The loaded .wibs file was saved before the &#34;
+                msg += &#34;attribute &#39;bin_borders&#39; was introduced. If WIBS.dndlog&#34;
+                msg += &#34;dp() is used, you have to pass the bin borders &#34;
+                msg += &#34;manually.&#34;
+                print(msg)
+                
+                #default Value
+                self.bin_borders = [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,
+                                    1.7,2,2.5,3,3.5,4,5,10,15,20,100]
+                
+        else:
+        
+            #import kwargs
+            defaults = {
+                &#34;FT_sigma&#34; : 3,
+                &#34;bin_borders&#34; : [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,
+                                 1.7,2,2.5,3,3.5,4,5,10,15,20,100],
+                &#34;flow&#34; : 0.3*1000/60,
+                &#34;fixed&#34; : None, #[float,flat,float]
+                &#34;start&#34; : None,
+                &#34;end&#34; : None,
+                &#34;FT_date&#34; : &#34;01.01.2000&#34;,
+                &#34;channels&#34; :  [&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,&#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;]
+                }
+            for key,value in defaults.items():
+                self.hk_kwargs(kwargs, key, value)
+            self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS&#34;)
+            
+            #setup variables
+            self.bins = len(self.bin_borders)-1
+            bm = [math.sqrt(self.bin_borders[i] * self.bin_borders[i+1]) 
+                  for i in range(self.bins)]
+            self.bin_means = bm
+            self.data = {}
+            self.rawdata = {}
+            self.details = {} #[name,unit]
+            if self.fixed != None:
+                self.fl1_FTbg = self.fixed[0]
+                self.fl2_FTbg = self.fixed[1]
+                self.fl3_FTbg = self.fixed[2]
+                      
+            #load Forced Trigger
+            
+            if FT_file == &#34;&#34;:
+                msg = &#34;WIBS needs a FT_file unless preprocessed data &#34;
+                msg += &#34;(.wibs-file) is used&#34;
+                raise KeyError(msg)
+    
+            try:
+                ft = h5py.File(FT_file,&#34;r&#34;)
+            except Exception as exc:
+                msg = &#34;Cant find FT_file at given path&#34;
+                raise FileNotFoundError(msg) from exc
+            ft2 = ft[&#34;NEO&#34;]
+            ft3 = ft2[&#34;ParticleData&#34;]
+            
+            ft_xe1 = np.transpose(list(ft3[&#34;Xe1_FluorPeak&#34;]))
+            ft_xe2 = np.transpose(list(ft3[&#34;Xe2_FluorPeak&#34;]))
+            self.start_FT = datetime.fromtimestamp(
+                list(ft3[&#34;Seconds&#34;]
+                     )[0],
+                tz=timezone.utc).replace(
+                    year=int(self.FT_date[-4:]),
+                    month=int(self.FT_date[3:5]),
+                    day=int(self.FT_date[:2])
+                    )
+            
+            f = f&#34;{self.FT_date}-{FT_time}/+0000&#34;,&#34;%d.%m.%Y-%H:%M:%S/%z&#34;
+            FT_time = datetime.strptime(f)
+            timecorr = FT_time - self.start_FT
+            
+            if self.fixed == None:
+                f1 = ft_xe1[0]
+                self.fl1_FTbg = np.nanmean(f1) + self.FT_sigma * np.nanstd(f1)
+                f2 = ft_xe1[1]
+                self.fl2_FTbg = np.nanmean(f2) + self.FT_sigma * np.nanstd(f2)
+                f3 = ft_xe2[1]
+                self.fl3_FTbg = np.nanmean(f3) + self.FT_sigma * np.nanstd(f3)
+            
+            
+            #load file
+            if isinstance(file,str):
+                try:
+                    f = h5py.File(file,&#34;r&#34;)
+                except Exception as exc:
+                    msg = &#34;Cant find file at given path&#34;
+                    raise FileNotFoundError(msg) from exc
+                f2 = f[&#34;NEO&#34;]
+                f3 = f2[&#39;ParticleData&#39;]
+                
+                wibstime = list(f3[&#34;Seconds&#34;])
+                self.timehandler = np.array(wibstime).astype(np.uint32)
+                
+                xe1 = np.transpose(list(f3[&#34;Xe1_FluorPeak&#34;]))
+                xe2 = np.transpose(list(f3[&#34;Xe2_FluorPeak&#34;]))
+                
+                self.rawdata[&#34;size&#34;] = np.array(list(f3[&#34;Size_um&#34;]))
+                self.rawdata[&#34;excited&#34;] = np.array(
+                    list(f3[&#34;Flag_Excited&#34;])
+                    ).astype(bool)
+                self.rawdata[&#34;Fl1&#34;] = np.where(xe1[0] &gt;= self.fl1_FTbg, 
+                                               True, False)
+                self.rawdata[&#34;Fl2&#34;] = np.where(xe1[1] &gt;= self.fl2_FTbg, 
+                                               True, False)
+                self.rawdata[&#34;Fl3&#34;] = np.where(xe2[1] &gt;= self.fl3_FTbg, 
+                                               True, False)
+                
+    
+            #load files
+            elif isinstance(file,list):
+    
+                firstfile = True
+                
+                for ff in file:
+                    f = h5py.File(ff,&#34;r&#34;)
+                    f2 = f[&#34;NEO&#34;]
+                    f3 = f2[&#39;ParticleData&#39;]
+                    
+                    filetime = list(f3[&#34;Seconds&#34;])
+                    th = np.array(filetime).astype(np.uint32)
+                    
+                    xe1 = np.transpose(list(f3[&#34;Xe1_FluorPeak&#34;]))
+                    xe2 = np.transpose(list(f3[&#34;Xe2_FluorPeak&#34;]))
+                    if len(xe1) == 0 or len(xe2) == 0:
+                        continue
+                    
+                    filecounts = np.array(list(f3[&#34;Size_um&#34;]))
+                    file_excited = np.array(
+                        list(f3[&#34;Flag_Excited&#34;])
+                        ).astype(bool)
+                    filefl1 = np.where(xe1[0] &gt;= self.fl1_FTbg, True, False)
+                    filefl2 = np.where(xe1[1] &gt;= self.fl2_FTbg, True, False)
+                    filefl3 = np.where(xe2[1] &gt;= self.fl3_FTbg, True, False)
+                    
+                    if firstfile:
+                        self.timehandler = th.astype(np.uint32)
+                        self.rawdata[&#34;size&#34;] = filecounts
+                        self.rawdata[&#34;excited&#34;] = file_excited
+                        self.rawdata[&#34;Fl1&#34;] = filefl1
+                        self.rawdata[&#34;Fl2&#34;] = filefl2
+                        self.rawdata[&#34;Fl3&#34;] = filefl3
+                        firstfile = False
+                    else:
+                        self.timehandler = np.append(
+                            self.timehandler,
+                            th
+                            ).astype(np.uint32)
+                        self.rawdata[&#34;size&#34;] = np.append(self.rawdata[&#34;size&#34;],
+                                                         filecounts)
+                        self.rawdata[&#34;excited&#34;] = np.append(
+                            self.rawdata[&#34;excited&#34;],
+                            file_excited
+                            )
+                        self.rawdata[&#34;Fl1&#34;] = np.append(self.rawdata[&#34;Fl1&#34;],
+                                                        filefl1)
+                        self.rawdata[&#34;Fl2&#34;] = np.append(self.rawdata[&#34;Fl2&#34;],
+                                                        filefl2)
+                        self.rawdata[&#34;Fl3&#34;] = np.append(self.rawdata[&#34;Fl3&#34;],
+                                                        filefl3)
+               
+             
+            if isinstance(self.start,str):
+                f = f&#34;{self.FT_date}-{self.start}/+0000&#34;,&#34;%d.%m.%Y-%H:%M:%S/%z&#34;
+                starttime = datetime.strptime(f)
+                starttime = int(starttime.replace(
+                    year=int(self.FT_date[-4:])
+                    ).timestamp())
+                if int(timecorr.total_seconds()) &gt;= 0:
+                    start_m = np.where(
+                        (self.timehandler 
+                         + int(timecorr.total_seconds())) &gt; starttime, 
+                        True, 
+                        False
+                        )
+                else:
+                    offset = abs(int(timecorr.total_seconds()))
+                    start_m = np.where(
+                        (self.timehandler - offset) &gt; starttime, 
+                        True, 
+                        False
+                        )
+                self.timehandler = self.timehandler[start_m]
+                self.rawdata[&#34;size&#34;] = self.rawdata[&#34;size&#34;][start_m]
+                self.rawdata[&#34;excited&#34;] = self.rawdata[&#34;excited&#34;][start_m]
+                self.rawdata[&#34;Fl1&#34;] = self.rawdata[&#34;Fl1&#34;][start_m]
+                self.rawdata[&#34;Fl2&#34;] = self.rawdata[&#34;Fl2&#34;][start_m]
+                self.rawdata[&#34;Fl3&#34;] = self.rawdata[&#34;Fl3&#34;][start_m]
+                del start_m
+            if isinstance(self.end,str):
+                f = f&#34;{self.FT_date}-{self.end}/+0000&#34;,&#34;%d.%m.%Y-%H:%M:%S/%z&#34;
+                endtime = datetime.strptime(f)
+                endtime = int(endtime.replace(
+                    year=int(self.FT_date[-4:])
+                    ).timestamp())
+                if int(timecorr.total_seconds()) &gt;= 0:
+                    end_m = np.where(
+                        (self.timehandler 
+                         + int(timecorr.total_seconds())) &lt; endtime,
+                        True,
+                        False
+                        )
+                else:
+                    offset = abs(int(timecorr.total_seconds()))
+                    end_m = np.where((self.timehandler - offset) &lt; endtime,
+                                     True,
+                                     False)
+                    print(self.timehandler[0] - offset)
+                    print(endtime)
+                self.timehandler = self.timehandler[end_m] 
+                self.rawdata[&#34;size&#34;] = self.rawdata[&#34;size&#34;][end_m]
+                self.rawdata[&#34;excited&#34;] = self.rawdata[&#34;excited&#34;][end_m]
+                self.rawdata[&#34;Fl1&#34;] = self.rawdata[&#34;Fl1&#34;][end_m]
+                self.rawdata[&#34;Fl2&#34;] = self.rawdata[&#34;Fl2&#34;][end_m]
+                self.rawdata[&#34;Fl3&#34;] = self.rawdata[&#34;Fl3&#34;][end_m]
+                del end_m
+    
+                
+            #process data
+            self.data[&#34;t&#34;] = np.array(
+                [datetime.utcfromtimestamp(timestamp) 
+                 for timestamp in range(self.timehandler[0],
+                                        self.timehandler[-1])]
+                ) + timecorr
+            self.date = [self.data[&#34;t&#34;][0].day,
+                         self.data[&#34;t&#34;][0].month,
+                         self.data[&#34;t&#34;][0].year]
+            time_mask = np.array(
+                [np.where(self.timehandler==i,True,False) 
+                 for i in range(self.timehandler[0],self.timehandler[-1])]
+                )
+                    
+            #part_conc &amp; #/s
+            for bin_no in range(self.bins):
+                m = np.where(self.bin_borders[bin_no] &lt; self.rawdata[&#34;size&#34;],
+                             True,
+                             False)
+                m = np.where(self.bin_borders[bin_no+1] &gt; self.rawdata[&#34;size&#34;],
+                             m,
+                             False)
+                bin_handler = time_mask &amp; m
+                self.data[f&#34;bin{bin_no}_cps&#34;] = np.array(
+                    [np.count_nonzero(arr) for arr in bin_handler]
+                    )
+                del bin_handler
+                self.data[f&#34;bin{bin_no}_partconc&#34;] = self.data[f&#34;bin{bin_no}_cps&#34;] / self.flow
+                self.details[f&#34;bin{bin_no}_partconc&#34;] = [f&#34;Particle Conc. (bin{bin_no}) &#34;,&#34;#/cm${}^3$&#34;]
+                self.details[f&#34;bin{bin_no}_cps&#34;] = [f&#34;Particle Counts (Bin{bin_no})&#34;,&#34;#/s&#34;]
+                
+            #dndlogdp
+            for bin_no in range(self.bins):
+                log_binwidth = np.log10(self.bin_borders[bin_no+1])-np.log10(self.bin_borders[bin_no])
+                self.data[f&#34;bin{bin_no}_dndlogdp&#34;] = self.data[f&#34;bin{bin_no}_partconc&#34;] / log_binwidth
+                self.details[f&#34;bin{bin_no}_dndlogdp&#34;] = [f&#34;dN/dlog$D_P$ (Bin{bin_no})&#34;,&#34;$\mu$m${}^{-1}$&#34;]
+                
+            #total
+            self.data[&#34;total_cps&#34;] = np.array(
+                [np.count_nonzero(arr) for arr in time_mask]
+                )
+            self.data[&#34;total_partconc&#34;] = self.data[&#34;total_cps&#34;] / self.flow
+            self.details[&#34;total_cps&#34;] = [&#34;Particle Counts&#34;,&#34;#/s&#34;]
+            self.details[&#34;total_partconc&#34;] = [&#34;Particle Conc.&#34;,&#34;#/cm${}^3$&#34;]
+            
+            
+            #excited
+            ex_handler = time_mask &amp; self.rawdata[&#34;excited&#34;]
+            self.data[&#34;excited&#34;] = np.array(
+                [np.count_nonzero(arr) for arr in ex_handler]
+                )
+            del ex_handler
+            self.data[&#34;excited_fraction&#34;] = np.divide(
+                self.data[&#34;excited&#34;],
+                self.data[&#34;total_cps&#34;],
+                out=np.ones(self.data[&#34;excited&#34;].shape,dtype=float),
+                where=self.data[&#34;total_cps&#34;]!=0
+                )
+            self.details[&#34;excited&#34;] = [&#34;Particle Counts (excited)&#34;,&#34;#/s&#34;]
+            self.details[&#34;excited_fraction&#34;] = [&#34;Fraction of excited Particles&#34;, &#34;No Unit&#34;]
+            
+            
+            #fluorescence channels
+            fl1_handler = time_mask &amp; self.rawdata[&#34;Fl1&#34;]
+            fl2_handler = time_mask &amp; self.rawdata[&#34;Fl2&#34;]
+            fl3_handler = time_mask &amp; self.rawdata[&#34;Fl3&#34;]
+            
+            self.data[&#34;fl1&#34;] = np.array(
+                [np.count_nonzero(arr) for arr in fl1_handler]
+                )/self.data[&#34;excited_fraction&#34;]
+            self.data[&#34;fl2&#34;] = np.array(
+                [np.count_nonzero(arr) for arr in fl2_handler]
+                )/self.data[&#34;excited_fraction&#34;]
+            self.data[&#34;fl3&#34;] = np.array(
+                [np.count_nonzero(arr) for arr in fl3_handler]
+                )/self.data[&#34;excited_fraction&#34;]
+            self.data[&#34;fl1_fraction&#34;] = np.divide(
+                self.data[&#34;fl1&#34;],
+                self.data[&#34;total_cps&#34;],
+                out=np.zeros(self.data[&#34;fl1&#34;].shape,dtype=float),
+                where=self.data[&#34;total_cps&#34;]!=0
+                )
+            self.data[&#34;fl2_fraction&#34;] = np.divide(
+                self.data[&#34;fl2&#34;],
+                self.data[&#34;total_cps&#34;],
+                out=np.zeros(self.data[&#34;fl2&#34;].shape,dtype=float),
+                where=self.data[&#34;total_cps&#34;]!=0
+                )
+            self.data[&#34;fl3_fraction&#34;] = np.divide(
+                self.data[&#34;fl3&#34;],
+                self.data[&#34;total_cps&#34;],
+                out=np.zeros(self.data[&#34;fl3&#34;].shape,dtype=float),
+                where=self.data[&#34;total_cps&#34;]!=0
+                )
+            for i in [1,2,3]:
+                self.details[f&#34;fl{i}&#34;] = [f&#34;Particle Counts (Fl{i})&#34;,&#34;#/s&#34;]
+                self.details[f&#34;fl{i}_fraction&#34;] = [f&#34;Fluorescent Fraction (Fl{i})&#34;, &#34;No Unit&#34;]
+            
+            def createmask(a,b,c,string):
+                a = a if &#34;a&#34; in string else ~a
+                b = b if &#34;b&#34; in string else ~b
+                c = c if &#34;c&#34; in string else ~c
+                
+                op = a&amp;b
+                return op&amp;c
+            
+            for channel in self.channels:
+                channel_mask = createmask(fl1_handler,
+                                          fl2_handler,
+                                          fl3_handler,
+                                          channel)
+                for bin_no in range(self.bins):
+                    m =np.where(
+                        self.bin_borders[bin_no] &lt; self.rawdata[&#34;size&#34;],
+                        True,
+                        False
+                        )
+                    m = np.where(
+                        self.bin_borders[bin_no+1] &gt; self.rawdata[&#34;size&#34;],
+                        m,
+                        False)
+                    m = channel_mask &amp; m
+                    self.data[f&#34;{channel}_bin{bin_no}_cps&#34;] = np.array(
+                        [np.count_nonzero(arr) for arr in m]
+                        )
+                    del m
+                    self.data[f&#34;{channel}_bin{bin_no}_partconc&#34;] = self.data[f&#34;{channel}_bin{bin_no}_cps&#34;] / self.flow
+                    self.details[f&#34;{channel}_bin{bin_no}_partconc&#34;] = [f&#34;Particle Conc. of {channel}-Particles (bin{bin_no}) &#34;,&#34;#/cm${}^3$&#34;]
+                    self.details[f&#34;{channel}_bin{bin_no}_cps&#34;] = [f&#34;Particle Counts of {channel}-Particles (Bin{bin_no})&#34;,&#34;#/s&#34;]
+                    
+                    log_binwidth = np.log10(self.bin_borders[bin_no+1])-np.log10(self.bin_borders[bin_no])
+                    self.data[f&#34;{channel}_bin{bin_no}_dndlogdp&#34;] = self.data[f&#34;{channel}_bin{bin_no}_partconc&#34;] / log_binwidth
+                    self.details[f&#34;{channel}_bin{bin_no}_dndlogdp&#34;] = [f&#34;dN/dlog$D_P$ of {channel}-Particles (Bin{bin_no})&#34;,&#34;cm$^{-3}$&#34;]
+                   
+                del channel_mask
+                self.data[f&#34;{channel}_total_cps&#34;] = np.sum([self.data[f&#34;{channel}_bin{i}_cps&#34;] for i in range(self.bins)],axis=0)
+                self.data[f&#34;{channel}_total_partconc&#34;] = self.data[f&#34;{channel}_total_cps&#34;] / self.flow
+                self.data[f&#34;{channel}_fraction&#34;] = np.divide(self.data[f&#34;{channel}_total_cps&#34;],self.data[&#34;total_cps&#34;],out=np.zeros(self.data[f&#34;{channel}_total_cps&#34;].shape,dtype=float),where=self.data[&#34;total_cps&#34;]!=0)
+                self.details[f&#34;{channel}_total_cps&#34;] = [f&#34;Particle Counts of {channel}-Particles&#34;,&#34;#/s&#34;]
+                self.details[f&#34;{channel}_total_partconc&#34;] = [f&#34;Particle Conc. of {channel}-Particles&#34;,&#34;#/cm${}^3$&#34;]
+                self.details[f&#34;{channel}_fraction&#34;] = [f&#34;Fluorescent Fraction ({channel})&#34;, &#34;No Unit&#34;]
+                
+            del self.timehandler
+            del self.start
+            del self.end
+            del self.FT_date
+            
+    
+    def quickplot(self,y):
+        &#34;&#34;&#34;
+        Plots the given y over time
+
+        Parameters
+        ----------
+        y : str
+            Determines which data should be plotted.
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        #error handling
+        xx = self.data[&#34;t&#34;]
+        try:
+            yy = self.data[y]
+        except KeyError as kerr:
+            raise IllegalValue(y, &#34;WIBS.quickplot()&#34;,list(self.data)) from kerr
+                
+        #draw plot
+        _,ax = plt.subplots()
+
+        ax.set_xlabel(&#34;CET&#34;)
+        ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34; if self.details[y][1] != &#34;No Unit&#34; else self.details[y][0]
+        ax.set_ylabel(ylabel)
+        
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        
+        ax.plot(xx,yy)
+        
+        plt.show()
+        
+        
+    def quickheatmap(self,y):
+        &#34;&#34;&#34;
+        Draws a dndlogdp number size distribution heatmap
+
+        Parameters
+        ----------
+        y : str
+            Determines which data should be plotted.
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        #error handling
+        try:
+            yy = np.array(
+                [self.data[f&#34;{y}_bin{i}_dndlogdp&#34;] for i in range(self.bins)]
+                ) if y != &#34;allparticles&#34; else np.array(
+                    [self.data[f&#34;bin{i}_dndlogdp&#34;] for i in range(self.bins)]
+                    )
+        except KeyError as kerr:
+            raise IllegalValue(y, 
+                               &#34;WIBS.quickheatmap&#34;, 
+                               [&#34;allparticles&#34;,&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,
+                                &#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;]) from kerr
+        
+        xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
+        xlims = md.date2num(xlims)
+            
+        #draw plot
+        _,ax = plt.subplots()
+        
+        im = ax.imshow(yy,
+                       aspect=&#34;auto&#34;,
+                       norm=&#34;log&#34;,
+                       extent=[xlims[0],xlims[1],0,self.bins]
+                       ,cmap=&#34;RdYlBu_r&#34;,
+                       interpolation=&#34;none&#34;,
+                       origin=&#34;lower&#34;)
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        ax.set_ylabel(&#34;$D_P$ in $\mu$m&#34;)
+        ax.set_xlabel(&#34;CET&#34;)
+        
+        labels = [str(round(label,2)) for label in self.bin_means]
+        ticks = [tick+0.5 for tick in range(self.bins)]
+        ax.set_yticks(ticks,labels=labels)
+        
+        ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
+        ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
+        plt.colorbar(im,ax=ax,label=&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;)
+        
+        plt.show()
+        
+        
+    def heatmap(self,ax,y,**kwargs):
+        &#34;&#34;&#34;
+        Draws a dndlogdp number size distribution heatmap over an existing 
+        mpl axis
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The heatmap will be drawn on this axis.
+        y : str
+            Determines which data should be plotted.
+        cmap : str, optional
+            Changes the colormap. The default is &#39;RdYlBu_r&#39;
+        pad : float, optional
+            Changes the padding between colorbar and plot. The default is 0.
+        orientation : str, optional
+            Changes the orientation of the colorbar.
+        location : str, optional
+            Changes the location of the colorbar. The default is &#39;top&#39;.
+        togglecbar : bool, optional
+            If False, the colorbar wont be shown. The default is True.
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        defaults = {&#34;cmap&#34; : &#34;RdYlBu_r&#34;,
+                    &#34;pad&#34; : 0,
+                    &#34;orientation&#34; : &#34;horizontal&#34;,
+                    &#34;location&#34; : &#34;top&#34;,
+                    &#34;togglecbar&#34; : True}
+        for key,default in defaults.items():
+            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+        self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.heatmap()&#34;)
+        
+        try:
+            yy = np.array(
+                [self.data[f&#34;{y}_bin{i}_dndlogdp&#34;] for i in range(self.bins)]
+                ) if y != &#34;allparticles&#34; else np.array(
+                    [self.data[f&#34;bin{i}_dndlogdp&#34;] for i in range(self.bins)]
+                    )
+        except KeyError as kerr:
+            raise IllegalValue(y, 
+                               &#34;WIBS.heatmap()&#34;, 
+                               [&#34;allparticles&#34;,&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,
+                                &#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;]) from kerr
+        
+        xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
+        xlims = md.date2num(xlims)
+            
+        #draw plot
+        im = ax.imshow(yy,
+                       aspect=&#34;auto&#34;,
+                       norm=&#34;log&#34;,
+                       extent=[xlims[0],xlims[1],0,self.bins],
+                       cmap=kwargs[&#34;cmap&#34;],
+                       interpolation=&#34;none&#34;,
+                       origin=&#34;lower&#34;)
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        ax.set_ylabel(&#34;$D_P$ in $\mu$m&#34;)
+        ax.set_xlabel(&#34;CET&#34;)
+        
+        labels = [str(round(label,2)) for label in self.bin_means]
+        ticks = [tick+0.5 for tick in range(self.bins)]
+        ax.set_yticks(ticks,labels=labels)
+        
+        ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
+        ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
+        plt.colorbar(im,
+                     ax=ax,
+                     label=&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;,
+                     pad=kwargs[&#34;pad&#34;],
+                     orientation=kwargs[&#34;orientation&#34;],
+                     location=kwargs[&#34;location&#34;])
+        
+    
+    def plot(self,ax,y,**kwargs):
+        &#34;&#34;&#34;
+        Plots y over time on an existing mpl axis.
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        y : str
+            Determines which data should be plotted.
+        label : str, optional
+            Changes the label of the plot. If a legend is created, this label 
+            will be shown there. The default is &#39;no label&#39;.
+        color : str
+            Changes the color of the plot. The default is &#39;tab:purple&#39;.
+        secondary : bool, optional
+            If True, the plot will draw the axis on the right-hand side. 
+            Should be used if the given ax is a twinx(). The default is False.
+        
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+
+        defaults = {&#34;label&#34; : &#34;no label&#34;,
+                    &#34;color&#34; : &#34;tab:purple&#34;,
+                    &#34;secondary&#34; : False}
+        for key,default in defaults.items():
+            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+        self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.plot()&#34;)
+        
+        xx = self.data[&#34;t&#34;]
+        try:
+            yy = self.data[y]
+        except KeyError as kerr:
+            raise IllegalValue(&#34;y&#34;, &#34;WIBS.plot()&#34;,list(self.data)) from kerr
+            
+        ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34; if self.details[y][1] != &#34;No Unit&#34; else self.details[y][0]
+            
+        #draw plot
+        ax.plot(xx,yy,label=kwargs[&#34;label&#34;],color=kwargs[&#34;color&#34;])
+        
+        ax.set_xlabel(&#34;CET&#34;)
+        ax.set_ylabel(ylabel)
+        ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+        
+        ax.tick_params(axis=&#39;y&#39;, colors=kwargs[&#34;color&#34;])
+        ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])
+        if not kwargs[&#34;secondary&#34;]:
+            ax.spines[&#34;left&#34;].set_color(kwargs[&#34;color&#34;])
+        else:
+            ax.spines[&#34;right&#34;].set_color(kwargs[&#34;color&#34;])
+            ax.spines[&#34;left&#34;].set_alpha(0)
+            
+    
+    ## needs docstring and improvement and testing
+    def stackedplot(self,ax,**kwargs):
+        &#34;&#34;&#34;
+        Creates a Stacked Plot on an existing axis.
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        
+        Kwargs
+        ------
+        start : str
+            Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
+            after it.
+        end : str, optional
+            Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
+            before it.
+        log : bool, optional
+            If True the x-axis of the plot will be scaled logarithmicly
+        xlabel : str, optional
+            Sets the xlabel of the plot. The default is &#34;D$_p$ in $\mu$m&#34;.
+        ylabel : str, optional
+            Sets the xlabel of the plot. The default is &#34;Fraction&#34;.
+        legend : bool, optional
+            If True a Legend will be drawn on the upper right. The default is 
+            True.
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        
+        
+        defaults = {&#34;start&#34; : None,
+                    &#34;end&#34; : None,
+                    &#34;log&#34; : True,
+                    &#34;xlabel&#34; : &#34;D$_p$ in $\mu$m&#34;,
+                    &#34;ylabel&#34; : &#34;Fraction&#34;,
+                    &#34;legend&#34; : True}
+        for key,default in defaults.items():
+            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+        self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.stackedplot()&#34;)
+        
+        m = np.array([True for i in self.data[&#34;t&#34;]])
+        if isinstance(kwargs[&#34;start&#34;],str):
+            kwargs[&#34;start&#34;] = datetime.strptime(kwargs[&#34;start&#34;],&#34;%H:%M:%S&#34;)
+            kwargs[&#34;start&#34;] = kwargs[&#34;start&#34;].replace(
+                year=self.data[&#34;t&#34;][0].year,
+                month = self.data[&#34;t&#34;][0].month,
+                day = self.data[&#34;t&#34;][0].day
+                )
+            m = np.where(kwargs[&#34;start&#34;]&lt;self.data[&#34;t&#34;],m,False)
+        if isinstance(kwargs[&#34;end&#34;],str):
+            kwargs[&#34;end&#34;] = datetime.strptime(kwargs[&#34;end&#34;],&#34;%H:%M:%S&#34;)
+            kwargs[&#34;end&#34;] = kwargs[&#34;end&#34;].replace(
+                year = self.data[&#34;t&#34;][0].year,
+                month = self.data[&#34;t&#34;][0].month,
+                day = self.data[&#34;t&#34;][0].day
+                )
+            m = np.where(kwargs[&#34;end&#34;]&gt;self.data[&#34;t&#34;],m,False)
+        
+        xx = self.bin_means
+        totals = []
+        for i in range(len(xx)):
+            totals.append(np.nanmean(self.data[f&#34;bin{i}_partconc&#34;][m]))
+            totals[i] = 1 if totals[i] == 0 else totals[i]
+        vals = np.array([0 for i in xx])
+        for ch in [&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,&#34;ab&#34;,&#34;bc&#34;,&#34;ac&#34;,&#34;abc&#34;]:
+            new_vals = []
+            for i in range(len(xx)):
+                new_vals.append(
+                    np.nanmean(self.data[f&#34;{ch}_bin{i}_partconc&#34;][m])
+                    )
+            new_vals = np.array(new_vals) + vals
+            ax.fill_between(xx,vals/totals,new_vals/totals,label=ch)
+            vals = new_vals
+        ax.fill_between(xx,vals/totals,[1 for i in xx],label=&#34;non fluorescent&#34;)
+        
+        if kwargs[&#34;log&#34;]:
+            ax.set_xscale(&#34;log&#34;)
+        if kwargs[&#34;legend&#34;]:
+            ax.legend(loc=&#34;upper right&#34;)
+        ax.set_xlabel(kwargs[&#34;xlabel&#34;])
+        ax.set_ylabel(kwargs[&#34;ylabel&#34;])
+        
+        
+    def dndlogdp(self,ax, **kwargs):
+        &#34;&#34;&#34;
+        Creates a dN/dlogDp plot on an existing mpl axis.
+
+        Parameters
+        ----------
+        ax : Axes obj of mpl.axes module
+            The plot will be drawn on this axis.
+        
+        Kwargs
+        ------
+        start : str, optional
+            If a str in the format &#34;HH:MM:SS&#34; is given, only data acquired 
+            after this timestamp will be used for the dNdlogDp curve.
+        end : str, optional
+            If a str in the format &#34;HH:MM:SS&#34; is given, only data acquired
+            before this timestamp will be used for the dNdlogDp curve.
+        log : bool, optional
+            If True the x-axis will be expressed logarithmicly. The default is
+            True.
+        xlabel : str, optional
+            Sets the x label to the given str. The default is &#39;D$_p$ in μm&#39;.
+        ylable : str, optional
+            Sets the y label to the given str. The default is 
+            &#39;dN/dlogD$_p$ in cm{^{-3}$&#39;.
+        scatter : bool, optional
+            If True, a scatterplot will be drawn instead of a bar plot. The 
+            default is False.
+        bin_borders : list of float, optional
+            Should only be passed if the WIBS object was created from a .wibs
+            file that was created before agg_dim 0.1.18 and does not have the 
+            &#39;bin_borders&#39; attribute. If no list is passed, it will try to use
+            the &#39;bin_borders&#39; attribute from the WIBS obj and if it has none, 
+            an AttributeError will be raised.
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        
+        
+        #kwargs
+        defaults = {&#34;start&#34; : None,
+                    &#34;end&#34; : None,
+                    &#34;log&#34; : True,
+                    &#34;xlabel&#34; : &#34;D$_p$ in μm&#34;,
+                    &#34;ylabel&#34; : &#34;dN/dlogD$_p$ in cm{^{-3}$&#34;,
+                    &#34;scatter&#34; : False,
+                    &#34;bin_borders&#34; : None}
+        
+        for key,default in defaults.items():
+            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+        self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.dndlogp()&#34;)
+        
+        xx = np.array(self.bin_means)
+        m = np.array([True for t in self.data[&#34;t&#34;]])
+        
+        if isinstance(kwargs[&#34;start&#34;],str):
+            dd = self.data[&#34;t&#34;][0].day
+            mm = self.data[&#34;t&#34;][0].month
+            yy = self.data[&#34;t&#34;][0].year
+            start = datetime.strptime(kwargs[&#34;start&#34;],
+                                      &#34;%H:%M:%S&#34;
+                                      ).replace(day=dd,
+                                                month=mm,
+                                                year=yy)
+            m = np.where(self.data[&#34;t&#34;]&gt;=start,m,False)
+        if isinstance(kwargs[&#34;end&#34;],str):
+            dd = self.data[&#34;t&#34;][0].day
+            mm = self.data[&#34;t&#34;][0].month
+            yy = self.data[&#34;t&#34;][0].year
+            end = datetime.strptime(kwargs[&#34;end&#34;],
+                                    &#34;%H:%M:%S&#34;
+                                    ).replace(day=dd,
+                                              month=mm,
+                                              year=yy)
+            m = np.where(self.data[&#34;t&#34;]&lt;=end,m,False)
+            
+        yy = np.array([np.nanmean(self.data[f&#34;bin{i}_dndlogdp&#34;][m]) 
+                       for i in range(self.bins)])
+        
+        if kwargs[&#34;scatter&#34;]:
+            ax.scatter(xx,yy)
+        else:
+            if isinstance(kwargs[&#34;bin_borders&#34;],list):
+                bb = kwargs[&#34;bin_borders&#34;]
+            else:
+                try:
+                    bb = self.bin_borders
+                except AttributeError:
+                    msg = &#34;bin_borders attribute does not exist. The loaded&#34;
+                    msg += &#34; .wibs file was probably created before the attri&#34;
+                    msg += &#34;bute was introduced. Try passing &#39;bin_borders&#39;&#34;
+                    msg += &#34; manually in WIBS.dndlogdp() or consult docu.&#34;
+                    raise AttributeError(msg)
+            bb = kwargs[&#34;bin_borders&#34;]
+            width = np.array([bb[i+1]-bb[i] for i in range(self.bins)])
+            ax.bar(xx,yy,width*0.8,align=&#34;center&#34;)
+        if kwargs[&#34;log&#34;]:
+            ax.set_xscale(&#34;log&#34;)
+        ax.set_xlabel(&#34;D$_p$ in μm&#34;)
+        ax.set_ylabel(&#34;dN/dlogD$_p$ in cm$^{-3}$&#34;)
+        
+        
+    def save(self, path):
+        &#34;&#34;&#34;
+        Saves the obj as a preprocessed .wibs file
+
+        Parameters
+        ----------
+        path : str
+            Determines the path and name, where the .wibs file should be saved.
+
+        Returns
+        -------
+        None.
+
+        &#34;&#34;&#34;
+        
+        op = {
+            &#34;bins&#34; : self.bins,
+            &#34;bin_means&#34; : self.bin_means,
+            &#34;bin_borders&#34; : self.bin_borders,
+            &#34;data&#34; : self.data,
+            &#34;rawdata&#34; : self.rawdata,
+            &#34;details&#34; : self.details,
+            &#34;fl1_FTbg&#34; : self.fl1_FTbg,
+            &#34;fl2_FTbg&#34; : self.fl2_FTbg,
+            &#34;fl3_FTbg&#34; : self.fl3_FTbg,
+            &#34;FT_sigma&#34; : self.FT_sigma,
+            &#34;flow&#34; : self.flow
+            }
+        
+        if path[-5:] != &#34;.wibs&#34;:
+            path.append(&#34;.wibs&#34;)
+          
+        with open(path,&#34;wb&#34;) as dumppath:
+            pickle.dump(op,dumppath,4)
+            
+            
+    def returndata(self):
+        &#34;&#34;&#34;
+        Returns a tuple containing all data in a standardized form. Important 
+        for communication with DroneWrapper or Wrapper objs.
+
+        Returns
+        -------
+        data : dict {str : np.array}
+            This dict contains all data in the form of np.arrays indexed by 
+            their name.
+        details : dict {str : [str,str]}
+            This dict contains a description and a unit for all the 
+            exported data.
+        &#34;&#34;&#34;
+        
+        
+        op_t = []
+        for t in self.data[&#34;t&#34;]:
+            op_t.append(t.replace(microsecond=0))
+        op_data = {&#34;t&#34;:np.array(op_t)}
+        for key in self.data.keys():
+            if key == &#34;t&#34;:
+                continue
+            op_data[key] = self.data[key]
+        
+        return op_data,self.details
+
+    
+    #housekeeping funcs
+    
+    def hk_kwargs(self,kwargs,key,default):
+        &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
+
+        op = kwargs[key] if key in kwargs else default
+        setattr(self,key,op)
+        
+        
+    def hk_func_kwargs(self,kwargs,key,default):
+        &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
+
+        op = kwargs[key] if key in kwargs else default
+        return op
+    
+    
+    def hk_errorhandling(self,kwargs,legallist,funcname):
+        &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
+
+        for key in kwargs:
+            if key not in legallist:
+                raise IllegalArgument(key,funcname,legallist)</code></pre>
+</details>
+<div class="desc"><p>Inits the WIBS obj</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>file</code></strong> :&ensp;<code>str</code> or <code>list</code> of <code>str</code></dt>
+<dd>Either the path to a wibs produced .h5 file or to a preprocessed
+.wibs file or a list of paths to wibs produced .h5 files.</dd>
+<dt><strong><code>FT_file</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path to a wibs produced forcedtrigger-file. Can be left if a
+preprocessed .wibs file is passed as file.</dd>
+<dt><strong><code>FT_time</code></strong> :&ensp;<code>str</code></dt>
+<dd>String in the form of 'hh:mm:ss' of the time when the forced
+trigger was started, which is used to correct the time. Can be
+left if a preprocessed .wibs file is passed as file.</dd>
+<dt><strong><code>FT_sigma</code></strong> :&ensp;<code>int</code> or <code>float</code>, optional</dt>
+<dd>Will be used as sigma for data processing. The default is 3.</dd>
+<dt><strong><code>bin_borders</code></strong> :&ensp;<code>list</code> of <code>float</code>, optional</dt>
+<dd>Particles will be classified according to the bins given here
+(in micrometers). The default is [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,
+1.4,1.7,2,2.5,3,3.5,4,5,10,15,20]</dd>
+<dt><strong><code>flow</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Flow in ccm/s. Will be used to calculate partconc and dndlogdp.
+The default is 0.018 ccm/s (=0.3 lpm).</dd>
+<dt><strong><code>fixed</code></strong> :&ensp;<code>list</code> of <code>floats with len 3</code>, optional</dt>
+<dd>If fixed is passed, the values will be treated as bg and FT_file
+will only be used for time correction.</dd>
+<dt><strong><code>start</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>String in the form 'hh:mm:ss'. If start is given, all data acquired
+before this timestamp will be ignored.</dd>
+<dt><strong><code>end</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>String in the form 'hh:mm:ss'. If end is given, all data acquired
+after this timestamp will be ignored.</dd>
+<dt><strong><code>FT_date</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Sets the FT_time to be this date (str format: 'dd.mm.yyyy'), only
+relevant if the data is going to be compared with other data.
+The default is '01.01.2000'</dd>
+<dt><strong><code>channels</code></strong> :&ensp;<code>list</code> of <code>str</code>, optional</dt>
+<dd>Decides which channels should be processed, by default all channels
+are processed, but it can be reduced for large files.
+The default is
+["a","b","c","ab","ac","bc","abc"].</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>bins</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of bins</dd>
+<dt><strong><code>bin_means</code></strong> :&ensp;<code>list</code> of <code>float</code></dt>
+<dd>Geometric means of bins. Used for dndlogdp stuff.</dd>
+<dt><strong><code>bin_borders</code></strong> :&ensp;<code>list</code> of <code>float</code></dt>
+<dd>The list of bin borders that is passed as a kwarg at init. It is only
+saved as an attribute in agg_dim 0.1.18 or higher.</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>{str : 1D numpy array}</code></dt>
+<dd>contains all processed data in the form of a dictionary
+(processed for every second)</dd>
+<dt><strong><code>details</code></strong> :&ensp;<code>{str : [str, str]}</code></dt>
+<dd>contains a description and the unit to each data array</dd>
+<dt><strong><code>rawdata</code></strong> :&ensp;<code>{str : 1D numpy array}</code></dt>
+<dd>conains all the raw data used for data processing</dd>
+<dt><strong><code>fl1_FTbg</code></strong> :&ensp;<code>float</code></dt>
+<dd>Contains the fluorescence of the chamber for fl1, calculated from the
+forced trigger.</dd>
+<dt><strong><code>fl2_FTbg</code></strong> :&ensp;<code>float</code></dt>
+<dd>Contains the fluorescence of the chamber for fl2, calculated from the
+forced trigger.</dd>
+<dt><strong><code>fl3_FTbg</code></strong> :&ensp;<code>float</code></dt>
+<dd>Contains the fluorescence of the chamber for fl3, calculated from the
+forced trigger.</dd>
+</dl></div>
+<h3>Methods</h3>
+<dl>
+<dt id="agg_dim.wibs.WIBS.dndlogdp"><code class="name flex">
+<span>def <span class="ident">dndlogdp</span></span>(<span>self, ax, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dndlogdp(self,ax, **kwargs):
+    &#34;&#34;&#34;
+    Creates a dN/dlogDp plot on an existing mpl axis.
+
+    Parameters
+    ----------
+    ax : Axes obj of mpl.axes module
+        The plot will be drawn on this axis.
+    
+    Kwargs
+    ------
+    start : str, optional
+        If a str in the format &#34;HH:MM:SS&#34; is given, only data acquired 
+        after this timestamp will be used for the dNdlogDp curve.
+    end : str, optional
+        If a str in the format &#34;HH:MM:SS&#34; is given, only data acquired
+        before this timestamp will be used for the dNdlogDp curve.
+    log : bool, optional
+        If True the x-axis will be expressed logarithmicly. The default is
+        True.
+    xlabel : str, optional
+        Sets the x label to the given str. The default is &#39;D$_p$ in μm&#39;.
+    ylable : str, optional
+        Sets the y label to the given str. The default is 
+        &#39;dN/dlogD$_p$ in cm{^{-3}$&#39;.
+    scatter : bool, optional
+        If True, a scatterplot will be drawn instead of a bar plot. The 
+        default is False.
+    bin_borders : list of float, optional
+        Should only be passed if the WIBS object was created from a .wibs
+        file that was created before agg_dim 0.1.18 and does not have the 
+        &#39;bin_borders&#39; attribute. If no list is passed, it will try to use
+        the &#39;bin_borders&#39; attribute from the WIBS obj and if it has none, 
+        an AttributeError will be raised.
+
+    Returns
+    -------
+    None
+    &#34;&#34;&#34;
+    
+    
+    #kwargs
+    defaults = {&#34;start&#34; : None,
+                &#34;end&#34; : None,
+                &#34;log&#34; : True,
+                &#34;xlabel&#34; : &#34;D$_p$ in μm&#34;,
+                &#34;ylabel&#34; : &#34;dN/dlogD$_p$ in cm{^{-3}$&#34;,
+                &#34;scatter&#34; : False,
+                &#34;bin_borders&#34; : None}
+    
+    for key,default in defaults.items():
+        kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+    self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.dndlogp()&#34;)
+    
+    xx = np.array(self.bin_means)
+    m = np.array([True for t in self.data[&#34;t&#34;]])
+    
+    if isinstance(kwargs[&#34;start&#34;],str):
+        dd = self.data[&#34;t&#34;][0].day
+        mm = self.data[&#34;t&#34;][0].month
+        yy = self.data[&#34;t&#34;][0].year
+        start = datetime.strptime(kwargs[&#34;start&#34;],
+                                  &#34;%H:%M:%S&#34;
+                                  ).replace(day=dd,
+                                            month=mm,
+                                            year=yy)
+        m = np.where(self.data[&#34;t&#34;]&gt;=start,m,False)
+    if isinstance(kwargs[&#34;end&#34;],str):
+        dd = self.data[&#34;t&#34;][0].day
+        mm = self.data[&#34;t&#34;][0].month
+        yy = self.data[&#34;t&#34;][0].year
+        end = datetime.strptime(kwargs[&#34;end&#34;],
+                                &#34;%H:%M:%S&#34;
+                                ).replace(day=dd,
+                                          month=mm,
+                                          year=yy)
+        m = np.where(self.data[&#34;t&#34;]&lt;=end,m,False)
+        
+    yy = np.array([np.nanmean(self.data[f&#34;bin{i}_dndlogdp&#34;][m]) 
+                   for i in range(self.bins)])
+    
+    if kwargs[&#34;scatter&#34;]:
+        ax.scatter(xx,yy)
+    else:
+        if isinstance(kwargs[&#34;bin_borders&#34;],list):
+            bb = kwargs[&#34;bin_borders&#34;]
+        else:
+            try:
+                bb = self.bin_borders
+            except AttributeError:
+                msg = &#34;bin_borders attribute does not exist. The loaded&#34;
+                msg += &#34; .wibs file was probably created before the attri&#34;
+                msg += &#34;bute was introduced. Try passing &#39;bin_borders&#39;&#34;
+                msg += &#34; manually in WIBS.dndlogdp() or consult docu.&#34;
+                raise AttributeError(msg)
+        bb = kwargs[&#34;bin_borders&#34;]
+        width = np.array([bb[i+1]-bb[i] for i in range(self.bins)])
+        ax.bar(xx,yy,width*0.8,align=&#34;center&#34;)
+    if kwargs[&#34;log&#34;]:
+        ax.set_xscale(&#34;log&#34;)
+    ax.set_xlabel(&#34;D$_p$ in μm&#34;)
+    ax.set_ylabel(&#34;dN/dlogD$_p$ in cm$^{-3}$&#34;)</code></pre>
+</details>
+<div class="desc"><p>Creates a dN/dlogDp plot on an existing mpl axis.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
+<dd>The plot will be drawn on this axis.</dd>
+</dl>
+<h2 id="kwargs">Kwargs</h2>
+<p>start : str, optional
+If a str in the format "HH:MM:SS" is given, only data acquired
+after this timestamp will be used for the dNdlogDp curve.
+end : str, optional
+If a str in the format "HH:MM:SS" is given, only data acquired
+before this timestamp will be used for the dNdlogDp curve.
+log : bool, optional
+If True the x-axis will be expressed logarithmicly. The default is
+True.
+xlabel : str, optional
+Sets the x label to the given str. The default is 'D$_p$ in μm'.
+ylable : str, optional
+Sets the y label to the given str. The default is
+'dN/dlogD$_p$ in cm{^{-3}$'.
+scatter : bool, optional
+If True, a scatterplot will be drawn instead of a bar plot. The
+default is False.
+bin_borders : list of float, optional
+Should only be passed if the WIBS object was created from a .wibs
+file that was created before agg_dim 0.1.18 and does not have the
+'bin_borders' attribute. If no list is passed, it will try to use
+the 'bin_borders' attribute from the WIBS obj and if it has none,
+an AttributeError will be raised.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+</dd>
+<dt id="agg_dim.wibs.WIBS.heatmap"><code class="name flex">
+<span>def <span class="ident">heatmap</span></span>(<span>self, ax, y, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def heatmap(self,ax,y,**kwargs):
+    &#34;&#34;&#34;
+    Draws a dndlogdp number size distribution heatmap over an existing 
+    mpl axis
+
+    Parameters
+    ----------
+    ax : Axes obj of mpl.axes module
+        The heatmap will be drawn on this axis.
+    y : str
+        Determines which data should be plotted.
+    cmap : str, optional
+        Changes the colormap. The default is &#39;RdYlBu_r&#39;
+    pad : float, optional
+        Changes the padding between colorbar and plot. The default is 0.
+    orientation : str, optional
+        Changes the orientation of the colorbar.
+    location : str, optional
+        Changes the location of the colorbar. The default is &#39;top&#39;.
+    togglecbar : bool, optional
+        If False, the colorbar wont be shown. The default is True.
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    defaults = {&#34;cmap&#34; : &#34;RdYlBu_r&#34;,
+                &#34;pad&#34; : 0,
+                &#34;orientation&#34; : &#34;horizontal&#34;,
+                &#34;location&#34; : &#34;top&#34;,
+                &#34;togglecbar&#34; : True}
+    for key,default in defaults.items():
+        kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+    self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.heatmap()&#34;)
+    
+    try:
+        yy = np.array(
+            [self.data[f&#34;{y}_bin{i}_dndlogdp&#34;] for i in range(self.bins)]
+            ) if y != &#34;allparticles&#34; else np.array(
+                [self.data[f&#34;bin{i}_dndlogdp&#34;] for i in range(self.bins)]
+                )
+    except KeyError as kerr:
+        raise IllegalValue(y, 
+                           &#34;WIBS.heatmap()&#34;, 
+                           [&#34;allparticles&#34;,&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,
+                            &#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;]) from kerr
+    
+    xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
+    xlims = md.date2num(xlims)
+        
+    #draw plot
+    im = ax.imshow(yy,
+                   aspect=&#34;auto&#34;,
+                   norm=&#34;log&#34;,
+                   extent=[xlims[0],xlims[1],0,self.bins],
+                   cmap=kwargs[&#34;cmap&#34;],
+                   interpolation=&#34;none&#34;,
+                   origin=&#34;lower&#34;)
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    ax.set_ylabel(&#34;$D_P$ in $\mu$m&#34;)
+    ax.set_xlabel(&#34;CET&#34;)
+    
+    labels = [str(round(label,2)) for label in self.bin_means]
+    ticks = [tick+0.5 for tick in range(self.bins)]
+    ax.set_yticks(ticks,labels=labels)
+    
+    ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
+    ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
+    plt.colorbar(im,
+                 ax=ax,
+                 label=&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;,
+                 pad=kwargs[&#34;pad&#34;],
+                 orientation=kwargs[&#34;orientation&#34;],
+                 location=kwargs[&#34;location&#34;])</code></pre>
+</details>
+<div class="desc"><p>Draws a dndlogdp number size distribution heatmap over an existing
+mpl axis</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
+<dd>The heatmap will be drawn on this axis.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
+<dd>Determines which data should be plotted.</dd>
+<dt><strong><code>cmap</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Changes the colormap. The default is 'RdYlBu_r'</dd>
+<dt><strong><code>pad</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Changes the padding between colorbar and plot. The default is 0.</dd>
+<dt><strong><code>orientation</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Changes the orientation of the colorbar.</dd>
+<dt><strong><code>location</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Changes the location of the colorbar. The default is 'top'.</dd>
+<dt><strong><code>togglecbar</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If False, the colorbar wont be shown. The default is True.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.wibs.WIBS.hk_errorhandling"><code class="name flex">
+<span>def <span class="ident">hk_errorhandling</span></span>(<span>self, kwargs, legallist, funcname)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
+    &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
+
+    for key in kwargs:
+        if key not in legallist:
+            raise IllegalArgument(key,funcname,legallist)</code></pre>
+</details>
+<div class="desc"><p>Checks if all passed kwargs are legal</p></div>
+</dd>
+<dt id="agg_dim.wibs.WIBS.hk_func_kwargs"><code class="name flex">
+<span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
+    &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
+
+    op = kwargs[key] if key in kwargs else default
+    return op</code></pre>
+</details>
+<div class="desc"><p>Gives kwargs a default value if they are not passed</p></div>
+</dd>
+<dt id="agg_dim.wibs.WIBS.hk_kwargs"><code class="name flex">
+<span>def <span class="ident">hk_kwargs</span></span>(<span>self, kwargs, key, default)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hk_kwargs(self,kwargs,key,default):
+    &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
+
+    op = kwargs[key] if key in kwargs else default
+    setattr(self,key,op)</code></pre>
+</details>
+<div class="desc"><p>Turns kwargs into attributes</p></div>
+</dd>
+<dt id="agg_dim.wibs.WIBS.plot"><code class="name flex">
+<span>def <span class="ident">plot</span></span>(<span>self, ax, y, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot(self,ax,y,**kwargs):
+    &#34;&#34;&#34;
+    Plots y over time on an existing mpl axis.
+
+    Parameters
+    ----------
+    ax : Axes obj of mpl.axes module
+        The plot will be drawn on this axis.
+    y : str
+        Determines which data should be plotted.
+    label : str, optional
+        Changes the label of the plot. If a legend is created, this label 
+        will be shown there. The default is &#39;no label&#39;.
+    color : str
+        Changes the color of the plot. The default is &#39;tab:purple&#39;.
+    secondary : bool, optional
+        If True, the plot will draw the axis on the right-hand side. 
+        Should be used if the given ax is a twinx(). The default is False.
+    
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+
+    defaults = {&#34;label&#34; : &#34;no label&#34;,
+                &#34;color&#34; : &#34;tab:purple&#34;,
+                &#34;secondary&#34; : False}
+    for key,default in defaults.items():
+        kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+    self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.plot()&#34;)
+    
+    xx = self.data[&#34;t&#34;]
+    try:
+        yy = self.data[y]
+    except KeyError as kerr:
+        raise IllegalValue(&#34;y&#34;, &#34;WIBS.plot()&#34;,list(self.data)) from kerr
+        
+    ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34; if self.details[y][1] != &#34;No Unit&#34; else self.details[y][0]
+        
+    #draw plot
+    ax.plot(xx,yy,label=kwargs[&#34;label&#34;],color=kwargs[&#34;color&#34;])
+    
+    ax.set_xlabel(&#34;CET&#34;)
+    ax.set_ylabel(ylabel)
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    
+    ax.tick_params(axis=&#39;y&#39;, colors=kwargs[&#34;color&#34;])
+    ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])
+    if not kwargs[&#34;secondary&#34;]:
+        ax.spines[&#34;left&#34;].set_color(kwargs[&#34;color&#34;])
+    else:
+        ax.spines[&#34;right&#34;].set_color(kwargs[&#34;color&#34;])
+        ax.spines[&#34;left&#34;].set_alpha(0)</code></pre>
+</details>
+<div class="desc"><p>Plots y over time on an existing mpl axis.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
+<dd>The plot will be drawn on this axis.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
+<dd>Determines which data should be plotted.</dd>
+<dt><strong><code>label</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Changes the label of the plot. If a legend is created, this label
+will be shown there. The default is 'no label'.</dd>
+<dt><strong><code>color</code></strong> :&ensp;<code>str</code></dt>
+<dd>Changes the color of the plot. The default is 'tab:purple'.</dd>
+<dt><strong><code>secondary</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, the plot will draw the axis on the right-hand side.
+Should be used if the given ax is a twinx(). The default is False.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.wibs.WIBS.quickheatmap"><code class="name flex">
+<span>def <span class="ident">quickheatmap</span></span>(<span>self, y)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def quickheatmap(self,y):
+    &#34;&#34;&#34;
+    Draws a dndlogdp number size distribution heatmap
+
+    Parameters
+    ----------
+    y : str
+        Determines which data should be plotted.
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    #error handling
+    try:
+        yy = np.array(
+            [self.data[f&#34;{y}_bin{i}_dndlogdp&#34;] for i in range(self.bins)]
+            ) if y != &#34;allparticles&#34; else np.array(
+                [self.data[f&#34;bin{i}_dndlogdp&#34;] for i in range(self.bins)]
+                )
+    except KeyError as kerr:
+        raise IllegalValue(y, 
+                           &#34;WIBS.quickheatmap&#34;, 
+                           [&#34;allparticles&#34;,&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,
+                            &#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;]) from kerr
+    
+    xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
+    xlims = md.date2num(xlims)
+        
+    #draw plot
+    _,ax = plt.subplots()
+    
+    im = ax.imshow(yy,
+                   aspect=&#34;auto&#34;,
+                   norm=&#34;log&#34;,
+                   extent=[xlims[0],xlims[1],0,self.bins]
+                   ,cmap=&#34;RdYlBu_r&#34;,
+                   interpolation=&#34;none&#34;,
+                   origin=&#34;lower&#34;)
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    ax.set_ylabel(&#34;$D_P$ in $\mu$m&#34;)
+    ax.set_xlabel(&#34;CET&#34;)
+    
+    labels = [str(round(label,2)) for label in self.bin_means]
+    ticks = [tick+0.5 for tick in range(self.bins)]
+    ax.set_yticks(ticks,labels=labels)
+    
+    ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
+    ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
+    plt.colorbar(im,ax=ax,label=&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;)
+    
+    plt.show()</code></pre>
+</details>
+<div class="desc"><p>Draws a dndlogdp number size distribution heatmap</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
+<dd>Determines which data should be plotted.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.wibs.WIBS.quickplot"><code class="name flex">
+<span>def <span class="ident">quickplot</span></span>(<span>self, y)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def quickplot(self,y):
+    &#34;&#34;&#34;
+    Plots the given y over time
+
+    Parameters
+    ----------
+    y : str
+        Determines which data should be plotted.
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    #error handling
+    xx = self.data[&#34;t&#34;]
+    try:
+        yy = self.data[y]
+    except KeyError as kerr:
+        raise IllegalValue(y, &#34;WIBS.quickplot()&#34;,list(self.data)) from kerr
+            
+    #draw plot
+    _,ax = plt.subplots()
+
+    ax.set_xlabel(&#34;CET&#34;)
+    ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34; if self.details[y][1] != &#34;No Unit&#34; else self.details[y][0]
+    ax.set_ylabel(ylabel)
+    
+    ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
+    
+    ax.plot(xx,yy)
+    
+    plt.show()</code></pre>
+</details>
+<div class="desc"><p>Plots the given y over time</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
+<dd>Determines which data should be plotted.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.wibs.WIBS.returndata"><code class="name flex">
+<span>def <span class="ident">returndata</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def returndata(self):
+    &#34;&#34;&#34;
+    Returns a tuple containing all data in a standardized form. Important 
+    for communication with DroneWrapper or Wrapper objs.
+
+    Returns
+    -------
+    data : dict {str : np.array}
+        This dict contains all data in the form of np.arrays indexed by 
+        their name.
+    details : dict {str : [str,str]}
+        This dict contains a description and a unit for all the 
+        exported data.
+    &#34;&#34;&#34;
+    
+    
+    op_t = []
+    for t in self.data[&#34;t&#34;]:
+        op_t.append(t.replace(microsecond=0))
+    op_data = {&#34;t&#34;:np.array(op_t)}
+    for key in self.data.keys():
+        if key == &#34;t&#34;:
+            continue
+        op_data[key] = self.data[key]
+    
+    return op_data,self.details</code></pre>
+</details>
+<div class="desc"><p>Returns a tuple containing all data in a standardized form. Important
+for communication with DroneWrapper or Wrapper objs.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict {str : np.array}</code></dt>
+<dd>This dict contains all data in the form of np.arrays indexed by
+their name.</dd>
+<dt><strong><code>details</code></strong> :&ensp;<code>dict {str : [str,str]}</code></dt>
+<dd>This dict contains a description and a unit for all the
+exported data.</dd>
+</dl></div>
+</dd>
+<dt id="agg_dim.wibs.WIBS.save"><code class="name flex">
+<span>def <span class="ident">save</span></span>(<span>self, path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save(self, path):
+    &#34;&#34;&#34;
+    Saves the obj as a preprocessed .wibs file
+
+    Parameters
+    ----------
+    path : str
+        Determines the path and name, where the .wibs file should be saved.
+
+    Returns
+    -------
+    None.
+
+    &#34;&#34;&#34;
+    
+    op = {
+        &#34;bins&#34; : self.bins,
+        &#34;bin_means&#34; : self.bin_means,
+        &#34;bin_borders&#34; : self.bin_borders,
+        &#34;data&#34; : self.data,
+        &#34;rawdata&#34; : self.rawdata,
+        &#34;details&#34; : self.details,
+        &#34;fl1_FTbg&#34; : self.fl1_FTbg,
+        &#34;fl2_FTbg&#34; : self.fl2_FTbg,
+        &#34;fl3_FTbg&#34; : self.fl3_FTbg,
+        &#34;FT_sigma&#34; : self.FT_sigma,
+        &#34;flow&#34; : self.flow
+        }
+    
+    if path[-5:] != &#34;.wibs&#34;:
+        path.append(&#34;.wibs&#34;)
+      
+    with open(path,&#34;wb&#34;) as dumppath:
+        pickle.dump(op,dumppath,4)</code></pre>
+</details>
+<div class="desc"><p>Saves the obj as a preprocessed .wibs file</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code></dt>
+<dd>Determines the path and name, where the .wibs file should be saved.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None.</p></div>
+</dd>
+<dt id="agg_dim.wibs.WIBS.stackedplot"><code class="name flex">
+<span>def <span class="ident">stackedplot</span></span>(<span>self, ax, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def stackedplot(self,ax,**kwargs):
+    &#34;&#34;&#34;
+    Creates a Stacked Plot on an existing axis.
+
+    Parameters
+    ----------
+    ax : Axes obj of mpl.axes module
+        The plot will be drawn on this axis.
+    
+    Kwargs
+    ------
+    start : str
+        Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
+        after it.
+    end : str, optional
+        Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
+        before it.
+    log : bool, optional
+        If True the x-axis of the plot will be scaled logarithmicly
+    xlabel : str, optional
+        Sets the xlabel of the plot. The default is &#34;D$_p$ in $\mu$m&#34;.
+    ylabel : str, optional
+        Sets the xlabel of the plot. The default is &#34;Fraction&#34;.
+    legend : bool, optional
+        If True a Legend will be drawn on the upper right. The default is 
+        True.
+
+    Returns
+    -------
+    None
+    &#34;&#34;&#34;
+    
+    
+    defaults = {&#34;start&#34; : None,
+                &#34;end&#34; : None,
+                &#34;log&#34; : True,
+                &#34;xlabel&#34; : &#34;D$_p$ in $\mu$m&#34;,
+                &#34;ylabel&#34; : &#34;Fraction&#34;,
+                &#34;legend&#34; : True}
+    for key,default in defaults.items():
+        kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
+    self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.stackedplot()&#34;)
+    
+    m = np.array([True for i in self.data[&#34;t&#34;]])
+    if isinstance(kwargs[&#34;start&#34;],str):
+        kwargs[&#34;start&#34;] = datetime.strptime(kwargs[&#34;start&#34;],&#34;%H:%M:%S&#34;)
+        kwargs[&#34;start&#34;] = kwargs[&#34;start&#34;].replace(
+            year=self.data[&#34;t&#34;][0].year,
+            month = self.data[&#34;t&#34;][0].month,
+            day = self.data[&#34;t&#34;][0].day
+            )
+        m = np.where(kwargs[&#34;start&#34;]&lt;self.data[&#34;t&#34;],m,False)
+    if isinstance(kwargs[&#34;end&#34;],str):
+        kwargs[&#34;end&#34;] = datetime.strptime(kwargs[&#34;end&#34;],&#34;%H:%M:%S&#34;)
+        kwargs[&#34;end&#34;] = kwargs[&#34;end&#34;].replace(
+            year = self.data[&#34;t&#34;][0].year,
+            month = self.data[&#34;t&#34;][0].month,
+            day = self.data[&#34;t&#34;][0].day
+            )
+        m = np.where(kwargs[&#34;end&#34;]&gt;self.data[&#34;t&#34;],m,False)
+    
+    xx = self.bin_means
+    totals = []
+    for i in range(len(xx)):
+        totals.append(np.nanmean(self.data[f&#34;bin{i}_partconc&#34;][m]))
+        totals[i] = 1 if totals[i] == 0 else totals[i]
+    vals = np.array([0 for i in xx])
+    for ch in [&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,&#34;ab&#34;,&#34;bc&#34;,&#34;ac&#34;,&#34;abc&#34;]:
+        new_vals = []
+        for i in range(len(xx)):
+            new_vals.append(
+                np.nanmean(self.data[f&#34;{ch}_bin{i}_partconc&#34;][m])
+                )
+        new_vals = np.array(new_vals) + vals
+        ax.fill_between(xx,vals/totals,new_vals/totals,label=ch)
+        vals = new_vals
+    ax.fill_between(xx,vals/totals,[1 for i in xx],label=&#34;non fluorescent&#34;)
+    
+    if kwargs[&#34;log&#34;]:
+        ax.set_xscale(&#34;log&#34;)
+    if kwargs[&#34;legend&#34;]:
+        ax.legend(loc=&#34;upper right&#34;)
+    ax.set_xlabel(kwargs[&#34;xlabel&#34;])
+    ax.set_ylabel(kwargs[&#34;ylabel&#34;])</code></pre>
+</details>
+<div class="desc"><p>Creates a Stacked Plot on an existing axis.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
+<dd>The plot will be drawn on this axis.</dd>
+</dl>
+<h2 id="kwargs">Kwargs</h2>
+<p>start : str
+Takes a str in the format "HH:MM:SS" and only plots data acquired
+after it.
+end : str, optional
+Takes a str in the format "HH:MM:SS" and only plots data acquired
+before it.
+log : bool, optional
+If True the x-axis of the plot will be scaled logarithmicly
+xlabel : str, optional
+Sets the xlabel of the plot. The default is "D$_p$ in $\mu$m".
+ylabel : str, optional
+Sets the xlabel of the plot. The default is "Fraction".
+legend : bool, optional
+If True a Legend will be drawn on the upper right. The default is
+True.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="agg_dim" href="index.html">agg_dim</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="agg_dim.wibs.WIBS" href="#agg_dim.wibs.WIBS">WIBS</a></code></h4>
+<ul class="two-column">
+<li><code><a title="agg_dim.wibs.WIBS.dndlogdp" href="#agg_dim.wibs.WIBS.dndlogdp">dndlogdp</a></code></li>
+<li><code><a title="agg_dim.wibs.WIBS.heatmap" href="#agg_dim.wibs.WIBS.heatmap">heatmap</a></code></li>
+<li><code><a title="agg_dim.wibs.WIBS.hk_errorhandling" href="#agg_dim.wibs.WIBS.hk_errorhandling">hk_errorhandling</a></code></li>
+<li><code><a title="agg_dim.wibs.WIBS.hk_func_kwargs" href="#agg_dim.wibs.WIBS.hk_func_kwargs">hk_func_kwargs</a></code></li>
+<li><code><a title="agg_dim.wibs.WIBS.hk_kwargs" href="#agg_dim.wibs.WIBS.hk_kwargs">hk_kwargs</a></code></li>
+<li><code><a title="agg_dim.wibs.WIBS.plot" href="#agg_dim.wibs.WIBS.plot">plot</a></code></li>
+<li><code><a title="agg_dim.wibs.WIBS.quickheatmap" href="#agg_dim.wibs.WIBS.quickheatmap">quickheatmap</a></code></li>
+<li><code><a title="agg_dim.wibs.WIBS.quickplot" href="#agg_dim.wibs.WIBS.quickplot">quickplot</a></code></li>
+<li><code><a title="agg_dim.wibs.WIBS.returndata" href="#agg_dim.wibs.WIBS.returndata">returndata</a></code></li>
+<li><code><a title="agg_dim.wibs.WIBS.save" href="#agg_dim.wibs.WIBS.save">save</a></code></li>
+<li><code><a title="agg_dim.wibs.WIBS.stackedplot" href="#agg_dim.wibs.WIBS.stackedplot">stackedplot</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
