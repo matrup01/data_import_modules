@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: agg_dim
-Version: 0.1.18
+Version: 0.2.0
 Summary: Data import modules for instruments used by AG Grothe
 Home-page: https://github.com/matrup01/data_import_modules/
 Author: Matthäus Rupprecht, Florian Wieland
@@ -16,32 +16,34 @@ Requires-Python: >=3.13.9
 Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: branca>=0.8.2
-Requires-Dist: certifi>=2025.11.12
-Requires-Dist: charset-normalizer>=3.4.4
+Requires-Dist: certifi>=2026.4.22
+Requires-Dist: charset-normalizer>=3.4.7
 Requires-Dist: contourpy>=1.3.3
 Requires-Dist: cycler>=0.12.1
 Requires-Dist: folium>=0.20.0
-Requires-Dist: fonttools>=4.60.1
-Requires-Dist: h5py>=3.15.1
-Requires-Dist: idna>=3.11
+Requires-Dist: fonttools>=4.62.1
+Requires-Dist: h5py>=3.16.0
+Requires-Dist: idna>=3.13
 Requires-Dist: Jinja2>=3.1.6
-Requires-Dist: kiwisolver>=1.4.9
-Requires-Dist: llvmlite>=0.45.1
+Requires-Dist: kiwisolver>=1.5.0
+Requires-Dist: llvmlite>=0.47.0
 Requires-Dist: MarkupSafe>=3.0.3
-Requires-Dist: matplotlib>=3.10.7
-Requires-Dist: numba>=0.62.1
-Requires-Dist: numpy>=2.3.5
-Requires-Dist: packaging>=25.0
-Requires-Dist: pillow>=12.0.0
-Requires-Dist: pyparsing>=3.2.5
+Requires-Dist: matplotlib>=3.10.9
+Requires-Dist: numba>=0.65.1
+Requires-Dist: numpy>=2.4.4
+Requires-Dist: packaging>=26.2
+Requires-Dist: pillow>=12.2.0
+Requires-Dist: pyparsing>=3.3.2
 Requires-Dist: python-dateutil>=2.9.0
-Requires-Dist: requests>=2.32.5
+Requires-Dist: requests>=2.33.1
 Requires-Dist: six>=1.17.0
-Requires-Dist: urllib3>=2.5.0
+Requires-Dist: urllib3>=2.7.0
 Requires-Dist: utm>=0.8.1
-Requires-Dist: xyzservices>=2025.10.0
+Requires-Dist: xyzservices>=2026.3.0
 Provides-Extra: dev
 Requires-Dist: twine>=6.2.0; extra == "dev"
+Requires-Dist: pdoc3>=0.11.6; extra == "dev"
+Requires-Dist: setuptools>=82.0.1; extra == "dev"
 Dynamic: author
 Dynamic: author-email
 Dynamic: classifier
@@ -74,4 +76,8 @@ Supported instruments:
 
 ## Documentation
 
-Full documentation is available on https://github.com/matrup01/data_import_modules
+Full documentation is available on https://matrup01.github.io/data_import_modules
+
+## How to contribute
+
+See https://github.com/matrup01/data_import_modules
