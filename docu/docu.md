@@ -1,5 +1,6 @@
-The docu is not up to date!!!
-It does NOT contain infos from commit MR 18.06.2026 upwards!
+The docu is depricated!!!
+It does NOT contain infos from agg_dim 0.1.17 upwards!
+Use the docu on https://matrup01.github.io/data_import_modules instead!
 
 1.    particle_counters.py:
 

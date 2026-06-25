@@ -386,7 +386,7 @@ class NewFData:
     
     def __init__(self,file,bg_file="blank.blank",**kwargs):
         """
-        inits NewFData obj
+        inits `NewFData` obj
 
         Parameters
         ----------

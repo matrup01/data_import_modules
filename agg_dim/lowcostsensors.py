@@ -14,17 +14,14 @@ from .ErrorHandler import IllegalArgument
 
 
 class CCS811:
-    """full documentation see https://github.com/matrup01/data_import_modules \n
-    
-    file (str) ... takes a ccs811-produced csv-file\n
-	
-	start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp\n
-	end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp\n
-	title (str, optional) ... takes a str and uses it as a title for quickplots\n
-	deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False\n"""
     
     def __init__(self,file,start="none",end="none",title="no title",deviate=False):
         """
+        An obj for inputting CCS811 generated .csv files
+        
+        .. deprecated:: 0.1.1
+            `CCS811` was succeeded by the `FlyingFlo_USB` class in agg_dim 
+            0.1.1 and was not updated since then.
 
         Parameters
         ----------
@@ -238,17 +235,14 @@ class CCS811:
         
         
 class SEN55:
-    """full documentation see https://github.com/matrup01/data_import_modules \n
-    
-    file (str) ... takes a sen55-produced csv-file\n
-	
-	start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp\n
-	end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp\n
-	title (str, optional) ... takes a str and uses it as a title for quickplots\n
-	deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False"""
     
     def __init__(self,file,start="none",end="none",title="no title",deviate=False):
         """
+        An obj for inputting SEN55 generated .csv files
+        
+        .. deprecated:: 0.1.1
+            `SEN55` was succeeded by the `FlyingFlo_USB` class in agg_dim 
+            0.1.1 and was not updated since then.
 
         Parameters
         ----------
@@ -506,43 +500,22 @@ class FlyingFlo_USB:
     deviate : bool, optional
         takes a bool to decide if the data should be expressed relative to mean. The default is False.
 
-    Variables
-    ---------
-    FlyingFlo_USB.title : str
+    Attributes
+    ----------
+    title : str
         Contains the title that is used for quickplots.
-    FlyingFlo_USB.deviated : bool
+    deviated : bool
         True if the data is epressed relative to a mean.
-    FlyingFlo_USB.averaged : bool
+    averaged : bool
         True if the data is averaged minutewise (through FlyingFlo.average() method).
-    FlyingFlo_USB.t : np.array of datetime obj of datetime module
+    t : np.array of datetime obj of datetime module
         Contains the timestamps of all datapoints.
-    FlyingFlo_USB.y : {str : np.array}
+    y : {str : np.array}
         Contains all data in the form of a dict.
 
     """
     
     def __init__(self,file,start="none",end="none",title="no title",deviate=False):
-        """
-        inits FlyingFlo_USB object
-
-        Parameters
-        ----------
-        file : str
-            takes a FlyingFlo_USB-produced csv-file.
-        start : str, optional
-            takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp. The default is "none".
-        end : str, optional
-            takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp. The default is "none".
-        title : str, optional
-            takes a str and uses it as a title for quickplots. The default is "no title".
-        deviate : bool, optional
-            takes a bool to decide if the data should be expressed relative to mean. The default is False.
-
-        Returns
-        -------
-        None.
-
-        """
         
         #init
         self.title = title
@@ -651,7 +624,8 @@ class FlyingFlo_USB:
         color : str, optional
             changes the color of the plot. The default is "tab:brown".
         secondary : bool, optional
-            determines which y-axis should be colored (False-left axis/True-right axis). The default is False.
+            determines which y-axis should be colored (False-left axis/
+            True-right axis). The default is False.
 
         Raises
         ------

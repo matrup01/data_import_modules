@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
 <title>agg_dim.wibs API documentation</title>
-<meta name="description" content="Created on Tue Nov 26 08:26:00 2024 …">
+<meta name="description" content="This Submodule provides the `WIBS` obj that can be used to read in wibs data">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -36,8 +36,7 @@ el.replaceWith(d);
 <h1 class="title">Module <code>agg_dim.wibs</code></h1>
 </header>
 <section id="section-intro">
-<p>Created on Tue Nov 26 08:26:00 2024</p>
-<p>@author: mrupp</p>
+<p>This Submodule provides the <code><a title="agg_dim.wibs.WIBS" href="#agg_dim.wibs.WIBS">WIBS</a></code> obj that can be used to read in wibs data</p>
 </section>
 <section>
 </section>
@@ -75,6 +74,9 @@ el.replaceWith(d);
             String in the form of &#39;hh:mm:ss&#39; of the time when the forced 
             trigger was started, which is used to correct the time. Can be 
             left if a preprocessed .wibs file is passed as file.
+            
+        Other Parameters
+        ----------------
         FT_sigma : int or float, optional
             Will be used as sigma for data processing. The default is 3.
         bin_borders : list of float, optional
@@ -609,6 +611,9 @@ el.replaceWith(d);
             The heatmap will be drawn on this axis.
         y : str
             Determines which data should be plotted.
+            
+        Other Parameters
+        ----------------
         cmap : str, optional
             Changes the colormap. The default is &#39;RdYlBu_r&#39;
         pad : float, optional
@@ -686,6 +691,9 @@ el.replaceWith(d);
             The plot will be drawn on this axis.
         y : str
             Determines which data should be plotted.
+            
+        Other Parameters
+        ----------------
         label : str, optional
             Changes the label of the plot. If a legend is created, this label 
             will be shown there. The default is &#39;no label&#39;.
@@ -742,8 +750,8 @@ el.replaceWith(d);
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
         
-        Kwargs
-        ------
+        Other Parameters
+        ----------------
         start : str
             Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
             after it.
@@ -828,8 +836,8 @@ el.replaceWith(d);
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
         
-        Kwargs
-        ------
+        Other Parameters
+        ----------------
         start : str, optional
             If a str in the format &#34;HH:MM:SS&#34; is given, only data acquired 
             after this timestamp will be used for the dNdlogDp curve.
@@ -847,12 +855,18 @@ el.replaceWith(d);
         scatter : bool, optional
             If True, a scatterplot will be drawn instead of a bar plot. The 
             default is False.
+        scatter_color : str, optional
+            Changes the color of the scatter plot. Only in effect if 
+            `scatter=True`. The default is &#39;tab:blue&#39;.
+        scatter_line : bool, optional
+            If True a dashed line that connects the points will be drawn. Only
+            in effect if `scatter=True`. The default is True.
         bin_borders : list of float, optional
-            Should only be passed if the WIBS object was created from a .wibs
+            Should only be passed if the `WIBS` object was created from a .wibs
             file that was created before agg_dim 0.1.18 and does not have the 
-            &#39;bin_borders&#39; attribute. If no list is passed, it will try to use
-            the &#39;bin_borders&#39; attribute from the WIBS obj and if it has none, 
-            an AttributeError will be raised.
+            `bin_borders` attribute. If no list is passed, it will try to 
+            use the `bin_borders` attribute from the `WIBS` obj and if it 
+            has none, an `AttributeError` will be raised.
 
         Returns
         -------
@@ -867,6 +881,8 @@ el.replaceWith(d);
                     &#34;xlabel&#34; : &#34;D$_p$ in μm&#34;,
                     &#34;ylabel&#34; : &#34;dN/dlogD$_p$ in cm{^{-3}$&#34;,
                     &#34;scatter&#34; : False,
+                    &#34;scatter_color&#34; : &#34;tab:blue&#34;,
+                    &#34;scatter_line&#34; : True,
                     &#34;bin_borders&#34; : None}
         
         for key,default in defaults.items():
@@ -901,7 +917,11 @@ el.replaceWith(d);
                        for i in range(self.bins)])
         
         if kwargs[&#34;scatter&#34;]:
-            ax.scatter(xx,yy)
+            ax.scatter(xx,yy,color=kwargs[&#34;scatter_color&#34;])
+            if kwargs[&#34;scatter_line&#34;]:
+                ax.plot(xx,yy,
+                        color=kwargs[&#34;scatter_color&#34;],
+                        linestyle=&#34;dashed&#34;)
         else:
             if isinstance(kwargs[&#34;bin_borders&#34;],list):
                 bb = kwargs[&#34;bin_borders&#34;]
@@ -962,7 +982,8 @@ el.replaceWith(d);
     def returndata(self):
         &#34;&#34;&#34;
         Returns a tuple containing all data in a standardized form. Important 
-        for communication with DroneWrapper or Wrapper objs.
+        for communication with `agg_dim.drone.DroneWrapper` or 
+        `agg_dim.experiment.Wrapper` objs.
 
         Returns
         -------
@@ -990,21 +1011,33 @@ el.replaceWith(d);
     #housekeeping funcs
     
     def hk_kwargs(self,kwargs,key,default):
-        &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Housekeeping Func --&gt; Should not be used outside the object
+        
+        Turns kwargs into attributes
+        &#34;&#34;&#34;
 
         op = kwargs[key] if key in kwargs else default
         setattr(self,key,op)
         
         
     def hk_func_kwargs(self,kwargs,key,default):
-        &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Housekeeping Func --&gt; Should not be used outside the object
+        
+        Gives kwargs a default value if they are not passed
+        &#34;&#34;&#34;
 
         op = kwargs[key] if key in kwargs else default
         return op
     
     
     def hk_errorhandling(self,kwargs,legallist,funcname):
-        &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Housekeeping Func --&gt; Should not be used outside the object
+        
+        Checks if all passed kwargs are legal
+        &#34;&#34;&#34;
 
         for key in kwargs:
             if key not in legallist:
@@ -1023,6 +1056,9 @@ preprocessed .wibs file is passed as file.</dd>
 <dd>String in the form of 'hh:mm:ss' of the time when the forced
 trigger was started, which is used to correct the time. Can be
 left if a preprocessed .wibs file is passed as file.</dd>
+</dl>
+<h2 id="other-parameters">Other Parameters</h2>
+<dl>
 <dt><strong><code>FT_sigma</code></strong> :&ensp;<code>int</code> or <code>float</code>, optional</dt>
 <dd>Will be used as sigma for data processing. The default is 3.</dd>
 <dt><strong><code>bin_borders</code></strong> :&ensp;<code>list</code> of <code>float</code>, optional</dt>
@@ -1096,8 +1132,8 @@ forced trigger.</dd>
     ax : Axes obj of mpl.axes module
         The plot will be drawn on this axis.
     
-    Kwargs
-    ------
+    Other Parameters
+    ----------------
     start : str, optional
         If a str in the format &#34;HH:MM:SS&#34; is given, only data acquired 
         after this timestamp will be used for the dNdlogDp curve.
@@ -1115,12 +1151,18 @@ forced trigger.</dd>
     scatter : bool, optional
         If True, a scatterplot will be drawn instead of a bar plot. The 
         default is False.
+    scatter_color : str, optional
+        Changes the color of the scatter plot. Only in effect if 
+        `scatter=True`. The default is &#39;tab:blue&#39;.
+    scatter_line : bool, optional
+        If True a dashed line that connects the points will be drawn. Only
+        in effect if `scatter=True`. The default is True.
     bin_borders : list of float, optional
-        Should only be passed if the WIBS object was created from a .wibs
+        Should only be passed if the `WIBS` object was created from a .wibs
         file that was created before agg_dim 0.1.18 and does not have the 
-        &#39;bin_borders&#39; attribute. If no list is passed, it will try to use
-        the &#39;bin_borders&#39; attribute from the WIBS obj and if it has none, 
-        an AttributeError will be raised.
+        `bin_borders` attribute. If no list is passed, it will try to 
+        use the `bin_borders` attribute from the `WIBS` obj and if it 
+        has none, an `AttributeError` will be raised.
 
     Returns
     -------
@@ -1135,6 +1177,8 @@ forced trigger.</dd>
                 &#34;xlabel&#34; : &#34;D$_p$ in μm&#34;,
                 &#34;ylabel&#34; : &#34;dN/dlogD$_p$ in cm{^{-3}$&#34;,
                 &#34;scatter&#34; : False,
+                &#34;scatter_color&#34; : &#34;tab:blue&#34;,
+                &#34;scatter_line&#34; : True,
                 &#34;bin_borders&#34; : None}
     
     for key,default in defaults.items():
@@ -1169,7 +1213,11 @@ forced trigger.</dd>
                    for i in range(self.bins)])
     
     if kwargs[&#34;scatter&#34;]:
-        ax.scatter(xx,yy)
+        ax.scatter(xx,yy,color=kwargs[&#34;scatter_color&#34;])
+        if kwargs[&#34;scatter_line&#34;]:
+            ax.plot(xx,yy,
+                    color=kwargs[&#34;scatter_color&#34;],
+                    linestyle=&#34;dashed&#34;)
     else:
         if isinstance(kwargs[&#34;bin_borders&#34;],list):
             bb = kwargs[&#34;bin_borders&#34;]
@@ -1196,30 +1244,38 @@ forced trigger.</dd>
 <dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
 <dd>The plot will be drawn on this axis.</dd>
 </dl>
-<h2 id="kwargs">Kwargs</h2>
-<p>start : str, optional
-If a str in the format "HH:MM:SS" is given, only data acquired
-after this timestamp will be used for the dNdlogDp curve.
-end : str, optional
-If a str in the format "HH:MM:SS" is given, only data acquired
-before this timestamp will be used for the dNdlogDp curve.
-log : bool, optional
-If True the x-axis will be expressed logarithmicly. The default is
-True.
-xlabel : str, optional
-Sets the x label to the given str. The default is 'D$_p$ in μm'.
-ylable : str, optional
-Sets the y label to the given str. The default is
-'dN/dlogD$_p$ in cm{^{-3}$'.
-scatter : bool, optional
-If True, a scatterplot will be drawn instead of a bar plot. The
-default is False.
-bin_borders : list of float, optional
-Should only be passed if the WIBS object was created from a .wibs
+<h2 id="other-parameters">Other Parameters</h2>
+<dl>
+<dt><strong><code>start</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>If a str in the format "HH:MM:SS" is given, only data acquired
+after this timestamp will be used for the dNdlogDp curve.</dd>
+<dt><strong><code>end</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>If a str in the format "HH:MM:SS" is given, only data acquired
+before this timestamp will be used for the dNdlogDp curve.</dd>
+<dt><strong><code>log</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True the x-axis will be expressed logarithmicly. The default is
+True.</dd>
+<dt><strong><code>xlabel</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Sets the x label to the given str. The default is 'D$_p$ in μm'.</dd>
+<dt><strong><code>ylable</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Sets the y label to the given str. The default is
+'dN/dlogD$_p$ in cm{^{-3}$'.</dd>
+<dt><strong><code>scatter</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, a scatterplot will be drawn instead of a bar plot. The
+default is False.</dd>
+<dt><strong><code>scatter_color</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Changes the color of the scatter plot. Only in effect if
+<code>scatter=True</code>. The default is 'tab:blue'.</dd>
+<dt><strong><code>scatter_line</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True a dashed line that connects the points will be drawn. Only
+in effect if <code>scatter=True</code>. The default is True.</dd>
+<dt><strong><code>bin_borders</code></strong> :&ensp;<code>list</code> of <code>float</code>, optional</dt>
+<dd>Should only be passed if the <code><a title="agg_dim.wibs.WIBS" href="#agg_dim.wibs.WIBS">WIBS</a></code> object was created from a .wibs
 file that was created before agg_dim 0.1.18 and does not have the
-'bin_borders' attribute. If no list is passed, it will try to use
-the 'bin_borders' attribute from the WIBS obj and if it has none,
-an AttributeError will be raised.</p>
+<code>bin_borders</code> attribute. If no list is passed, it will try to
+use the <code>bin_borders</code> attribute from the <code><a title="agg_dim.wibs.WIBS" href="#agg_dim.wibs.WIBS">WIBS</a></code> obj and if it
+has none, an <code>AttributeError</code> will be raised.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>None</code></dt>
@@ -1245,6 +1301,9 @@ an AttributeError will be raised.</p>
         The heatmap will be drawn on this axis.
     y : str
         Determines which data should be plotted.
+        
+    Other Parameters
+    ----------------
     cmap : str, optional
         Changes the colormap. The default is &#39;RdYlBu_r&#39;
     pad : float, optional
@@ -1319,6 +1378,9 @@ mpl axis</p>
 <dd>The heatmap will be drawn on this axis.</dd>
 <dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
 <dd>Determines which data should be plotted.</dd>
+</dl>
+<h2 id="other-parameters">Other Parameters</h2>
+<dl>
 <dt><strong><code>cmap</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>Changes the colormap. The default is 'RdYlBu_r'</dd>
 <dt><strong><code>pad</code></strong> :&ensp;<code>float</code>, optional</dt>
@@ -1342,13 +1404,18 @@ mpl axis</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
-    &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Housekeeping Func --&gt; Should not be used outside the object
+    
+    Checks if all passed kwargs are legal
+    &#34;&#34;&#34;
 
     for key in kwargs:
         if key not in legallist:
             raise IllegalArgument(key,funcname,legallist)</code></pre>
 </details>
-<div class="desc"><p>Checks if all passed kwargs are legal</p></div>
+<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
+<p>Checks if all passed kwargs are legal</p></div>
 </dd>
 <dt id="agg_dim.wibs.WIBS.hk_func_kwargs"><code class="name flex">
 <span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
@@ -1359,12 +1426,17 @@ mpl axis</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Housekeeping Func --&gt; Should not be used outside the object
+    
+    Gives kwargs a default value if they are not passed
+    &#34;&#34;&#34;
 
     op = kwargs[key] if key in kwargs else default
     return op</code></pre>
 </details>
-<div class="desc"><p>Gives kwargs a default value if they are not passed</p></div>
+<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
+<p>Gives kwargs a default value if they are not passed</p></div>
 </dd>
 <dt id="agg_dim.wibs.WIBS.hk_kwargs"><code class="name flex">
 <span>def <span class="ident">hk_kwargs</span></span>(<span>self, kwargs, key, default)</span>
@@ -1375,12 +1447,17 @@ mpl axis</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def hk_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Housekeeping Func --&gt; Should not be used outside the object
+    
+    Turns kwargs into attributes
+    &#34;&#34;&#34;
 
     op = kwargs[key] if key in kwargs else default
     setattr(self,key,op)</code></pre>
 </details>
-<div class="desc"><p>Turns kwargs into attributes</p></div>
+<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
+<p>Turns kwargs into attributes</p></div>
 </dd>
 <dt id="agg_dim.wibs.WIBS.plot"><code class="name flex">
 <span>def <span class="ident">plot</span></span>(<span>self, ax, y, **kwargs)</span>
@@ -1400,6 +1477,9 @@ mpl axis</p>
         The plot will be drawn on this axis.
     y : str
         Determines which data should be plotted.
+        
+    Other Parameters
+    ----------------
     label : str, optional
         Changes the label of the plot. If a legend is created, this label 
         will be shown there. The default is &#39;no label&#39;.
@@ -1452,6 +1532,9 @@ mpl axis</p>
 <dd>The plot will be drawn on this axis.</dd>
 <dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
 <dd>Determines which data should be plotted.</dd>
+</dl>
+<h2 id="other-parameters">Other Parameters</h2>
+<dl>
 <dt><strong><code>label</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>Changes the label of the plot. If a legend is created, this label
 will be shown there. The default is 'no label'.</dd>
@@ -1599,7 +1682,8 @@ Should be used if the given ax is a twinx(). The default is False.</dd>
 <pre><code class="python">def returndata(self):
     &#34;&#34;&#34;
     Returns a tuple containing all data in a standardized form. Important 
-    for communication with DroneWrapper or Wrapper objs.
+    for communication with `agg_dim.drone.DroneWrapper` or 
+    `agg_dim.experiment.Wrapper` objs.
 
     Returns
     -------
@@ -1624,7 +1708,8 @@ Should be used if the given ax is a twinx(). The default is False.</dd>
     return op_data,self.details</code></pre>
 </details>
 <div class="desc"><p>Returns a tuple containing all data in a standardized form. Important
-for communication with DroneWrapper or Wrapper objs.</p>
+for communication with <code><a title="agg_dim.drone.DroneWrapper" href="drone.html#agg_dim.drone.DroneWrapper">DroneWrapper</a></code> or
+<code><a title="agg_dim.experiment.Wrapper" href="experiment.html#agg_dim.experiment.Wrapper">Wrapper</a></code> objs.</p>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><strong><code>data</code></strong> :&ensp;<code>dict {str : np.array}</code></dt>
@@ -1704,8 +1789,8 @@ exported data.</dd>
     ax : Axes obj of mpl.axes module
         The plot will be drawn on this axis.
     
-    Kwargs
-    ------
+    Other Parameters
+    ----------------
     start : str
         Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
         after it.
@@ -1786,22 +1871,24 @@ exported data.</dd>
 <dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
 <dd>The plot will be drawn on this axis.</dd>
 </dl>
-<h2 id="kwargs">Kwargs</h2>
-<p>start : str
-Takes a str in the format "HH:MM:SS" and only plots data acquired
-after it.
-end : str, optional
-Takes a str in the format "HH:MM:SS" and only plots data acquired
-before it.
-log : bool, optional
-If True the x-axis of the plot will be scaled logarithmicly
-xlabel : str, optional
-Sets the xlabel of the plot. The default is "D$_p$ in $\mu$m".
-ylabel : str, optional
-Sets the xlabel of the plot. The default is "Fraction".
-legend : bool, optional
-If True a Legend will be drawn on the upper right. The default is
-True.</p>
+<h2 id="other-parameters">Other Parameters</h2>
+<dl>
+<dt><strong><code>start</code></strong> :&ensp;<code>str</code></dt>
+<dd>Takes a str in the format "HH:MM:SS" and only plots data acquired
+after it.</dd>
+<dt><strong><code>end</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Takes a str in the format "HH:MM:SS" and only plots data acquired
+before it.</dd>
+<dt><strong><code>log</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True the x-axis of the plot will be scaled logarithmicly</dd>
+<dt><strong><code>xlabel</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Sets the xlabel of the plot. The default is "D$_p$ in $\mu$m".</dd>
+<dt><strong><code>ylabel</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Sets the xlabel of the plot. The default is "Fraction".</dd>
+<dt><strong><code>legend</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True a Legend will be drawn on the upper right. The default is
+True.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>None</code></dt>

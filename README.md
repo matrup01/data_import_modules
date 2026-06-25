@@ -2,7 +2,7 @@
 
 ## Contents
 
-This repo contains modules with python importable classes that can be used for data analysis of different instruments. Further documentation is available in /docu/docu.md
+This repo contains modules with python importable classes that can be used for data analysis of different instruments. Further documentation is available under https://matrup01.github.io/data_import_modules
 
 Supported instruments:
 - POPS

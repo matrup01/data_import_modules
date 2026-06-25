@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov 26 08:26:00 2024
-
-@author: mrupp
+This Submodule provides the `WIBS` obj that can be used to read in wibs data
 """
 
 import math
@@ -33,6 +31,9 @@ class WIBS:
             String in the form of 'hh:mm:ss' of the time when the forced 
             trigger was started, which is used to correct the time. Can be 
             left if a preprocessed .wibs file is passed as file.
+            
+        Other Parameters
+        ----------------
         FT_sigma : int or float, optional
             Will be used as sigma for data processing. The default is 3.
         bin_borders : list of float, optional
@@ -67,8 +68,8 @@ class WIBS:
         bin_means : list of float
             Geometric means of bins. Used for dndlogdp stuff.
         bin_borders : list of float
-            The list of bin borders that is passed as a kwarg at init. It is only 
-            saved as an attribute in agg_dim 0.1.18 or higher.
+            The list of bin borders that is passed as a kwarg at init. It is 
+            only saved as an attribute in agg_dim 0.1.18 or higher.
         data : {str : 1D numpy array}
             contains all processed data in the form of a dictionary 
             (processed for every second)
@@ -77,14 +78,14 @@ class WIBS:
         rawdata : {str : 1D numpy array}
             conains all the raw data used for data processing
         fl1_FTbg : float
-            Contains the fluorescence of the chamber for fl1, calculated from the 
-            forced trigger.
+            Contains the fluorescence of the chamber for fl1, calculated from 
+            the forced trigger.
         fl2_FTbg : float
-            Contains the fluorescence of the chamber for fl2, calculated from the 
-            forced trigger.
+            Contains the fluorescence of the chamber for fl2, calculated from 
+            the forced trigger.
         fl3_FTbg : float
-            Contains the fluorescence of the chamber for fl3, calculated from the 
-            forced trigger.    
+            Contains the fluorescence of the chamber for fl3, calculated from 
+            the forced trigger.    
         """
         
         if file[-5:] == ".wibs":
@@ -135,7 +136,7 @@ class WIBS:
             self.data = {}
             self.rawdata = {}
             self.details = {} #[name,unit]
-            if self.fixed != None:
+            if self.fixed is not None:
                 self.fl1_FTbg = self.fixed[0]
                 self.fl2_FTbg = self.fixed[1]
                 self.fl3_FTbg = self.fixed[2]
@@ -170,7 +171,7 @@ class WIBS:
             FT_time = datetime.strptime(f)
             timecorr = FT_time - self.start_FT
             
-            if self.fixed == None:
+            if self.fixed is None:
                 f1 = ft_xe1[0]
                 self.fl1_FTbg = np.nanmean(f1) + self.FT_sigma * np.nanstd(f1)
                 f2 = ft_xe1[1]
@@ -343,15 +344,23 @@ class WIBS:
                     [np.count_nonzero(arr) for arr in bin_handler]
                     )
                 del bin_handler
-                self.data[f"bin{bin_no}_partconc"] = self.data[f"bin{bin_no}_cps"] / self.flow
-                self.details[f"bin{bin_no}_partconc"] = [f"Particle Conc. (bin{bin_no}) ","#/cm${}^3$"]
-                self.details[f"bin{bin_no}_cps"] = [f"Particle Counts (Bin{bin_no})","#/s"]
+                pc = f"bin{bin_no}_partconc"
+                cps = f"bin{bin_no}_cps"
+                self.data[pc] = self.data[cps] / self.flow
+                self.details[pc] = [f"Particle Conc. (bin{bin_no}) ",
+                                    "#/cm${}^3$"]
+                self.details[cps] = [f"Particle Counts (Bin{bin_no})","#/s"]
                 
             #dndlogdp
             for bin_no in range(self.bins):
-                log_binwidth = np.log10(self.bin_borders[bin_no+1])-np.log10(self.bin_borders[bin_no])
-                self.data[f"bin{bin_no}_dndlogdp"] = self.data[f"bin{bin_no}_partconc"] / log_binwidth
-                self.details[f"bin{bin_no}_dndlogdp"] = [f"dN/dlog$D_P$ (Bin{bin_no})","$\mu$m${}^{-1}$"]
+                log_binwidth = np.log10(
+                    self.bin_borders[bin_no+1]
+                    )-np.log10(self.bin_borders[bin_no])
+                dn = f"bin{bin_no}_dndlogdp"
+                pc = f"bin{bin_no}_partconc"
+                self.data[dn] = self.data[pc] / log_binwidth
+                self.details[dn] = [f"dN/dlog$D_P$ (Bin{bin_no})",
+                                    "$\mu$m${}^{-1}$"]
                 
             #total
             self.data["total_cps"] = np.array(
@@ -375,7 +384,10 @@ class WIBS:
                 where=self.data["total_cps"]!=0
                 )
             self.details["excited"] = ["Particle Counts (excited)","#/s"]
-            self.details["excited_fraction"] = ["Fraction of excited Particles", "No Unit"]
+            self.details["excited_fraction"] = [
+                "Fraction of excited Particles", 
+                "No Unit"
+                ]
             
             
             #fluorescence channels
@@ -412,7 +424,10 @@ class WIBS:
                 )
             for i in [1,2,3]:
                 self.details[f"fl{i}"] = [f"Particle Counts (Fl{i})","#/s"]
-                self.details[f"fl{i}_fraction"] = [f"Fluorescent Fraction (Fl{i})", "No Unit"]
+                self.details[f"fl{i}_fraction"] = [
+                    f"Fluorescent Fraction (Fl{i})",
+                    "No Unit"
+                    ]
             
             def createmask(a,b,c,string):
                 a = a if "a" in string else ~a
@@ -438,25 +453,55 @@ class WIBS:
                         m,
                         False)
                     m = channel_mask & m
-                    self.data[f"{channel}_bin{bin_no}_cps"] = np.array(
+                    cps = f"{channel}_bin{bin_no}_cps"
+                    pc = f"{channel}_bin{bin_no}_partconc"
+                    dn = f"{channel}_bin{bin_no}_dndlogdp"
+                    self.data[cps] = np.array(
                         [np.count_nonzero(arr) for arr in m]
                         )
                     del m
-                    self.data[f"{channel}_bin{bin_no}_partconc"] = self.data[f"{channel}_bin{bin_no}_cps"] / self.flow
-                    self.details[f"{channel}_bin{bin_no}_partconc"] = [f"Particle Conc. of {channel}-Particles (bin{bin_no}) ","#/cm${}^3$"]
-                    self.details[f"{channel}_bin{bin_no}_cps"] = [f"Particle Counts of {channel}-Particles (Bin{bin_no})","#/s"]
+                    self.data[pc] = self.data[cps] / self.flow
+                    self.details[pc] = [
+                        f"Particle Conc. of {channel}-Particles (bin{bin_no})",
+                        "#/cm${}^3$"
+                        ]
+                    self.details[cps] = [
+                        f"Counts of {channel}-Particles (Bin{bin_no})",
+                        "#/s"
+                        ]
                     
-                    log_binwidth = np.log10(self.bin_borders[bin_no+1])-np.log10(self.bin_borders[bin_no])
-                    self.data[f"{channel}_bin{bin_no}_dndlogdp"] = self.data[f"{channel}_bin{bin_no}_partconc"] / log_binwidth
-                    self.details[f"{channel}_bin{bin_no}_dndlogdp"] = [f"dN/dlog$D_P$ of {channel}-Particles (Bin{bin_no})","cm$^{-3}$"]
+                    log_binwidth = np.log10(
+                        self.bin_borders[bin_no+1]
+                        )-np.log10(self.bin_borders[bin_no])
+                    self.data[dn] = self.data[pc] / log_binwidth
+                    self.details[dn] = [
+                        f"dN/dlog$D_P$ of {channel}-Particles (Bin{bin_no})",
+                        "cm$^{-3}$"
+                        ]
                    
                 del channel_mask
-                self.data[f"{channel}_total_cps"] = np.sum([self.data[f"{channel}_bin{i}_cps"] for i in range(self.bins)],axis=0)
-                self.data[f"{channel}_total_partconc"] = self.data[f"{channel}_total_cps"] / self.flow
-                self.data[f"{channel}_fraction"] = np.divide(self.data[f"{channel}_total_cps"],self.data["total_cps"],out=np.zeros(self.data[f"{channel}_total_cps"].shape,dtype=float),where=self.data["total_cps"]!=0)
-                self.details[f"{channel}_total_cps"] = [f"Particle Counts of {channel}-Particles","#/s"]
-                self.details[f"{channel}_total_partconc"] = [f"Particle Conc. of {channel}-Particles","#/cm${}^3$"]
-                self.details[f"{channel}_fraction"] = [f"Fluorescent Fraction ({channel})", "No Unit"]
+                cps = f"{channel}_total_cps"
+                pc = f"{channel}_total_partconc"
+                fr = f"{channel}_fraction"
+                self.data[cps] = np.sum(
+                    [self.data[f"{channel}_bin{i}_cps"] 
+                     for i in range(self.bins)],
+                    axis=0
+                    )
+                self.data[pc] = self.data[cps] / self.flow
+                self.data[fr] = np.divide(
+                    self.data[cps],
+                    self.data["total_cps"],
+                    out=np.zeros(self.data[f"{channel}_total_cps"].shape,
+                                 dtype=float),
+                    where=self.data["total_cps"]!=0
+                    )
+                self.details[cps] = [f"Particle Counts of {channel}-Particles",
+                                     "#/s"]
+                self.details[pc] = [f"Particle Conc. of {channel}-Particles",
+                                    "#/cm${}^3$"]
+                self.details[fr] = [f"Fluorescent Fraction ({channel})",
+                                    "No Unit"]
                 
             del self.timehandler
             del self.start
@@ -490,7 +535,10 @@ class WIBS:
         _,ax = plt.subplots()
 
         ax.set_xlabel("CET")
-        ylabel = f"{self.details[y][0]} in {self.details[y][1]}" if self.details[y][1] != "No Unit" else self.details[y][0]
+        if self.details[y][1] != "No Unit":
+            ylabel = f"{self.details[y][0]} in {self.details[y][1]}"
+        else:
+            ylabel = self.details[y][0]
         ax.set_ylabel(ylabel)
         
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
@@ -567,6 +615,9 @@ class WIBS:
             The heatmap will be drawn on this axis.
         y : str
             Determines which data should be plotted.
+            
+        Other Parameters
+        ----------------
         cmap : str, optional
             Changes the colormap. The default is 'RdYlBu_r'
         pad : float, optional
@@ -644,6 +695,9 @@ class WIBS:
             The plot will be drawn on this axis.
         y : str
             Determines which data should be plotted.
+            
+        Other Parameters
+        ----------------
         label : str, optional
             Changes the label of the plot. If a legend is created, this label 
             will be shown there. The default is 'no label'.
@@ -672,7 +726,10 @@ class WIBS:
         except KeyError as kerr:
             raise IllegalValue("y", "WIBS.plot()",list(self.data)) from kerr
             
-        ylabel = f"{self.details[y][0]} in {self.details[y][1]}" if self.details[y][1] != "No Unit" else self.details[y][0]
+        if self.details[y][1] != "No Unit":
+            ylabel = f"{self.details[y][0]} in {self.details[y][1]}"
+        else:
+            ylabel = self.details[y][0]
             
         #draw plot
         ax.plot(xx,yy,label=kwargs["label"],color=kwargs["color"])
@@ -700,8 +757,8 @@ class WIBS:
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
         
-        Kwargs
-        ------
+        Other Parameters
+        ----------------
         start : str
             Takes a str in the format "HH:MM:SS" and only plots data acquired
             after it.
@@ -786,8 +843,8 @@ class WIBS:
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
         
-        Kwargs
-        ------
+        Other Parameters
+        ----------------
         start : str, optional
             If a str in the format "HH:MM:SS" is given, only data acquired 
             after this timestamp will be used for the dNdlogDp curve.
@@ -805,12 +862,18 @@ class WIBS:
         scatter : bool, optional
             If True, a scatterplot will be drawn instead of a bar plot. The 
             default is False.
+        scatter_color : str, optional
+            Changes the color of the scatter plot. Only in effect if 
+            `scatter=True`. The default is 'tab:blue'.
+        scatter_line : bool, optional
+            If True a dashed line that connects the points will be drawn. Only
+            in effect if `scatter=True`. The default is True.
         bin_borders : list of float, optional
-            Should only be passed if the WIBS object was created from a .wibs
+            Should only be passed if the `WIBS` object was created from a .wibs
             file that was created before agg_dim 0.1.18 and does not have the 
-            'bin_borders' attribute. If no list is passed, it will try to use
-            the 'bin_borders' attribute from the WIBS obj and if it has none, 
-            an AttributeError will be raised.
+            `bin_borders` attribute. If no list is passed, it will try to 
+            use the `bin_borders` attribute from the `WIBS` obj and if it 
+            has none, an `AttributeError` will be raised.
 
         Returns
         -------
@@ -825,6 +888,8 @@ class WIBS:
                     "xlabel" : "D$_p$ in μm",
                     "ylabel" : "dN/dlogD$_p$ in cm{^{-3}$",
                     "scatter" : False,
+                    "scatter_color" : "tab:blue",
+                    "scatter_line" : True,
                     "bin_borders" : None}
         
         for key,default in defaults.items():
@@ -859,7 +924,11 @@ class WIBS:
                        for i in range(self.bins)])
         
         if kwargs["scatter"]:
-            ax.scatter(xx,yy)
+            ax.scatter(xx,yy,color=kwargs["scatter_color"])
+            if kwargs["scatter_line"]:
+                ax.plot(xx,yy,
+                        color=kwargs["scatter_color"],
+                        linestyle="dashed")
         else:
             if isinstance(kwargs["bin_borders"],list):
                 bb = kwargs["bin_borders"]
@@ -920,7 +989,8 @@ class WIBS:
     def returndata(self):
         """
         Returns a tuple containing all data in a standardized form. Important 
-        for communication with DroneWrapper or Wrapper objs.
+        for communication with `agg_dim.drone.DroneWrapper` or 
+        `agg_dim.experiment.Wrapper` objs.
 
         Returns
         -------
@@ -948,21 +1018,33 @@ class WIBS:
     #housekeeping funcs
     
     def hk_kwargs(self,kwargs,key,default):
-        """Turns kwargs into attributes"""
+        """
+        Housekeeping Func --> Should not be used outside the object
+        
+        Turns kwargs into attributes
+        """
 
         op = kwargs[key] if key in kwargs else default
         setattr(self,key,op)
         
         
     def hk_func_kwargs(self,kwargs,key,default):
-        """Gives kwargs a default value if they are not passed"""
+        """
+        Housekeeping Func --> Should not be used outside the object
+        
+        Gives kwargs a default value if they are not passed
+        """
 
         op = kwargs[key] if key in kwargs else default
         return op
     
     
     def hk_errorhandling(self,kwargs,legallist,funcname):
-        """Checks if all passed kwargs are legal"""
+        """
+        Housekeeping Func --> Should not be used outside the object
+        
+        Checks if all passed kwargs are legal
+        """
 
         for key in kwargs:
             if key not in legallist:

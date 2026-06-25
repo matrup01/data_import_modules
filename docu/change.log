@@ -1,3 +1,10 @@
+######################### MR 25.06.2026 #########################
+#             "Docu switch and Wrapper improvements"            #
+#                                                               #
+# - Added kwargs to Wrapper.windrose()                          #
+# - Switched to a better organised HTML docu.                   #
+#################################################################
+
 ######################### MR 23.06.2026 #########################
 #                      "windrose and docu"                      #
 #                                                               #

@@ -14,4 +14,8 @@ Supported instruments:
 
 ## Documentation
 
-Full documentation is available on https://github.com/matrup01/data_import_modules
+Full documentation is available on https://matrup01.github.io/data_import_modules
+
+## How to contribute
+
+See https://github.com/matrup01/data_import_modules

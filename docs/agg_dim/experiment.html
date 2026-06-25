@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
 <title>agg_dim.experiment API documentation</title>
-<meta name="description" content="Created on Thu Jun 18 14:36:26 2026 …">
+<meta name="description" content="This Submodule Provides a `Wrapper` that can wrap data from other submodules
+and make them accessable in an easy way …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -36,8 +37,10 @@ el.replaceWith(d);
 <h1 class="title">Module <code>agg_dim.experiment</code></h1>
 </header>
 <section id="section-intro">
-<p>Created on Thu Jun 18 14:36:26 2026</p>
-<p>@author: mrupp</p>
+<p>This Submodule Provides a <code><a title="agg_dim.experiment.Wrapper" href="#agg_dim.experiment.Wrapper">Wrapper</a></code> that can wrap data from other submodules
+and make them accessable in an easy way.</p>
+<p>It also provides functions that allow to save wrapped obj to a .experiment
+file.</p>
 </section>
 <section>
 </section>
@@ -56,7 +59,7 @@ el.replaceWith(d);
 </summary>
 <pre><code class="python">def load_experiment(path):
     &#34;&#34;&#34;
-    Loads a .experiment file and returns a Wrapper obj.
+    Loads a .experiment file and returns a `Wrapper`.
 
     Parameters
     ----------
@@ -75,7 +78,7 @@ el.replaceWith(d);
     with open(path,&#34;rb&#34;) as loadpath:
         return pickle.load(loadpath)</code></pre>
 </details>
-<div class="desc"><p>Loads a .experiment file and returns a Wrapper obj.</p>
+<div class="desc"><p>Loads a .experiment file and returns a <code><a title="agg_dim.experiment.Wrapper" href="#agg_dim.experiment.Wrapper">Wrapper</a></code>.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>path</code></strong> :&ensp;<code>str</code></dt>
@@ -97,7 +100,7 @@ el.replaceWith(d);
 </summary>
 <pre><code class="python">def save_experiment(wrapper,path):
     &#34;&#34;&#34;
-    Saves a Wrapper object into a .experiment file.
+    Saves a `Wrapper` into a .experiment file.
 
     Parameters
     ----------
@@ -116,7 +119,7 @@ el.replaceWith(d);
     with open(path,&#34;wb&#34;) as dumppath:
         pickle.dump(wrapper,dumppath,4)</code></pre>
 </details>
-<div class="desc"><p>Saves a Wrapper object into a .experiment file.</p>
+<div class="desc"><p>Saves a <code><a title="agg_dim.experiment.Wrapper" href="#agg_dim.experiment.Wrapper">Wrapper</a></code> into a .experiment file.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>wrapper</code></strong> :&ensp;<code><a title="agg_dim.experiment.Wrapper" href="#agg_dim.experiment.Wrapper">Wrapper</a></code></dt>
@@ -154,13 +157,21 @@ el.replaceWith(d);
         ----------
         day : int, optional
             Sets the day in all time arrays that will be loaded to its value. 
-            The default is 1.
+            The default is `1`.
         month : int, optional
             Sets the month in all time arrays that will be loaded to its value. 
-            The default is 1.
+            The default is `1`.
         year : int, optional
             Sets the year in all time arrays that will be loaded to its value. 
-            The default is 1900.
+            The default is `1900`.
+            
+        Attributes
+        ----------
+        data : dict
+            Dictionary that contains all data arrays from wrapped objects.
+        details : dict
+            Dictionary that contains all `details` dictionaries from wrapped
+            objects.
 
         Returns
         -------
@@ -182,15 +193,26 @@ el.replaceWith(d);
 
         Parameters
         ----------
-        obj : WIBS, OPC, POPS, Weatherdata or FlyingFloUSB
-            This object will be included in the Wrapper.
+        obj : agg_dim.wibs.WIBS, agg_dim.particle_counters.OPC, agg_dim.particle_counters.Pops, agg_dim.weather.WeatherData or agg_dim.lowcostsensors.FlyingFlo_USB
+            This object will be included in the `Wrapper`.
         name : str
-            This str will be used as a key in Wrapper.data and Wrapper.details
-            and it will be the attribute name for the object.
+            This str will be used as a key in `Wrapper.data` and 
+            `Wrapper.details` and it will be the attribute name for the object.
 
         Returns
         -------
         None
+        
+        Examples
+        --------
+        &gt;&gt;&gt; from agg_dim import Wrapper,WIBS
+        &gt;&gt;&gt; w = WIBS(&#39;example.wibs&#39;)
+        &gt;&gt;&gt; exp = Wrapper()
+        &gt;&gt;&gt; exp.wrap(w,&#39;wibs&#39;)
+        
+        The `agg_dim.wibs.WIBS` obj is now wrapped by the `Wrapper` obj.
+        It can be accessed via `exp.wibs` and its data can be accessed through
+        `Wrapper` methods.
         &#34;&#34;&#34;
         
         
@@ -215,14 +237,14 @@ el.replaceWith(d);
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
         x : str
-            Takes a str in the format &#34;plottype@instrument&#34; and uses it on the 
-            x-axis. E.g.: &#34;total_partconc@wibs&#34;
+            Takes a str in the format `&#39;plottype@instrument&#39;` and uses it on the 
+            x-axis. E.g.: `&#39;total_partconc@wibs&#39;`
         y : str
-            Takes a str in the format &#34;plottype@instrument&#34; and uses it on the 
-            y-axis. E.g.: &#34;total_partconc@wibs&#34;
-            
-        Kwargs
-        ------
+            Takes a str in the format `&#39;plottype@instrument&#39;` and uses it on the 
+            y-axis. E.g.: `&#39;total_partconc@wibs&#39;`
+        
+        Other Parameters
+        ----------------
         start : str, optional
             Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
             after it.
@@ -233,22 +255,22 @@ el.replaceWith(d);
             If True a scatter plot will be drawn, else a line plot will be 
             drawn. The default is True.
         color : str, optional
-            The plot will be drawn in this color. The default is &#34;tab:blue&#34;.
+            The plot will be drawn in this color. The default is `&#39;tab:blue&#39;`.
         pearson : bool, optional
             If True Pearsons R for the given data will be printed to console.
-            The default is True.
+            The default is `True`.
         return_arrs : bool, optional
             If True, the function will return the arrays for the x and the y
-            axis. The default is False.
+            axis. The default is `False`.
 
         Returns
         -------
-        xx : np array
+        xx : np.array
             Array that contains the data from the x-axis. Will only be returned
-            if the kwarg &#34;return_arrs&#34; is True.
-        yy : np array
+            if the kwarg `return_arrs` is True.
+        yy : np.array
             Array that contains the data from the y-axis. Will only be returned
-            if the kwarg &#34;return_arrs&#34; is True.
+            if the kwarg `return_arrs` is True.
         &#34;&#34;&#34;
         
         
@@ -353,17 +375,26 @@ el.replaceWith(d);
         ----------
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis. This axis has to be of the 
-            projection &#39;polar&#39;.
+            projection `&#39;polar&#39;`.
         y : str
-            Takes a str in the format &#34;plottype@instrument&#34; and uses it to
-            determine which data shold be plotted. E.g.: &#39;total_partconc@wibs&#39;
-
-        Kwargs
-        ------
+            Takes a str in the format `&#39;plottype@instrument&#39;` and uses it to
+            determine which data shold be plotted. E.g.: 
+            `&#39;total_partconc@wibs&#39;`
+            
+        Other Parameters
+        ----------------
         weatherdata : str, optional
             The given str is used as the instrument name of the weatherstation,
-            which is expected to have the data rows &#39;wind&#39; and &#39;winddir&#39;.
-            The default is &#39;weather&#39;.
+            which is expected to have the data rows `&#39;wind&#39;` and `&#39;winddir&#39;`.
+            The default is `&#39;weather&#39;`.
+        theta : str, optional
+            Specifies which data row should be used for the theta axis. It has
+            to be either in rad or in degrees (If it is given in degrees, 
+            `Wrapper.details[&#39;weather&#39;][&#39;theta&#39;][1]` has to be `&#39;°&#39;`). The 
+            default is `&#39;winddir&#39;`.
+        radius : str, optional
+            Specifies which data should be used for the binning along the 
+            radius. The default is `&#39;wind&#39;`.
         start : str, optional
             Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
             after it.
@@ -373,26 +404,41 @@ el.replaceWith(d);
         scatter : bool, optional
             If True, a scatter plot of the raw winddata is plotted over the 
             heatmap, which can be used to get an overview over how dense the 
-            data is. The default is True.
+            data is. The default is `True`.
         scatter_color : str, optional
-            Changes the color of the scatter plot (only in effect if scatter
-            is True). The default is &#39;tab:blue&#39;.
+            Changes the color of the scatter plot (only in effect if `scatter`
+            is `True`). The default is `&#39;tab:blue&#39;`.
         colormap : str, optional
             Changes the colormap, that is used for the heatmap. The default is
             &#39;viridis&#39;.
         min_threshold : int, optional
             If a min_threshold is given, only bins with at least min_threshold
-            are shown. The default is 0.
+            are shown. The default is `0`.
         sectors : int, optional
             The windrose will be devided into this many sectors along the 
-            theta axis. The default is 4.
+            theta axis. The default is `4`.
         bins : int, optional
             The windrose will be devided into this many bins along the radius.
-            The default is 3.
+            The default is `3`.
         heatmap_lim : list or tuple of float with len 2, optional
-            If a heatmap_lim is given, the limits of the colorbar will be set
-            to its values. If no heatmap_lim is given, the minimum and the 
+            If a `heatmap_lim` is given, the limits of the colorbar will be set
+            to its values. If no `heatmap_lim` is given, the minimum and the 
             maximum values will be used as limits.
+        windspeed_lim : int or float, optional
+            If a `windspeed_lim` is passed, it will be used as the maximum 
+            radius of the windrose. Otherwise the maximum windspeed in the 
+            dataset will be used.
+        startangle : int or float, optional
+            Will turn the sectors clockwise by its value degrees. The default 
+            is `0`, which means that the first sector has its lower boundary at 
+            exactly North.
+        usedegrees : bool, optional
+            If `True` the plot will use degrees as theta axis ticks instead of
+            cardinal directions (N,E,S,W). The default is `False`.
+        inverted : bool, optional
+            If `True` the theta values will be inverted. E.g. if the raw data
+            gives the angle from which the wind blows, `inverted = True` will
+            plot the angle the wind blows in. The default is `False`.
 
         Returns
         -------
@@ -411,7 +457,13 @@ el.replaceWith(d);
             &#34;min_threshold&#34; : 0,
             &#34;sectors&#34; : 4,
             &#34;bins&#34; : 3,
-            &#34;heatmap_lim&#34; : None
+            &#34;heatmap_lim&#34; : None,
+            &#34;windspeed_lim&#34; : None,
+            &#34;startangle&#34; : 0,
+            &#34;usedegrees&#34; : False,
+            &#34;theta&#34; : &#34;winddir&#34;,
+            &#34;radius&#34; : &#34;wind&#34;,
+            &#34;inverted&#34; : False
             }
         for key,default in defaults.items():
             kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
@@ -456,13 +508,16 @@ el.replaceWith(d);
                 )
         
         #load data
-        if self.details[kwargs[&#34;weatherdata&#34;]][&#34;winddir&#34;][1] == &#34;°&#34;:
+        winddir = kwargs[&#34;theta&#34;]
+        if self.details[kwargs[&#34;weatherdata&#34;]][winddir][1] == &#34;°&#34;:
             theta = np.radians(
-                self.data[kwargs[&#34;weatherdata&#34;]][&#34;winddir&#34;][wind_m]
+                self.data[kwargs[&#34;weatherdata&#34;]][winddir][wind_m]
                 )
         else:
-            theta = self.data[kwargs[&#34;weatherdata&#34;]][&#34;winddir&#34;][wind_m]
-        r = self.data[kwargs[&#34;weatherdata&#34;]][&#34;wind&#34;][wind_m]
+            theta = self.data[kwargs[&#34;weatherdata&#34;]][winddir][wind_m]
+        if kwargs[&#34;inverted&#34;]:
+            theta = (theta + np.pi) % (2*np.pi)
+        r = self.data[kwargs[&#34;weatherdata&#34;]][kwargs[&#34;radius&#34;]][wind_m]
         z = self.data[y_instrument][y_data][y_m]
         
         if (np.count_nonzero(wind_m) == 0 
@@ -470,16 +525,36 @@ el.replaceWith(d);
             raise ValueError(&#34;There are no values in the given timeframe&#34;)
         
         #transform data an plot
-        sector_borders = np.linspace(0, 2*np.pi,kwargs[&#34;sectors&#34;]+1)
-        bin_borders = np.linspace(0,np.max(r),kwargs[&#34;bins&#34;]+1)
+        kwargs[&#34;startangle&#34;] = kwargs[&#34;startangle&#34;]%(360/kwargs[&#34;sectors&#34;])
+        kwargs[&#34;startangle&#34;] = np.radians(kwargs[&#34;startangle&#34;])
+        sector_borders = np.linspace(kwargs[&#34;startangle&#34;], 
+                                     2*np.pi+kwargs[&#34;startangle&#34;],
+                                     kwargs[&#34;sectors&#34;]+1)
+        sector_borders = sector_borders % (2*np.pi)
+        if kwargs[&#34;windspeed_lim&#34;] is None:
+            bin_borders = np.linspace(0,np.max(r),kwargs[&#34;bins&#34;]+1)
+        else:
+            bin_borders = np.linspace(0,
+                                      kwargs[&#34;windspeed_lim&#34;],
+                                      kwargs[&#34;bins&#34;]+1)
         
         darr = np.zeros((kwargs[&#34;bins&#34;],kwargs[&#34;sectors&#34;]))
         for b in range(kwargs[&#34;bins&#34;]):
             bm = np.where(r&gt;=bin_borders[b],True,False)
             bm = np.where(r&lt;=bin_borders[b+1],bm,False)
             for sec in range(kwargs[&#34;sectors&#34;]):
-                sm = np.where(theta&gt;=sector_borders[sec],bm,False)
-                sm = np.where(theta&lt;=sector_borders[sec+1],sm,False)
+                if sector_borders[sec] &lt; sector_borders[sec+1]:
+                    sm = np.where(theta&gt;=sector_borders[sec],bm,False)
+                    sm = np.where(theta&lt;=sector_borders[sec+1],sm,False)
+                else:
+                    sm1 = np.where(theta&gt;=sector_borders[sec],
+                                  True,
+                                  False)
+                    sm2 =  np.where(theta&lt;=sector_borders[sec+1],
+                                  True,
+                                  False)
+                    sm = sm1 | sm2
+                    sm = sm &amp; bm
                 
                 if np.count_nonzero(sm) &lt; kwargs[&#34;min_threshold&#34;]:
                     darr[b][sec] = np.nan
@@ -490,7 +565,6 @@ el.replaceWith(d);
             and len(kwargs[&#34;heatmap_lim&#34;]) == 2):
             minval = kwargs[&#34;heatmap_lim&#34;][0]
             maxval = kwargs[&#34;heatmap_lim&#34;][1]
-            print(&#34;besn&#34;)
         else:
             minval = np.nanmin(darr)
             maxval = np.nanmax(darr)
@@ -498,18 +572,35 @@ el.replaceWith(d);
         for b in range(kwargs[&#34;bins&#34;]):
             for sec in range(kwargs[&#34;sectors&#34;]):
                 color = (darr[b][sec]-minval)/(maxval-minval)
-                ax.bar(
-                    x=(sector_borders[sec]+sector_borders[sec+1])/2, 
-                    height=bin_borders[b+1]-bin_borders[b], 
-                    width=sector_borders[sec+1]-sector_borders[sec], 
-                    bottom=bin_borders[b], 
-                    color=cm(color)
-                )
+                if sector_borders[sec] &lt; sector_borders[sec+1]:
+                    ax.bar(
+                        x=(sector_borders[sec]+sector_borders[sec+1])/2, 
+                        height=bin_borders[b+1]-bin_borders[b], 
+                        width=sector_borders[sec+1]-sector_borders[sec], 
+                        bottom=bin_borders[b], 
+                        color=cm(color)
+                    )
+                else:
+                    ax.bar(
+                        x=(sector_borders[sec]+2*np.pi)/2, 
+                        height=bin_borders[b+1]-bin_borders[b], 
+                        width=2*np.pi-sector_borders[sec], 
+                        bottom=bin_borders[b], 
+                        color=cm(color)
+                    )
+                    ax.bar(
+                        x=sector_borders[sec+1]/2, 
+                        height=bin_borders[b+1]-bin_borders[b], 
+                        width=sector_borders[sec+1], 
+                        bottom=bin_borders[b], 
+                        color=cm(color)
+                    )
                     
         #misc plotting
         if kwargs[&#34;scatter&#34;]:
             ax.scatter(theta,r,color=kwargs[&#34;scatter_color&#34;])
-        ax.set_thetagrids([0,90,180,270],[&#34;N&#34;,&#34;E&#34;,&#34;S&#34;,&#34;W&#34;])
+        if not kwargs[&#34;usedegrees&#34;]:
+            ax.set_thetagrids([0,90,180,270],[&#34;N&#34;,&#34;E&#34;,&#34;S&#34;,&#34;W&#34;])
         ax.set_theta_direction(-1)
         ax.set_theta_zero_location(&#34;N&#34;)
         ffig = ax.figure
@@ -528,6 +619,7 @@ el.replaceWith(d);
     def hk_func_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
+        
         Gives kwargs a default value if they are not passed
         &#34;&#34;&#34;
 
@@ -537,6 +629,7 @@ el.replaceWith(d);
     def hk_errorhandling(self,kwargs,legallist,funcname):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
+        
         Checks if all passed kwargs are legal
         &#34;&#34;&#34;
 
@@ -547,6 +640,7 @@ el.replaceWith(d);
     def hk_checktime(self,x_instrument,y_instrument,start_str,end_str):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
+        
         Checks if the given time window is outside one of the instruments
         time windows and returns corrected start and end strings
         &#34;&#34;&#34;
@@ -596,6 +690,7 @@ el.replaceWith(d);
     def hk_timemask(self,y,start_str,end_str):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
+        
         Returns a mask within start and end for an instrument y
         &#34;&#34;&#34;
         
@@ -644,13 +739,21 @@ el.replaceWith(d);
 <dl>
 <dt><strong><code>day</code></strong> :&ensp;<code>int</code>, optional</dt>
 <dd>Sets the day in all time arrays that will be loaded to its value.
-The default is 1.</dd>
+The default is <code>1</code>.</dd>
 <dt><strong><code>month</code></strong> :&ensp;<code>int</code>, optional</dt>
 <dd>Sets the month in all time arrays that will be loaded to its value.
-The default is 1.</dd>
+The default is <code>1</code>.</dd>
 <dt><strong><code>year</code></strong> :&ensp;<code>int</code>, optional</dt>
 <dd>Sets the year in all time arrays that will be loaded to its value.
-The default is 1900.</dd>
+The default is <code>1900</code>.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Dictionary that contains all data arrays from wrapped objects.</dd>
+<dt><strong><code>details</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Dictionary that contains all <code>details</code> dictionaries from wrapped
+objects.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -670,6 +773,7 @@ The default is 1900.</dd>
 <pre><code class="python">def hk_checktime(self,x_instrument,y_instrument,start_str,end_str):
     &#34;&#34;&#34;
     Housekeeping Func --&gt; Should not be used outside the object
+    
     Checks if the given time window is outside one of the instruments
     time windows and returns corrected start and end strings
     &#34;&#34;&#34;
@@ -715,8 +819,8 @@ The default is 1900.</dd>
     
     return start.strftime(&#34;%H:%M:%S&#34;),end.strftime(&#34;%H:%M:%S&#34;)</code></pre>
 </details>
-<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object
-Checks if the given time window is outside one of the instruments
+<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
+<p>Checks if the given time window is outside one of the instruments
 time windows and returns corrected start and end strings</p></div>
 </dd>
 <dt id="agg_dim.experiment.Wrapper.hk_errorhandling"><code class="name flex">
@@ -730,6 +834,7 @@ time windows and returns corrected start and end strings</p></div>
 <pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
     &#34;&#34;&#34;
     Housekeeping Func --&gt; Should not be used outside the object
+    
     Checks if all passed kwargs are legal
     &#34;&#34;&#34;
 
@@ -737,8 +842,8 @@ time windows and returns corrected start and end strings</p></div>
         if key not in legallist:
             raise IllegalArgument(key,funcname,legallist)</code></pre>
 </details>
-<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object
-Checks if all passed kwargs are legal</p></div>
+<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
+<p>Checks if all passed kwargs are legal</p></div>
 </dd>
 <dt id="agg_dim.experiment.Wrapper.hk_func_kwargs"><code class="name flex">
 <span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
@@ -751,14 +856,15 @@ Checks if all passed kwargs are legal</p></div>
 <pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
     &#34;&#34;&#34;
     Housekeeping Func --&gt; Should not be used outside the object
+    
     Gives kwargs a default value if they are not passed
     &#34;&#34;&#34;
 
     op = kwargs[key] if key in kwargs else default
     return op</code></pre>
 </details>
-<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object
-Gives kwargs a default value if they are not passed</p></div>
+<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
+<p>Gives kwargs a default value if they are not passed</p></div>
 </dd>
 <dt id="agg_dim.experiment.Wrapper.hk_timemask"><code class="name flex">
 <span>def <span class="ident">hk_timemask</span></span>(<span>self, y, start_str, end_str)</span>
@@ -771,6 +877,7 @@ Gives kwargs a default value if they are not passed</p></div>
 <pre><code class="python">def hk_timemask(self,y,start_str,end_str):
     &#34;&#34;&#34;
     Housekeeping Func --&gt; Should not be used outside the object
+    
     Returns a mask within start and end for an instrument y
     &#34;&#34;&#34;
     
@@ -814,8 +921,8 @@ Gives kwargs a default value if they are not passed</p></div>
                  False)
     return m</code></pre>
 </details>
-<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object
-Returns a mask within start and end for an instrument y</p></div>
+<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
+<p>Returns a mask within start and end for an instrument y</p></div>
 </dd>
 <dt id="agg_dim.experiment.Wrapper.plot"><code class="name flex">
 <span>def <span class="ident">plot</span></span>(<span>self, ax, x, y, **kwargs)</span>
@@ -834,14 +941,14 @@ Returns a mask within start and end for an instrument y</p></div>
     ax : Axes obj of mpl.axes module
         The plot will be drawn on this axis.
     x : str
-        Takes a str in the format &#34;plottype@instrument&#34; and uses it on the 
-        x-axis. E.g.: &#34;total_partconc@wibs&#34;
+        Takes a str in the format `&#39;plottype@instrument&#39;` and uses it on the 
+        x-axis. E.g.: `&#39;total_partconc@wibs&#39;`
     y : str
-        Takes a str in the format &#34;plottype@instrument&#34; and uses it on the 
-        y-axis. E.g.: &#34;total_partconc@wibs&#34;
-        
-    Kwargs
-    ------
+        Takes a str in the format `&#39;plottype@instrument&#39;` and uses it on the 
+        y-axis. E.g.: `&#39;total_partconc@wibs&#39;`
+    
+    Other Parameters
+    ----------------
     start : str, optional
         Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
         after it.
@@ -852,22 +959,22 @@ Returns a mask within start and end for an instrument y</p></div>
         If True a scatter plot will be drawn, else a line plot will be 
         drawn. The default is True.
     color : str, optional
-        The plot will be drawn in this color. The default is &#34;tab:blue&#34;.
+        The plot will be drawn in this color. The default is `&#39;tab:blue&#39;`.
     pearson : bool, optional
         If True Pearsons R for the given data will be printed to console.
-        The default is True.
+        The default is `True`.
     return_arrs : bool, optional
         If True, the function will return the arrays for the x and the y
-        axis. The default is False.
+        axis. The default is `False`.
 
     Returns
     -------
-    xx : np array
+    xx : np.array
         Array that contains the data from the x-axis. Will only be returned
-        if the kwarg &#34;return_arrs&#34; is True.
-    yy : np array
+        if the kwarg `return_arrs` is True.
+    yy : np.array
         Array that contains the data from the y-axis. Will only be returned
-        if the kwarg &#34;return_arrs&#34; is True.
+        if the kwarg `return_arrs` is True.
     &#34;&#34;&#34;
     
     
@@ -967,38 +1074,40 @@ Returns a mask within start and end for an instrument y</p></div>
 <dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
 <dd>The plot will be drawn on this axis.</dd>
 <dt><strong><code>x</code></strong> :&ensp;<code>str</code></dt>
-<dd>Takes a str in the format "plottype@instrument" and uses it on the
-x-axis. E.g.: "total_partconc@wibs"</dd>
+<dd>Takes a str in the format <code>'plottype@instrument'</code> and uses it on the
+x-axis. E.g.: <code>'total_partconc@wibs'</code></dd>
 <dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
-<dd>Takes a str in the format "plottype@instrument" and uses it on the
-y-axis. E.g.: "total_partconc@wibs"</dd>
+<dd>Takes a str in the format <code>'plottype@instrument'</code> and uses it on the
+y-axis. E.g.: <code>'total_partconc@wibs'</code></dd>
 </dl>
-<h2 id="kwargs">Kwargs</h2>
-<p>start : str, optional
-Takes a str in the format "HH:MM:SS" and only plots data acquired
-after it.
-end : str, optional
-Takes a str in the format "HH:MM:SS" and only plots data acquired
-before it.
-scatter : bool, optonal
-If True a scatter plot will be drawn, else a line plot will be
-drawn. The default is True.
-color : str, optional
-The plot will be drawn in this color. The default is "tab:blue".
-pearson : bool, optional
-If True Pearsons R for the given data will be printed to console.
-The default is True.
-return_arrs : bool, optional
-If True, the function will return the arrays for the x and the y
-axis. The default is False.</p>
+<h2 id="other-parameters">Other Parameters</h2>
+<dl>
+<dt><strong><code>start</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Takes a str in the format "HH:MM:SS" and only plots data acquired
+after it.</dd>
+<dt><strong><code>end</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Takes a str in the format "HH:MM:SS" and only plots data acquired
+before it.</dd>
+<dt><strong><code>scatter</code></strong> :&ensp;<code>bool, optonal</code></dt>
+<dd>If True a scatter plot will be drawn, else a line plot will be
+drawn. The default is True.</dd>
+<dt><strong><code>color</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The plot will be drawn in this color. The default is <code>'tab:blue'</code>.</dd>
+<dt><strong><code>pearson</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True Pearsons R for the given data will be printed to console.
+The default is <code>True</code>.</dd>
+<dt><strong><code>return_arrs</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, the function will return the arrays for the x and the y
+axis. The default is <code>False</code>.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>xx</code></strong> :&ensp;<code>np array</code></dt>
+<dt><strong><code>xx</code></strong> :&ensp;<code>np.array</code></dt>
 <dd>Array that contains the data from the x-axis. Will only be returned
-if the kwarg "return_arrs" is True.</dd>
-<dt><strong><code>yy</code></strong> :&ensp;<code>np array</code></dt>
+if the kwarg <code>return_arrs</code> is True.</dd>
+<dt><strong><code>yy</code></strong> :&ensp;<code>np.array</code></dt>
 <dd>Array that contains the data from the y-axis. Will only be returned
-if the kwarg "return_arrs" is True.</dd>
+if the kwarg <code>return_arrs</code> is True.</dd>
 </dl></div>
 </dd>
 <dt id="agg_dim.experiment.Wrapper.windrose"><code class="name flex">
@@ -1019,17 +1128,26 @@ if the kwarg "return_arrs" is True.</dd>
     ----------
     ax : Axes obj of mpl.axes module
         The plot will be drawn on this axis. This axis has to be of the 
-        projection &#39;polar&#39;.
+        projection `&#39;polar&#39;`.
     y : str
-        Takes a str in the format &#34;plottype@instrument&#34; and uses it to
-        determine which data shold be plotted. E.g.: &#39;total_partconc@wibs&#39;
-
-    Kwargs
-    ------
+        Takes a str in the format `&#39;plottype@instrument&#39;` and uses it to
+        determine which data shold be plotted. E.g.: 
+        `&#39;total_partconc@wibs&#39;`
+        
+    Other Parameters
+    ----------------
     weatherdata : str, optional
         The given str is used as the instrument name of the weatherstation,
-        which is expected to have the data rows &#39;wind&#39; and &#39;winddir&#39;.
-        The default is &#39;weather&#39;.
+        which is expected to have the data rows `&#39;wind&#39;` and `&#39;winddir&#39;`.
+        The default is `&#39;weather&#39;`.
+    theta : str, optional
+        Specifies which data row should be used for the theta axis. It has
+        to be either in rad or in degrees (If it is given in degrees, 
+        `Wrapper.details[&#39;weather&#39;][&#39;theta&#39;][1]` has to be `&#39;°&#39;`). The 
+        default is `&#39;winddir&#39;`.
+    radius : str, optional
+        Specifies which data should be used for the binning along the 
+        radius. The default is `&#39;wind&#39;`.
     start : str, optional
         Takes a str in the format &#34;HH:MM:SS&#34; and only plots data acquired
         after it.
@@ -1039,26 +1157,41 @@ if the kwarg "return_arrs" is True.</dd>
     scatter : bool, optional
         If True, a scatter plot of the raw winddata is plotted over the 
         heatmap, which can be used to get an overview over how dense the 
-        data is. The default is True.
+        data is. The default is `True`.
     scatter_color : str, optional
-        Changes the color of the scatter plot (only in effect if scatter
-        is True). The default is &#39;tab:blue&#39;.
+        Changes the color of the scatter plot (only in effect if `scatter`
+        is `True`). The default is `&#39;tab:blue&#39;`.
     colormap : str, optional
         Changes the colormap, that is used for the heatmap. The default is
         &#39;viridis&#39;.
     min_threshold : int, optional
         If a min_threshold is given, only bins with at least min_threshold
-        are shown. The default is 0.
+        are shown. The default is `0`.
     sectors : int, optional
         The windrose will be devided into this many sectors along the 
-        theta axis. The default is 4.
+        theta axis. The default is `4`.
     bins : int, optional
         The windrose will be devided into this many bins along the radius.
-        The default is 3.
+        The default is `3`.
     heatmap_lim : list or tuple of float with len 2, optional
-        If a heatmap_lim is given, the limits of the colorbar will be set
-        to its values. If no heatmap_lim is given, the minimum and the 
+        If a `heatmap_lim` is given, the limits of the colorbar will be set
+        to its values. If no `heatmap_lim` is given, the minimum and the 
         maximum values will be used as limits.
+    windspeed_lim : int or float, optional
+        If a `windspeed_lim` is passed, it will be used as the maximum 
+        radius of the windrose. Otherwise the maximum windspeed in the 
+        dataset will be used.
+    startangle : int or float, optional
+        Will turn the sectors clockwise by its value degrees. The default 
+        is `0`, which means that the first sector has its lower boundary at 
+        exactly North.
+    usedegrees : bool, optional
+        If `True` the plot will use degrees as theta axis ticks instead of
+        cardinal directions (N,E,S,W). The default is `False`.
+    inverted : bool, optional
+        If `True` the theta values will be inverted. E.g. if the raw data
+        gives the angle from which the wind blows, `inverted = True` will
+        plot the angle the wind blows in. The default is `False`.
 
     Returns
     -------
@@ -1077,7 +1210,13 @@ if the kwarg "return_arrs" is True.</dd>
         &#34;min_threshold&#34; : 0,
         &#34;sectors&#34; : 4,
         &#34;bins&#34; : 3,
-        &#34;heatmap_lim&#34; : None
+        &#34;heatmap_lim&#34; : None,
+        &#34;windspeed_lim&#34; : None,
+        &#34;startangle&#34; : 0,
+        &#34;usedegrees&#34; : False,
+        &#34;theta&#34; : &#34;winddir&#34;,
+        &#34;radius&#34; : &#34;wind&#34;,
+        &#34;inverted&#34; : False
         }
     for key,default in defaults.items():
         kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
@@ -1122,13 +1261,16 @@ if the kwarg "return_arrs" is True.</dd>
             )
     
     #load data
-    if self.details[kwargs[&#34;weatherdata&#34;]][&#34;winddir&#34;][1] == &#34;°&#34;:
+    winddir = kwargs[&#34;theta&#34;]
+    if self.details[kwargs[&#34;weatherdata&#34;]][winddir][1] == &#34;°&#34;:
         theta = np.radians(
-            self.data[kwargs[&#34;weatherdata&#34;]][&#34;winddir&#34;][wind_m]
+            self.data[kwargs[&#34;weatherdata&#34;]][winddir][wind_m]
             )
     else:
-        theta = self.data[kwargs[&#34;weatherdata&#34;]][&#34;winddir&#34;][wind_m]
-    r = self.data[kwargs[&#34;weatherdata&#34;]][&#34;wind&#34;][wind_m]
+        theta = self.data[kwargs[&#34;weatherdata&#34;]][winddir][wind_m]
+    if kwargs[&#34;inverted&#34;]:
+        theta = (theta + np.pi) % (2*np.pi)
+    r = self.data[kwargs[&#34;weatherdata&#34;]][kwargs[&#34;radius&#34;]][wind_m]
     z = self.data[y_instrument][y_data][y_m]
     
     if (np.count_nonzero(wind_m) == 0 
@@ -1136,16 +1278,36 @@ if the kwarg "return_arrs" is True.</dd>
         raise ValueError(&#34;There are no values in the given timeframe&#34;)
     
     #transform data an plot
-    sector_borders = np.linspace(0, 2*np.pi,kwargs[&#34;sectors&#34;]+1)
-    bin_borders = np.linspace(0,np.max(r),kwargs[&#34;bins&#34;]+1)
+    kwargs[&#34;startangle&#34;] = kwargs[&#34;startangle&#34;]%(360/kwargs[&#34;sectors&#34;])
+    kwargs[&#34;startangle&#34;] = np.radians(kwargs[&#34;startangle&#34;])
+    sector_borders = np.linspace(kwargs[&#34;startangle&#34;], 
+                                 2*np.pi+kwargs[&#34;startangle&#34;],
+                                 kwargs[&#34;sectors&#34;]+1)
+    sector_borders = sector_borders % (2*np.pi)
+    if kwargs[&#34;windspeed_lim&#34;] is None:
+        bin_borders = np.linspace(0,np.max(r),kwargs[&#34;bins&#34;]+1)
+    else:
+        bin_borders = np.linspace(0,
+                                  kwargs[&#34;windspeed_lim&#34;],
+                                  kwargs[&#34;bins&#34;]+1)
     
     darr = np.zeros((kwargs[&#34;bins&#34;],kwargs[&#34;sectors&#34;]))
     for b in range(kwargs[&#34;bins&#34;]):
         bm = np.where(r&gt;=bin_borders[b],True,False)
         bm = np.where(r&lt;=bin_borders[b+1],bm,False)
         for sec in range(kwargs[&#34;sectors&#34;]):
-            sm = np.where(theta&gt;=sector_borders[sec],bm,False)
-            sm = np.where(theta&lt;=sector_borders[sec+1],sm,False)
+            if sector_borders[sec] &lt; sector_borders[sec+1]:
+                sm = np.where(theta&gt;=sector_borders[sec],bm,False)
+                sm = np.where(theta&lt;=sector_borders[sec+1],sm,False)
+            else:
+                sm1 = np.where(theta&gt;=sector_borders[sec],
+                              True,
+                              False)
+                sm2 =  np.where(theta&lt;=sector_borders[sec+1],
+                              True,
+                              False)
+                sm = sm1 | sm2
+                sm = sm &amp; bm
             
             if np.count_nonzero(sm) &lt; kwargs[&#34;min_threshold&#34;]:
                 darr[b][sec] = np.nan
@@ -1156,7 +1318,6 @@ if the kwarg "return_arrs" is True.</dd>
         and len(kwargs[&#34;heatmap_lim&#34;]) == 2):
         minval = kwargs[&#34;heatmap_lim&#34;][0]
         maxval = kwargs[&#34;heatmap_lim&#34;][1]
-        print(&#34;besn&#34;)
     else:
         minval = np.nanmin(darr)
         maxval = np.nanmax(darr)
@@ -1164,18 +1325,35 @@ if the kwarg "return_arrs" is True.</dd>
     for b in range(kwargs[&#34;bins&#34;]):
         for sec in range(kwargs[&#34;sectors&#34;]):
             color = (darr[b][sec]-minval)/(maxval-minval)
-            ax.bar(
-                x=(sector_borders[sec]+sector_borders[sec+1])/2, 
-                height=bin_borders[b+1]-bin_borders[b], 
-                width=sector_borders[sec+1]-sector_borders[sec], 
-                bottom=bin_borders[b], 
-                color=cm(color)
-            )
+            if sector_borders[sec] &lt; sector_borders[sec+1]:
+                ax.bar(
+                    x=(sector_borders[sec]+sector_borders[sec+1])/2, 
+                    height=bin_borders[b+1]-bin_borders[b], 
+                    width=sector_borders[sec+1]-sector_borders[sec], 
+                    bottom=bin_borders[b], 
+                    color=cm(color)
+                )
+            else:
+                ax.bar(
+                    x=(sector_borders[sec]+2*np.pi)/2, 
+                    height=bin_borders[b+1]-bin_borders[b], 
+                    width=2*np.pi-sector_borders[sec], 
+                    bottom=bin_borders[b], 
+                    color=cm(color)
+                )
+                ax.bar(
+                    x=sector_borders[sec+1]/2, 
+                    height=bin_borders[b+1]-bin_borders[b], 
+                    width=sector_borders[sec+1], 
+                    bottom=bin_borders[b], 
+                    color=cm(color)
+                )
                 
     #misc plotting
     if kwargs[&#34;scatter&#34;]:
         ax.scatter(theta,r,color=kwargs[&#34;scatter_color&#34;])
-    ax.set_thetagrids([0,90,180,270],[&#34;N&#34;,&#34;E&#34;,&#34;S&#34;,&#34;W&#34;])
+    if not kwargs[&#34;usedegrees&#34;]:
+        ax.set_thetagrids([0,90,180,270],[&#34;N&#34;,&#34;E&#34;,&#34;S&#34;,&#34;W&#34;])
     ax.set_theta_direction(-1)
     ax.set_theta_zero_location(&#34;N&#34;)
     ffig = ax.figure
@@ -1195,45 +1373,71 @@ the wind speed.</p>
 <dl>
 <dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
 <dd>The plot will be drawn on this axis. This axis has to be of the
-projection 'polar'.</dd>
+projection <code>'polar'</code>.</dd>
 <dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
-<dd>Takes a str in the format "plottype@instrument" and uses it to
-determine which data shold be plotted. E.g.: 'total_partconc@wibs'</dd>
+<dd>Takes a str in the format <code>'plottype@instrument'</code> and uses it to
+determine which data shold be plotted. E.g.:
+<code>'total_partconc@wibs'</code></dd>
 </dl>
-<h2 id="kwargs">Kwargs</h2>
-<p>weatherdata : str, optional
-The given str is used as the instrument name of the weatherstation,
-which is expected to have the data rows 'wind' and 'winddir'.
-The default is 'weather'.
-start : str, optional
-Takes a str in the format "HH:MM:SS" and only plots data acquired
-after it.
-end : str, optional
-Takes a str in the format "HH:MM:SS" and only plots data acquired
-before it.
-scatter : bool, optional
-If True, a scatter plot of the raw winddata is plotted over the
+<h2 id="other-parameters">Other Parameters</h2>
+<dl>
+<dt><strong><code>weatherdata</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The given str is used as the instrument name of the weatherstation,
+which is expected to have the data rows <code>'wind'</code> and <code>'winddir'</code>.
+The default is <code>'weather'</code>.</dd>
+<dt><strong><code>theta</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Specifies which data row should be used for the theta axis. It has
+to be either in rad or in degrees (If it is given in degrees,
+<code>Wrapper.details['weather']['theta'][1]</code> has to be <code>'°'</code>). The
+default is <code>'winddir'</code>.</dd>
+<dt><strong><code>radius</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Specifies which data should be used for the binning along the
+radius. The default is <code>'wind'</code>.</dd>
+<dt><strong><code>start</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Takes a str in the format "HH:MM:SS" and only plots data acquired
+after it.</dd>
+<dt><strong><code>end</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Takes a str in the format "HH:MM:SS" and only plots data acquired
+before it.</dd>
+<dt><strong><code>scatter</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, a scatter plot of the raw winddata is plotted over the
 heatmap, which can be used to get an overview over how dense the
-data is. The default is True.
-scatter_color : str, optional
-Changes the color of the scatter plot (only in effect if scatter
-is True). The default is 'tab:blue'.
-colormap : str, optional
-Changes the colormap, that is used for the heatmap. The default is
-'viridis'.
-min_threshold : int, optional
-If a min_threshold is given, only bins with at least min_threshold
-are shown. The default is 0.
-sectors : int, optional
-The windrose will be devided into this many sectors along the
-theta axis. The default is 4.
-bins : int, optional
-The windrose will be devided into this many bins along the radius.
-The default is 3.
-heatmap_lim : list or tuple of float with len 2, optional
-If a heatmap_lim is given, the limits of the colorbar will be set
-to its values. If no heatmap_lim is given, the minimum and the
-maximum values will be used as limits.</p>
+data is. The default is <code>True</code>.</dd>
+<dt><strong><code>scatter_color</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Changes the color of the scatter plot (only in effect if <code>scatter</code>
+is <code>True</code>). The default is <code>'tab:blue'</code>.</dd>
+<dt><strong><code>colormap</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Changes the colormap, that is used for the heatmap. The default is
+'viridis'.</dd>
+<dt><strong><code>min_threshold</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>If a min_threshold is given, only bins with at least min_threshold
+are shown. The default is <code>0</code>.</dd>
+<dt><strong><code>sectors</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The windrose will be devided into this many sectors along the
+theta axis. The default is <code>4</code>.</dd>
+<dt><strong><code>bins</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The windrose will be devided into this many bins along the radius.
+The default is <code>3</code>.</dd>
+<dt><strong><code>heatmap_lim</code></strong> :&ensp;<code>list</code> or <code>tuple</code> of <code>float with len 2</code>, optional</dt>
+<dd>If a <code>heatmap_lim</code> is given, the limits of the colorbar will be set
+to its values. If no <code>heatmap_lim</code> is given, the minimum and the
+maximum values will be used as limits.</dd>
+<dt><strong><code>windspeed_lim</code></strong> :&ensp;<code>int</code> or <code>float</code>, optional</dt>
+<dd>If a <code>windspeed_lim</code> is passed, it will be used as the maximum
+radius of the windrose. Otherwise the maximum windspeed in the
+dataset will be used.</dd>
+<dt><strong><code>startangle</code></strong> :&ensp;<code>int</code> or <code>float</code>, optional</dt>
+<dd>Will turn the sectors clockwise by its value degrees. The default
+is <code>0</code>, which means that the first sector has its lower boundary at
+exactly North.</dd>
+<dt><strong><code>usedegrees</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If <code>True</code> the plot will use degrees as theta axis ticks instead of
+cardinal directions (N,E,S,W). The default is <code>False</code>.</dd>
+<dt><strong><code>inverted</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If <code>True</code> the theta values will be inverted. E.g. if the raw data
+gives the angle from which the wind blows, <code>inverted = True</code> will
+plot the angle the wind blows in. The default is <code>False</code>.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>None</code></dt>
@@ -1255,15 +1459,26 @@ maximum values will be used as limits.</p>
 
     Parameters
     ----------
-    obj : WIBS, OPC, POPS, Weatherdata or FlyingFloUSB
-        This object will be included in the Wrapper.
+    obj : agg_dim.wibs.WIBS, agg_dim.particle_counters.OPC, agg_dim.particle_counters.Pops, agg_dim.weather.WeatherData or agg_dim.lowcostsensors.FlyingFlo_USB
+        This object will be included in the `Wrapper`.
     name : str
-        This str will be used as a key in Wrapper.data and Wrapper.details
-        and it will be the attribute name for the object.
+        This str will be used as a key in `Wrapper.data` and 
+        `Wrapper.details` and it will be the attribute name for the object.
 
     Returns
     -------
     None
+    
+    Examples
+    --------
+    &gt;&gt;&gt; from agg_dim import Wrapper,WIBS
+    &gt;&gt;&gt; w = WIBS(&#39;example.wibs&#39;)
+    &gt;&gt;&gt; exp = Wrapper()
+    &gt;&gt;&gt; exp.wrap(w,&#39;wibs&#39;)
+    
+    The `agg_dim.wibs.WIBS` obj is now wrapped by the `Wrapper` obj.
+    It can be accessed via `exp.wibs` and its data can be accessed through
+    `Wrapper` methods.
     &#34;&#34;&#34;
     
     
@@ -1283,17 +1498,26 @@ maximum values will be used as limits.</p>
 into the corresponding dicts and saving the object in Wrapper.name</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
-<dt><strong><code>obj</code></strong> :&ensp;<code>WIBS, OPC, POPS, Weatherdata</code> or <code>FlyingFloUSB</code></dt>
-<dd>This object will be included in the Wrapper.</dd>
+<dt><strong><code>obj</code></strong> :&ensp;<code><a title="agg_dim.wibs.WIBS" href="wibs.html#agg_dim.wibs.WIBS">WIBS</a>, <a title="agg_dim.particle_counters.OPC" href="particle_counters.html#agg_dim.particle_counters.OPC">OPC</a>, <a title="agg_dim.particle_counters.Pops" href="particle_counters.html#agg_dim.particle_counters.Pops">Pops</a>, <a title="agg_dim.weather.WeatherData" href="weather.html#agg_dim.weather.WeatherData">WeatherData</a></code> or <code><a title="agg_dim.lowcostsensors.FlyingFlo_USB" href="lowcostsensors.html#agg_dim.lowcostsensors.FlyingFlo_USB">FlyingFlo_USB</a></code></dt>
+<dd>This object will be included in the <code><a title="agg_dim.experiment.Wrapper" href="#agg_dim.experiment.Wrapper">Wrapper</a></code>.</dd>
 <dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
-<dd>This str will be used as a key in Wrapper.data and Wrapper.details
-and it will be the attribute name for the object.</dd>
+<dd>This str will be used as a key in <code>Wrapper.data</code> and
+<code>Wrapper.details</code> and it will be the attribute name for the object.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>None</code></dt>
 <dd>&nbsp;</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; from agg_dim import Wrapper,WIBS
+&gt;&gt;&gt; w = WIBS('example.wibs')
+&gt;&gt;&gt; exp = Wrapper()
+&gt;&gt;&gt; exp.wrap(w,'wibs')
+</code></pre>
+<p>The <code><a title="agg_dim.wibs.WIBS" href="wibs.html#agg_dim.wibs.WIBS">WIBS</a></code> obj is now wrapped by the <code><a title="agg_dim.experiment.Wrapper" href="#agg_dim.experiment.Wrapper">Wrapper</a></code> obj.
+It can be accessed via <code>exp.wibs</code> and its data can be accessed through
+<code><a title="agg_dim.experiment.Wrapper" href="#agg_dim.experiment.Wrapper">Wrapper</a></code> methods.</p></div>
 </dd>
 </dl>
 </dd>

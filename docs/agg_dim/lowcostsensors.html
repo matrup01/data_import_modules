@@ -58,17 +58,14 @@ el.replaceWith(d);
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class CCS811:
-    &#34;&#34;&#34;full documentation see https://github.com/matrup01/data_import_modules \n
-    
-    file (str) ... takes a ccs811-produced csv-file\n
-        
-        start (str,optional) ... takes a str in &#39;hh:mm:ss&#39;-format and only imports data acquired after that timestamp\n
-        end (str,optional) ... takes a str in &#39;hh:mm:ss&#39;-format and only imports data acquired before that timestamp\n
-        title (str, optional) ... takes a str and uses it as a title for quickplots\n
-        deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False\n&#34;&#34;&#34;
     
     def __init__(self,file,start=&#34;none&#34;,end=&#34;none&#34;,title=&#34;no title&#34;,deviate=False):
         &#34;&#34;&#34;
+        An obj for inputting CCS811 generated .csv files
+        
+        .. deprecated:: 0.1.1
+            `CCS811` was succeeded by the `FlyingFlo_USB` class in agg_dim 
+            0.1.1 and was not updated since then.
 
         Parameters
         ----------
@@ -280,16 +277,12 @@ el.replaceWith(d);
                 
         self.deviated = True</code></pre>
 </details>
-<div class="desc"><p>full documentation see <a href="https://github.com/matrup01/data_import_modules">https://github.com/matrup01/data_import_modules</a> </p>
-<p>file (str) &hellip; takes a ccs811-produced csv-file</p>
-<pre><code>start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp
-
-end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp
-
-title (str, optional) ... takes a str and uses it as a title for quickplots
-
-deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False
-</code></pre>
+<div class="desc"><p>An obj for inputting CCS811 generated .csv files</p>
+<div class="admonition deprecated">
+<p class="admonition-title">Deprecated since version:&ensp;0.1.1</p>
+<p><code><a title="agg_dim.lowcostsensors.CCS811" href="#agg_dim.lowcostsensors.CCS811">CCS811</a></code> was succeeded by the <code><a title="agg_dim.lowcostsensors.FlyingFlo_USB" href="#agg_dim.lowcostsensors.FlyingFlo_USB">FlyingFlo_USB</a></code> class in agg_dim
+0.1.1 and was not updated since then.</p>
+</div>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>file</code></strong> :&ensp;<code>str</code></dt>
@@ -562,43 +555,22 @@ deviate (bool, optional) ... takes a bool to decide if the data should be expres
     deviate : bool, optional
         takes a bool to decide if the data should be expressed relative to mean. The default is False.
 
-    Variables
-    ---------
-    FlyingFlo_USB.title : str
+    Attributes
+    ----------
+    title : str
         Contains the title that is used for quickplots.
-    FlyingFlo_USB.deviated : bool
+    deviated : bool
         True if the data is epressed relative to a mean.
-    FlyingFlo_USB.averaged : bool
+    averaged : bool
         True if the data is averaged minutewise (through FlyingFlo.average() method).
-    FlyingFlo_USB.t : np.array of datetime obj of datetime module
+    t : np.array of datetime obj of datetime module
         Contains the timestamps of all datapoints.
-    FlyingFlo_USB.y : {str : np.array}
+    y : {str : np.array}
         Contains all data in the form of a dict.
 
     &#34;&#34;&#34;
     
     def __init__(self,file,start=&#34;none&#34;,end=&#34;none&#34;,title=&#34;no title&#34;,deviate=False):
-        &#34;&#34;&#34;
-        inits FlyingFlo_USB object
-
-        Parameters
-        ----------
-        file : str
-            takes a FlyingFlo_USB-produced csv-file.
-        start : str, optional
-            takes a str in &#39;hh:mm:ss&#39;-format and only imports data acquired after that timestamp. The default is &#34;none&#34;.
-        end : str, optional
-            takes a str in &#39;hh:mm:ss&#39;-format and only imports data acquired before that timestamp. The default is &#34;none&#34;.
-        title : str, optional
-            takes a str and uses it as a title for quickplots. The default is &#34;no title&#34;.
-        deviate : bool, optional
-            takes a bool to decide if the data should be expressed relative to mean. The default is False.
-
-        Returns
-        -------
-        None.
-
-        &#34;&#34;&#34;
         
         #init
         self.title = title
@@ -707,7 +679,8 @@ deviate (bool, optional) ... takes a bool to decide if the data should be expres
         color : str, optional
             changes the color of the plot. The default is &#34;tab:brown&#34;.
         secondary : bool, optional
-            determines which y-axis should be colored (False-left axis/True-right axis). The default is False.
+            determines which y-axis should be colored (False-left axis/
+            True-right axis). The default is False.
 
         Raises
         ------
@@ -887,33 +860,19 @@ deviate (bool, optional) ... takes a bool to decide if the data should be expres
 <dt><strong><code>deviate</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>takes a bool to decide if the data should be expressed relative to mean. The default is False.</dd>
 </dl>
-<h2 id="variables">Variables</h2>
-<p>FlyingFlo_USB.title : str
-Contains the title that is used for quickplots.
-FlyingFlo_USB.deviated : bool
-True if the data is epressed relative to a mean.
-FlyingFlo_USB.averaged : bool
-True if the data is averaged minutewise (through FlyingFlo.average() method).
-FlyingFlo_USB.t : np.array of datetime obj of datetime module
-Contains the timestamps of all datapoints.
-FlyingFlo_USB.y : {str : np.array}
-Contains all data in the form of a dict.</p>
-<p>inits FlyingFlo_USB object</p>
-<h2 id="parameters_1">Parameters</h2>
+<h2 id="attributes">Attributes</h2>
 <dl>
-<dt><strong><code>file</code></strong> :&ensp;<code>str</code></dt>
-<dd>takes a FlyingFlo_USB-produced csv-file.</dd>
-<dt><strong><code>start</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp. The default is "none".</dd>
-<dt><strong><code>end</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp. The default is "none".</dd>
-<dt><strong><code>title</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>takes a str and uses it as a title for quickplots. The default is "no title".</dd>
-<dt><strong><code>deviate</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>takes a bool to decide if the data should be expressed relative to mean. The default is False.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<p>None.</p></div>
+<dt><strong><code>title</code></strong> :&ensp;<code>str</code></dt>
+<dd>Contains the title that is used for quickplots.</dd>
+<dt><strong><code>deviated</code></strong> :&ensp;<code>bool</code></dt>
+<dd>True if the data is epressed relative to a mean.</dd>
+<dt><strong><code>averaged</code></strong> :&ensp;<code>bool</code></dt>
+<dd>True if the data is averaged minutewise (through FlyingFlo.average() method).</dd>
+<dt><strong><code>t</code></strong> :&ensp;<code>np.array</code> of <code>datetime obj</code> of <code>datetime module</code></dt>
+<dd>Contains the timestamps of all datapoints.</dd>
+<dt><strong><code>y</code></strong> :&ensp;<code>{str : np.array}</code></dt>
+<dd>Contains all data in the form of a dict.</dd>
+</dl></div>
 <h3>Methods</h3>
 <dl>
 <dt id="agg_dim.lowcostsensors.FlyingFlo_USB.average"><code class="name flex">
@@ -1074,7 +1033,8 @@ Contains all data in the form of a dict.</p>
     color : str, optional
         changes the color of the plot. The default is &#34;tab:brown&#34;.
     secondary : bool, optional
-        determines which y-axis should be colored (False-left axis/True-right axis). The default is False.
+        determines which y-axis should be colored (False-left axis/
+        True-right axis). The default is False.
 
     Raises
     ------
@@ -1125,7 +1085,8 @@ Contains all data in the form of a dict.</p>
 <dt><strong><code>color</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>changes the color of the plot. The default is "tab:brown".</dd>
 <dt><strong><code>secondary</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>determines which y-axis should be colored (False-left axis/True-right axis). The default is False.</dd>
+<dd>determines which y-axis should be colored (False-left axis/
+True-right axis). The default is False.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
@@ -1259,17 +1220,14 @@ Contains all data in the form of a dict.</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class SEN55:
-    &#34;&#34;&#34;full documentation see https://github.com/matrup01/data_import_modules \n
-    
-    file (str) ... takes a sen55-produced csv-file\n
-        
-        start (str,optional) ... takes a str in &#39;hh:mm:ss&#39;-format and only imports data acquired after that timestamp\n
-        end (str,optional) ... takes a str in &#39;hh:mm:ss&#39;-format and only imports data acquired before that timestamp\n
-        title (str, optional) ... takes a str and uses it as a title for quickplots\n
-        deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False&#34;&#34;&#34;
     
     def __init__(self,file,start=&#34;none&#34;,end=&#34;none&#34;,title=&#34;no title&#34;,deviate=False):
         &#34;&#34;&#34;
+        An obj for inputting SEN55 generated .csv files
+        
+        .. deprecated:: 0.1.1
+            `SEN55` was succeeded by the `FlyingFlo_USB` class in agg_dim 
+            0.1.1 and was not updated since then.
 
         Parameters
         ----------
@@ -1509,16 +1467,12 @@ Contains all data in the form of a dict.</p>
                 
         self.deviated = True</code></pre>
 </details>
-<div class="desc"><p>full documentation see <a href="https://github.com/matrup01/data_import_modules">https://github.com/matrup01/data_import_modules</a> </p>
-<p>file (str) &hellip; takes a sen55-produced csv-file</p>
-<pre><code>start (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp
-
-end (str,optional) ... takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp
-
-title (str, optional) ... takes a str and uses it as a title for quickplots
-
-deviate (bool, optional) ... takes a bool to decide if the data should be expressed relative to mean, default-False
-</code></pre>
+<div class="desc"><p>An obj for inputting SEN55 generated .csv files</p>
+<div class="admonition deprecated">
+<p class="admonition-title">Deprecated since version:&ensp;0.1.1</p>
+<p><code><a title="agg_dim.lowcostsensors.SEN55" href="#agg_dim.lowcostsensors.SEN55">SEN55</a></code> was succeeded by the <code><a title="agg_dim.lowcostsensors.FlyingFlo_USB" href="#agg_dim.lowcostsensors.FlyingFlo_USB">FlyingFlo_USB</a></code> class in agg_dim
+0.1.1 and was not updated since then.</p>
+</div>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>file</code></strong> :&ensp;<code>str</code></dt>
