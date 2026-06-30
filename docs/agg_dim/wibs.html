@@ -111,8 +111,8 @@ el.replaceWith(d);
         bin_means : list of float
             Geometric means of bins. Used for dndlogdp stuff.
         bin_borders : list of float
-            The list of bin borders that is passed as a kwarg at init. It is only 
-            saved as an attribute in agg_dim 0.1.18 or higher.
+            The list of bin borders that is passed as a kwarg at init. It is 
+            only saved as an attribute in agg_dim 0.1.18 or higher.
         data : {str : 1D numpy array}
             contains all processed data in the form of a dictionary 
             (processed for every second)
@@ -121,14 +121,14 @@ el.replaceWith(d);
         rawdata : {str : 1D numpy array}
             conains all the raw data used for data processing
         fl1_FTbg : float
-            Contains the fluorescence of the chamber for fl1, calculated from the 
-            forced trigger.
+            Contains the fluorescence of the chamber for fl1, calculated from 
+            the forced trigger.
         fl2_FTbg : float
-            Contains the fluorescence of the chamber for fl2, calculated from the 
-            forced trigger.
+            Contains the fluorescence of the chamber for fl2, calculated from 
+            the forced trigger.
         fl3_FTbg : float
-            Contains the fluorescence of the chamber for fl3, calculated from the 
-            forced trigger.    
+            Contains the fluorescence of the chamber for fl3, calculated from 
+            the forced trigger.    
         &#34;&#34;&#34;
         
         if file[-5:] == &#34;.wibs&#34;:
@@ -179,7 +179,7 @@ el.replaceWith(d);
             self.data = {}
             self.rawdata = {}
             self.details = {} #[name,unit]
-            if self.fixed != None:
+            if self.fixed is not None:
                 self.fl1_FTbg = self.fixed[0]
                 self.fl2_FTbg = self.fixed[1]
                 self.fl3_FTbg = self.fixed[2]
@@ -210,11 +210,11 @@ el.replaceWith(d);
                     day=int(self.FT_date[:2])
                     )
             
-            f = f&#34;{self.FT_date}-{FT_time}/+0000&#34;,&#34;%d.%m.%Y-%H:%M:%S/%z&#34;
-            FT_time = datetime.strptime(f)
+            f = f&#34;{self.FT_date}-{FT_time}/+0000&#34;
+            FT_time = datetime.strptime(f,&#34;%d.%m.%Y-%H:%M:%S/%z&#34;)
             timecorr = FT_time - self.start_FT
             
-            if self.fixed == None:
+            if self.fixed is None:
                 f1 = ft_xe1[0]
                 self.fl1_FTbg = np.nanmean(f1) + self.FT_sigma * np.nanstd(f1)
                 f2 = ft_xe1[1]
@@ -387,15 +387,23 @@ el.replaceWith(d);
                     [np.count_nonzero(arr) for arr in bin_handler]
                     )
                 del bin_handler
-                self.data[f&#34;bin{bin_no}_partconc&#34;] = self.data[f&#34;bin{bin_no}_cps&#34;] / self.flow
-                self.details[f&#34;bin{bin_no}_partconc&#34;] = [f&#34;Particle Conc. (bin{bin_no}) &#34;,&#34;#/cm${}^3$&#34;]
-                self.details[f&#34;bin{bin_no}_cps&#34;] = [f&#34;Particle Counts (Bin{bin_no})&#34;,&#34;#/s&#34;]
+                pc = f&#34;bin{bin_no}_partconc&#34;
+                cps = f&#34;bin{bin_no}_cps&#34;
+                self.data[pc] = self.data[cps] / self.flow
+                self.details[pc] = [f&#34;Particle Conc. (bin{bin_no}) &#34;,
+                                    &#34;#/cm${}^3$&#34;]
+                self.details[cps] = [f&#34;Particle Counts (Bin{bin_no})&#34;,&#34;#/s&#34;]
                 
             #dndlogdp
             for bin_no in range(self.bins):
-                log_binwidth = np.log10(self.bin_borders[bin_no+1])-np.log10(self.bin_borders[bin_no])
-                self.data[f&#34;bin{bin_no}_dndlogdp&#34;] = self.data[f&#34;bin{bin_no}_partconc&#34;] / log_binwidth
-                self.details[f&#34;bin{bin_no}_dndlogdp&#34;] = [f&#34;dN/dlog$D_P$ (Bin{bin_no})&#34;,&#34;$\mu$m${}^{-1}$&#34;]
+                log_binwidth = np.log10(
+                    self.bin_borders[bin_no+1]
+                    )-np.log10(self.bin_borders[bin_no])
+                dn = f&#34;bin{bin_no}_dndlogdp&#34;
+                pc = f&#34;bin{bin_no}_partconc&#34;
+                self.data[dn] = self.data[pc] / log_binwidth
+                self.details[dn] = [f&#34;dN/dlog$D_P$ (Bin{bin_no})&#34;,
+                                    &#34;$\mu$m${}^{-1}$&#34;]
                 
             #total
             self.data[&#34;total_cps&#34;] = np.array(
@@ -419,7 +427,10 @@ el.replaceWith(d);
                 where=self.data[&#34;total_cps&#34;]!=0
                 )
             self.details[&#34;excited&#34;] = [&#34;Particle Counts (excited)&#34;,&#34;#/s&#34;]
-            self.details[&#34;excited_fraction&#34;] = [&#34;Fraction of excited Particles&#34;, &#34;No Unit&#34;]
+            self.details[&#34;excited_fraction&#34;] = [
+                &#34;Fraction of excited Particles&#34;, 
+                &#34;No Unit&#34;
+                ]
             
             
             #fluorescence channels
@@ -456,7 +467,10 @@ el.replaceWith(d);
                 )
             for i in [1,2,3]:
                 self.details[f&#34;fl{i}&#34;] = [f&#34;Particle Counts (Fl{i})&#34;,&#34;#/s&#34;]
-                self.details[f&#34;fl{i}_fraction&#34;] = [f&#34;Fluorescent Fraction (Fl{i})&#34;, &#34;No Unit&#34;]
+                self.details[f&#34;fl{i}_fraction&#34;] = [
+                    f&#34;Fluorescent Fraction (Fl{i})&#34;,
+                    &#34;No Unit&#34;
+                    ]
             
             def createmask(a,b,c,string):
                 a = a if &#34;a&#34; in string else ~a
@@ -482,25 +496,55 @@ el.replaceWith(d);
                         m,
                         False)
                     m = channel_mask &amp; m
-                    self.data[f&#34;{channel}_bin{bin_no}_cps&#34;] = np.array(
+                    cps = f&#34;{channel}_bin{bin_no}_cps&#34;
+                    pc = f&#34;{channel}_bin{bin_no}_partconc&#34;
+                    dn = f&#34;{channel}_bin{bin_no}_dndlogdp&#34;
+                    self.data[cps] = np.array(
                         [np.count_nonzero(arr) for arr in m]
                         )
                     del m
-                    self.data[f&#34;{channel}_bin{bin_no}_partconc&#34;] = self.data[f&#34;{channel}_bin{bin_no}_cps&#34;] / self.flow
-                    self.details[f&#34;{channel}_bin{bin_no}_partconc&#34;] = [f&#34;Particle Conc. of {channel}-Particles (bin{bin_no}) &#34;,&#34;#/cm${}^3$&#34;]
-                    self.details[f&#34;{channel}_bin{bin_no}_cps&#34;] = [f&#34;Particle Counts of {channel}-Particles (Bin{bin_no})&#34;,&#34;#/s&#34;]
+                    self.data[pc] = self.data[cps] / self.flow
+                    self.details[pc] = [
+                        f&#34;Particle Conc. of {channel}-Particles (bin{bin_no})&#34;,
+                        &#34;#/cm${}^3$&#34;
+                        ]
+                    self.details[cps] = [
+                        f&#34;Counts of {channel}-Particles (Bin{bin_no})&#34;,
+                        &#34;#/s&#34;
+                        ]
                     
-                    log_binwidth = np.log10(self.bin_borders[bin_no+1])-np.log10(self.bin_borders[bin_no])
-                    self.data[f&#34;{channel}_bin{bin_no}_dndlogdp&#34;] = self.data[f&#34;{channel}_bin{bin_no}_partconc&#34;] / log_binwidth
-                    self.details[f&#34;{channel}_bin{bin_no}_dndlogdp&#34;] = [f&#34;dN/dlog$D_P$ of {channel}-Particles (Bin{bin_no})&#34;,&#34;cm$^{-3}$&#34;]
+                    log_binwidth = np.log10(
+                        self.bin_borders[bin_no+1]
+                        )-np.log10(self.bin_borders[bin_no])
+                    self.data[dn] = self.data[pc] / log_binwidth
+                    self.details[dn] = [
+                        f&#34;dN/dlog$D_P$ of {channel}-Particles (Bin{bin_no})&#34;,
+                        &#34;cm$^{-3}$&#34;
+                        ]
                    
                 del channel_mask
-                self.data[f&#34;{channel}_total_cps&#34;] = np.sum([self.data[f&#34;{channel}_bin{i}_cps&#34;] for i in range(self.bins)],axis=0)
-                self.data[f&#34;{channel}_total_partconc&#34;] = self.data[f&#34;{channel}_total_cps&#34;] / self.flow
-                self.data[f&#34;{channel}_fraction&#34;] = np.divide(self.data[f&#34;{channel}_total_cps&#34;],self.data[&#34;total_cps&#34;],out=np.zeros(self.data[f&#34;{channel}_total_cps&#34;].shape,dtype=float),where=self.data[&#34;total_cps&#34;]!=0)
-                self.details[f&#34;{channel}_total_cps&#34;] = [f&#34;Particle Counts of {channel}-Particles&#34;,&#34;#/s&#34;]
-                self.details[f&#34;{channel}_total_partconc&#34;] = [f&#34;Particle Conc. of {channel}-Particles&#34;,&#34;#/cm${}^3$&#34;]
-                self.details[f&#34;{channel}_fraction&#34;] = [f&#34;Fluorescent Fraction ({channel})&#34;, &#34;No Unit&#34;]
+                cps = f&#34;{channel}_total_cps&#34;
+                pc = f&#34;{channel}_total_partconc&#34;
+                fr = f&#34;{channel}_fraction&#34;
+                self.data[cps] = np.sum(
+                    [self.data[f&#34;{channel}_bin{i}_cps&#34;] 
+                     for i in range(self.bins)],
+                    axis=0
+                    )
+                self.data[pc] = self.data[cps] / self.flow
+                self.data[fr] = np.divide(
+                    self.data[cps],
+                    self.data[&#34;total_cps&#34;],
+                    out=np.zeros(self.data[f&#34;{channel}_total_cps&#34;].shape,
+                                 dtype=float),
+                    where=self.data[&#34;total_cps&#34;]!=0
+                    )
+                self.details[cps] = [f&#34;Particle Counts of {channel}-Particles&#34;,
+                                     &#34;#/s&#34;]
+                self.details[pc] = [f&#34;Particle Conc. of {channel}-Particles&#34;,
+                                    &#34;#/cm${}^3$&#34;]
+                self.details[fr] = [f&#34;Fluorescent Fraction ({channel})&#34;,
+                                    &#34;No Unit&#34;]
                 
             del self.timehandler
             del self.start
@@ -534,7 +578,10 @@ el.replaceWith(d);
         _,ax = plt.subplots()
 
         ax.set_xlabel(&#34;CET&#34;)
-        ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34; if self.details[y][1] != &#34;No Unit&#34; else self.details[y][0]
+        if self.details[y][1] != &#34;No Unit&#34;:
+            ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
+        else:
+            ylabel = self.details[y][0]
         ax.set_ylabel(ylabel)
         
         ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
@@ -722,7 +769,10 @@ el.replaceWith(d);
         except KeyError as kerr:
             raise IllegalValue(&#34;y&#34;, &#34;WIBS.plot()&#34;,list(self.data)) from kerr
             
-        ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34; if self.details[y][1] != &#34;No Unit&#34; else self.details[y][0]
+        if self.details[y][1] != &#34;No Unit&#34;:
+            ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
+        else:
+            ylabel = self.details[y][0]
             
         #draw plot
         ax.plot(xx,yy,label=kwargs[&#34;label&#34;],color=kwargs[&#34;color&#34;])
@@ -1094,8 +1144,8 @@ The default is
 <dt><strong><code>bin_means</code></strong> :&ensp;<code>list</code> of <code>float</code></dt>
 <dd>Geometric means of bins. Used for dndlogdp stuff.</dd>
 <dt><strong><code>bin_borders</code></strong> :&ensp;<code>list</code> of <code>float</code></dt>
-<dd>The list of bin borders that is passed as a kwarg at init. It is only
-saved as an attribute in agg_dim 0.1.18 or higher.</dd>
+<dd>The list of bin borders that is passed as a kwarg at init. It is
+only saved as an attribute in agg_dim 0.1.18 or higher.</dd>
 <dt><strong><code>data</code></strong> :&ensp;<code>{str : 1D numpy array}</code></dt>
 <dd>contains all processed data in the form of a dictionary
 (processed for every second)</dd>
@@ -1104,14 +1154,14 @@ saved as an attribute in agg_dim 0.1.18 or higher.</dd>
 <dt><strong><code>rawdata</code></strong> :&ensp;<code>{str : 1D numpy array}</code></dt>
 <dd>conains all the raw data used for data processing</dd>
 <dt><strong><code>fl1_FTbg</code></strong> :&ensp;<code>float</code></dt>
-<dd>Contains the fluorescence of the chamber for fl1, calculated from the
-forced trigger.</dd>
+<dd>Contains the fluorescence of the chamber for fl1, calculated from
+the forced trigger.</dd>
 <dt><strong><code>fl2_FTbg</code></strong> :&ensp;<code>float</code></dt>
-<dd>Contains the fluorescence of the chamber for fl2, calculated from the
-forced trigger.</dd>
+<dd>Contains the fluorescence of the chamber for fl2, calculated from
+the forced trigger.</dd>
 <dt><strong><code>fl3_FTbg</code></strong> :&ensp;<code>float</code></dt>
-<dd>Contains the fluorescence of the chamber for fl3, calculated from the
-forced trigger.</dd>
+<dd>Contains the fluorescence of the chamber for fl3, calculated from
+the forced trigger.</dd>
 </dl></div>
 <h3>Methods</h3>
 <dl>
@@ -1508,7 +1558,10 @@ mpl axis</p>
     except KeyError as kerr:
         raise IllegalValue(&#34;y&#34;, &#34;WIBS.plot()&#34;,list(self.data)) from kerr
         
-    ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34; if self.details[y][1] != &#34;No Unit&#34; else self.details[y][0]
+    if self.details[y][1] != &#34;No Unit&#34;:
+        ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
+    else:
+        ylabel = self.details[y][0]
         
     #draw plot
     ax.plot(xx,yy,label=kwargs[&#34;label&#34;],color=kwargs[&#34;color&#34;])
@@ -1653,7 +1706,10 @@ Should be used if the given ax is a twinx(). The default is False.</dd>
     _,ax = plt.subplots()
 
     ax.set_xlabel(&#34;CET&#34;)
-    ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34; if self.details[y][1] != &#34;No Unit&#34; else self.details[y][0]
+    if self.details[y][1] != &#34;No Unit&#34;:
+        ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
+    else:
+        ylabel = self.details[y][0]
     ax.set_ylabel(ylabel)
     
     ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))

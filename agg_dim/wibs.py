@@ -167,8 +167,8 @@ class WIBS:
                     day=int(self.FT_date[:2])
                     )
             
-            f = f"{self.FT_date}-{FT_time}/+0000","%d.%m.%Y-%H:%M:%S/%z"
-            FT_time = datetime.strptime(f)
+            f = f"{self.FT_date}-{FT_time}/+0000"
+            FT_time = datetime.strptime(f,"%d.%m.%Y-%H:%M:%S/%z")
             timecorr = FT_time - self.start_FT
             
             if self.fixed is None:
