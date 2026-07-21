@@ -1,3 +1,15 @@
+######################### MR 21.07.2026 #########################
+#                      "misc improvements"                      #
+#                                                               #
+# - IMPORTANT: Changed WIBS.stackedplot() to dndlogdp instead   #
+#              of partconc. Use new 'legacy' kwarg to keep      #
+#              using partconc.                                  #
+# - Added kwargs to WIBS.stackedplot()                          #
+# - Added 'particletype' kwarg to WIBS.dndlogdp()               #
+# - Fixed a bug in Wrapper.hk_checktime()                       #
+# - Fixed error with ".wibs" appending in WIBS.save()           #
+#################################################################
+
 ######################### MR 30.06.2026 #########################
 #                         "WIBS hotfix"                         #
 #                                                               #

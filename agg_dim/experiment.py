@@ -257,9 +257,12 @@ class Wrapper:
             ax.scatter(xx,yy,color=kwargs["color"])
         else:
             ax.plot(xx,yy,color=kwargs["color"])
-        ax.set_xlabel(self.details[x_instrument][x_val][0]
-                      + " in "
-                      + self.details[x_instrument][x_val][1])
+        if x_val != "t":
+            ax.set_xlabel(self.details[x_instrument][x_val][0]
+                          + " in "
+                          + self.details[x_instrument][x_val][1])
+        else:
+            ax.set_xlabel("CET")
         ax.set_ylabel(self.details[y_instrument][y_val][0]
                       + " in "
                       + self.details[y_instrument][y_val][1])
@@ -564,7 +567,7 @@ class Wrapper:
             start = dt.datetime.strptime(start_str, "%H:%M:%S").replace(
                 year = x_t[0].year,
                 month = x_t[0].month,
-                day = x_t[0].month
+                day = x_t[0].day
                 )
         else:
             start = x_t[0]
@@ -572,7 +575,7 @@ class Wrapper:
             end = dt.datetime.strptime(end_str, "%H:%M:%S").replace(
                 year = x_t[0].year,
                 month = x_t[0].month,
-                day = x_t[0].month
+                day = x_t[0].day
                 )
         else:
             end = x_t[-1]
@@ -584,12 +587,12 @@ class Wrapper:
         start = start.replace(
             year = y_t[0].year,
             month = y_t[0].month,
-            day = y_t[0].month
+            day = y_t[0].day
             )
         end = end.replace(
             year = y_t[0].year,
             month = y_t[0].month,
-            day = y_t[0].month
+            day = y_t[0].day
             )
         if start < y_t[0]:
             start = y_t[0]

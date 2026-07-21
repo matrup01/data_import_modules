@@ -810,6 +810,9 @@ el.replaceWith(d);
             before it.
         log : bool, optional
             If True the x-axis of the plot will be scaled logarithmicly
+        ylog : bool, optional
+            If True the y-axis will be scaled logarithmically. The default is
+            False.
         xlabel : str, optional
             Sets the xlabel of the plot. The default is &#34;D$_p$ in $\mu$m&#34;.
         ylabel : str, optional
@@ -817,6 +820,12 @@ el.replaceWith(d);
         legend : bool, optional
             If True a Legend will be drawn on the upper right. The default is 
             True.
+        normalize : bool, optional
+            If True the stackedplot will be normalized to 1, if False it will
+            show the raw dndlogdp. The default is True.
+        legacy : bool, optional
+            If True, partconc is used instead of dndlogdp to calculate the 
+            stacked areas. The default is False.
 
         Returns
         -------
@@ -829,7 +838,10 @@ el.replaceWith(d);
                     &#34;log&#34; : True,
                     &#34;xlabel&#34; : &#34;D$_p$ in $\mu$m&#34;,
                     &#34;ylabel&#34; : &#34;Fraction&#34;,
-                    &#34;legend&#34; : True}
+                    &#34;legend&#34; : True,
+                    &#34;normalize&#34; : True,
+                    &#34;legacy&#34; : False,
+                    &#34;ylog&#34; : False}
         for key,default in defaults.items():
             kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
         self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.stackedplot()&#34;)
@@ -852,25 +864,42 @@ el.replaceWith(d);
                 )
             m = np.where(kwargs[&#34;end&#34;]&gt;self.data[&#34;t&#34;],m,False)
         
+        leg = &#34;partconc&#34; if kwargs[&#34;legacy&#34;] else &#34;dndlogdp&#34;
         xx = self.bin_means
         totals = []
         for i in range(len(xx)):
-            totals.append(np.nanmean(self.data[f&#34;bin{i}_partconc&#34;][m]))
+            totals.append(np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m]))
             totals[i] = 1 if totals[i] == 0 else totals[i]
         vals = np.array([0 for i in xx])
         for ch in [&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,&#34;ab&#34;,&#34;bc&#34;,&#34;ac&#34;,&#34;abc&#34;]:
             new_vals = []
             for i in range(len(xx)):
                 new_vals.append(
-                    np.nanmean(self.data[f&#34;{ch}_bin{i}_partconc&#34;][m])
+                    np.nanmean(self.data[f&#34;{ch}_bin{i}_{leg}&#34;][m])
                     )
             new_vals = np.array(new_vals) + vals
-            ax.fill_between(xx,vals/totals,new_vals/totals,label=ch)
+            if kwargs[&#34;normalize&#34;]:
+                ax.fill_between(xx,vals/totals,new_vals/totals,label=ch)
+            else:
+                ax.fill_between(xx,vals,new_vals,label=ch)
             vals = new_vals
-        ax.fill_between(xx,vals/totals,[1 for i in xx],label=&#34;non fluorescent&#34;)
+        if kwargs[&#34;normalize&#34;]:
+            ax.fill_between(xx,vals/totals,
+                            [1 for i in xx],
+                            label=&#34;non fluorescent&#34;)
+        else:
+            totals = [
+                np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m]) 
+                for i in range(len(xx))
+                ]
+            ax.fill_between(xx,vals,
+                            totals,
+                            label=&#34;non fluorescent&#34;)
         
         if kwargs[&#34;log&#34;]:
             ax.set_xscale(&#34;log&#34;)
+        if kwargs[&#34;ylog&#34;]:
+            ax.set_yscale(&#34;log&#34;)
         if kwargs[&#34;legend&#34;]:
             ax.legend(loc=&#34;upper right&#34;)
         ax.set_xlabel(kwargs[&#34;xlabel&#34;])
@@ -917,6 +946,10 @@ el.replaceWith(d);
             `bin_borders` attribute. If no list is passed, it will try to 
             use the `bin_borders` attribute from the `WIBS` obj and if it 
             has none, an `AttributeError` will be raised.
+        particle_type : str, optional
+            Decides which particle type should be plotted. (legal values are: 
+            a,b,c,ab,ac,bc,abc). If all particles should be plotted without 
+            considering particle type, dont pass this kwarg.
 
         Returns
         -------
@@ -933,7 +966,8 @@ el.replaceWith(d);
                     &#34;scatter&#34; : False,
                     &#34;scatter_color&#34; : &#34;tab:blue&#34;,
                     &#34;scatter_line&#34; : True,
-                    &#34;bin_borders&#34; : None}
+                    &#34;bin_borders&#34; : None,
+                    &#34;particletype&#34; : None}
         
         for key,default in defaults.items():
             kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
@@ -963,9 +997,24 @@ el.replaceWith(d);
                                               year=yy)
             m = np.where(self.data[&#34;t&#34;]&lt;=end,m,False)
             
-        yy = np.array([np.nanmean(self.data[f&#34;bin{i}_dndlogdp&#34;][m]) 
-                       for i in range(self.bins)])
-        
+        if kwargs[&#34;particletype&#34;] is None:
+            yy = np.array([np.nanmean(self.data[f&#34;bin{i}_dndlogdp&#34;][m]) 
+                           for i in range(self.bins)])
+        else:
+            try:
+                pt = kwargs[&#34;particletype&#34;]
+                yy = np.array(
+                    [np.nanmean(self.data[f&#34;{pt}_bin{i}_dndlogdp&#34;][m]) 
+                     for i in range(self.bins)]
+                    )
+            except:
+                msg = f&#34;{kwargs[&#39;particletype&#39;]} is not a legal particletype. &#34;
+                msg += &#34;Legal particle types are a, b, c, ab, ac, bc or abc. &#34;
+                msg += &#34;If you want to plot the particle number size distribut&#34;
+                msg += &#34;ion of all particles, leave the kwarg &#39;particletype&#39; &#34;
+                msg += &#34;blank.&#34;
+                raise ValueError(msg)
+     
         if kwargs[&#34;scatter&#34;]:
             ax.scatter(xx,yy,color=kwargs[&#34;scatter_color&#34;])
             if kwargs[&#34;scatter_line&#34;]:
@@ -984,7 +1033,6 @@ el.replaceWith(d);
                     msg += &#34;bute was introduced. Try passing &#39;bin_borders&#39;&#34;
                     msg += &#34; manually in WIBS.dndlogdp() or consult docu.&#34;
                     raise AttributeError(msg)
-            bb = kwargs[&#34;bin_borders&#34;]
             width = np.array([bb[i+1]-bb[i] for i in range(self.bins)])
             ax.bar(xx,yy,width*0.8,align=&#34;center&#34;)
         if kwargs[&#34;log&#34;]:
@@ -1023,7 +1071,7 @@ el.replaceWith(d);
             }
         
         if path[-5:] != &#34;.wibs&#34;:
-            path.append(&#34;.wibs&#34;)
+            path += &#34;.wibs&#34;
           
         with open(path,&#34;wb&#34;) as dumppath:
             pickle.dump(op,dumppath,4)
@@ -1213,6 +1261,10 @@ the forced trigger.</dd>
         `bin_borders` attribute. If no list is passed, it will try to 
         use the `bin_borders` attribute from the `WIBS` obj and if it 
         has none, an `AttributeError` will be raised.
+    particle_type : str, optional
+        Decides which particle type should be plotted. (legal values are: 
+        a,b,c,ab,ac,bc,abc). If all particles should be plotted without 
+        considering particle type, dont pass this kwarg.
 
     Returns
     -------
@@ -1229,7 +1281,8 @@ the forced trigger.</dd>
                 &#34;scatter&#34; : False,
                 &#34;scatter_color&#34; : &#34;tab:blue&#34;,
                 &#34;scatter_line&#34; : True,
-                &#34;bin_borders&#34; : None}
+                &#34;bin_borders&#34; : None,
+                &#34;particletype&#34; : None}
     
     for key,default in defaults.items():
         kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
@@ -1259,9 +1312,24 @@ the forced trigger.</dd>
                                           year=yy)
         m = np.where(self.data[&#34;t&#34;]&lt;=end,m,False)
         
-    yy = np.array([np.nanmean(self.data[f&#34;bin{i}_dndlogdp&#34;][m]) 
-                   for i in range(self.bins)])
-    
+    if kwargs[&#34;particletype&#34;] is None:
+        yy = np.array([np.nanmean(self.data[f&#34;bin{i}_dndlogdp&#34;][m]) 
+                       for i in range(self.bins)])
+    else:
+        try:
+            pt = kwargs[&#34;particletype&#34;]
+            yy = np.array(
+                [np.nanmean(self.data[f&#34;{pt}_bin{i}_dndlogdp&#34;][m]) 
+                 for i in range(self.bins)]
+                )
+        except:
+            msg = f&#34;{kwargs[&#39;particletype&#39;]} is not a legal particletype. &#34;
+            msg += &#34;Legal particle types are a, b, c, ab, ac, bc or abc. &#34;
+            msg += &#34;If you want to plot the particle number size distribut&#34;
+            msg += &#34;ion of all particles, leave the kwarg &#39;particletype&#39; &#34;
+            msg += &#34;blank.&#34;
+            raise ValueError(msg)
+ 
     if kwargs[&#34;scatter&#34;]:
         ax.scatter(xx,yy,color=kwargs[&#34;scatter_color&#34;])
         if kwargs[&#34;scatter_line&#34;]:
@@ -1280,7 +1348,6 @@ the forced trigger.</dd>
                 msg += &#34;bute was introduced. Try passing &#39;bin_borders&#39;&#34;
                 msg += &#34; manually in WIBS.dndlogdp() or consult docu.&#34;
                 raise AttributeError(msg)
-        bb = kwargs[&#34;bin_borders&#34;]
         width = np.array([bb[i+1]-bb[i] for i in range(self.bins)])
         ax.bar(xx,yy,width*0.8,align=&#34;center&#34;)
     if kwargs[&#34;log&#34;]:
@@ -1325,6 +1392,10 @@ file that was created before agg_dim 0.1.18 and does not have the
 <code>bin_borders</code> attribute. If no list is passed, it will try to
 use the <code>bin_borders</code> attribute from the <code><a title="agg_dim.wibs.WIBS" href="#agg_dim.wibs.WIBS">WIBS</a></code> obj and if it
 has none, an <code>AttributeError</code> will be raised.</dd>
+<dt><strong><code>particle_type</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Decides which particle type should be plotted. (legal values are:
+a,b,c,ab,ac,bc,abc). If all particles should be plotted without
+considering particle type, dont pass this kwarg.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -1814,7 +1885,7 @@ exported data.</dd>
         }
     
     if path[-5:] != &#34;.wibs&#34;:
-        path.append(&#34;.wibs&#34;)
+        path += &#34;.wibs&#34;
       
     with open(path,&#34;wb&#34;) as dumppath:
         pickle.dump(op,dumppath,4)</code></pre>
@@ -1855,6 +1926,9 @@ exported data.</dd>
         before it.
     log : bool, optional
         If True the x-axis of the plot will be scaled logarithmicly
+    ylog : bool, optional
+        If True the y-axis will be scaled logarithmically. The default is
+        False.
     xlabel : str, optional
         Sets the xlabel of the plot. The default is &#34;D$_p$ in $\mu$m&#34;.
     ylabel : str, optional
@@ -1862,6 +1936,12 @@ exported data.</dd>
     legend : bool, optional
         If True a Legend will be drawn on the upper right. The default is 
         True.
+    normalize : bool, optional
+        If True the stackedplot will be normalized to 1, if False it will
+        show the raw dndlogdp. The default is True.
+    legacy : bool, optional
+        If True, partconc is used instead of dndlogdp to calculate the 
+        stacked areas. The default is False.
 
     Returns
     -------
@@ -1874,7 +1954,10 @@ exported data.</dd>
                 &#34;log&#34; : True,
                 &#34;xlabel&#34; : &#34;D$_p$ in $\mu$m&#34;,
                 &#34;ylabel&#34; : &#34;Fraction&#34;,
-                &#34;legend&#34; : True}
+                &#34;legend&#34; : True,
+                &#34;normalize&#34; : True,
+                &#34;legacy&#34; : False,
+                &#34;ylog&#34; : False}
     for key,default in defaults.items():
         kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
     self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.stackedplot()&#34;)
@@ -1897,25 +1980,42 @@ exported data.</dd>
             )
         m = np.where(kwargs[&#34;end&#34;]&gt;self.data[&#34;t&#34;],m,False)
     
+    leg = &#34;partconc&#34; if kwargs[&#34;legacy&#34;] else &#34;dndlogdp&#34;
     xx = self.bin_means
     totals = []
     for i in range(len(xx)):
-        totals.append(np.nanmean(self.data[f&#34;bin{i}_partconc&#34;][m]))
+        totals.append(np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m]))
         totals[i] = 1 if totals[i] == 0 else totals[i]
     vals = np.array([0 for i in xx])
     for ch in [&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,&#34;ab&#34;,&#34;bc&#34;,&#34;ac&#34;,&#34;abc&#34;]:
         new_vals = []
         for i in range(len(xx)):
             new_vals.append(
-                np.nanmean(self.data[f&#34;{ch}_bin{i}_partconc&#34;][m])
+                np.nanmean(self.data[f&#34;{ch}_bin{i}_{leg}&#34;][m])
                 )
         new_vals = np.array(new_vals) + vals
-        ax.fill_between(xx,vals/totals,new_vals/totals,label=ch)
+        if kwargs[&#34;normalize&#34;]:
+            ax.fill_between(xx,vals/totals,new_vals/totals,label=ch)
+        else:
+            ax.fill_between(xx,vals,new_vals,label=ch)
         vals = new_vals
-    ax.fill_between(xx,vals/totals,[1 for i in xx],label=&#34;non fluorescent&#34;)
+    if kwargs[&#34;normalize&#34;]:
+        ax.fill_between(xx,vals/totals,
+                        [1 for i in xx],
+                        label=&#34;non fluorescent&#34;)
+    else:
+        totals = [
+            np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m]) 
+            for i in range(len(xx))
+            ]
+        ax.fill_between(xx,vals,
+                        totals,
+                        label=&#34;non fluorescent&#34;)
     
     if kwargs[&#34;log&#34;]:
         ax.set_xscale(&#34;log&#34;)
+    if kwargs[&#34;ylog&#34;]:
+        ax.set_yscale(&#34;log&#34;)
     if kwargs[&#34;legend&#34;]:
         ax.legend(loc=&#34;upper right&#34;)
     ax.set_xlabel(kwargs[&#34;xlabel&#34;])
@@ -1937,6 +2037,9 @@ after it.</dd>
 before it.</dd>
 <dt><strong><code>log</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>If True the x-axis of the plot will be scaled logarithmicly</dd>
+<dt><strong><code>ylog</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True the y-axis will be scaled logarithmically. The default is
+False.</dd>
 <dt><strong><code>xlabel</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>Sets the xlabel of the plot. The default is "D$_p$ in $\mu$m".</dd>
 <dt><strong><code>ylabel</code></strong> :&ensp;<code>str</code>, optional</dt>
@@ -1944,6 +2047,12 @@ before it.</dd>
 <dt><strong><code>legend</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>If True a Legend will be drawn on the upper right. The default is
 True.</dd>
+<dt><strong><code>normalize</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True the stackedplot will be normalized to 1, if False it will
+show the raw dndlogdp. The default is True.</dd>
+<dt><strong><code>legacy</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, partconc is used instead of dndlogdp to calculate the
+stacked areas. The default is False.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>

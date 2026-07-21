@@ -767,6 +767,9 @@ class WIBS:
             before it.
         log : bool, optional
             If True the x-axis of the plot will be scaled logarithmicly
+        ylog : bool, optional
+            If True the y-axis will be scaled logarithmically. The default is
+            False.
         xlabel : str, optional
             Sets the xlabel of the plot. The default is "D$_p$ in $\mu$m".
         ylabel : str, optional
@@ -774,6 +777,12 @@ class WIBS:
         legend : bool, optional
             If True a Legend will be drawn on the upper right. The default is 
             True.
+        normalize : bool, optional
+            If True the stackedplot will be normalized to 1, if False it will
+            show the raw dndlogdp. The default is True.
+        legacy : bool, optional
+            If True, partconc is used instead of dndlogdp to calculate the 
+            stacked areas. The default is False.
 
         Returns
         -------
@@ -786,7 +795,10 @@ class WIBS:
                     "log" : True,
                     "xlabel" : "D$_p$ in $\mu$m",
                     "ylabel" : "Fraction",
-                    "legend" : True}
+                    "legend" : True,
+                    "normalize" : True,
+                    "legacy" : False,
+                    "ylog" : False}
         for key,default in defaults.items():
             kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
         self.hk_errorhandling(kwargs, defaults.keys(), "WIBS.stackedplot()")
@@ -809,25 +821,42 @@ class WIBS:
                 )
             m = np.where(kwargs["end"]>self.data["t"],m,False)
         
+        leg = "partconc" if kwargs["legacy"] else "dndlogdp"
         xx = self.bin_means
         totals = []
         for i in range(len(xx)):
-            totals.append(np.nanmean(self.data[f"bin{i}_partconc"][m]))
+            totals.append(np.nanmean(self.data[f"bin{i}_{leg}"][m]))
             totals[i] = 1 if totals[i] == 0 else totals[i]
         vals = np.array([0 for i in xx])
         for ch in ["a","b","c","ab","bc","ac","abc"]:
             new_vals = []
             for i in range(len(xx)):
                 new_vals.append(
-                    np.nanmean(self.data[f"{ch}_bin{i}_partconc"][m])
+                    np.nanmean(self.data[f"{ch}_bin{i}_{leg}"][m])
                     )
             new_vals = np.array(new_vals) + vals
-            ax.fill_between(xx,vals/totals,new_vals/totals,label=ch)
+            if kwargs["normalize"]:
+                ax.fill_between(xx,vals/totals,new_vals/totals,label=ch)
+            else:
+                ax.fill_between(xx,vals,new_vals,label=ch)
             vals = new_vals
-        ax.fill_between(xx,vals/totals,[1 for i in xx],label="non fluorescent")
+        if kwargs["normalize"]:
+            ax.fill_between(xx,vals/totals,
+                            [1 for i in xx],
+                            label="non fluorescent")
+        else:
+            totals = [
+                np.nanmean(self.data[f"bin{i}_{leg}"][m]) 
+                for i in range(len(xx))
+                ]
+            ax.fill_between(xx,vals,
+                            totals,
+                            label="non fluorescent")
         
         if kwargs["log"]:
             ax.set_xscale("log")
+        if kwargs["ylog"]:
+            ax.set_yscale("log")
         if kwargs["legend"]:
             ax.legend(loc="upper right")
         ax.set_xlabel(kwargs["xlabel"])
@@ -874,6 +903,10 @@ class WIBS:
             `bin_borders` attribute. If no list is passed, it will try to 
             use the `bin_borders` attribute from the `WIBS` obj and if it 
             has none, an `AttributeError` will be raised.
+        particle_type : str, optional
+            Decides which particle type should be plotted. (legal values are: 
+            a,b,c,ab,ac,bc,abc). If all particles should be plotted without 
+            considering particle type, dont pass this kwarg.
 
         Returns
         -------
@@ -890,7 +923,8 @@ class WIBS:
                     "scatter" : False,
                     "scatter_color" : "tab:blue",
                     "scatter_line" : True,
-                    "bin_borders" : None}
+                    "bin_borders" : None,
+                    "particletype" : None}
         
         for key,default in defaults.items():
             kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
@@ -920,9 +954,24 @@ class WIBS:
                                               year=yy)
             m = np.where(self.data["t"]<=end,m,False)
             
-        yy = np.array([np.nanmean(self.data[f"bin{i}_dndlogdp"][m]) 
-                       for i in range(self.bins)])
-        
+        if kwargs["particletype"] is None:
+            yy = np.array([np.nanmean(self.data[f"bin{i}_dndlogdp"][m]) 
+                           for i in range(self.bins)])
+        else:
+            try:
+                pt = kwargs["particletype"]
+                yy = np.array(
+                    [np.nanmean(self.data[f"{pt}_bin{i}_dndlogdp"][m]) 
+                     for i in range(self.bins)]
+                    )
+            except:
+                msg = f"{kwargs['particletype']} is not a legal particletype. "
+                msg += "Legal particle types are a, b, c, ab, ac, bc or abc. "
+                msg += "If you want to plot the particle number size distribut"
+                msg += "ion of all particles, leave the kwarg 'particletype' "
+                msg += "blank."
+                raise ValueError(msg)
+     
         if kwargs["scatter"]:
             ax.scatter(xx,yy,color=kwargs["scatter_color"])
             if kwargs["scatter_line"]:
@@ -941,7 +990,6 @@ class WIBS:
                     msg += "bute was introduced. Try passing 'bin_borders'"
                     msg += " manually in WIBS.dndlogdp() or consult docu."
                     raise AttributeError(msg)
-            bb = kwargs["bin_borders"]
             width = np.array([bb[i+1]-bb[i] for i in range(self.bins)])
             ax.bar(xx,yy,width*0.8,align="center")
         if kwargs["log"]:
@@ -980,7 +1028,7 @@ class WIBS:
             }
         
         if path[-5:] != ".wibs":
-            path.append(".wibs")
+            path += ".wibs"
           
         with open(path,"wb") as dumppath:
             pickle.dump(op,dumppath,4)
