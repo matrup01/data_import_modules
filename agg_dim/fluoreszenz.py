@@ -391,25 +391,37 @@ class NewFData:
         Parameters
         ----------
         file : str
-            Either the path to a FSpec-produced .csv file or a preprocessed .fspec file.
+            Either the path to a FSpec-produced .csv file or a preprocessed 
+            .fspec file.
         bg_file : str
-            Either the path to a FSpec-produced .csv file or a preprocessed .fspec file. Can be left if a preprocessed .fspec file is passed as file.
+            Either the path to a FSpec-produced .csv file or a preprocessed 
+            .fspec file. Can be left if a preprocessed .fspec file is passed 
+            as file.
         sigma : float or int, optional
             Will be used as sigma for data processing. The default is 1.
         measurement_frequency : int, optional
-            Measurement Frequency in Hz which is used to calculate the fluorescence index. The default is None.
+            Measurement Frequency in Hz which is used to calculate the 
+            fluorescence index. The default is None.
         start : str, optional
-            String in the form 'hh:mm:ss'. If start is given, all data acquired before this timestamp will be ignored.
+            String in the form 'hh:mm:ss'. If start is given, all data acquired
+            before this timestamp will be ignored.
         end : str, optional
-            String in the form 'hh:mm:ss'. If end is given, all data acquired after this timestamp will be ignored.
+            String in the form 'hh:mm:ss'. If end is given, all data acquired 
+            after this timestamp will be ignored.
         jit : bool, optional
-            If True the data processing is done using the just in time compiler numba. The default is True.
+            If True the data processing is done using the just in time compiler
+            numba. The default is True.
         bg_start : str, optional
-            String in the form 'hh:mm:ss'. If bg_start is given, all data acquired befor this timestamp will be ignored for the background. Only works if a .csv file is passed as bg_file.
+            String in the form 'hh:mm:ss'. If bg_start is given, all data 
+            acquired befor this timestamp will be ignored for the background. 
+            Only works if a .csv file is passed as bg_file.
         bg_end : str, optional
-            String in the form 'hh:mm:ss'. If bg_end is given, all data acquired after this timestamp will be ignored for the background. Only works if a .csv file is passed as bg_file.
+            String in the form 'hh:mm:ss'. If bg_end is given, all data 
+            acquired after this timestamp will be ignored for the background. 
+            Only works if a .csv file is passed as bg_file.
         layout : list of int with len 2
-            Decides which columns of the .csv files should be used for the channels.
+            Decides which columns of the .csv files should be used for the 
+            channels.
 
         Attributes
         ----------
@@ -420,9 +432,11 @@ class NewFData:
         bg : np.array of float with len 16
             Contains the mean+std*sigma threshhold for each channel
         rawtime : np.array of dt.datetime obj
-            Contains the timestamp of each dataset recorded (of each row of .csv file)
+            Contains the timestamp of each dataset recorded (of each row of 
+            .csv file)
         rawchannels : 2D np.array of int
-            Contains the raw fluorescence intesities of each channel for all recorded datasets
+            Contains the raw fluorescence intesities of each channel for all 
+            recorded datasets
         t : np.array of dt.datetime obj
             Contains the time for each datapoint of the processed data
         channels : 2D np.array of float
@@ -449,7 +463,13 @@ class NewFData:
             
             #error handling
             for key in kwargs:
-                if key not in ["sigma","measurement_frequency","start","end","jit","bg_start","bg_end"]:
+                if key not in ["sigma",
+                               "measurement_frequency",
+                               "start",
+                               "end",
+                               "jit",
+                               "bg_start",
+                               "bg_end"]:
                     raise IllegalArgument(key,"NewFData")
             
             #import background-data
@@ -461,7 +481,8 @@ class NewFData:
                     bgdata_all[i] = bgdata_all[i].split(";")
                     if len(bgdata_all[i]) < 2:
                         print(bgdata_all[i])
-                bgdata_time = [bgdata_all[i][1] for i in range(len(bgdata_all))]
+                bgdata_time = [bgdata_all[i][1] 
+                               for i in range(len(bgdata_all))]
                 bgdata = bgdata_all[1:]
                 bg_start_index = 100
                 bg_end_index = len(bgdata)
@@ -487,14 +508,22 @@ class NewFData:
                 bgdata = np.array(bgdata).transpose()
                 bgdata = bgdata[3:].astype("int")
                 bgdata = np.where(bgdata != 1000,bgdata,np.nan)
-                self.bg = np.array([np.nanmean(channel)+np.nanstd(channel)*self.sigma for channel in bgdata])
+                self.bg = np.array(
+                    [np.nanmean(channel)+np.nanstd(channel)*self.sigma 
+                     for channel in bgdata]
+                    )
                 self.bg = self.bg - 1000
             elif bg_filetype == "fspec":
                 with open(bg_file,"rb") as openbg:
                     bg_ip = pickle.load(openbg)
-                self.bg = np.array([mean+std*self.sigma for mean,std in zip(bg_ip["bg_means"],bg_ip["bg_stds"])])
+                self.bg = np.array(
+                    [mean+std*self.sigma 
+                     for mean,std in zip(bg_ip["bg_means"],bg_ip["bg_stds"])]
+                    )
             else:
-                raise IllegalFileFormat(bg_filetype, "csv or .fspec", "bg_file")
+                raise IllegalFileFormat(bg_filetype,
+                                        "csv or .fspec",
+                                        "bg_file")
             
             #import raw data
             with open(file,"r",encoding="ansi") as f:
@@ -510,7 +539,11 @@ class NewFData:
                         data[i] = data[i][:-j]
             #data = np.array(data).transpose()
             data = [list(row) for row in zip(*data)] #transpose without np
-            self.rawtime = np.array([dt.datetime.strptime(time,"%H:%M:%S.%f").replace(microsecond=0) for time in data[1]])
+            self.rawtime = np.array(
+                [dt.datetime.strptime(
+                    time,"%H:%M:%S.%f"
+                    ).replace(microsecond=0) for time in data[1]]
+                )
             self.rawchannels = data[self.layout[0]:self.layout[1]]
             for i in range(len(self.rawchannels)):
                 for j in range(len(self.rawchannels[i])):
@@ -544,7 +577,8 @@ class NewFData:
                         t_end = tcounter
             
             self.rawtime = self.rawtime[t_start:t_end]
-            self.rawchannels = [channel[t_start:t_end] for channel in self.rawchannels]
+            self.rawchannels = [channel[t_start:t_end] 
+                                for channel in self.rawchannels]
             
             #process data
             secs = []
@@ -554,21 +588,49 @@ class NewFData:
             self.t = np.array(secs)
             
             if self.jit:
-                numba_t = np.array([(i - dt.datetime(1970, 1, 1)).total_seconds() for i in self.t],float)
-                numba_rt = np.array([(i - dt.datetime(1970, 1, 1)).total_seconds() for i in self.rawtime],float)
+                numba_t = np.array(
+                    [(i - dt.datetime(1970, 1, 1)).total_seconds() 
+                     for i in self.t],
+                    float
+                    )
+                numba_rt = np.array(
+                    [(i - dt.datetime(1970, 1, 1)).total_seconds() 
+                     for i in self.rawtime]
+                    ,float
+                    )
                 numba_rc = np.array(self.rawchannels,float)
                 numba_bg = np.array(self.bg,float)
-                numba_ch = np.array([[float(0) for j in range(len(numba_t))] for i in range(len(numba_rc))])
-                self.channels = self.hk_process_data(numba_t,numba_rc,numba_bg,numba_rt,numba_ch)
+                numba_ch = np.array(
+                    [[float(0) for j in range(len(numba_t))] 
+                     for i in range(len(numba_rc))]
+                    )
+                self.channels = self.hk_process_data(numba_t,
+                                                     numba_rc,
+                                                     numba_bg,
+                                                     numba_rt,
+                                                     numba_ch)
                 if self.measurement_frequency != None:
                     self.channels /= self.measurement_frequency
                 else:
-                    m_f = np.array([np.count_nonzero(~np.isnan(np.where(self.rawtime == s,self.rawchannels[0],np.nan))) for s in secs])
+                    m_f = np.array(
+                        [np.count_nonzero(
+                            ~np.isnan(
+                                np.where(
+                                    self.rawtime == s,self.rawchannels[0],
+                                    np.nan
+                                    )
+                                )
+                            ) for s in secs]
+                        )
                     self.channels /= m_f
             else:
                 if self.measurement_frequency == None:
                     self.measurement_frequency = 100
-                self.channels = np.array([[0 for j in range(len(self.t))] for i in range(len(self.rawchannels))],float)
+                self.channels = np.array(
+                    [[0 for j in range(len(self.t))] 
+                     for i in range(len(self.rawchannels))]
+                    ,float
+                    )
                 for t in range(len(self.t)):
                     for channel in range(len(self.rawchannels)):
                         
@@ -612,7 +674,8 @@ class NewFData:
                         t_end = tcounter
             
             self.t = self.t[t_start:t_end]
-            self.channels = np.array([channel[t_start:t_end] for channel in self.channels])
+            self.channels = np.array([channel[t_start:t_end] 
+                                      for channel in self.channels])
             
         else:
             raise IllegalFileFormat(filetype, "csv-file or .fspec", file)
@@ -628,9 +691,11 @@ class NewFData:
         filename : str
             Determines path and filename where the obj will be saved to.
         start : str, optional
-            String of the form 'hh:mm:ss'. If start is given all data before it wont be saved.
+            String of the form 'hh:mm:ss'. If start is given all data before 
+            it wont be saved.
         end : str, optional
-            String of the form 'hh:mm:ss'. If end is given all data after it wont be saved.
+            String of the form 'hh:mm:ss'. If end is given all data after 
+            it wont be saved.
 
         Returns
         -------
@@ -683,8 +748,14 @@ class NewFData:
         save_channels = [channel[t_start:t_end] for channel in self.channels]
         
         #create background params
-        bg_means = np.array([np.mean(channel) for channel in self.rawchannels[raw_start:raw_end]])
-        bg_stds = np.array([np.std(channel) for channel in self.rawchannels[raw_start:raw_end]])
+        bg_means = np.array(
+            [np.mean(channel) 
+             for channel in self.rawchannels[raw_start:raw_end]]
+            )
+        bg_stds = np.array(
+            [np.std(channel) 
+             for channel in self.rawchannels[raw_start:raw_end]]
+            )
         
         op = {"sigma" : self.sigma,
               "measurement_frequency" : self.measurement_frequency,
@@ -750,7 +821,14 @@ class NewFData:
         
         _,ax = plt.subplots()
         
-        im = ax.pcolormesh(xx,yy,heatmap_data,cmap="RdYlBu_r",norm=LogNorm(),shading="nearest")
+        im = ax.pcolormesh(
+            xx,
+            yy,
+            heatmap_data,
+            cmap="RdYlBu_r",
+            norm=LogNorm(),
+            shading="nearest"
+            )
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         ax.set_ylabel("Channels")
         ax.set_xlabel("CET")
@@ -777,11 +855,14 @@ class NewFData:
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
         quakes : list of str, optional
-            Takes times in the form of "HH:MM:SS" and draws vertical lines on the plot at these times. The default is []
+            Takes times in the form of "HH:MM:SS" and draws vertical lines on 
+            the plot at these times. The default is []
         quakeslabel : str, optional
-            If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is "no label"
+            If quakes != [] this label will be used for the quake-lines if the 
+            plot contains a legend. The default is "no label"
         quakecolor : str, optional
-            Determines which color the quake-lines should have. The default is "tab:purple"
+            Determines which color the quake-lines should have. The default 
+            is "tab:purple"
         color : str, optional
             Changes the color of the plot. The default is "tab:green"
 
@@ -805,37 +886,57 @@ class NewFData:
         channelno -= 1
         
         #draw plot
-        ax.plot(self.t,self.channels[channelno],label=channelname,color=kwargs["color"])
+        ax.plot(
+            self.t,
+            self.channels[channelno],
+            label=channelname,
+            color=kwargs["color"]
+            )
         ax.set_ylabel("fluorescence index (channel " + str(channelno+1) + ")")
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         if len(kwargs["quakes"]) != 0:
-            ax.vlines(x=[dt.datetime.strptime(element, "%H:%M:%S")for element in kwargs["quakes"]],ymin=min(self.channels[channelno]),ymax=max(self.channels[channelno]),color=kwargs["quakecolor"],ls="dashed",label=kwargs["quakeslabel"])
+            ax.vlines(
+                x=[dt.datetime.strptime(element, "%H:%M:%S") 
+                   for element in kwargs["quakes"]],
+                ymin=min(self.channels[channelno]),
+                ymax=max(self.channels[channelno]),
+                color=kwargs["quakecolor"],
+                ls="dashed",
+                label=kwargs["quakeslabel"]
+                )
         ax.tick_params(axis='y', colors=kwargs["color"])
         ax.axes.yaxis.label.set_color(kwargs["color"])
         
         
     def meanplot(self,ax,**kwargs):
         """
-        Draws a plot of the mean fluorescence index over time on a given mpl axis
+        Draws a plot of the mean fluorescence index over time on a given 
+        mpl axis
 
         Parameters
         ----------
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
         min_ch : int, optional
-            Lower Channels than this will be ignored when the mean is calculated. The default is 1.
+            Lower Channels than this will be ignored when the mean is 
+            calculated. The default is 1.
         max_ch : int, optional
-            Higher Channels than this will be ignored when the mean is calculated. The default is 15.
+            Higher Channels than this will be ignored when the mean is 
+            calculated. The default is 15.
         quakes : list of str, optional
-            Takes times in the form of "HH:MM:SS" and draws vertical lines on the plot at these times. The default is []
+            Takes times in the form of "HH:MM:SS" and draws vertical lines on 
+            the plot at these times. The default is []
         quakeslabel : str, optional
-            If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is "no label"
+            If quakes != [] this label will be used for the quake-lines if the 
+            plot contains a legend. The default is "no label"
         quakecolor : str, optional
-            Determines which color the quake-lines should have. The default is "tab:purple"
+            Determines which color the quake-lines should have. The default 
+            is "tab:purple"
         color : str, optional
             Changes the color of the plot. The default is "tab:green"
         rolling : int, optional
-            If a positive int is given, the rolling average of 'rolling' values is plotted. The default is 0.
+            If a positive int is given, the rolling average of 'rolling' 
+            values is plotted. The default is 0.
 
         Returns
         -------
@@ -858,9 +959,16 @@ class NewFData:
         kwargs["min_ch"] -= 1
         #ch_len = len(list(range(kwargs["min_ch"],kwargs["max_ch"])))
         
-        meanchannel = np.mean(self.channels[kwargs["min_ch"]:kwargs["max_ch"]],axis=0)
+        meanchannel = np.mean(
+            self.channels[kwargs["min_ch"]:kwargs["max_ch"]],
+            axis=0
+            )
         if kwargs["rolling"] > 0 and isinstance(kwargs["rolling"],int):
-            meanchannel = np.convolve(meanchannel, np.ones(kwargs["rolling"]),mode="same") / kwargs["rolling"]
+            meanchannel = np.convolve(
+                meanchannel,
+                np.ones(kwargs["rolling"]),
+                mode="same"
+                ) / kwargs["rolling"]
                 
         #draw plot
         label = f"mean of channels {kwargs['min_ch']+1} - {kwargs['max_ch']}"
@@ -868,7 +976,15 @@ class NewFData:
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         ax.set_ylabel(f"Fluorescence Index ({label})")
         if len(kwargs["quakes"]) != 0:
-            ax.vlines(x=[dt.datetime.strptime(element, "%H:%M:%S")for element in kwargs["quakes"]],ymin=min(meanchannel),ymax=max(meanchannel),color=kwargs["quakecolor"],ls="dashed",label=kwargs["quakeslabel"])
+            ax.vlines(
+                x=[dt.datetime.strptime(element, "%H:%M:%S") 
+                   for element in kwargs["quakes"]],
+                ymin=min(meanchannel),
+                ymax=max(meanchannel),
+                color=kwargs["quakecolor"],
+                ls="dashed",
+                label=kwargs["quakeslabel"]
+                )
         ax.tick_params(axis='y', colors=kwargs["color"])
         ax.axes.yaxis.label.set_color(kwargs["color"])
         
@@ -886,11 +1002,13 @@ class NewFData:
         cmap : str, optional
             Changes the colormap. The default is 'RdYlBu_r'.
         pad : float, optional
-            Changes the padding between heatmap and colorbar. The default is 0.01.
+            Changes the padding between heatmap and colorbar. 
+            The default is 0.01.
         togglecbar : bool, optional
             If True the colorbar will be shown. the default is True
         xlims : list of str with len = 2
-            Takes timestamps in the format 'hh:mm:ss'. If xlims are given, only data between the two timestamps is used.
+            Takes timestamps in the format 'hh:mm:ss'. If xlims are given, 
+            only data between the two timestamps is used.
 
         Returns
         -------
@@ -913,13 +1031,28 @@ class NewFData:
         heatmap_data = deepcopy(self.channels)
         heatmap_data = self.hk_replacezeros(heatmap_data)
         if isinstance(kwargs["xlims"],list):
-            ax.set_xlim([dt.datetime.strptime(element, "%H:%M:%S") for element in kwargs["xlims"]])
+            ax.set_xlim([dt.datetime.strptime(element, "%H:%M:%S") 
+                         for element in kwargs["xlims"]])
         
         #draw
         if kwargs["smooth"]:
-            im = ax.pcolormesh(xx,yy,heatmap_data,cmap=kwargs["cmap"],norm=LogNorm(),shading="gouraud")
+            im = ax.pcolormesh(
+                xx,
+                yy,
+                heatmap_data,
+                cmap=kwargs["cmap"],
+                norm=LogNorm(),
+                shading="gouraud"
+                )
         else:
-            im = ax.pcolormesh(xx,yy,heatmap_data,cmap=kwargs["cmap"],norm=LogNorm(),shading="nearest")
+            im = ax.pcolormesh(
+                xx,
+                yy,
+                heatmap_data,
+                cmap=kwargs["cmap"],
+                norm=LogNorm(),
+                shading="nearest"
+                )
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         ax.set_ylabel("Channels")
         ax.set_xlabel("CET")
@@ -935,14 +1068,17 @@ class NewFData:
             
     def returndata(self):
         """
-        Returns a tuple containing all data in a standardized form. Important for communication with DroneWrapper objs.
+        Returns a tuple containing all data in a standardized form. 
+        Important for communication with DroneWrapper objs.
 
         Returns
         -------
         op : dict {str : np.array}
-            This dict contains all data in the form of np.arrays indexed by their name.
+            This dict contains all data in the form of np.arrays indexed by 
+            their name.
         op_details : dict {str : [str,str]}
-            This dict contains a description and a unit for all the data saved in op.
+            This dict contains a description and a unit for all the data 
+            saved in op.
 
         """        
         op = {}
@@ -960,6 +1096,38 @@ class NewFData:
         op["t"] = op_t
         
         return op,op_details
+    
+    
+    def append(self,fspec2,copy_raw=False):
+        """
+        Appends the data of another `NewFData` obj to this one.
+
+        Parameters
+        ----------
+        fspec2 : NewFData
+            The data of this obj will be appended.
+        copy_raw : bool
+            If True, the rawdata dict will also be copied, which will 
+            significantly increase file size.
+
+        Returns
+        -------
+        None
+        """
+        
+        self.t = np.append(self.t,fspec2.t)
+        newchannels = [[] for i in range(len(self.channels))]
+        for i in range(len(self.channels)):
+            newchannels[i] = np.append(self.channels[i],fspec2.channels[i])
+        self.channels = np.array(newchannels)
+        
+        if copy_raw:
+            self.rawtime = np.append(self.rawtime,fspec2.rawtime)
+            newchannels = [[] for i in range(len(self.rawchannels))]
+            for i in range(len(self.rawchannels)):
+                newchannels[i] = np.append(self.rawchannels[i])
+            self.rawchannels = np.array(newchannels)
+        
         
     #housekeeping funcs    
     def hk_kwargs(self,kwargs,key,default):

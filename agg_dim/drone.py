@@ -474,6 +474,12 @@ class DroneWrapper:
             if a mapimage is given and a mapimage.png and mapimage.tfw exist, the png will be plotted onto the map
         save_loc : str, optional
             if a save_loc is given, the map will be saved as a html file and not displayed in the browser
+        cmap_min : float, optional
+            if a `cmap_min` is given, the colormap will be scaled to have the
+            colour corresponding to the lowest value at this value.
+        cmap_max : float, optional
+            if a `cmap_max` is given, the colormap will be scaled to have the
+            colour corresponding to the highest value at this value.
 
         Returns
         -------
@@ -490,7 +496,9 @@ class DroneWrapper:
                     "bettermap_resolution" : 15,
                     "bettermap_minimumcounts" : 0,
                     "mapimage" : None,
-                    "save_loc" : None
+                    "save_loc" : None,
+                    "cmap_min" : None,
+                    "cmap_max" : None
             }
         for key,default in zip(defaults.keys(),defaults.values()):
             kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
@@ -544,11 +552,21 @@ class DroneWrapper:
             long = long[m]
             y = y[m]
             
+        if kwargs["cmap_min"] is not None:
+            vmin = kwargs["cmap_min"]
+        else:
+            vmin = min(y)
+        if kwargs["cmap_max"] is not None:
+            vmax = kwargs["cmap_max"]
+        else:
+            vmax = max(y)
+            
         if not kwargs["bettermap"]:
             x1_start = (max(lat) + min(lat)) / 2
             x2_start = (max(long) + min(long)) / 2
             
-            cmap = cm.LinearColormap(colors=kwargs["colors"],vmin=min(y),vmax=max(y),caption=f"{self.details[name][yy][0]} in {self.details[name][yy][1]}")
+            
+            cmap = cm.LinearColormap(colors=kwargs["colors"],vmin=vmin,vmax=vmax,caption=f"{self.details[name][yy][0]} in {self.details[name][yy][1]}")
             output = folium.Map(location=(x1_start,x2_start),control_scale=True,zoom_start=kwargs["zoomstart"],max_zoom=50)
             
             if kwargs["mapimage"] != None:
@@ -614,7 +632,7 @@ class DroneWrapper:
             x1_start = (max(lat) + min(lat)) / 2
             x2_start = (max(long) + min(long)) / 2
             
-            cmap = cm.LinearColormap(colors=kwargs["colors"],vmin=min(y),vmax=max(y),caption=f"{self.details[name][yy][0]} in {self.details[name][yy][1]}")
+            cmap = cm.LinearColormap(colors=kwargs["colors"],vmin=vmin,vmax=vmax,caption=f"{self.details[name][yy][0]} in {self.details[name][yy][1]}")
             output = folium.Map(location=(x1_start,x2_start),control_scale=True,zoom_start=kwargs["zoomstart"],max_zoom=50)
             
             if kwargs["mapimage"] != None:

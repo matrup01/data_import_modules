@@ -305,10 +305,13 @@ el.replaceWith(d);
                
              
             if isinstance(self.start,str):
-                f = f&#34;{self.FT_date}-{self.start}/+0000&#34;,&#34;%d.%m.%Y-%H:%M:%S/%z&#34;
-                starttime = datetime.strptime(f)
+                wb_date = datetime.utcfromtimestamp(self.timehandler[0])
+                f = f&#34;{self.FT_date}-{self.start}/+0000&#34;
+                starttime = datetime.strptime(f,&#34;%d.%m.%Y-%H:%M:%S/%z&#34;)
                 starttime = int(starttime.replace(
-                    year=int(self.FT_date[-4:])
+                    year=wb_date.year,
+                    month=wb_date.month,
+                    day=wb_date.day
                     ).timestamp())
                 if int(timecorr.total_seconds()) &gt;= 0:
                     start_m = np.where(
@@ -332,11 +335,15 @@ el.replaceWith(d);
                 self.rawdata[&#34;Fl3&#34;] = self.rawdata[&#34;Fl3&#34;][start_m]
                 del start_m
             if isinstance(self.end,str):
-                f = f&#34;{self.FT_date}-{self.end}/+0000&#34;,&#34;%d.%m.%Y-%H:%M:%S/%z&#34;
-                endtime = datetime.strptime(f)
-                endtime = int(endtime.replace(
-                    year=int(self.FT_date[-4:])
+                wb_date = datetime.utcfromtimestamp(self.timehandler[0])
+                f = f&#34;{self.FT_date}-{self.end}/+0000&#34;
+                endtime = datetime.strptime(f,&#34;%d.%m.%Y-%H:%M:%S/%z&#34;)
+                endtime = np.uint32(endtime.replace(
+                    year=wb_date.year,
+                    month=wb_date.month,
+                    day=wb_date.day
                     ).timestamp())
+                
                 if int(timecorr.total_seconds()) &gt;= 0:
                     end_m = np.where(
                         (self.timehandler 
@@ -349,7 +356,8 @@ el.replaceWith(d);
                     end_m = np.where((self.timehandler - offset) &lt; endtime,
                                      True,
                                      False)
-                    print(self.timehandler[0] - offset)
+                    print(self.timehandler[0] + offset)
+                    print(offset)
                     print(endtime)
                 self.timehandler = self.timehandler[end_m] 
                 self.rawdata[&#34;size&#34;] = self.rawdata[&#34;size&#34;][end_m]
@@ -1104,6 +1112,27 @@ el.replaceWith(d);
             op_data[key] = self.data[key]
         
         return op_data,self.details
+    
+
+    def append(self,wibs2):
+        &#34;&#34;&#34;
+        Adds another `WIBS` obj to the current one.
+
+        Parameters
+        ----------
+        wibs2 : WIBS
+            Object whichs data is to be appended.
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        
+        for key in self.data:
+            self.data[key] = np.append(
+                self.data[key],
+                wibs2.data[key]
+                )
 
     
     #housekeeping funcs
@@ -1213,6 +1242,46 @@ the forced trigger.</dd>
 </dl></div>
 <h3>Methods</h3>
 <dl>
+<dt id="agg_dim.wibs.WIBS.append"><code class="name flex">
+<span>def <span class="ident">append</span></span>(<span>self, wibs2)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def append(self,wibs2):
+    &#34;&#34;&#34;
+    Adds another `WIBS` obj to the current one.
+
+    Parameters
+    ----------
+    wibs2 : WIBS
+        Object whichs data is to be appended.
+
+    Returns
+    -------
+    None
+    &#34;&#34;&#34;
+    
+    for key in self.data:
+        self.data[key] = np.append(
+            self.data[key],
+            wibs2.data[key]
+            )</code></pre>
+</details>
+<div class="desc"><p>Adds another <code><a title="agg_dim.wibs.WIBS" href="#agg_dim.wibs.WIBS">WIBS</a></code> obj to the current one.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>wibs2</code></strong> :&ensp;<code><a title="agg_dim.wibs.WIBS" href="#agg_dim.wibs.WIBS">WIBS</a></code></dt>
+<dd>Object whichs data is to be appended.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+</dd>
 <dt id="agg_dim.wibs.WIBS.dndlogdp"><code class="name flex">
 <span>def <span class="ident">dndlogdp</span></span>(<span>self, ax, **kwargs)</span>
 </code></dt>
@@ -2080,6 +2149,7 @@ stacked areas. The default is False.</dd>
 <li>
 <h4><code><a title="agg_dim.wibs.WIBS" href="#agg_dim.wibs.WIBS">WIBS</a></code></h4>
 <ul class="two-column">
+<li><code><a title="agg_dim.wibs.WIBS.append" href="#agg_dim.wibs.WIBS.append">append</a></code></li>
 <li><code><a title="agg_dim.wibs.WIBS.dndlogdp" href="#agg_dim.wibs.WIBS.dndlogdp">dndlogdp</a></code></li>
 <li><code><a title="agg_dim.wibs.WIBS.heatmap" href="#agg_dim.wibs.WIBS.heatmap">heatmap</a></code></li>
 <li><code><a title="agg_dim.wibs.WIBS.hk_errorhandling" href="#agg_dim.wibs.WIBS.hk_errorhandling">hk_errorhandling</a></code></li>

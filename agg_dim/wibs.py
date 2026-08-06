@@ -262,10 +262,13 @@ class WIBS:
                
              
             if isinstance(self.start,str):
-                f = f"{self.FT_date}-{self.start}/+0000","%d.%m.%Y-%H:%M:%S/%z"
-                starttime = datetime.strptime(f)
+                wb_date = datetime.utcfromtimestamp(self.timehandler[0])
+                f = f"{self.FT_date}-{self.start}/+0000"
+                starttime = datetime.strptime(f,"%d.%m.%Y-%H:%M:%S/%z")
                 starttime = int(starttime.replace(
-                    year=int(self.FT_date[-4:])
+                    year=wb_date.year,
+                    month=wb_date.month,
+                    day=wb_date.day
                     ).timestamp())
                 if int(timecorr.total_seconds()) >= 0:
                     start_m = np.where(
@@ -289,11 +292,15 @@ class WIBS:
                 self.rawdata["Fl3"] = self.rawdata["Fl3"][start_m]
                 del start_m
             if isinstance(self.end,str):
-                f = f"{self.FT_date}-{self.end}/+0000","%d.%m.%Y-%H:%M:%S/%z"
-                endtime = datetime.strptime(f)
-                endtime = int(endtime.replace(
-                    year=int(self.FT_date[-4:])
+                wb_date = datetime.utcfromtimestamp(self.timehandler[0])
+                f = f"{self.FT_date}-{self.end}/+0000"
+                endtime = datetime.strptime(f,"%d.%m.%Y-%H:%M:%S/%z")
+                endtime = np.uint32(endtime.replace(
+                    year=wb_date.year,
+                    month=wb_date.month,
+                    day=wb_date.day
                     ).timestamp())
+                
                 if int(timecorr.total_seconds()) >= 0:
                     end_m = np.where(
                         (self.timehandler 
@@ -306,7 +313,8 @@ class WIBS:
                     end_m = np.where((self.timehandler - offset) < endtime,
                                      True,
                                      False)
-                    print(self.timehandler[0] - offset)
+                    print(self.timehandler[0] + offset)
+                    print(offset)
                     print(endtime)
                 self.timehandler = self.timehandler[end_m] 
                 self.rawdata["size"] = self.rawdata["size"][end_m]
@@ -1061,6 +1069,27 @@ class WIBS:
             op_data[key] = self.data[key]
         
         return op_data,self.details
+    
+
+    def append(self,wibs2):
+        """
+        Adds another `WIBS` obj to the current one.
+
+        Parameters
+        ----------
+        wibs2 : WIBS
+            Object whichs data is to be appended.
+
+        Returns
+        -------
+        None
+        """
+        
+        for key in self.data:
+            self.data[key] = np.append(
+                self.data[key],
+                wibs2.data[key]
+                )
 
     
     #housekeeping funcs
