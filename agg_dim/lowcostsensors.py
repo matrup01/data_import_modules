@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Feb 26 15:52:29 2025
+This module provides objects to read in MOx sensors and low cost sensors.
 
-@author: mrupp
+It contains the deprecated `CCS811` and `SEN55` objects, as well as the up-to 
+date `FlyingFlo_USB` obj, that can read in data produced by the CircuitPython 
+setup used in our systems (ccs811,bme680 and sen55).
 """
 import csv
 import datetime as dt
@@ -41,6 +43,12 @@ class CCS811:
         None.
 
         """
+        
+        warning = "CCS811 has been deprecated since agg_dim 0.1.1 and might"
+        warning += " be removed soon. Please consider using FlyingFlo_USB "
+        warning += "instead."
+        
+        print(f"WARNING:\n{warning}")
         
         #init
         self.title = title
@@ -262,6 +270,12 @@ class SEN55:
         None.
 
         """
+        
+        warning = "SEN55 has been deprecated since agg_dim 0.1.1 and might"
+        warning += " be removed soon. Please consider using FlyingFlo_USB "
+        warning += "instead."
+        
+        print(f"WARNING:\n{warning}")
         
         #init
         self.title = title

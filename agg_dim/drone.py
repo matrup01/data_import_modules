@@ -1,3 +1,12 @@
+"""
+This submodule provides objects to read in data produced by drones.
+
+The deprecated `Dronedata` obj can be used to read in data from the M300.
+The `DroneWrapper` obj can read in data produced by our M300 or the BladeScape
+drone, in addition to being able to wrap data from other modules and make it 
+accessible in an easy way.
+"""
+
 import csv
 import pickle
 import datetime as dt
@@ -10,13 +19,14 @@ import utm
 from .ErrorHandler import IllegalArgument, IllegalFileFormat
 
 class Dronedata: 
-    """full documentation see https://github.com/matrup01/data_import_modules \n
-    
-    file (str) ... takes a drone-produced csv-file"""
     
     def __init__(self,file):
         """
         Initialises a Dronedata obj.
+        
+        .. deprecated:: 0.1.2
+            `Dronedata` was succeeded by the `DroneWrapper` class in agg_dim 
+            0.1.2 and was not updated since then.
 
         Parameters
         ----------
@@ -28,6 +38,12 @@ class Dronedata:
         None.
 
         """
+        warning = "Dronedata has been deprecated since agg_dim 0.1.2 and might"
+        warning += " be removed soon. Please consider using DroneWrapper "
+        warning += "instead."
+        
+        print(f"WARNING:\n{warning}")
+        
         with open(file) as f:
             data = list(csv.reader(f,delimiter=","))
         
@@ -168,21 +184,6 @@ class Dronedata:
         
 class DroneWrapper:
     
-    """full documentation see https://github.com/matrup01/data_import_modules \n\n
-    
-    Parameters\n
-    ----------\n
-    file (str) ... takes a Drone produced .csv file
-    dronetype (str, optional) ... specifies which drone was used to read csv correctly (currently implemented: "BladeScapes","Own") - default: "BladeScapes"\n
-    start (str, optional) ... if a str of the form "HH:MM:SS" is given, all data acquired before this timestamp wont be used\n
-    end (str, optional) ... if a str of the form "HH:MM:SS" ist given, all data acquired after this timestamp wont be used\n\n
-    
-    Variables\n
-    ---------\n
-    DroneWrapper.data (nested dict) ... contains the data of all data and wrapped data\n
-    DroneWrapper.details (nested dict) ... contains lists of type [name, unit] for each data array in DroneWrapper.data
-    """
-    
     def __init__(self,file,**kwargs):
         """
         inits DroneWrapper object
@@ -295,7 +296,7 @@ class DroneWrapper:
         ----------
         name : str
             name that is used to find the data from the wrapped object (key in DroneWrapper.data and DroneWrapper.details).
-        obj : Pops, NewFDatam or FlyingFlo_USB
+        obj : Pops, NewFData or FlyingFlo_USB
             Object which should  be wrapped.
 
         Returns

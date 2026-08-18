@@ -1,3 +1,16 @@
+######################### MR 18.08.2026 #########################
+#                "WIBS performance enhancement"                 #
+#                                                               #
+# - greatly enhanced WIBS performance by implementing a         #
+#   chunking system                                             #
+# - Corrected the calculation of the total partconc in WIBS     #
+#   when not the entire size range is covered.                  #
+# - Changed default value for WIBS kwarg 'channels' to ["a",    #
+#   "b","c","ab","ac","bc","abc","nonfluor"]                    #
+# - added deprecated warnings                                   #
+# - improved docu                                               #
+#################################################################
+
 ######################### MR 06.08.2026 #########################
 #                "added WIBS/NewFData appending"                #
 #                                                               #

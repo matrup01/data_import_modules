@@ -1,3 +1,12 @@
+"""
+This submodule provides the `NewFData` obj, which can be used to process
+data produced by the self built Fluorescence Spectrometer (FSPEC).
+
+It also contains the deprecated `FData` obj, which can be used to read in data
+but does not support any data processing which is currently employed with 
+FSPEC analysis.
+"""
+
 from copy import deepcopy
 import csv
 import datetime as dt
@@ -16,6 +25,10 @@ class FData:
     def __init__(self,file,title="no title",encoding_artifacts=True,start="none",end="none",skiprows=0,layout=[3,18]):
         """
         Initialises an FData obj
+        
+        .. deprecated:: 0.1.1
+            `FData` was succeeded by the `NewFData` class in agg_dim 
+            0.1.1 and was not updated since then.
 
         Parameters
         ----------
@@ -39,6 +52,12 @@ class FData:
         None.
 
         """
+        
+        warning = "FData can only be used to read in raw FSPEC data and does "
+        warning += "not support any of the currently used data processing. If"
+        warning += "data processing is required use NewFData."
+        
+        print(f"WARNING: {warning}")
         
         #reads data from csv to list
         self.title = title

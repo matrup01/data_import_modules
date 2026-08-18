@@ -1,3 +1,8 @@
+"""
+This Submodule provides the `Pops` and the `OPC` obj, which can be used to 
+read in pops and opc data
+"""
+
 from copy import copy
 import csv
 import datetime as dt

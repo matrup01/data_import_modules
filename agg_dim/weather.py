@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Sep  8 15:02:42 2025
-
-@author: mrupp
+This submodule provides the `WeatherData` obj, which can be used to read in 
+data produces by the weather station.
 """
 
 import csv

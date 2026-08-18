@@ -38,8 +38,9 @@ class WIBS:
             Will be used as sigma for data processing. The default is 3.
         bin_borders : list of float, optional
             Particles will be classified according to the bins given here 
-            (in micrometers). The default is [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,
-                                              1.4,1.7,2,2.5,3,3.5,4,5,10,15,20]
+            (in micrometers). 
+            The default is [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,
+                            1.7,2,2.5,3,3.5,4,5,10,15,20,100]
         flow : float, optional
             Flow in ccm/s. Will be used to calculate partconc and dndlogdp. 
             The default is 0.018 ccm/s (=0.3 lpm).
@@ -59,7 +60,7 @@ class WIBS:
         channels : list of str, optional
             Decides which channels should be processed, by default all channels
             are processed, but it can be reduced for large files. 
-            The default is  ["a","b","c","ab","ac","bc","abc"].
+            The default is  ["a","b","c","ab","ac","bc","abc","nonfluor"].
             
         Attributes
         ----------
@@ -85,7 +86,10 @@ class WIBS:
             the forced trigger.
         fl3_FTbg : float
             Contains the fluorescence of the chamber for fl3, calculated from 
-            the forced trigger.    
+            the forced trigger. 
+        chunklen : int
+            Time in seconds, how long a chunk is. It can be reduced to reduce
+            peak RAM usage. The default is 600.
         """
         
         if file[-5:] == ".wibs":
@@ -122,7 +126,8 @@ class WIBS:
                 "start" : None,
                 "end" : None,
                 "FT_date" : "01.01.2000",
-                "channels" :  ["a","b","c","ab","ac","bc","abc"]
+                "channels" :  ["a","b","c","ab","ac","bc","abc","nonfluor"],
+                "chunklen" : 600
                 }
             for key,value in defaults.items():
                 self.hk_kwargs(kwargs, key, value)
@@ -313,9 +318,6 @@ class WIBS:
                     end_m = np.where((self.timehandler - offset) < endtime,
                                      True,
                                      False)
-                    print(self.timehandler[0] + offset)
-                    print(offset)
-                    print(endtime)
                 self.timehandler = self.timehandler[end_m] 
                 self.rawdata["size"] = self.rawdata["size"][end_m]
                 self.rawdata["excited"] = self.rawdata["excited"][end_m]
@@ -334,17 +336,30 @@ class WIBS:
             self.date = [self.data["t"][0].day,
                          self.data["t"][0].month,
                          self.data["t"][0].year]
+            
+            lower=int(self.timehandler[0]//1)
+            upper=lower+self.chunklen
+            chunkmask=np.where(self.timehandler>=lower,True,False)
+            chunkmask=np.where(self.timehandler<upper,chunkmask,False)
+            chunktime = self.timehandler[chunkmask]
+            chunksize = self.rawdata["size"][chunkmask]
+            chunkexc = self.rawdata["excited"][chunkmask]
+            chunkfl1 = self.rawdata["Fl1"][chunkmask]
+            chunkfl2 = self.rawdata["Fl2"][chunkmask]
+            chunkfl3 = self.rawdata["Fl3"][chunkmask]
+            del chunkmask
+            
             time_mask = np.array(
-                [np.where(self.timehandler==i,True,False) 
-                 for i in range(self.timehandler[0],self.timehandler[-1])]
+                [np.where(chunktime==i,True,False) 
+                 for i in range(lower,upper)]
                 )
                     
             #part_conc & #/s
             for bin_no in range(self.bins):
-                m = np.where(self.bin_borders[bin_no] < self.rawdata["size"],
+                m = np.where(self.bin_borders[bin_no] < chunksize,
                              True,
                              False)
-                m = np.where(self.bin_borders[bin_no+1] > self.rawdata["size"],
+                m = np.where(self.bin_borders[bin_no+1] > chunksize,
                              m,
                              False)
                 bin_handler = time_mask & m
@@ -368,30 +383,32 @@ class WIBS:
                 pc = f"bin{bin_no}_partconc"
                 self.data[dn] = self.data[pc] / log_binwidth
                 self.details[dn] = [f"dN/dlog$D_P$ (Bin{bin_no})",
-                                    "$\mu$m${}^{-1}$"]
+                                    "µm${}^{-1}$"]
                 
             #total
+            m = np.where(self.bin_borders[0] < chunksize,True,False)
+            m = np.where(self.bin_borders[-1] > chunksize,m,False)
+            total_handler = time_mask & m
             self.data["total_cps"] = np.array(
-                [np.count_nonzero(arr) for arr in time_mask]
+                [np.count_nonzero(arr) for arr in total_handler]
                 )
-            self.data["total_partconc"] = self.data["total_cps"] / self.flow
+            del total_handler
             self.details["total_cps"] = ["Particle Counts","#/s"]
-            self.details["total_partconc"] = ["Particle Conc.","#/cm${}^3$"]
             
             
             #excited
-            ex_handler = time_mask & self.rawdata["excited"]
+            ex_handler = time_mask & chunkexc
             self.data["excited"] = np.array(
                 [np.count_nonzero(arr) for arr in ex_handler]
                 )
             del ex_handler
+            self.details["excited"] = ["Particle Counts (excited)","#/s"]
             self.data["excited_fraction"] = np.divide(
                 self.data["excited"],
                 self.data["total_cps"],
                 out=np.ones(self.data["excited"].shape,dtype=float),
                 where=self.data["total_cps"]!=0
                 )
-            self.details["excited"] = ["Particle Counts (excited)","#/s"]
             self.details["excited_fraction"] = [
                 "Fraction of excited Particles", 
                 "No Unit"
@@ -399,9 +416,9 @@ class WIBS:
             
             
             #fluorescence channels
-            fl1_handler = time_mask & self.rawdata["Fl1"]
-            fl2_handler = time_mask & self.rawdata["Fl2"]
-            fl3_handler = time_mask & self.rawdata["Fl3"]
+            fl1_handler = time_mask & chunkfl1
+            fl2_handler = time_mask & chunkfl2
+            fl3_handler = time_mask & chunkfl3
             
             self.data["fl1"] = np.array(
                 [np.count_nonzero(arr) for arr in fl1_handler]
@@ -412,24 +429,6 @@ class WIBS:
             self.data["fl3"] = np.array(
                 [np.count_nonzero(arr) for arr in fl3_handler]
                 )/self.data["excited_fraction"]
-            self.data["fl1_fraction"] = np.divide(
-                self.data["fl1"],
-                self.data["total_cps"],
-                out=np.zeros(self.data["fl1"].shape,dtype=float),
-                where=self.data["total_cps"]!=0
-                )
-            self.data["fl2_fraction"] = np.divide(
-                self.data["fl2"],
-                self.data["total_cps"],
-                out=np.zeros(self.data["fl2"].shape,dtype=float),
-                where=self.data["total_cps"]!=0
-                )
-            self.data["fl3_fraction"] = np.divide(
-                self.data["fl3"],
-                self.data["total_cps"],
-                out=np.zeros(self.data["fl3"].shape,dtype=float),
-                where=self.data["total_cps"]!=0
-                )
             for i in [1,2,3]:
                 self.details[f"fl{i}"] = [f"Particle Counts (Fl{i})","#/s"]
                 self.details[f"fl{i}_fraction"] = [
@@ -452,45 +451,186 @@ class WIBS:
                                           channel)
                 for bin_no in range(self.bins):
                     m =np.where(
-                        self.bin_borders[bin_no] < self.rawdata["size"],
+                        self.bin_borders[bin_no] < chunksize,
                         True,
                         False
                         )
                     m = np.where(
-                        self.bin_borders[bin_no+1] > self.rawdata["size"],
+                        self.bin_borders[bin_no+1] > chunksize,
                         m,
                         False)
                     m = channel_mask & m
                     cps = f"{channel}_bin{bin_no}_cps"
-                    pc = f"{channel}_bin{bin_no}_partconc"
-                    dn = f"{channel}_bin{bin_no}_dndlogdp"
+                    
                     self.data[cps] = np.array(
                         [np.count_nonzero(arr) for arr in m]
                         )
                     del m
-                    self.data[pc] = self.data[cps] / self.flow
-                    self.details[pc] = [
-                        f"Particle Conc. of {channel}-Particles (bin{bin_no})",
-                        "#/cm${}^3$"
-                        ]
                     self.details[cps] = [
                         f"Counts of {channel}-Particles (Bin{bin_no})",
                         "#/s"
                         ]
                     
+                   
+                del channel_mask
+                
+                
+                
+            lower = upper
+            upper = lower + self.chunklen
+            
+            while lower <= self.timehandler[-1]:
+                chunkmask=np.where(self.timehandler>=lower,True,False)
+                chunkmask=np.where(self.timehandler<upper,chunkmask,False)
+                chunktime = self.timehandler[chunkmask]
+                chunksize = self.rawdata["size"][chunkmask]
+                chunkexc = self.rawdata["excited"][chunkmask]
+                chunkfl1 = self.rawdata["Fl1"][chunkmask]
+                chunkfl2 = self.rawdata["Fl2"][chunkmask]
+                chunkfl3 = self.rawdata["Fl3"][chunkmask]
+                del chunkmask
+                
+                if upper < self.timehandler[-1]:
+                    time_mask = np.array(
+                        [np.where(chunktime==i,True,False) 
+                         for i in range(lower,upper)]
+                        )
+                else:
+                    time_mask = np.array(
+                        [np.where(chunktime==i,True,False) 
+                         for i in range(lower,self.timehandler[-1])]
+                        )
+                        
+                #part_conc & #/s & dndlogdp
+                for bin_no in range(self.bins):
+                    m = np.where(self.bin_borders[bin_no] < chunksize,
+                                 True,
+                                 False)
+                    m = np.where(self.bin_borders[bin_no+1] > chunksize,
+                                 m,
+                                 False)
+                    bin_handler = time_mask & m
+                    dat = np.array(
+                        [np.count_nonzero(arr) for arr in bin_handler]
+                        )
+                    del bin_handler
+                    pc = f"bin{bin_no}_partconc"
+                    cps = f"bin{bin_no}_cps"
+                    self.data[cps] = np.append(self.data[cps],dat)
+                    dat = dat / self.flow
+                    self.data[pc] = np.append(self.data[pc],dat)
+                    
                     log_binwidth = np.log10(
                         self.bin_borders[bin_no+1]
                         )-np.log10(self.bin_borders[bin_no])
-                    self.data[dn] = self.data[pc] / log_binwidth
-                    self.details[dn] = [
-                        f"dN/dlog$D_P$ of {channel}-Particles (Bin{bin_no})",
-                        "cm$^{-3}$"
-                        ]
-                   
-                del channel_mask
+                    dn = f"bin{bin_no}_dndlogdp"
+                    dat = dat / log_binwidth
+                    self.data[dn] = np.append(self.data[dn],dat)
+                    
+                #total
+                m = np.where(self.bin_borders[0] < chunksize,True,False)
+                m = np.where(self.bin_borders[-1] > chunksize,m,False)
+                total_handler = time_mask & m
+                dat = np.array(
+                    [np.count_nonzero(arr) for arr in total_handler]
+                    )
+                del total_handler
+                self.data["total_cps"] = np.append(self.data["total_cps"],dat)
+                
+                #excited
+                ex_handler = time_mask & chunkexc
+                ex = np.array(
+                    [np.count_nonzero(arr) for arr in ex_handler]
+                    )
+                self.data["excited"] = np.append(self.data["excited"],ex)
+                del ex_handler
+                exfrac = np.divide(
+                    ex,
+                    dat,
+                    out=np.ones(ex.shape,dtype=float),
+                    where=dat!=0
+                    )
+                self.data["excited_fraction"] = np.append(
+                    self.data["excited_fraction"],
+                    exfrac
+                    )
+                
+                
+                #fluorescence channels
+                fl1_handler = time_mask & chunkfl1
+                fl2_handler = time_mask & chunkfl2
+                fl3_handler = time_mask & chunkfl3
+                
+                fl1 = np.array(
+                    [np.count_nonzero(arr) for arr in fl1_handler]
+                    )/exfrac
+                self.data["fl1"] = np.append(self.data["fl1"],fl1)
+                fl2 = np.array(
+                    [np.count_nonzero(arr) for arr in fl2_handler]
+                    )/exfrac
+                self.data["fl2"] = np.append(self.data["fl2"],fl2)
+                fl3 = np.array(
+                    [np.count_nonzero(arr) for arr in fl3_handler]
+                    )/exfrac
+                self.data["fl3"] = np.append(self.data["fl3"],fl3)
+                
+                
+                for channel in self.channels:
+                    channel_mask = createmask(fl1_handler,
+                                              fl2_handler,
+                                              fl3_handler,
+                                              channel)
+                    for bin_no in range(self.bins):
+                        m =np.where(
+                            self.bin_borders[bin_no] < chunksize,
+                            True,
+                            False
+                            )
+                        m = np.where(
+                            self.bin_borders[bin_no+1] > chunksize,
+                            m,
+                            False)
+                        m = channel_mask & m
+                        cps = f"{channel}_bin{bin_no}_cps"                        
+                        dat = np.array(
+                            [np.count_nonzero(arr) for arr in m]
+                            )
+                        self.data[cps] = np.append(self.data[cps],dat)
+                        del m
+                       
+                    del channel_mask
+                    
+                    
+                lower = upper
+                upper = lower + self.chunklen
+                    
+            self.data["total_partconc"] = self.data["total_cps"] / self.flow
+            self.details["total_partconc"] = ["Particle Conc.","#/cm${}^3$"]
+            
+            self.data["fl1_fraction"] = np.divide(
+                self.data["fl1"],
+                self.data["total_cps"],
+                out=np.zeros(self.data["fl1"].shape,dtype=float),
+                where=self.data["total_cps"]!=0
+                )
+            self.data["fl2_fraction"] = np.divide(
+                self.data["fl2"],
+                self.data["total_cps"],
+                out=np.zeros(self.data["fl2"].shape,dtype=float),
+                where=self.data["total_cps"]!=0
+                )
+            self.data["fl3_fraction"] = np.divide(
+                self.data["fl3"],
+                self.data["total_cps"],
+                out=np.zeros(self.data["fl3"].shape,dtype=float),
+                where=self.data["total_cps"]!=0
+                )
+            
+            for channel in self.channels:
                 cps = f"{channel}_total_cps"
                 pc = f"{channel}_total_partconc"
                 fr = f"{channel}_fraction"
+                cps = f"{channel}_total_cps"
                 self.data[cps] = np.sum(
                     [self.data[f"{channel}_bin{i}_cps"] 
                      for i in range(self.bins)],
@@ -510,6 +650,23 @@ class WIBS:
                                     "#/cm${}^3$"]
                 self.details[fr] = [f"Fluorescent Fraction ({channel})",
                                     "No Unit"]
+                for bin_no in range(self.bins):
+                    cps = f"{channel}_bin{bin_no}_cps"
+                    pc = f"{channel}_bin{bin_no}_partconc"
+                    dn = f"{channel}_bin{bin_no}_dndlogdp"
+                    self.data[pc] = self.data[cps] / self.flow
+                    self.details[pc] = [
+                        f"Particle Conc. of {channel}-Particles (bin{bin_no})",
+                        "#/cm${}^3$"
+                        ]
+                    log_binwidth = np.log10(
+                        self.bin_borders[bin_no+1]
+                        )-np.log10(self.bin_borders[bin_no])
+                    self.data[dn] = self.data[pc] / log_binwidth
+                    self.details[dn] = [
+                        f"dN/dlog$D_P$ of {channel}-Particles (Bin{bin_no})",
+                        "cm$^{-3}$"
+                        ]
                 
             del self.timehandler
             del self.start
@@ -598,7 +755,7 @@ class WIBS:
                        interpolation="none",
                        origin="lower")
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
-        ax.set_ylabel("$D_P$ in $\mu$m")
+        ax.set_ylabel("$D_P$ in µm")
         ax.set_xlabel("CET")
         
         labels = [str(round(label,2)) for label in self.bin_means]
@@ -676,7 +833,7 @@ class WIBS:
                        interpolation="none",
                        origin="lower")
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
-        ax.set_ylabel("$D_P$ in $\mu$m")
+        ax.set_ylabel("$D_P$ in µm")
         ax.set_xlabel("CET")
         
         labels = [str(round(label,2)) for label in self.bin_means]
@@ -774,12 +931,13 @@ class WIBS:
             Takes a str in the format "HH:MM:SS" and only plots data acquired
             before it.
         log : bool, optional
-            If True the x-axis of the plot will be scaled logarithmicly
+            If True the x-axis of the plot will be scaled logarithmicly. The 
+            default is True.
         ylog : bool, optional
             If True the y-axis will be scaled logarithmically. The default is
             False.
         xlabel : str, optional
-            Sets the xlabel of the plot. The default is "D$_p$ in $\mu$m".
+            Sets the xlabel of the plot. The default is "D$_p$ in µm".
         ylabel : str, optional
             Sets the xlabel of the plot. The default is "Fraction".
         legend : bool, optional
@@ -801,7 +959,7 @@ class WIBS:
         defaults = {"start" : None,
                     "end" : None,
                     "log" : True,
-                    "xlabel" : "D$_p$ in $\mu$m",
+                    "xlabel" : "D$_p$ in µm",
                     "ylabel" : "Fraction",
                     "legend" : True,
                     "normalize" : True,

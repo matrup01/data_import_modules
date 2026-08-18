@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
 <title>agg_dim.drone API documentation</title>
-<meta name="description" content="">
+<meta name="description" content="This submodule provides objects to read in data produced by drones …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -36,6 +36,11 @@ el.replaceWith(d);
 <h1 class="title">Module <code>agg_dim.drone</code></h1>
 </header>
 <section id="section-intro">
+<p>This submodule provides objects to read in data produced by drones.</p>
+<p>The deprecated <code><a title="agg_dim.drone.Dronedata" href="#agg_dim.drone.Dronedata">Dronedata</a></code> obj can be used to read in data from the M300.
+The <code><a title="agg_dim.drone.DroneWrapper" href="#agg_dim.drone.DroneWrapper">DroneWrapper</a></code> obj can read in data produced by our M300 or the BladeScape
+drone, in addition to being able to wrap data from other modules and make it
+accessible in an easy way.</p>
 </section>
 <section>
 </section>
@@ -56,21 +61,6 @@ el.replaceWith(d);
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class DroneWrapper:
-    
-    &#34;&#34;&#34;full documentation see https://github.com/matrup01/data_import_modules \n\n
-    
-    Parameters\n
-    ----------\n
-    file (str) ... takes a Drone produced .csv file
-    dronetype (str, optional) ... specifies which drone was used to read csv correctly (currently implemented: &#34;BladeScapes&#34;,&#34;Own&#34;) - default: &#34;BladeScapes&#34;\n
-    start (str, optional) ... if a str of the form &#34;HH:MM:SS&#34; is given, all data acquired before this timestamp wont be used\n
-    end (str, optional) ... if a str of the form &#34;HH:MM:SS&#34; ist given, all data acquired after this timestamp wont be used\n\n
-    
-    Variables\n
-    ---------\n
-    DroneWrapper.data (nested dict) ... contains the data of all data and wrapped data\n
-    DroneWrapper.details (nested dict) ... contains lists of type [name, unit] for each data array in DroneWrapper.data
-    &#34;&#34;&#34;
     
     def __init__(self,file,**kwargs):
         &#34;&#34;&#34;
@@ -184,7 +174,7 @@ el.replaceWith(d);
         ----------
         name : str
             name that is used to find the data from the wrapped object (key in DroneWrapper.data and DroneWrapper.details).
-        obj : Pops, NewFDatam or FlyingFlo_USB
+        obj : Pops, NewFData or FlyingFlo_USB
             Object which should  be wrapped.
 
         Returns
@@ -928,18 +918,7 @@ el.replaceWith(d);
         op = kwargs[key] if key in kwargs else default
         return op</code></pre>
 </details>
-<div class="desc"><p>full documentation see <a href="https://github.com/matrup01/data_import_modules">https://github.com/matrup01/data_import_modules</a> </p>
-<p>Parameters</p>
-<hr>
-<p>file (str) &hellip; takes a Drone produced .csv file
-dronetype (str, optional) &hellip; specifies which drone was used to read csv correctly (currently implemented: "BladeScapes","Own") - default: "BladeScapes"</p>
-<p>start (str, optional) &hellip; if a str of the form "HH:MM:SS" is given, all data acquired before this timestamp wont be used</p>
-<p>end (str, optional) &hellip; if a str of the form "HH:MM:SS" ist given, all data acquired after this timestamp wont be used</p>
-<p>Variables</p>
-<hr>
-<p>DroneWrapper.data (nested dict) &hellip; contains the data of all data and wrapped data</p>
-<p>DroneWrapper.details (nested dict) &hellip; contains lists of type [name, unit] for each data array in DroneWrapper.data</p>
-<p>inits DroneWrapper object</p>
+<div class="desc"><p>inits DroneWrapper object</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>file</code></strong> :&ensp;<code>str</code></dt>
@@ -1950,7 +1929,7 @@ colour corresponding to the highest value at this value.</dd>
     ----------
     name : str
         name that is used to find the data from the wrapped object (key in DroneWrapper.data and DroneWrapper.details).
-    obj : Pops, NewFDatam or FlyingFlo_USB
+    obj : Pops, NewFData or FlyingFlo_USB
         Object which should  be wrapped.
 
     Returns
@@ -1969,7 +1948,7 @@ colour corresponding to the highest value at this value.</dd>
 <dl>
 <dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
 <dd>name that is used to find the data from the wrapped object (key in DroneWrapper.data and DroneWrapper.details).</dd>
-<dt><strong><code>obj</code></strong> :&ensp;<code>Pops, NewFDatam</code> or <code>FlyingFlo_USB</code></dt>
+<dt><strong><code>obj</code></strong> :&ensp;<code>Pops, NewFData</code> or <code>FlyingFlo_USB</code></dt>
 <dd>Object which should
 be wrapped.</dd>
 </dl>
@@ -1988,13 +1967,14 @@ be wrapped.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Dronedata: 
-    &#34;&#34;&#34;full documentation see https://github.com/matrup01/data_import_modules \n
-    
-    file (str) ... takes a drone-produced csv-file&#34;&#34;&#34;
     
     def __init__(self,file):
         &#34;&#34;&#34;
         Initialises a Dronedata obj.
+        
+        .. deprecated:: 0.1.2
+            `Dronedata` was succeeded by the `DroneWrapper` class in agg_dim 
+            0.1.2 and was not updated since then.
 
         Parameters
         ----------
@@ -2006,6 +1986,12 @@ be wrapped.</dd>
         None.
 
         &#34;&#34;&#34;
+        warning = &#34;Dronedata has been deprecated since agg_dim 0.1.2 and might&#34;
+        warning += &#34; be removed soon. Please consider using DroneWrapper &#34;
+        warning += &#34;instead.&#34;
+        
+        print(f&#34;WARNING:\n{warning}&#34;)
+        
         with open(file) as f:
             data = list(csv.reader(f,delimiter=&#34;,&#34;))
         
@@ -2143,9 +2129,12 @@ be wrapped.</dd>
             for j in obj.data[i]:
                 self.data[i].append(j)      </code></pre>
 </details>
-<div class="desc"><p>full documentation see <a href="https://github.com/matrup01/data_import_modules">https://github.com/matrup01/data_import_modules</a> </p>
-<p>file (str) &hellip; takes a drone-produced csv-file</p>
-<p>Initialises a Dronedata obj.</p>
+<div class="desc"><p>Initialises a Dronedata obj.</p>
+<div class="admonition deprecated">
+<p class="admonition-title">Deprecated since version:&ensp;0.1.2</p>
+<p><code><a title="agg_dim.drone.Dronedata" href="#agg_dim.drone.Dronedata">Dronedata</a></code> was succeeded by the <code><a title="agg_dim.drone.DroneWrapper" href="#agg_dim.drone.DroneWrapper">DroneWrapper</a></code> class in agg_dim
+0.1.2 and was not updated since then.</p>
+</div>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>file</code></strong> :&ensp;<code>str</code></dt>

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov 27 15:15:41 2024
-
-@author: mrupp
+This submodule contains classes that are used to raise Exceptions inside the
+module agg_dim. From outside the module there is no real usecase.
 """
 
 class IllegalValue(Exception):

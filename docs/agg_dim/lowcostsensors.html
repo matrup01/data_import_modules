@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
 <title>agg_dim.lowcostsensors API documentation</title>
-<meta name="description" content="Created on Wed Feb 26 15:52:29 2025 …">
+<meta name="description" content="This module provides objects to read in MOx sensors and low cost sensors …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -36,8 +36,10 @@ el.replaceWith(d);
 <h1 class="title">Module <code>agg_dim.lowcostsensors</code></h1>
 </header>
 <section id="section-intro">
-<p>Created on Wed Feb 26 15:52:29 2025</p>
-<p>@author: mrupp</p>
+<p>This module provides objects to read in MOx sensors and low cost sensors.</p>
+<p>It contains the deprecated <code><a title="agg_dim.lowcostsensors.CCS811" href="#agg_dim.lowcostsensors.CCS811">CCS811</a></code> and <code><a title="agg_dim.lowcostsensors.SEN55" href="#agg_dim.lowcostsensors.SEN55">SEN55</a></code> objects, as well as the up-to
+date <code><a title="agg_dim.lowcostsensors.FlyingFlo_USB" href="#agg_dim.lowcostsensors.FlyingFlo_USB">FlyingFlo_USB</a></code> obj, that can read in data produced by the CircuitPython
+setup used in our systems (ccs811,bme680 and sen55).</p>
 </section>
 <section>
 </section>
@@ -85,6 +87,12 @@ el.replaceWith(d);
         None.
 
         &#34;&#34;&#34;
+        
+        warning = &#34;CCS811 has been deprecated since agg_dim 0.1.1 and might&#34;
+        warning += &#34; be removed soon. Please consider using FlyingFlo_USB &#34;
+        warning += &#34;instead.&#34;
+        
+        print(f&#34;WARNING:\n{warning}&#34;)
         
         #init
         self.title = title
@@ -1247,6 +1255,12 @@ True-right axis). The default is False.</dd>
         None.
 
         &#34;&#34;&#34;
+        
+        warning = &#34;SEN55 has been deprecated since agg_dim 0.1.1 and might&#34;
+        warning += &#34; be removed soon. Please consider using FlyingFlo_USB &#34;
+        warning += &#34;instead.&#34;
+        
+        print(f&#34;WARNING:\n{warning}&#34;)
         
         #init
         self.title = title

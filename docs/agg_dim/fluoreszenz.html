@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
 <title>agg_dim.fluoreszenz API documentation</title>
-<meta name="description" content="">
+<meta name="description" content="This submodule provides the `NewFData` obj, which can be used to process
+data produced by the self built Fluorescence Spectrometer (FSPEC) …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -36,6 +37,11 @@ el.replaceWith(d);
 <h1 class="title">Module <code>agg_dim.fluoreszenz</code></h1>
 </header>
 <section id="section-intro">
+<p>This submodule provides the <code><a title="agg_dim.fluoreszenz.NewFData" href="#agg_dim.fluoreszenz.NewFData">NewFData</a></code> obj, which can be used to process
+data produced by the self built Fluorescence Spectrometer (FSPEC).</p>
+<p>It also contains the deprecated <code><a title="agg_dim.fluoreszenz.FData" href="#agg_dim.fluoreszenz.FData">FData</a></code> obj, which can be used to read in data
+but does not support any data processing which is currently employed with
+FSPEC analysis.</p>
 </section>
 <section>
 </section>
@@ -61,6 +67,10 @@ el.replaceWith(d);
     def __init__(self,file,title=&#34;no title&#34;,encoding_artifacts=True,start=&#34;none&#34;,end=&#34;none&#34;,skiprows=0,layout=[3,18]):
         &#34;&#34;&#34;
         Initialises an FData obj
+        
+        .. deprecated:: 0.1.1
+            `FData` was succeeded by the `NewFData` class in agg_dim 
+            0.1.1 and was not updated since then.
 
         Parameters
         ----------
@@ -84,6 +94,12 @@ el.replaceWith(d);
         None.
 
         &#34;&#34;&#34;
+        
+        warning = &#34;FData can only be used to read in raw FSPEC data and does &#34;
+        warning += &#34;not support any of the currently used data processing. If&#34;
+        warning += &#34;data processing is required use NewFData.&#34;
+        
+        print(f&#34;WARNING: {warning}&#34;)
         
         #reads data from csv to list
         self.title = title
@@ -427,6 +443,11 @@ el.replaceWith(d);
 </details>
 <div class="desc"><p>full documentation see <a href="https://github.com/matrup01/data_import_modules">https://github.com/matrup01/data_import_modules</a></p>
 <p>Initialises an FData obj</p>
+<div class="admonition deprecated">
+<p class="admonition-title">Deprecated since version:&ensp;0.1.1</p>
+<p><code><a title="agg_dim.fluoreszenz.FData" href="#agg_dim.fluoreszenz.FData">FData</a></code> was succeeded by the <code><a title="agg_dim.fluoreszenz.NewFData" href="#agg_dim.fluoreszenz.NewFData">NewFData</a></code> class in agg_dim
+0.1.1 and was not updated since then.</p>
+</div>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>file</code></strong> :&ensp;<code>str</code></dt>

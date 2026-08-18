@@ -4,12 +4,31 @@ Welcome to agg_dim!
 
 This Module contains Data Analysis Classes for different instruments.
 
-Full Docu is available under https://matrup01.github.io/data_import_modules
 
-## How to use
+## Installation
 Install over PyPi:
 ```
 pip install -i https://test.pypi.org/simple/ agg-dim
+```
+
+--> Alternatively you can also get the .whl from [github](https://github.com/matrup01/data_import_modules)
+```
+pip install ~/your/local/path/downloadedfile.whl
+```
+
+## How to use
+This module provides objects, which the data of the different instruments 
+should be read into. All further analysis can be done using this obj.
+Example from the Grimm 11-D:
+```python
+from agg_dim import OPC
+import matplotlib.pyplot as plt
+
+opc = OPC("file-C.dat")
+
+_,ax = plt.subplots()
+opc.plot(ax,"totalpartconc")
+plt.show()
 ```
 
 ## How to contribute

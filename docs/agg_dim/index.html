@@ -40,10 +40,25 @@ el.replaceWith(d);
 <h1 id="ag-grothe-data-import-modules">AG Grothe Data Import Modules</h1>
 <p>Welcome to agg_dim!</p>
 <p>This Module contains Data Analysis Classes for different instruments.</p>
-<p>Full Docu is available under <a href="https://matrup01.github.io/data_import_modules">https://matrup01.github.io/data_import_modules</a></p>
-<h2 id="how-to-use">How to use</h2>
+<h2 id="installation">Installation</h2>
 <p>Install over PyPi:</p>
 <pre><code>pip install -i https://test.pypi.org/simple/ agg-dim
+</code></pre>
+<p>&ndash;&gt; Alternatively you can also get the .whl from <a href="https://github.com/matrup01/data_import_modules">github</a></p>
+<pre><code>pip install ~/your/local/path/downloadedfile.whl
+</code></pre>
+<h2 id="how-to-use">How to use</h2>
+<p>This module provides objects, which the data of the different instruments
+should be read into. All further analysis can be done using this obj.
+Example from the Grimm 11-D:</p>
+<pre><code class="language-python">from agg_dim import OPC
+import matplotlib.pyplot as plt
+
+opc = OPC(&quot;file-C.dat&quot;)
+
+_,ax = plt.subplots()
+opc.plot(ax,&quot;totalpartconc&quot;)
+plt.show()
 </code></pre>
 <h2 id="how-to-contribute">How to contribute</h2>
 <p>See <a href="https://github.com/matrup01/data_import_modules">https://github.com/matrup01/data_import_modules</a></p>
@@ -53,11 +68,12 @@ el.replaceWith(d);
 <dl>
 <dt><code class="name"><a title="agg_dim.ErrorHandler" href="ErrorHandler.html">agg_dim.ErrorHandler</a></code></dt>
 <dd>
-<div class="desc"><p>Created on Wed Nov 27 15:15:41 2024 …</p></div>
+<div class="desc"><p>This submodule contains classes that are used to raise Exceptions inside the
+module agg_dim. From outside the module there is no real usecase.</p></div>
 </dd>
 <dt><code class="name"><a title="agg_dim.drone" href="drone.html">agg_dim.drone</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>This submodule provides objects to read in data produced by drones …</p></div>
 </dd>
 <dt><code class="name"><a title="agg_dim.experiment" href="experiment.html">agg_dim.experiment</a></code></dt>
 <dd>
@@ -66,20 +82,22 @@ and make them accessable in an easy way …</p></div>
 </dd>
 <dt><code class="name"><a title="agg_dim.fluoreszenz" href="fluoreszenz.html">agg_dim.fluoreszenz</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>This submodule provides the <code>NewFData</code> obj, which can be used to process
+data produced by the self built Fluorescence Spectrometer (FSPEC) …</p></div>
 </dd>
 <dt><code class="name"><a title="agg_dim.lowcostsensors" href="lowcostsensors.html">agg_dim.lowcostsensors</a></code></dt>
 <dd>
-<div class="desc"><p>Created on Wed Feb 26 15:52:29 2025 …</p></div>
+<div class="desc"><p>This module provides objects to read in MOx sensors and low cost sensors …</p></div>
 </dd>
 <dt><code class="name"><a title="agg_dim.particle_counters" href="particle_counters.html">agg_dim.particle_counters</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>This Submodule provides the <code>Pops</code> and the <code>OPC</code> obj, which can be used to
+read in pops and opc data</p></div>
 </dd>
 <dt><code class="name"><a title="agg_dim.weather" href="weather.html">agg_dim.weather</a></code></dt>
 <dd>
-<div class="desc"><p>Created on Mon Sep
-8 15:02:42 2025 …</p></div>
+<div class="desc"><p>This submodule provides the <code>WeatherData</code> obj, which can be used to read in
+data produces by the weather station.</p></div>
 </dd>
 <dt><code class="name"><a title="agg_dim.wibs" href="wibs.html">agg_dim.wibs</a></code></dt>
 <dd>
@@ -98,6 +116,7 @@ and make them accessable in an easy way …</p></div>
 <div class="toc">
 <ul>
 <li><a href="#ag-grothe-data-import-modules">AG Grothe Data Import Modules</a><ul>
+<li><a href="#installation">Installation</a></li>
 <li><a href="#how-to-use">How to use</a></li>
 <li><a href="#how-to-contribute">How to contribute</a></li>
 </ul>
