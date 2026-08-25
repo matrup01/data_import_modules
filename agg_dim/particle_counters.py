@@ -3,17 +3,14 @@ This Submodule provides the `Pops` and the `OPC` obj, which can be used to
 read in pops and opc data
 """
 
-from copy import copy
-import csv
 import datetime as dt
-import math
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
 from matplotlib.colors import LogNorm
 import numpy as np
 import pickle
 
-from .ErrorHandler import IllegalArgument,SensorNotMounted,IllegalFileFormat,IllegalValue,UnknownLayoutError
+from .ErrorHandler import IllegalArgument,IllegalFileFormat,IllegalValue,UnknownLayoutError
 
 class Pops:    
     
@@ -25,22 +22,30 @@ class Pops:
         ----------
         file : str
             path to pops produced .csv file.
-        title : str, optional
-            Given str is used as a title for quickplots. The default is "no title".
         start : str, optional
-            Takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp.
+            Takes a str in 'hh:mm:ss'-format and only imports data acquired 
+            after that timestamp.
         end : str, optional
-            Takes a str in 'hh:mm:ss'-format and only import data acquired before that timestamp.
+            Takes a str in 'hh:mm:ss'-format and only import data acquired 
+            before that timestamp.
         bgobj : Pops, optional
             Takes another Pops object and uses its mean values as background.
         timecorr : int, optional
             Takes an int and corrects popstime by it. The default is 23.
         relobj : Pops, optional
-            Takes a Pops object and displays all data as relative to the mean of it
+            Takes a Pops object and displays all data as relative to the 
+            mean of it
         deviate : bool, optional
-            If True, all values are expressed as relative values to the mean. The default is False
+            If True, all values are expressed as relative values to the mean. 
+            The default is False
         layout : dict or str
-            Makes sure, the data is read correctly from the .csv-file. Legal strings are "desktopmode", "box_pallnsdorfer" and "FlyingFlo2.0". For custom dicts see documentation. The default is "FlyingFlo2.0".
+            Makes sure, the data is read correctly from the .csv-file. Legal 
+            strings are "desktopmode", "box_pallnsdorfer" and "FlyingFlo2.0". 
+            For custom dicts see documentation. The default is "FlyingFlo2.0".
+        t_no_beaglebone : bool, optional
+            If True, only the time column written by the raspy will be used 
+            instead of the time column written by beaglebone. The default is
+            True.
 
         Attributes
         ----------
@@ -52,64 +57,74 @@ class Pops:
             True if the data is expressed relative to the mean
         d_categories : list of float
             Contains the bin borders in nanometers
-        plottypes : list of lists of str
-            Contains information of the different values measured by the peripheral sensors (even if they arent mounted)
-        plottypes2 : list of lists of str
-            Contains information of the different values measured by POPS
+        data : dict of np.arrays
+            contains all the data arrays
+        details : dict of list of strs
+            contains lists with `len=2` which contain information what data is 
+            stored in `self.data`
 
         """
 
         #init vars
         self.filename = file
+        self.data = {}
+        self.details = {}
         self.relative = False
         self.deviated = False
-        self.d_categories = [element * 1000 for element in [0.115,
-                                                            0.125,
-                                                            0.135,
-                                                            0.150,
-                                                            0.165,
-                                                            0.185,
-                                                            0.210,
-                                                            0.250,
-                                                            0.350,
-                                                            0.475,
-                                                            0.575,
-                                                            0.855,
-                                                            1.220,
-                                                            1.53,
-                                                            1.99,
-                                                            2.585,
-                                                            3.37]]
-        self.plottypes = [["temp_bm680","temperature (bm680)","°C"],
-                          ["hum_bm680","rel. humidity (bm680)","%"],
-                          ["temp_sen55","temperature","°C"],
-                          ["hum_sen55","rel. humidity","%"],
-                          ["press","ambient pressure","hPa"],
-                          ["gas","Gaswiderstand",r"$\Ohm$"],
-                          ["pm1","PM1.0",r"$\mu$g/$m^3$"],
-                          ["pm25","PM2.5",r"$\mu$g/$m^3$"],
-                          ["pm4","PM4.0",r"$\mu$g/$m^3$"],
-                          ["pm10","PM10.0",r"$\mu$g/$m^3$"],
-                          ["voc","VOC-Index",""],
-                          ["nox",r"$NO_X$-Index",""],
-                          ["co2",r"$CO_2$","ppm"],
-                          ["tvoc","TVOC","ppb"]]
-        self.plottypes2 = [["total","part. conc." , r"Counts/$cm^3$"],
-                           ["popstemp","temperature inside POPS-box","°C"],
-                           ["boardtemp","boardtemp","°C"],
-                           ["overpm25","PM2.5 from POPS",r"Counts/$cm^3$"],
-                           ["underpm25","particles smaller than 350 nm",r"Counts/$cm^3$"]]
+        self.d_categories = np.array(
+            [element * 1000 for element in [0.115,
+                                            0.125,
+                                            0.135,
+                                            0.150,
+                                            0.165,
+                                            0.185,
+                                            0.210,
+                                            0.250,
+                                            0.350,
+                                            0.475,
+                                            0.575,
+                                            0.855,
+                                            1.220,
+                                            1.53,
+                                            1.99,
+                                            2.585,
+                                            3.37]
+             ]
+            )
+        self.plottypes = [
+            ["temp_bm680","temperature (bm680)","°C"],
+            ["hum_bm680","rel. humidity (bm680)","%"],
+            ["temp_sen55","temperature","°C"],
+            ["hum_sen55","rel. humidity","%"],
+            ["press","ambient pressure","hPa"],
+            ["gas","Gaswiderstand",r"$\Ohm$"],
+            ["pm1","PM1.0",r"$\mu$g/$m^3$"],
+            ["pm25","PM2.5",r"$\mu$g/$m^3$"],
+            ["pm4","PM4.0",r"$\mu$g/$m^3$"],
+            ["pm10","PM10.0",r"$\mu$g/$m^3$"],
+            ["voc","VOC-Index",""],
+            ["nox",r"$NO_X$-Index",""],
+            ["co2",r"$CO_2$","ppm"],
+            ["tvoc","TVOC","ppb"]
+            ]
+        self.plottypes2 = [
+            ["total","part. conc." , r"Counts/$cm^3$"],
+            ["popstemp","temperature inside POPS-box","°C"],
+            ["boardtemp","boardtemp","°C"],
+            ["overpm25","PM2.5 from POPS",r"Counts/$cm^3$"],
+            ["underpm25","particles smaller than 350 nm",r"Counts/$cm^3$"]
+            ]
         
         #kwargs
-        defaults = {"title" : "no title",
-                    "start" : "none",
-                    "end" : "none",
+        defaults = {"start" : "00:00:00",
+                    "end" : "23:59:59",
                     "bgobj" : "none",
                     "timecorr" : 2,
                     "relobj" : "none",
                     "deviate" : False,
                     "wintertime" : False,
-                    "layout" : "FlyingFlo2.0"}
+                    "layout" : "FlyingFlo2.0",
+                    "t_no_beaglebone" : True}
         for key,value in zip(defaults.keys(),defaults.values()):
             self._hk_kwargs(kwargs, key, value)
         self._hk_errorhandling(kwargs, defaults.keys(), "Pops")
@@ -139,89 +154,104 @@ class Pops:
                                    "t" : 1,
                                    "flow" : 18}
                 case _:
-                    raise UnknownLayoutError(self.layout, ["desktopmode","box_pallnsdorfer","FlyingFlo2.0"], "POPS")
+                    raise UnknownLayoutError(self.layout, 
+                                             ["desktopmode",
+                                              "box_pallnsdorfer",
+                                              "FlyingFlo2.0"], 
+                                             "POPS")
+        self.ydata = np.array(
+            [det[0] for det in self.plottypes])
         
-        
-        #reads data from csv to list
-        with open(file) as openfile:
-            data = list(csv.reader(openfile,delimiter=","))
-        newdata = []
-        for dat in data:
-            if dat[0][0] == "2": #only works for the next 975 years
-                newdata.append(dat)
-        data = newdata
-        
-        #deletes last row if it hasnt been written completely
-        if len(data[0]) > len(data[-1]):
-            data = [data[i] for i in range(len(data)-1)]
+        if self.filename.endswith(".csv"):
+            with open(self.filename,"r") as f:
+                data = list(f)[1:]
+            for i in range(len(data)):
+                data[i] = data[i].split(",")
+            newdata = []
+            for dat in data:
+                if dat[0][0] == "2": #only works for the next 974 years
+                    newdata.append(dat)
+            data = newdata
+            del newdata
             
-        #init wintertime-correction
-        wt_corr = dt.timedelta(0,3600) if self.wintertime else dt.timedelta(0,7200)
-        
-        #extract x and y values from list
-        self.popstime = [dt.datetime.strptime("00:00:00","%H:%M:%S")-dt.timedelta(0,self.timecorr)+wt_corr+dt.timedelta(0,float(data[i][self.layout["popstime"]])) for i in range(1,len(data))]
-        if self.layout["t"] < 0:
-            self.t = self.popstime
-        else:
-            self.t = [dt.datetime.strptime(data[i][self.layout["t"]],"%H:%M:%S") for i in range(1,len(data))]
-        self.pops_bins_raw = [[float(data[i][j]) for i in range(1,len(data))]for j in self.layout["bins"]]
-        self.pops_bins = [[self.pops_bins_raw[j][i] / float(data[i+1][self.layout["flow"]]) for i in range(len(data)-1)] for j in range(len(self.pops_bins_raw))]
-        if isinstance(self.layout["ydata"],str):
-            self.ydata = "NULL"
-        else:
-            self.ydata = [[float(data[i][j]) for i in range(1,len(data))]for j in self.layout["ydata"]]
-        self.ydata2 = [[float(data[i][j]) for i in range(1,len(data))] for j in self.layout["ydata2"]]
-        #ydata-Syntax: [temp_bm680,rf_bm680,temp_sen55,rf_sen55,press,gas,pm1,pm25,pm4,pm10,voc,nox,co2,tvoc]
-        #ydata2-Syntax: [total,popstemp,boardtemp,pops_pm25,pops_underpm25]
-        self.ydata2.append([np.sum([self.pops_bins[i][j] for i in range(8,15)]) for j in range(len(self.pops_bins[0]))])
-        self.ydata2.append([np.sum([self.pops_bins[i][j] for i in range(8)]) for j in range(len(self.pops_bins[0]))])
-        
+            #deletes last row if it hasnt been written completely
+            if len(data[0]) > len(data[-1]):
+                data.pop(-1)
+                
+            wt_corr = dt.timedelta(0,3600) if self.wintertime else dt.timedelta(0,7200)
+            
+            self.data["popstime"] = [dt.datetime.strptime(
+                "00:00:00",
+                "%H:%M:%S"
+                )-dt.timedelta(
+                    0,
+                    self.timecorr
+                    )+wt_corr+dt.timedelta(
+                        0,
+                        float(data[i][self.layout["popstime"]])
+                        ) for i in range(1,len(data))]
+            self.data["popstime"] = np.array(self.data["popstime"])
+            if self.layout["t"] < 0:
+                self.data["t"] = self.data["popstime"]
+            else:
+                self.data["t"] = [dt.datetime.strptime(
+                    data[i][self.layout["t"]],
+                    "%H:%M:%S") for i in range(1,len(data))]
+            self.data["t"] = np.array(self.data["t"])
+            if self.t_no_beaglebone:
+                self.data["popstime"] = self.data["t"]
+            
+            flow = np.array(
+                [data[i][self.layout["flow"]] for i in range(1,len(data))]
+                ).astype(float)
+            print(flow)
+            
+            for i,b in enumerate(self.layout["bins"]):
+                self.data[f"b{i}cps"] = np.array(
+                    [data[row][b] for row in range(1,len(data))]
+                    ).astype(float)
+                self.details[f"b{i}cps"] = [
+                    f"Particle Counts of Bin {i}",
+                    "#/s"
+                    ]
+                self.data[f"b{i}partconc"] = self.data[f"b{i}cps"] / flow
+                self.details[f"b{i}partconc"] = [
+                    f"Particle Concentration of Bin {i}",
+                    "#/s"
+                    ]
+            
+            if self.layout["ydata"] != "NULL":
+                for loc,dat in zip(self.layout["ydata"],self.plottypes):
+                    self.data[dat[0]] = np.array(
+                        [data[i][loc] for i in range(1,len(data))]
+                        ).astype(float)
+                    self.details = [dat[1],dat[2]]
+            for loc,dat in zip(self.layout["ydata2"],self.plottypes2):
+                self.data[dat[0]] = np.array(
+                    [data[i][loc] for i in range(1,len(data))]
+                    ).astype(float)
+                self.details[dat[0]] = [dat[1],dat[2]]
+                
         #crop
-        if self.start != "none":
-            tcounter = -1
-            for element in [data[i][self.layout["t"]] for i in range(1,len(data))]:
-                tcounter += 1
-                if self.start == element:
-                    t_start = tcounter
-            popscounter = -1
-            unixstart = str(int(self.start[0:2])*3600+int(self.start[3:5])*60+int(self.start[6:8])-7200 + self.timecorr)
-            for element in [data[i][self.layout["popstime"]][0:5] for i in range(1,len(data))]:
-                popscounter += 1
-                if unixstart == element:
-                    pops_start = popscounter
-        else:
-            t_start = 0
-            pops_start = 0
-            
-        if self.end != "none":
-            tcounter = -1
-            for element in [data[i][self.layout["t"]] for i in range(1,len(data))]:
-                tcounter += 1
-                if self.end == element:
-                    t_end = tcounter
-            popscounter = -1
-            unixend = str(int(self.end[0:2])*3600+int(self.end[3:5])*60+int(self.end[6:8])-7200 + self.timecorr)
-            for element in [data[i][self.layout["popstime"]][0:5] for i in range(1,len(data))]:
-                popscounter += 1
-                if unixend == element:
-                    pops_end = popscounter
-        else:
-            t_end = len(data)-1
-            pops_end = len(data)-1
-            
-        self.t = [self.t[i] for i in range(t_start,t_end)]
-        self.popstime = [self.popstime[i] for i in range(pops_start,pops_end)]
-        for i in range(len(self.ydata2)):
-            self.ydata2[i] = [self.ydata2[i][j] for j in range(pops_start,pops_end)]
-        if not isinstance(self.ydata,str):
-            for i in range(len(self.ydata)):
-                self.ydata[i] = [self.ydata[i][j] for j in range(t_start,t_end)]
-        for i in range(len(self.pops_bins)):
-            self.pops_bins[i] = [self.pops_bins[i][j] for j in range(pops_start,pops_end)]
+        m1 = self._hk_returncropmask(self.data["t"], self.start, self.end)
+        m2 = self._hk_returncropmask(self.data["popstime"], self.start,self.end)
+        for key in self.data:
+            if key in self.ydata or key=="t":
+                self.data[key] = self.data[key][m1]
+            else:
+                self.data[key] = self.data[key][m2]
             
         #correctbg
         if isinstance(self.bgobj,Pops):
             self.importbg(self.bgobj.exportbg())
+            
+            for key in self.data:
+                try:
+                    self.data[key] = self.data[key]-np.nanmean(self.bgobj[key])
+                except:
+                    msg = f"WARNING: {key} could not be bg-corrected, because"
+                    msg += f"it does not exist in {self.bgobj}"
+                    print(msg)
             
         #make values relative
         if isinstance(self.relobj,Pops):
@@ -232,48 +262,9 @@ class Pops:
         if self.deviate:
             self.deviatefrommean()
             self.deviated = True
-            
-            
-    def exportbg(self):
-        """
-        Legacy-function: using this object as background is easier, if you pass it as bgobj in the target Pops objects init
-        Calculates the mean of all pops bins and returns it.
-
-        Returns
-        -------
-        list in the form of: [np.array,float]
-            Contains the mean of all bins in an np.array and the mean of the total partconc.
-
-        """
-        
-        bins = np.array(self.pops_bins)
-        bg = np.array([np.mean(element) for element in bins])
-        totalbg = np.mean(np.array(self.ydata2[0]))
-        return [bg,totalbg]
-    
-    
-    def importbg(self,bg):
-        """
-        Legacy-function: importing a background from another pops object is easier by passing it as bgobj in the init
-        Imports a background in the form its exported through Pops.exportbg()
-
-        Parameters
-        ----------
-        bg : list in the form of: [np.array,float]
-            Contains the mean of all bins in an np.array and the mean of the total partconc.
-
-        Returns
-        -------
-        None.
-
-        """
-        
-        for i in range(len(self.pops_bins)):
-            self.pops_bins[i] = [self.pops_bins[i][j]-bg[0][i] for j in range(len(self.pops_bins[i]))]
-        self.ydata2[0] = [self.ydata2[0][i] - bg[1] for i in range(len(self.ydata2[0]))]
         
         
-    def quickplot(self,y,**kwargs):
+    def quickplot(self,y):
         """
         Draws a plot y vs time
 
@@ -281,10 +272,6 @@ class Pops:
         ----------
         y : str
             Determines which y should be plotted.
-        startcrop : int, optional
-            Crops the data by startcrop seconds starting from the beginning
-        endcrop : int, optional
-            Crops the data by endcrop seconds starting from the end
 
         Returns
         -------
@@ -292,29 +279,20 @@ class Pops:
 
         """
         
-        #kwargs
-        defaults = {"startcrop" : 0,
-                    "endcrop" : 0}
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
-        self._hk_errorhandling(kwargs, defaults.keys(), "Pops.quickplot()")
-        
-        #find plotdata
-        plotx,ploty,label,ylabel = self._hk_findplottype(y)
-        plotx = [plotx[i] for i in range(kwargs["startcrop"],len(plotx)-kwargs["endcrop"])]
-        ploty = [ploty[i] for i in range(kwargs["startcrop"],len(ploty)-kwargs["endcrop"])]
+        xx = self.data["t"] if y in self.ydata else self.data["popstime"]
+        yy = self.data[y]  
+        label = f"{self.details[y][0]} in {self.details[y][1]}"
             
         #draw plot
         _,ax = plt.subplots()
-        ax.plot(plotx,ploty,label=label)
+        ax.plot(xx,yy,label=self.details[y][0])
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
-        ax.set_ylabel(ylabel)
-        plt.title(self.title)
-        plt.legend()
+        ax.set_ylabel(label)
+        ax.legend()
         plt.show()
         
         
-    def plot(self,ax,y,**kwargs): #add usepopstime kwarg
+    def plot(self,ax,y,**kwargs):
         """
         Plots y over time on an existing mpl axis
 
@@ -324,28 +302,37 @@ class Pops:
             The plot will be drawn on this axis.
         y : str
             Determines which data should be plotted.
-        startcrop : int, optional
-            rops the data by startcrop seconds starting from the beginning.
-        endcrop : int, optional
-            Crops the data by endcrop seconds starting from the end.
+        start : str, optional
+            When 'start' is given in the format "HH:MM:SS", only data acquired
+            after this timestamp will be plotted.
+        end : str, optional
+            When 'end' is given in the format "HH:MM:SS", only data acquired
+            before this timestamp will be plotted.
         quakes : list of str, optional
-            Takes times in the form of "HH:MM:SS" and draws vertical lines on the plot at these times. The default is []
+            Takes times in the form of "HH:MM:SS" and draws vertical lines on 
+            the plot at these times. The default is []
         quakeslabel : str, optional
-            If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is "no label"
+            If quakes != [] this label will be used for the quake-lines if the 
+            plot contains a legend. The default is "no label"
         quakecolor : str, optional
-            Determines which color the quake-lines should have. The default is "tab:pink"
+            Determines which color the quake-lines should have. The default 
+            is "tab:pink"
         color : str, optional
             Determines the color of the plot. The default is "tab:blue"
         togglexticks : bool, optional
             If True, xticks of the axis are visible. The default is True.
         printstats : bool, optional
-            If True, mean, std and var are printed in the console. The default is False
+            If True, mean, std and var are printed in the console. 
+            The default is False
         secondary : bool, optional
-            If True the plot uses the y-axis on the right-hand side. Should be used if the axis is a twinx. The default is False.
+            If True the plot uses the y-axis on the right-hand side. Should be 
+            used if the axis is a twinx. The default is False.
         plotlabel : str, optional
-            This string is used as a label for the plot, if a legend is created. The default is "no label"
+            This string is used as a label for the plot, if a legend is 
+            created. The default is "no label"
         usepopstime : bool, optional
-            If True, popstime is used instead of Raspi-time. Should only used if layout="box_pallnsdorfer". The default is False.
+            If True, popstime is used instead of Raspi-time. Should only used 
+            if layout="box_pallnsdorfer". The default is False.
 
         Returns
         -------
@@ -354,8 +341,8 @@ class Pops:
         """
         
         #kwargs
-        defaults = {"startcrop" : 0,
-                    "endcrop" : 0,
+        defaults = {"start" : "none",
+                    "end" : "none",
                     "quakes" : [],
                     "quakeslabel" : "none",
                     "quakecolor" : "tab:pink",
@@ -369,21 +356,35 @@ class Pops:
             kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
         self._hk_errorhandling(kwargs, defaults.keys(), "Pops.plot()")
         
-        #find plotdata
-        plotx,ploty,label,ylabel = self._hk_findplottype(y)
-        if kwargs["usepopstime"]:
-            plotx = self.popstime
-        plotx = [plotx[i] for i in range(kwargs["startcrop"],len(plotx)-kwargs["endcrop"])]
-        ploty = [ploty[i] for i in range(kwargs["startcrop"],len(ploty)-kwargs["endcrop"])]
+        try:
+            self.data[y]
+        except ValueError:
+            legals = ",".join(self.data.keys())
+            msg = f"{y} is no legal 'y' for Pops.plot(). Consider one of the "
+            msg += "following: "
+            raise ValueError(msg+legals)
+        
+        if y in self.ydata and not kwargs["usepopstime"]:
+            m = self._hk_returncropmask(self.data["t"], 
+                                       kwargs["start"], 
+                                       kwargs["end"])
+            xx = self.data["t"][m]
+        else:
+            m = self._hk_returncropmask(self.data["popstime"], 
+                                       kwargs["start"], 
+                                       kwargs["end"])
+            xx = self.data["popstime"][m]
+        yy = self.data[y][m]
         
         #change label
         if kwargs["plotlabel"] != "none":
             legendlabel = kwargs["plotlabel"]
-        else: legendlabel = label
+        else: 
+            legendlabel = self.details[y][0]
         
         #draw plot
-        ax.plot(plotx,ploty,label=legendlabel,color=kwargs["color"])
-        ax.set_ylabel(label + " in " + ylabel)
+        ax.plot(xx,yy,label=legendlabel,color=kwargs["color"])
+        ax.set_ylabel(f"{self.details[y][0]} in {self.details[y][1]}")
         ax.axes.xaxis.set_visible(kwargs["togglexticks"])
         ax.axes.yaxis.label.set_color(kwargs["color"])
         ax.tick_params(axis='y', colors=kwargs["color"])
@@ -393,16 +394,23 @@ class Pops:
             ax.spines["right"].set_color(kwargs["color"])
             ax.spines["left"].set_alpha(0)
         if len(kwargs["quakes"]) != 0:
-            ax.vlines(x=[dt.datetime.strptime(element, "%H:%M:%S")for element in kwargs["quakes"]],ymin=min(ploty),ymax=max(ploty),color=kwargs["quakecolor"],ls="dashed",label=kwargs["quakeslabel"])
+            ax.vlines(
+                x=[dt.datetime.strptime(element, "%H:%M:%S")
+                   for element in kwargs["quakes"]],
+                ymin=min(yy),
+                ymax=max(xx),
+                color=kwargs["quakecolor"],
+                ls="dashed",
+                label=kwargs["quakeslabel"])
         
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         
         #print stats
         if kwargs["printstats"]:
-            mean = np.mean(ploty)
-            std = np.std(ploty,ddof=1)
-            var = np.var(ploty,ddof=1)
-            print(label + " (mean,std,var): " + str(mean) + ", " + str(std) + ", " + str(var))
+            mean = np.mean(yy)
+            std = np.std(yy,ddof=1)
+            var = np.var(yy,ddof=1)
+            print(f"{legendlabel}:\n\tmean: {mean}\n\tstd:  {std}\n\tvar:  {var}")
         
     
     def quickheatmap(self):
@@ -416,13 +424,19 @@ class Pops:
         """
         
         #convert to heatmapdata
-        heatmapdata = [[self.pops_bins[j][i] / (math.log10(self.d_categories[j+1])-math.log10(self.d_categories[j])) for i in range(len(self.pops_bins[0])-1)] for j in range(len(self.pops_bins))]
-        heatmapdata = self._hk_replacezeros(heatmapdata)
-        xx,yy = np.meshgrid(self.popstime,self.d_categories)
+        
+        dlog = np.log10(self.d_categories)
+        dndlogdp = np.array(
+            [self.data[f"b{i}partconc"]/(dlog[i+1]-dlog[i])
+             for i in range(len(dlog)-1)]
+            )[:,:-1]
+        zeros = np.where(dndlogdp==0)
+        dndlogdp[zeros] = np.nan
+        xx,yy = np.meshgrid(self.data["popstime"],self.d_categories)
         
         #draw plot
         _,ax = plt.subplots()
-        im = ax.pcolormesh(xx,yy,heatmapdata,cmap="RdYlBu_r",norm=LogNorm())
+        im = ax.pcolormesh(xx,yy,dndlogdp,cmap="RdYlBu_r",norm=LogNorm())
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         ax.set_yscale("log")
         ax.set_ylabel("Durchmesser in nm")
@@ -434,11 +448,21 @@ class Pops:
     def heatmap(self,ax,**kwargs):
         """
         Draws a dndlogdp heatmap over an existing mpl axis
+        
+        .. deprecated:: 0.2.5
+            This method was last updated in agg_dim 0.2.5 and might be removed
+            soon since it was succeeded by Pops.newheatmap.
 
         Parameters
         ----------
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
+        start : str, optional
+            When 'start' is given in the format "HH:MM:SS", only data acquired
+            after this timestamp will be plotted.
+        end : str, optional
+            When 'end' is given in the format "HH:MM:SS", only data acquired
+            before this timestamp will be plotted.
         togglexticks : bool, optional
             If True, xticks of the axis are visible. The default is True.
         orientation : str, optional
@@ -453,9 +477,15 @@ class Pops:
         None.
 
         """
+        msg = "WARNING: Pops.heatmap() is deprecated and might be removed soon"
+        msg += ". Check out the docu and consider using Pops.newheatmap() "
+        msg += "instead."
+        print(msg)
         
         #kwargs
-        defaults = {"togglexticks" : True,
+        defaults = {"start" : "none",
+                    "end" : "none",
+                    "togglexticks" : True,
                     "orientation" : "horizontal",
                     "location" : "top",
                     "togglecbar" : True,
@@ -464,28 +494,42 @@ class Pops:
             kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
         self._hk_errorhandling(kwargs, defaults.keys(), "Pops.heatmap()")
         
-        #convert to heatmapdata
-        heatmapdata = [[self.pops_bins[j][i] / (math.log10(self.d_categories[j+1])-math.log10(self.d_categories[j])) for i in range(len(self.pops_bins[0])-1)] for j in range(len(self.pops_bins))]
-        heatmapdata = self._hk_replacezeros(heatmapdata)
-        xx,yy = np.meshgrid(self.popstime,self.d_categories)
+        dlog = np.log10(self.d_categories)
+        m = self._hk_returncropmask(self.data["popstime"],
+                                   kwargs["start"],
+                                   kwargs["end"])
+        dndlogdp = np.array(
+            [self.data[f"b{i}partconc"][m]/(dlog[i+1]-dlog[i])
+             for i in range(len(dlog)-1)]
+            )
+        dndlogdp = np.where(dndlogdp==0,np.nan,dndlogdp)[:,:-1]
         
-        mask = np.array([[xx[i][j] for j in range(len(xx[i])-1)] for i in range(len(xx)-1)])
-        
-        heatmapdata = np.ma.masked_array(heatmapdata,mask<min(self.popstime))
-        heatmapdata = np.ma.masked_array(heatmapdata,mask>max(self.popstime))
+        xx,yy = np.meshgrid(self.data["popstime"][m],self.d_categories)
         
         #draw plot
-        im = ax.pcolormesh(xx,yy,heatmapdata,cmap="RdYlBu_r",norm=LogNorm(vmin=1,vmax=10000))
+        im = ax.pcolormesh(xx,
+                           yy,
+                           dndlogdp,
+                           cmap="RdYlBu_r",
+                           norm=LogNorm(vmin=1,vmax=10000))
         ax.set_yscale("log")
         ax.set_ylabel("optical diameter $D_p$ in $\mu$m")
         ax.set_xlabel("CET")
-        ax.set_yticks(self.d_categories,labels=[str(self.d_categories[i]/1000) if len(str(self.d_categories[i]/1000)) == 5 else str(self.d_categories[i]/1000) + "0" for i in range(len(self.d_categories))])
+        yticks = [str(i/1000) for i in self.d_categories]
+        for i,yt in enumerate(yticks):
+            if len(yt) != 5:
+                yticks[i] += "0"
+        ax.set_yticks(self.d_categories,labels=yticks)
         ax.axes.xaxis.set_visible(kwargs["togglexticks"])
         ax.yaxis.set_tick_params(which='minor', size=0)
         ax.yaxis.set_tick_params(which='minor', width=0)
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         if kwargs["togglecbar"]:
-            plt.colorbar(im,label="dN/dlog$D_p$",orientation=kwargs["orientation"],location=kwargs["location"],pad=kwargs["pad"])
+            plt.colorbar(im,
+                         label="dN/dlog$D_p$",
+                         orientation=kwargs["orientation"],
+                         location=kwargs["location"],
+                         pad=kwargs["pad"])
             
             
     def newheatmap(self,ax,**kwargs):
@@ -496,12 +540,20 @@ class Pops:
         ----------
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
+        start : str, optional
+            When 'start' is given in the format "HH:MM:SS", only data acquired
+            after this timestamp will be plotted.
+        end : str, optional
+            When 'end' is given in the format "HH:MM:SS", only data acquired
+            before this timestamp will be plotted.
         orientation : str, optional
             Changes the orientation of the colorbar. The default is "horizontal".
         location : str, optional
             Changes the location of the colorbar. The default is "top".
         pad : float, optional
             Changes the padding between plot and colorbar. The default is 0.
+        cmap : str, optional
+            Decides which colormap should be used. The default is "RdYlBu_r".
 
         Returns
         -------
@@ -512,33 +564,56 @@ class Pops:
         #kwargs
         defaults = {"orientation" : "horizontal",
                     "location" : "top",
-                    "pad" : 0}
+                    "pad" : 0,
+                    "start" : "none",
+                    "end" : "none",
+                    "cmap" : "RdYlBu_r"}
         for key,default in zip(defaults.keys(),defaults.values()):
             kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
-        self._hk_errorhandling(kwargs, defaults.keys(), "Pops.newheatmap()")
+        self._hk_errorhandling(kwargs, defaults.keys(), "Pops.heatmap()")
         
-        heatmapdata = [[self.pops_bins[j][i] / (math.log10(self.d_categories[j+1])-math.log10(self.d_categories[j])) for i in range(len(self.pops_bins[0])-1)] for j in range(len(self.pops_bins))]
-        heatmapdata = self._hk_replacezeros(heatmapdata)
+        dlog = np.log10(self.d_categories)
+        m = self._hk_returncropmask(self.data["popstime"],
+                                   kwargs["start"],
+                                   kwargs["end"])
+        dndlogdp = np.array(
+            [self.data[f"b{i}partconc"][m]/(dlog[i+1]-dlog[i])
+             for i in range(len(dlog)-1)]
+            )
+        zeros = np.where(dndlogdp==0)
+        dndlogdp[zeros] = np.nan
+
         
-        xlims = [self.t[0],self.t[-1]]
+        xlims = [self.data["popstime"][0],self.data["popstime"][-1]]
         xlims = md.date2num(xlims)
         
-        im = ax.imshow(heatmapdata,aspect="auto",cmap="RdYlBu_r",norm=LogNorm(vmin=1,vmax=10000),extent=[xlims[0],xlims[1],0,len(self.d_categories)-1],origin="lower",interpolation="none")
-        labels = [math.sqrt(self.d_categories[i]*self.d_categories[i+1]) for i in range(len(self.d_categories)-1)]
+        im = ax.imshow(dndlogdp,
+                       aspect="auto",
+                       cmap=kwargs["cmap"],
+                       norm=LogNorm(vmin=1,vmax=10000),
+                       extent=[xlims[0],xlims[1],0,len(self.d_categories)-1],
+                       origin="lower",
+                       interpolation="none")
+        labels = [np.sqrt(self.d_categories[i]*self.d_categories[i+1]) 
+                  for i in range(len(self.d_categories)-1)]
         labels = [str(round(labels[i]/1000,2)) for i in range(len(labels))]
         ticks = list(range(len(self.d_categories)-1))
         ticks = [ticks[i]+0.5 for i in range(len(ticks))]
         ax.set_yticks(ticks,labels=labels)
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         
-        plt.colorbar(im,label="dN/dlog$D_p$ in cm${}^{-3}$",orientation=kwargs["orientation"],location=kwargs["location"],pad=kwargs["pad"])
+        plt.colorbar(im,
+                     label="dN/dlog$D_p$ in cm${}^{-3}$",
+                     orientation=kwargs["orientation"],
+                     location=kwargs["location"],
+                     pad=kwargs["pad"])
         
         ax.yaxis.set_tick_params(which='minor', size=0)
         ax.yaxis.set_tick_params(which='minor', width=0)
         ax.set_xlabel("CET")
         ax.set_ylabel("optical diameter $D_p$ in $\mu$m")
         
-    def dndlogdp(self,ax):
+    def dndlogdp(self,ax,**kwargs):
         """
         Draws a dndlogdp number size distribution histogram over an existing mpl axis
 
@@ -546,6 +621,20 @@ class Pops:
         ----------
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
+        start : str, optional
+            When 'start' is given in the format "HH:MM:SS", only data acquired
+            after this timestamp will be plotted.
+        end : str, optional
+            When 'end' is given in the format "HH:MM:SS", only data acquired
+            before this timestamp will be plotted.
+        scatter : bool, optional
+            If True, a scatterplot will be drawn instead of a bar plot. 
+            The default is False.
+        color : str, optional
+            Changes the color of the bar/points. The default is 'tab:blue'.
+        label : str, optional
+            Changes the plot label, which is used in a legend. The default is
+            'no label'.
 
         Returns
         -------
@@ -553,14 +642,42 @@ class Pops:
 
         """
         
-        #calculate needed values
-        means = np.array([np.mean(self.pops_bins[i]) for i in range(len(self.pops_bins))])
-        dndlogdp = [means[i]/(math.log10(self.d_categories[i+1])-math.log10(self.d_categories[i])) for i in range(len(means))]
-        xvals = [self.d_categories[i] for i in range(len(means))]
-        widths = [self.d_categories[i+1]-self.d_categories[i] for i in range(len(xvals))]
+        #kwargs
+        defaults = {"start" : "none",
+                    "end" : "none",
+                    "scatter" : False,
+                    "color" : "tab:blue",
+                    "label" : "no label"}
+        for key,default in zip(defaults.keys(),defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "Pops.dndlogdp()")
+        
+        #calculate needed values       
+        dlog = np.log10(self.d_categories)
+        m = self._hk_returncropmask(self.data["popstime"],
+                                   kwargs["start"],
+                                   kwargs["end"])
+        dndlogdp = np.array(
+            [self.data[f"b{i}partconc"][m]/(dlog[i+1]-dlog[i])
+             for i in range(len(dlog)-1)]
+            )
+        dndlogdp = np.mean(dndlogdp,axis=1)
+        xvals = self.d_categories[:-1]
+        widths = self.d_categories[1:] - self.d_categories[:-1]
         
         #draw plot
-        ax.bar(x=xvals,width=widths,align="edge",height=dndlogdp)
+        if kwargs["scatter"]:
+            ax.scatter(xvals,
+                       dndlogdp,
+                       color=kwargs["color"],
+                       label=kwargs["label"])
+        else:
+            ax.bar(x=xvals,
+                   width=widths,
+                   align="edge",
+                   height=dndlogdp,
+                   color=kwargs["color"],
+                   label=kwargs["label"])
         ax.set_yscale("log")
         ax.set_ylabel("dN/dlog$D_p$")
         ax.set_xscale("log")
@@ -577,14 +694,16 @@ class Pops:
 
         """
         
-        print("test")
-        
         #calculate needed values
-        means = np.array([np.mean(self.pops_bins[i]) for i in range(len(self.pops_bins))])
-        dndlogdp = [means[i]/(math.log10(self.d_categories[i+1])-math.log10(self.d_categories[i])) for i in range(len(means))]
-        xvals = [self.d_categories[i] for i in range(len(means))]
-        widths = [self.d_categories[i+1]-self.d_categories[i] for i in range(len(xvals))]
-
+        dlog = np.log10(self.d_categories)
+        dndlogdp = np.array(
+            [self.data[f"b{i}partconc"]/(dlog[i+1]-dlog[i])
+             for i in range(len(dlog)-1)]
+            )
+        dndlogdp = np.mean(dndlogdp,axis=1)
+        xvals = self.d_categories[:-1]
+        widths = self.d_categories[1:] - self.d_categories[:-1]
+        print(*dndlogdp)
         #draw
         _,ax = plt.subplots()
         ax.bar(x=xvals,width=widths,align="edge",height=dndlogdp)
@@ -592,56 +711,7 @@ class Pops:
         ax.set_ylabel("dN/dlog$D_p$")
         ax.set_xscale("log")
         ax.set_xlabel("$D_p$ in nm")
-        plt.title(self.title)
-        plt.show()
-        
-        
-    def cumulativeparticles(self):
-        """
-        Legacy function just use the built in variable "total" instead.
-
-        Returns
-        -------
-        cparticles : float
-            Sum of the means of all bins.
-
-        """
-        
-        #calculate needed values
-        means = np.array([np.mean(self.pops_bins[i]) for i in range(len(self.pops_bins))])
-        cparticles = np.sum(means)
-        print(self.title + ": " + str(cparticles) + " counts/cm3 (cumulative)")
-        
-        return cparticles
-        
-    
-    def crop(self,startcrop,endcrop):
-        """
-        Legacy function: Use kwargs 'start' and 'end' in init instead
-        Crops the data by 'startcrop' seconds on the front and 'endcrop' seconds on the end
-
-        Parameters
-        ----------
-        startcrop : int
-            Data will be cropped by 'startcrop' seconds beginning from the start.
-        endcrop : int
-            Data will be cropped by 'endcrop' seconds beginning from the end.
-
-        Returns
-        -------
-        None.
-
-        """
-        length = len(self.t)
-        self.t = [self.t[i] for i in range(startcrop,length-endcrop)]
-        self.popstime = [self.popstime[i] for i in range(startcrop,length-endcrop)]
-        for i in range(len(self.ydata)):
-            self.ydata[i] = [self.ydata[i][j] for j in range(startcrop,length-endcrop)]
-        for i in range(len(self.pops_bins)):
-            self.pops_bins[i] = [self.pops_bins[i][j] for j in range(startcrop,length-endcrop)]
-        for i in range(len(self.ydata2)):
-            self.ydata2[i] = [self.ydata2[i][j] for j in range(startcrop,length-endcrop)]
-        
+        plt.show()        
         
         
     def stats(self,y):
@@ -659,11 +729,12 @@ class Pops:
 
         """
         
-        _,data,label,unit = self._hk_findplottype(y)
+        data = self.data[y]
         mean = np.mean(data)
         std = np.std(data,ddof=1)
         var = np.var(data,ddof=1)
-        print(label + " in " + unit + " (mean,std,var): " + str(mean) + ", " + str(std) + ", " + str(var))
+        print(f"\nSTATS:\n{self.details[y][0]} in {self.details[y][1]}:")
+        print(f"\tmean {mean}\n\tstd  {std}\n\tvar  {var}")
     
         
     def returnstats(self,y):
@@ -686,7 +757,7 @@ class Pops:
 
         """
         
-        _,data,_,_ = self._hk_findplottype(y)
+        data = self.data["y"]
         mean = np.mean(data)
         std = np.std(data,ddof=1)
         var = np.var(data,ddof=1)
@@ -708,21 +779,15 @@ class Pops:
         None.
 
         """
-        
-        self.popstime += obj.popstime
-        self.t += obj.t
             
-        if not isinstance(self.ydata,str) and not isinstance(obj.ydata,str):
-            for i in range(len(self.ydata)):
-                self.ydata[i] += obj.ydata[i]
-        elif isinstance(self.ydata,str) and not isinstance(obj.ydata,str):
-            self.ydata = obj.ydata
+        for key in self.data:
+            try:
+                self.data[key] = np.append(self.data[key],obj.data[key])
+            except:
+                msg = f"WARNING: {key} is not loaded in the Pops obj that "
+                msg += "should be appended"
+                print(msg)
                 
-        for i in range(len(self.ydata2)):
-            self.ydata2 += obj.ydata2
-                
-        for i in range(len(self.pops_bins)):
-            self.pops_bins += obj.pops_bins
                 
                 
     def add(self,obj):
@@ -742,22 +807,14 @@ class Pops:
         """
                     
         newpops = Pops(file=self.filename)
-        newpops.t = copy(self.t) + obj.t
-        newpops.popstime = copy(self.popstime) + obj.popstime
-        newpops.ydata = copy(self.ydata)
-        newpops.ydata2 = copy(self.ydata2)
-            
-        if not isinstance(newpops.ydata,str) and not isinstance(obj.ydata,str):
-            for i in range(len(newpops.ydata)):
-                newpops.ydata[i] += obj.ydata[i]
-        elif isinstance(newpops.ydata,str) and not isinstance(obj.ydata,str):
-            newpops.ydata = obj.ydata
-                
-        for i in range(len(newpops.ydata2)):
-            newpops.ydata2 += obj.ydata2
-                
-        for i in range(len(newpops.pops_bins)):
-            newpops.pops_bins += obj.pops_bins
+        
+        for key in self.data:
+            try:
+                newpops.data[key] = np.append(self.data[key],obj.data[key])
+            except:
+                msg = f"WARNING: {key} is not loaded in the Pops obj that "
+                msg += "should be appended"
+                print(msg)
                 
         return newpops
     
@@ -772,26 +829,11 @@ class Pops:
 
         """
         
-        for element in self.ydata:
-            
-            mean = np.mean(element)
-            
-            for i in range(len(element)):
-                element[i] = ((element[i] / mean) - 1)*100
-                
-        for element in self.ydata2:
-            
-            mean = np.mean(element)
-            
-            for i in range(len(element)):
-                element[i] = ((element[i] / mean) - 1)*100
-                
-        for element in self.pops_bins:
-            
-            mean = np.mean(element)
-            
-            for i in range(len(element)):
-                element[i] = ((element[i] / mean) - 1)*100
+        for key in self.data:
+            if key != "t" and key != "popstime":
+                mean = np.mean(self.data[key])
+                self.data[key] = ((self.data[key]/mean)-1)*100
+                self.details[key][1] = self.details[key][1] + " (normalised)"
                 
         self.deviated = True
     
@@ -810,43 +852,18 @@ class Pops:
         None.
 
         """
-
-        bgydata = [bgobj.returnstats(bgobj.plottypes[i][0])[0] for i in range(len(bgobj.plottypes))]            
-        bgydata2 = [bgobj.returnstats(bgobj.plottypes2[i][0])[0] for i in range(len(bgobj.plottypes2))]
-        bgpops_bins = [bgobj.returnstats(str(i))[0] for i in range(len(bgobj.pops_bins))]
         
-        for j in range(len(self.ydata)):
-            newdata = []
-            if bgydata[j] > 0.0:
-                for i in range(len(self.ydata[j])):
-                    newdata.append(((self.ydata[j][i] / bgydata[j])-1)*100)
-                self.ydata[j] = copy(newdata)
-            else:
-                for i in range(len(self.ydata[j])):
-                    newdata.append((((self.ydata[j][i]) / (bgydata[j]+1))-1)*100)
-                self.ydata[j] = copy(newdata)
-            
-        for j in range(len(self.ydata2)):
-            newdata = []
-            if bgydata2[j] > 0.0:
-                for i in range(len(self.ydata2[j])):
-                    newdata.append(((self.ydata2[j][i] / bgydata2[j])-1)*100)
-                self.ydata2[j] = copy(newdata)
-            else:
-                for i in range(len(self.ydata2[j])):
-                    newdata.append((((self.ydata2[j][i]) / (bgydata2[j]+1))-1)*100)
-                self.ydata2[j] = copy(newdata)
-            
-        for j in range(len(self.pops_bins)):
-            newdata = []
-            if bgpops_bins[j] > 0.0:
-                for i in range(len(self.pops_bins[j])):
-                    newdata.append(((self.pops_bins[j][i] / bgpops_bins[j])-1)*100)
-                self.pops_bins[j] = copy(newdata)
-            else:
-                for i in range(len(self.pops_bins[j])):
-                    newdata.append((((self.pops_bins[j][i]) / (bgpops_bins[j])+1)-1)*100)
-                self.pops_bins[j] = copy(newdata)
+        for key in self.data:
+            try:
+                if key != "t" and key != "popstime":
+                    mean = np.mean(bgobj.data[key])
+                    self.data[key] = ((self.data[key]/mean)-1)*100
+                    self.details[key][1] = f"{self.details[key][1]} (normalised)"
+            except:
+                msg = f"WARNING: {key} is not loaded in the Pops obj that "
+                msg += "should be appended. {key} will not be expressed "
+                msg += "relatively"
+                print(msg)
             
         self.relative = True
     
@@ -854,6 +871,10 @@ class Pops:
     def average(self):
         """
         Averages all data minutewise
+        
+        .. deprecated:: 0.2.5
+            This method was last updated in agg_dim 0.2.5 and might be removed
+            soon since it was succeeded by Pops.desample.
 
         Returns
         -------
@@ -861,52 +882,65 @@ class Pops:
 
         """
         
-        meant,meanydata,meanpopst,meanydata2,meanpopsbins = [],[],[],[],[]
+        msg = "WARNING: Pops.average() is deprecated and might be removed soon"
+        msg += ". Consider using Pops.desample() instead."
+        print(msg)
+        self.desample(60)
+    
+    def desample(self,samplesize):
+        """
+        Averages all data by a custom amount of seconds
         
-        if not isinstance(self.ydata,str):
-            for i in range(len(self.ydata)):
-                meanydata.append([])
-        for i in range(len(self.ydata2)):
-            meanydata2.append([])
-        for i in range(len(self.pops_bins)):
-            meanpopsbins.append([])
-            
-        for_checker = True
-            
-        for i in range(len(self.t)):
-            
-            if for_checker:
-                now = self.t[i].minute
-                minute_vals = []
-                
-            for_checker = False
-            
-            minute_vals.append(i)
-            
-            if self.t[i].minute != now:
-                
-                meant.append(self.t[minute_vals[math.ceil(len(minute_vals)/2)]])
-                meanpopst.append(self.popstime[minute_vals[math.ceil(len(minute_vals)/2)]])
-                if not isinstance(self.ydata,str):
-                    for j in range(len(self.ydata)):
-                        meanydata[j].append(np.mean([self.ydata[j][k] for k in minute_vals]))
-                for j in range(len(self.ydata2)):
-                    meanydata2[j].append(np.mean([self.ydata2[j][k] for k in minute_vals]))
-                for j in range(len(self.pops_bins)):
-                    meanpopsbins[j].append(np.mean([self.pops_bins[j][k] for k in minute_vals]))
-                    
-                for_checker = True
-                
-        self.t = meant
-        self.popstime = meanpopst
-        self.ydata = meanydata
-        self.ydata2 = meanydata2
-        self.pops_bins = meanpopsbins
+        Parameters
+        ----------
+        samplesize : int
+            The data will be desampled to chunks of this many seconds (e.g. 
+            `samplesize=60` means minutewise averaging)
+
+        Returns
+        -------
+        None.
+
+        """
+        
+        n1 = len(self.data["t"]) // samplesize
+        n2 = len(self.data["popstime"]) // samplesize
+        for key in self.data:
+            if key != "t" and key != "popstime":
+                if key in self.ydata:
+                    yy = self.data[key][:n1*samplesize].reshape(
+                        -1,
+                        samplesize
+                        ).mean(axis=1)
+                    self.data[key] = np.append(
+                        yy,
+                        np.mean(self.data[key][n1*samplesize:])
+                        )
+                else:
+                    yy = self.data[key][:n2*samplesize].reshape(
+                        -1,
+                        samplesize
+                        ).mean(axis=1)
+                    self.data[key] = np.append(
+                        yy,
+                        np.mean(self.data[key][n2*samplesize:])
+                        )
+            elif key == "t":
+                self.data[key] = np.append(
+                    self.data[key][:n1*samplesize:samplesize],
+                    self.data[key][n1*samplesize]
+                    ) + dt.timedelta(seconds=samplesize/2)
+            else:
+                self.data[key] = np.append(
+                    self.data[key][:n2*samplesize:samplesize],
+                    self.data[key][n2*samplesize]
+                    ) + dt.timedelta(seconds=samplesize/2)
         
         
     def returndata(self):
         """
-        Returns a tuple containing all data in a standardized form. Important for communication with DroneWrapper objs.
+        Returns a tuple containing all data in a standardized form. 
+        Important for communication with `DroneWrapper` or `Wrapper` objs.
 
         Returns
         -------
@@ -917,127 +951,74 @@ class Pops:
 
         """
         
-        y = {}
-        op_details = {}
-        for i in range(len(self.plottypes2)):
-            y[self.plottypes2[i][0]] = self.ydata2[i]
-            op_details[self.plottypes2[i][0]] = [self.plottypes2[i][1],
-                                                 self.plottypes2[i][2]]
-        for i in range(16):
-            y[f"b{i}"] = self.pops_bins[i]
-            op_details[f"b{i}"] = [f"Bin {i}",r"Counts/$cm^3$"]
-            
-        op_t = []
-        new_t = self.t[0].replace(microsecond=0)
-        while new_t < self.t[-1]:
-            op_t.append(new_t)
-            new_t += dt.timedelta(seconds=1)
-        op_t = np.array(op_t)
-        
-        mask = []
-        compare_t = [i.replace(microsecond=0) for i in self.t]
-        for i in op_t:
-            if i in compare_t:
-                mask.append(compare_t.index(i))
-            else:
-                mask.append(np.nan)
-                
-        op = {"t" : op_t}
-        for key,val in y.items():
-            y_op = np.array([val[i] if not np.isnan(i) else np.nan for i in mask])
-            op[key] = y_op
-            
-        return op,op_details
+        return self.data,self.details
         
         
     #housekeeping funcs    
     def _hk_kwargs(self,kwargs,key,default):
-        """Turns kwargs into attributes"""
+        """
+        @private
+        Housekeeping Func --> no usecase outside obj
+        
+        Turns kwargs into attributes
+        """
         
         op = kwargs[key] if key in kwargs else default
-        if isinstance(op,str):
-            if op =="null":
-                print("WARNING: Loaded file seems to have been produced either from another object than NewFData or another version of NewFData. Some functions may not be available.")
         setattr(self, key, op)
         
         
     def _hk_func_kwargs(self,kwargs,key,default):
-        """Gives kwargs a default value if they are not passed"""
+        """
+        @private
+        Housekeeping func --> no usecase outside obj
+        
+        Gives kwargs a default value if they are not passed
+        """
         
         op = kwargs[key] if key in kwargs else default
         return op
     
     
     def _hk_errorhandling(self,kwargs,legallist,funcname):
-        """Checks if all passed kwargs are legal"""
+        """
+        @private
+        Housekeeping func --> no usecase outside obj
+        
+        Checks if all passed kwargs are legal
+        """
         
         for key in kwargs:
             if key not in legallist:
                 raise IllegalArgument(key,funcname,legallist)
+
+ 
+    def _hk_returncropmask(self,cropby,start,end):
+        """
+        @private
+        Housekeeping Func --> no usecase outside obj 
         
+        Helps with cropping data to a timewindow
+        """
         
-    def _hk_findplottype(self,y):
-        """Finds plotdata for a given y"""
-        
-        #find correct plottype
-        for i in range(len(self.plottypes)):
-            if self.plottypes[i][0] == y:
-                if isinstance(self.ydata,str):
-                    raise SensorNotMounted(y, "POPS")
-                plotx = self.t
-                ploty = self.ydata[i]
-                label = self.plottypes[i][1]
-                ylabel = self.plottypes[i][2] if not self.relative else "% of background"
-                if self.deviated:
-                    ylabel = "%  deviation from mean"
-                
-                return plotx,ploty,label,ylabel
+        y = cropby[0].year
+        m = cropby[0].month
+        d = cropby[0].day
+        if start != "none":
+            start = dt.datetime.strptime(
+                f"{y}.{m}.{d}-{start}",
+                "%Y.%m.%d-%H:%M:%S"
+                )
+        else:
+            start = dt.datetime(1199,1,1,11,11,11)
+        if end != "none":
+            end = dt.datetime.strptime(
+                f"{y}.{m}.{d}-{end}",
+                "%Y.%m.%d-%H:%M:%S"
+                )
+        else:
+            end = dt.datetime(2999,1,1,11,11,11)
             
-        
-        
-        for i in range(len(self.plottypes2)):
-            if y == self.plottypes2[i][0]:
-                plotx = self.t
-                ploty = self.ydata2[i]
-                label = self.plottypes2[i][1]
-                ylabel = self.plottypes2[i][2] if not self.relative else "% of background"
-                if self.deviated:
-                    ylabel = "%  deviation from mean"
-            
-                return plotx,ploty,label,ylabel
-            
-        for i in range(16):
-            if "".join([char for char in y if char.isdigit()]) == str(i):
-                plotx = self.t
-                ploty = self.pops_bins[i]
-                label = "b" + str(i)
-                ylabel = r"Counts/$cm^3$" if not self.relative else "% of background"
-                if self.deviated:
-                    ylabel = "%  deviation from mean"
-                
-                return plotx,ploty,label,ylabel
-            
-        output = "Unknown y: y must be one of the following strings: " + "".join([self.plottypes[i][0]+", " for i in range(len(self.plottypes))])
-        output += "".join([self.plottypes2[i][0]+", " for i in range(len(self.plottypes2))])
-        output += "".join(["b"+str(i)+", " for i in range(15)])
-        output += "b15"
-        
-        raise ValueError(output)
-        
-        
-    def _hk_replacezeros(self,data):
-        """replaces zeros for a logarithmic scale"""
-        
-        smallest = 10000
-        for element in data:
-            for i in range(len(element)):
-                if element[i] < smallest and element[i] > 0:
-                    smallest = element[i]
-        for element in data:
-            for i in range(len(element)):
-                if element[i] <= 0:
-                    element[i] = np.nan
-        return data
+        return np.array([start<=i<=end for i in cropby])
  
 
 

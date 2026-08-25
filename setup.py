@@ -5,7 +5,7 @@ with open("docu/pypi_descr.md","r") as f:
 
 setup(
     name = "agg_dim",
-    version = "0.2.4",
+    version = "0.2.5",
     description="Data import modules for instruments used by AG Grothe",
     packages = find_packages(),
     long_description = long_description,
