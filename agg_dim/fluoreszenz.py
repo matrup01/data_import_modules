@@ -298,7 +298,7 @@ class FData:
         
         xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
         heatmap_data = deepcopy(self.channels)
-        heatmap_data = self.hk_replacezeros(heatmap_data)
+        heatmap_data = self._hk_replacezeros(heatmap_data)
         
         _,ax = plt.subplots()
         
@@ -358,7 +358,7 @@ class FData:
         #prepare data
         xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
         heatmap_data = deepcopy(self.channels)
-        heatmap_data = self.hk_replacezeros(heatmap_data)
+        heatmap_data = self._hk_replacezeros(heatmap_data)
         if isinstance(xlims,list):
             ax.set_xlim([dt.datetime.strptime(element, "%H:%M:%S") for element in xlims])
         
@@ -382,7 +382,7 @@ class FData:
         
         
     #housekeeping funcs
-    def hk_replacezeros(self,arr):
+    def _hk_replacezeros(self,arr):
         """replaces zeros for a logarithmic scale"""
 
         array = deepcopy(arr)
@@ -477,8 +477,8 @@ class NewFData:
                         "bg_end" : "*",
                         "layout" : [3,18]}
             for key,value in zip(defaults.keys(),defaults.values()):
-                self.hk_kwargs(kwargs, key, value)
-            self.hk_errorhandling(kwargs, defaults.keys(), "NewFData")
+                self._hk_kwargs(kwargs, key, value)
+            self._hk_errorhandling(kwargs, defaults.keys(), "NewFData")
             
             #error handling
             for key in kwargs:
@@ -623,7 +623,7 @@ class NewFData:
                     [[float(0) for j in range(len(numba_t))] 
                      for i in range(len(numba_rc))]
                     )
-                self.channels = self.hk_process_data(numba_t,
+                self.channels = self._hk_process_data(numba_t,
                                                      numba_rc,
                                                      numba_bg,
                                                      numba_rt,
@@ -664,16 +664,16 @@ class NewFData:
             with open(file,"rb") as openfile:
                 ip = pickle.load(openfile)
             
-            self.hk_kwargs(ip,"sigma",1)
-            self.hk_kwargs(ip,"measurement_frequency", 100)
-            self.hk_kwargs(ip,"bg", "null")
-            self.hk_kwargs(ip,"rawtime", "null")
-            self.hk_kwargs(ip,"rawchannels", "null")
-            self.hk_kwargs(ip,"t", "null")
-            self.hk_kwargs(ip,"channels","null")
+            self._hk_kwargs(ip,"sigma",1)
+            self._hk_kwargs(ip,"measurement_frequency", 100)
+            self._hk_kwargs(ip,"bg", "null")
+            self._hk_kwargs(ip,"rawtime", "null")
+            self._hk_kwargs(ip,"rawchannels", "null")
+            self._hk_kwargs(ip,"t", "null")
+            self._hk_kwargs(ip,"channels","null")
             
-            self.hk_kwargs(kwargs, "start", "none")
-            self.hk_kwargs(kwargs, "end", "none")
+            self._hk_kwargs(kwargs, "start", "none")
+            self._hk_kwargs(kwargs, "end", "none")
             
             #crop
             t_start = 0
@@ -726,8 +726,8 @@ class NewFData:
         defaults = {"start" : "none",
                     "end" : "none"}
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), "NewFData.save()")
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "NewFData.save()")
 
         
         #crop
@@ -836,7 +836,7 @@ class NewFData:
         
         xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
         heatmap_data = deepcopy(self.channels)
-        heatmap_data = self.hk_replacezeros(heatmap_data)
+        heatmap_data = self._hk_replacezeros(heatmap_data)
         
         _,ax = plt.subplots()
         
@@ -897,8 +897,8 @@ class NewFData:
                     "quakecolor" : "tab:purple",
                     "color" : "tab:green"}
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), "NewFData.plot()")
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "NewFData.plot()")
         
         
         channelname = "ch" + str(channelno)
@@ -972,8 +972,8 @@ class NewFData:
                     "color" : "tab:green",
                     "rolling" : 0}
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), "NewFData.meanplot()")
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "NewFData.meanplot()")
         
         kwargs["min_ch"] -= 1
         #ch_len = len(list(range(kwargs["min_ch"],kwargs["max_ch"])))
@@ -1042,13 +1042,13 @@ class NewFData:
                    "togglecbar" : True,
                    "xlims" : "none"}
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), "NewFData.heatmap()")
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "NewFData.heatmap()")
         
         #prepare data
         xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
         heatmap_data = deepcopy(self.channels)
-        heatmap_data = self.hk_replacezeros(heatmap_data)
+        heatmap_data = self._hk_replacezeros(heatmap_data)
         if isinstance(kwargs["xlims"],list):
             ax.set_xlim([dt.datetime.strptime(element, "%H:%M:%S") 
                          for element in kwargs["xlims"]])
@@ -1149,7 +1149,7 @@ class NewFData:
         
         
     #housekeeping funcs    
-    def hk_kwargs(self,kwargs,key,default):
+    def _hk_kwargs(self,kwargs,key,default):
         """Turns kwargs into attributes"""
 
         op = kwargs[key] if key in kwargs else default
@@ -1159,14 +1159,14 @@ class NewFData:
         setattr(self,key,op)
         
         
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         """Gives kwargs a default value if they are not passed"""
 
         op = kwargs[key] if key in kwargs else default
         return op
         
         
-    def hk_replacezeros(self,arr):
+    def _hk_replacezeros(self,arr):
         """replaces zeros for a logarithmic scale"""
 
         array = deepcopy(arr)
@@ -1184,7 +1184,7 @@ class NewFData:
         return array
     
     
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         """Checks if all passed kwargs are legal"""
 
         for key in kwargs:
@@ -1194,7 +1194,7 @@ class NewFData:
     
     @staticmethod
     @njit(float64[:,:](float64[:],float64[:,:],float64[:],float64[:],float64[:,:]))
-    def hk_process_data(tt,rc,bg,rt,channels):
+    def _hk_process_data(tt,rc,bg,rt,channels):
         """Numba compiled method to calculate fluorescence indices"""
 
         for t in prange(len(tt)):

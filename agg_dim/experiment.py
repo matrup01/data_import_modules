@@ -174,6 +174,10 @@ class Wrapper:
         return_arrs : bool, optional
             If True, the function will return the arrays for the x and the y
             axis. The default is `False`.
+        desample : int, optional
+            If a value greater 0 is passed the data will be desampled to chunks
+            of 'desample' seconds. E.g. a value of `desample=60` will give a
+            value for every minute.
 
         Returns
         -------
@@ -193,11 +197,12 @@ class Wrapper:
             "scatter": True,
             "color" : "tab:blue",
             "pearson" : True,
-            "return_arrs" : False
+            "return_arrs" : False,
+            "desample" : 0
             }
         for key,default in defaults.items():
-            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-        self.hk_errorhandling(kwargs, defaults.keys(), "Wrapper.plot()")
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "Wrapper.plot()")
         
         x_val,x_instrument = x.split("@")
         y_val,y_instrument = y.split("@")
@@ -221,16 +226,16 @@ class Wrapper:
                            + loaded)
             
         # crop
-        kwargs["start"],kwargs["end"] = self.hk_checktime(
+        kwargs["start"],kwargs["end"] = self._hk_checktime(
             x_instrument, 
             y_instrument, 
             kwargs["start"], 
             kwargs["end"])
         if isinstance(kwargs["start"],str) or isinstance(kwargs["end"],str):
-            xm = self.hk_timemask(x_instrument, 
+            xm = self._hk_timemask(x_instrument, 
                                   kwargs["start"], 
                                   kwargs["end"])
-            ym = self.hk_timemask(y_instrument,
+            ym = self._hk_timemask(y_instrument,
                                   kwargs["start"],
                                   kwargs["end"])
         else:
@@ -251,6 +256,20 @@ class Wrapper:
             
             xx = xdata[xm]
             yy = ydata[ym]
+         
+        if kwargs["desample"] > 0:
+            des = kwargs["desample"]
+            n = len(xx) // des
+            y1 = yy[:n*des].reshape(-1,des).mean(axis=1)
+            yy = np.append(y1,np.mean(yy[n*des:]))
+            if x_val != "t":
+                x1 = xx[:n*des].reshape(-1,des).mean(axis=1)
+                xx = np.append(x1,np.mean(xx[n*des:]))
+            else:
+                xx = np.append(
+                    xx[:n*des:des],xx[n*des]
+                    ) + dt.timedelta(seconds=des/2)
+            
             
         # plot
         if kwargs["scatter"]:
@@ -381,8 +400,8 @@ class Wrapper:
             "inverted" : False
             }
         for key,default in defaults.items():
-            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-        self.hk_errorhandling(kwargs, defaults.keys(), "Wrapper.windrose()")
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "Wrapper.windrose()")
         
         #check ax and y
         if ax.name != "polar":
@@ -402,16 +421,16 @@ class Wrapper:
             raise ValueError(f"{y} is no legal y. Try one of {legalstr}")
 
         #crop
-        kwargs["start"],kwargs["end"] = self.hk_checktime(
+        kwargs["start"],kwargs["end"] = self._hk_checktime(
             kwargs["weatherdata"], 
             y_instrument, 
             kwargs["start"], 
             kwargs["end"])
         if isinstance(kwargs["start"],str) or isinstance(kwargs["end"],str):
-            wind_m = self.hk_timemask(kwargs["weatherdata"], 
+            wind_m = self._hk_timemask(kwargs["weatherdata"], 
                                       kwargs["start"],
                                       kwargs["end"])
-            y_m = self.hk_timemask(y_instrument, 
+            y_m = self._hk_timemask(y_instrument, 
                                    kwargs["start"], 
                                    kwargs["end"])
         else:
@@ -531,7 +550,7 @@ class Wrapper:
             
     ## Housekeeping Funcs
     
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         """
         Housekeeping Func --> Should not be used outside the object
         
@@ -541,7 +560,7 @@ class Wrapper:
         op = kwargs[key] if key in kwargs else default
         return op
     
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         """
         Housekeeping Func --> Should not be used outside the object
         
@@ -552,7 +571,7 @@ class Wrapper:
             if key not in legallist:
                 raise IllegalArgument(key,funcname,legallist)
                 
-    def hk_checktime(self,x_instrument,y_instrument,start_str,end_str):
+    def _hk_checktime(self,x_instrument,y_instrument,start_str,end_str):
         """
         Housekeeping Func --> Should not be used outside the object
         
@@ -602,7 +621,7 @@ class Wrapper:
         return start.strftime("%H:%M:%S"),end.strftime("%H:%M:%S")
                 
                 
-    def hk_timemask(self,y,start_str,end_str):
+    def _hk_timemask(self,y,start_str,end_str):
         """
         Housekeeping Func --> Should not be used outside the object
         

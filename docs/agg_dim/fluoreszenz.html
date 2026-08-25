@@ -340,7 +340,7 @@ FSPEC analysis.</p>
         
         xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
         heatmap_data = deepcopy(self.channels)
-        heatmap_data = self.hk_replacezeros(heatmap_data)
+        heatmap_data = self._hk_replacezeros(heatmap_data)
         
         _,ax = plt.subplots()
         
@@ -400,7 +400,7 @@ FSPEC analysis.</p>
         #prepare data
         xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
         heatmap_data = deepcopy(self.channels)
-        heatmap_data = self.hk_replacezeros(heatmap_data)
+        heatmap_data = self._hk_replacezeros(heatmap_data)
         if isinstance(xlims,list):
             ax.set_xlim([dt.datetime.strptime(element, &#34;%H:%M:%S&#34;) for element in xlims])
         
@@ -424,7 +424,7 @@ FSPEC analysis.</p>
         
         
     #housekeeping funcs
-    def hk_replacezeros(self,arr):
+    def _hk_replacezeros(self,arr):
         &#34;&#34;&#34;replaces zeros for a logarithmic scale&#34;&#34;&#34;
 
         array = deepcopy(arr)
@@ -618,7 +618,7 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
     #prepare data
     xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
     heatmap_data = deepcopy(self.channels)
-    heatmap_data = self.hk_replacezeros(heatmap_data)
+    heatmap_data = self._hk_replacezeros(heatmap_data)
     if isinstance(xlims,list):
         ax.set_xlim([dt.datetime.strptime(element, &#34;%H:%M:%S&#34;) for element in xlims])
     
@@ -657,33 +657,6 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
-</dd>
-<dt id="agg_dim.fluoreszenz.FData.hk_replacezeros"><code class="name flex">
-<span>def <span class="ident">hk_replacezeros</span></span>(<span>self, arr)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_replacezeros(self,arr):
-    &#34;&#34;&#34;replaces zeros for a logarithmic scale&#34;&#34;&#34;
-
-    array = deepcopy(arr)
-    
-    smallest = 10000
-    for row in array:
-        for element in row:
-            if element &lt; smallest and element &gt; 0:
-                smallest = element
-    for i in range(len(array)):
-        for j in range(len(array[i])):
-            if array[i][j] == 0:
-                array[i][j] += smallest
-                
-    return array</code></pre>
-</details>
-<div class="desc"><p>replaces zeros for a logarithmic scale</p></div>
 </dd>
 <dt id="agg_dim.fluoreszenz.FData.internalbg"><code class="name flex">
 <span>def <span class="ident">internalbg</span></span>(<span>self, startmeasurementtime, bgcrop=0)</span>
@@ -827,7 +800,7 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
     
     xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
     heatmap_data = deepcopy(self.channels)
-    heatmap_data = self.hk_replacezeros(heatmap_data)
+    heatmap_data = self._hk_replacezeros(heatmap_data)
     
     _,ax = plt.subplots()
     
@@ -992,8 +965,8 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
                         &#34;bg_end&#34; : &#34;*&#34;,
                         &#34;layout&#34; : [3,18]}
             for key,value in zip(defaults.keys(),defaults.values()):
-                self.hk_kwargs(kwargs, key, value)
-            self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData&#34;)
+                self._hk_kwargs(kwargs, key, value)
+            self._hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData&#34;)
             
             #error handling
             for key in kwargs:
@@ -1138,7 +1111,7 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
                     [[float(0) for j in range(len(numba_t))] 
                      for i in range(len(numba_rc))]
                     )
-                self.channels = self.hk_process_data(numba_t,
+                self.channels = self._hk_process_data(numba_t,
                                                      numba_rc,
                                                      numba_bg,
                                                      numba_rt,
@@ -1179,16 +1152,16 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
             with open(file,&#34;rb&#34;) as openfile:
                 ip = pickle.load(openfile)
             
-            self.hk_kwargs(ip,&#34;sigma&#34;,1)
-            self.hk_kwargs(ip,&#34;measurement_frequency&#34;, 100)
-            self.hk_kwargs(ip,&#34;bg&#34;, &#34;null&#34;)
-            self.hk_kwargs(ip,&#34;rawtime&#34;, &#34;null&#34;)
-            self.hk_kwargs(ip,&#34;rawchannels&#34;, &#34;null&#34;)
-            self.hk_kwargs(ip,&#34;t&#34;, &#34;null&#34;)
-            self.hk_kwargs(ip,&#34;channels&#34;,&#34;null&#34;)
+            self._hk_kwargs(ip,&#34;sigma&#34;,1)
+            self._hk_kwargs(ip,&#34;measurement_frequency&#34;, 100)
+            self._hk_kwargs(ip,&#34;bg&#34;, &#34;null&#34;)
+            self._hk_kwargs(ip,&#34;rawtime&#34;, &#34;null&#34;)
+            self._hk_kwargs(ip,&#34;rawchannels&#34;, &#34;null&#34;)
+            self._hk_kwargs(ip,&#34;t&#34;, &#34;null&#34;)
+            self._hk_kwargs(ip,&#34;channels&#34;,&#34;null&#34;)
             
-            self.hk_kwargs(kwargs, &#34;start&#34;, &#34;none&#34;)
-            self.hk_kwargs(kwargs, &#34;end&#34;, &#34;none&#34;)
+            self._hk_kwargs(kwargs, &#34;start&#34;, &#34;none&#34;)
+            self._hk_kwargs(kwargs, &#34;end&#34;, &#34;none&#34;)
             
             #crop
             t_start = 0
@@ -1241,8 +1214,8 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
         defaults = {&#34;start&#34; : &#34;none&#34;,
                     &#34;end&#34; : &#34;none&#34;}
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.save()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.save()&#34;)
 
         
         #crop
@@ -1351,7 +1324,7 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
         
         xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
         heatmap_data = deepcopy(self.channels)
-        heatmap_data = self.hk_replacezeros(heatmap_data)
+        heatmap_data = self._hk_replacezeros(heatmap_data)
         
         _,ax = plt.subplots()
         
@@ -1412,8 +1385,8 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
                     &#34;quakecolor&#34; : &#34;tab:purple&#34;,
                     &#34;color&#34; : &#34;tab:green&#34;}
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.plot()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.plot()&#34;)
         
         
         channelname = &#34;ch&#34; + str(channelno)
@@ -1487,8 +1460,8 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
                     &#34;color&#34; : &#34;tab:green&#34;,
                     &#34;rolling&#34; : 0}
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.meanplot()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.meanplot()&#34;)
         
         kwargs[&#34;min_ch&#34;] -= 1
         #ch_len = len(list(range(kwargs[&#34;min_ch&#34;],kwargs[&#34;max_ch&#34;])))
@@ -1557,13 +1530,13 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
                    &#34;togglecbar&#34; : True,
                    &#34;xlims&#34; : &#34;none&#34;}
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.heatmap()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.heatmap()&#34;)
         
         #prepare data
         xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
         heatmap_data = deepcopy(self.channels)
-        heatmap_data = self.hk_replacezeros(heatmap_data)
+        heatmap_data = self._hk_replacezeros(heatmap_data)
         if isinstance(kwargs[&#34;xlims&#34;],list):
             ax.set_xlim([dt.datetime.strptime(element, &#34;%H:%M:%S&#34;) 
                          for element in kwargs[&#34;xlims&#34;]])
@@ -1664,7 +1637,7 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
         
         
     #housekeeping funcs    
-    def hk_kwargs(self,kwargs,key,default):
+    def _hk_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
 
         op = kwargs[key] if key in kwargs else default
@@ -1674,14 +1647,14 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
         setattr(self,key,op)
         
         
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
 
         op = kwargs[key] if key in kwargs else default
         return op
         
         
-    def hk_replacezeros(self,arr):
+    def _hk_replacezeros(self,arr):
         &#34;&#34;&#34;replaces zeros for a logarithmic scale&#34;&#34;&#34;
 
         array = deepcopy(arr)
@@ -1699,7 +1672,7 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
         return array
     
     
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
 
         for key in kwargs:
@@ -1709,7 +1682,7 @@ Crops the data by startcrop datapoints at the start and endrop datapoints at the
     
     @staticmethod
     @njit(float64[:,:](float64[:],float64[:,:],float64[:],float64[:],float64[:,:]))
-    def hk_process_data(tt,rc,bg,rt,channels):
+    def _hk_process_data(tt,rc,bg,rt,channels):
         &#34;&#34;&#34;Numba compiled method to calculate fluorescence indices&#34;&#34;&#34;
 
         for t in prange(len(tt)):
@@ -1775,32 +1748,6 @@ recorded datasets</dd>
 <dt><strong><code>channels</code></strong> :&ensp;<code>2D np.array</code> of <code>float</code></dt>
 <dd>Contains the porcessed fluorescence index values of each channel</dd>
 </dl></div>
-<h3>Static methods</h3>
-<dl>
-<dt id="agg_dim.fluoreszenz.NewFData.hk_process_data"><code class="name flex">
-<span>def <span class="ident">hk_process_data</span></span>(<span>tt, rc, bg, rt, channels)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@staticmethod
-@njit(float64[:,:](float64[:],float64[:,:],float64[:],float64[:],float64[:,:]))
-def hk_process_data(tt,rc,bg,rt,channels):
-    &#34;&#34;&#34;Numba compiled method to calculate fluorescence indices&#34;&#34;&#34;
-
-    for t in prange(len(tt)):
-        for channel in prange(len(rc)):
-            for val in prange(len(rc[channel])):
-                if rc[channel][val] &gt; bg[channel] and rt[val] == tt[t]:
-                    channels[channel][t] += 1
-         
-    return channels</code></pre>
-</details>
-<div class="desc"><p>Numba compiled method to calculate fluorescence indices</p></div>
-</dd>
-</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="agg_dim.fluoreszenz.NewFData.append"><code class="name flex">
@@ -1898,13 +1845,13 @@ significantly increase file size.</dd>
                &#34;togglecbar&#34; : True,
                &#34;xlims&#34; : &#34;none&#34;}
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.heatmap()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.heatmap()&#34;)
     
     #prepare data
     xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
     heatmap_data = deepcopy(self.channels)
-    heatmap_data = self.hk_replacezeros(heatmap_data)
+    heatmap_data = self._hk_replacezeros(heatmap_data)
     if isinstance(kwargs[&#34;xlims&#34;],list):
         ax.set_xlim([dt.datetime.strptime(element, &#34;%H:%M:%S&#34;) 
                      for element in kwargs[&#34;xlims&#34;]])
@@ -1961,85 +1908,6 @@ only data between the two timestamps is used.</dd>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
 </dd>
-<dt id="agg_dim.fluoreszenz.NewFData.hk_errorhandling"><code class="name flex">
-<span>def <span class="ident">hk_errorhandling</span></span>(<span>self, kwargs, legallist, funcname)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
-    &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
-
-    for key in kwargs:
-        if key not in legallist:
-            raise IllegalArgument(key,funcname,legallist)</code></pre>
-</details>
-<div class="desc"><p>Checks if all passed kwargs are legal</p></div>
-</dd>
-<dt id="agg_dim.fluoreszenz.NewFData.hk_func_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
-
-    op = kwargs[key] if key in kwargs else default
-    return op</code></pre>
-</details>
-<div class="desc"><p>Gives kwargs a default value if they are not passed</p></div>
-</dd>
-<dt id="agg_dim.fluoreszenz.NewFData.hk_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
-
-    op = kwargs[key] if key in kwargs else default
-    if type(op) == str:
-        if op ==&#34;null&#34;:
-            print(&#34;WARNING: Loaded file seems to have been produced either from another object than NewFData or another version of NewFData. Some functions may not be available.&#34;)
-    setattr(self,key,op)</code></pre>
-</details>
-<div class="desc"><p>Turns kwargs into attributes</p></div>
-</dd>
-<dt id="agg_dim.fluoreszenz.NewFData.hk_replacezeros"><code class="name flex">
-<span>def <span class="ident">hk_replacezeros</span></span>(<span>self, arr)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_replacezeros(self,arr):
-    &#34;&#34;&#34;replaces zeros for a logarithmic scale&#34;&#34;&#34;
-
-    array = deepcopy(arr)
-    
-    smallest = 10000
-    for row in array:
-        for element in row:
-            if element &lt; smallest and element &gt; 0:
-                smallest = element
-    for i in range(len(array)):
-        for j in range(len(array[i])):
-            if array[i][j] == 0:
-                array[i][j] += smallest
-                
-    return array</code></pre>
-</details>
-<div class="desc"><p>replaces zeros for a logarithmic scale</p></div>
-</dd>
 <dt id="agg_dim.fluoreszenz.NewFData.meanplot"><code class="name flex">
 <span>def <span class="ident">meanplot</span></span>(<span>self, ax, **kwargs)</span>
 </code></dt>
@@ -2093,8 +1961,8 @@ only data between the two timestamps is used.</dd>
                 &#34;color&#34; : &#34;tab:green&#34;,
                 &#34;rolling&#34; : 0}
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.meanplot()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.meanplot()&#34;)
     
     kwargs[&#34;min_ch&#34;] -= 1
     #ch_len = len(list(range(kwargs[&#34;min_ch&#34;],kwargs[&#34;max_ch&#34;])))
@@ -2200,8 +2068,8 @@ values is plotted. The default is 0.</dd>
                 &#34;quakecolor&#34; : &#34;tab:purple&#34;,
                 &#34;color&#34; : &#34;tab:green&#34;}
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.plot()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.plot()&#34;)
     
     
     channelname = &#34;ch&#34; + str(channelno)
@@ -2271,7 +2139,7 @@ is "tab:purple"</dd>
     
     xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
     heatmap_data = deepcopy(self.channels)
-    heatmap_data = self.hk_replacezeros(heatmap_data)
+    heatmap_data = self._hk_replacezeros(heatmap_data)
     
     _,ax = plt.subplots()
     
@@ -2432,8 +2300,8 @@ saved in op.</dd>
     defaults = {&#34;start&#34; : &#34;none&#34;,
                 &#34;end&#34; : &#34;none&#34;}
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.save()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;NewFData.save()&#34;)
 
     
     #crop
@@ -2536,7 +2404,6 @@ it wont be saved.</dd>
 <li><code><a title="agg_dim.fluoreszenz.FData.crop" href="#agg_dim.fluoreszenz.FData.crop">crop</a></code></li>
 <li><code><a title="agg_dim.fluoreszenz.FData.externalbg" href="#agg_dim.fluoreszenz.FData.externalbg">externalbg</a></code></li>
 <li><code><a title="agg_dim.fluoreszenz.FData.heatmap" href="#agg_dim.fluoreszenz.FData.heatmap">heatmap</a></code></li>
-<li><code><a title="agg_dim.fluoreszenz.FData.hk_replacezeros" href="#agg_dim.fluoreszenz.FData.hk_replacezeros">hk_replacezeros</a></code></li>
 <li><code><a title="agg_dim.fluoreszenz.FData.internalbg" href="#agg_dim.fluoreszenz.FData.internalbg">internalbg</a></code></li>
 <li><code><a title="agg_dim.fluoreszenz.FData.plot" href="#agg_dim.fluoreszenz.FData.plot">plot</a></code></li>
 <li><code><a title="agg_dim.fluoreszenz.FData.quickheatmap" href="#agg_dim.fluoreszenz.FData.quickheatmap">quickheatmap</a></code></li>
@@ -2548,11 +2415,6 @@ it wont be saved.</dd>
 <ul class="two-column">
 <li><code><a title="agg_dim.fluoreszenz.NewFData.append" href="#agg_dim.fluoreszenz.NewFData.append">append</a></code></li>
 <li><code><a title="agg_dim.fluoreszenz.NewFData.heatmap" href="#agg_dim.fluoreszenz.NewFData.heatmap">heatmap</a></code></li>
-<li><code><a title="agg_dim.fluoreszenz.NewFData.hk_errorhandling" href="#agg_dim.fluoreszenz.NewFData.hk_errorhandling">hk_errorhandling</a></code></li>
-<li><code><a title="agg_dim.fluoreszenz.NewFData.hk_func_kwargs" href="#agg_dim.fluoreszenz.NewFData.hk_func_kwargs">hk_func_kwargs</a></code></li>
-<li><code><a title="agg_dim.fluoreszenz.NewFData.hk_kwargs" href="#agg_dim.fluoreszenz.NewFData.hk_kwargs">hk_kwargs</a></code></li>
-<li><code><a title="agg_dim.fluoreszenz.NewFData.hk_process_data" href="#agg_dim.fluoreszenz.NewFData.hk_process_data">hk_process_data</a></code></li>
-<li><code><a title="agg_dim.fluoreszenz.NewFData.hk_replacezeros" href="#agg_dim.fluoreszenz.NewFData.hk_replacezeros">hk_replacezeros</a></code></li>
 <li><code><a title="agg_dim.fluoreszenz.NewFData.meanplot" href="#agg_dim.fluoreszenz.NewFData.meanplot">meanplot</a></code></li>
 <li><code><a title="agg_dim.fluoreszenz.NewFData.plot" href="#agg_dim.fluoreszenz.NewFData.plot">plot</a></code></li>
 <li><code><a title="agg_dim.fluoreszenz.NewFData.quickheatmap" href="#agg_dim.fluoreszenz.NewFData.quickheatmap">quickheatmap</a></code></li>

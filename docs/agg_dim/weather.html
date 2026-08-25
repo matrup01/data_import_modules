@@ -182,8 +182,8 @@ data produces by the weather station.</p>
             }
         
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;WeatherData.plot()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;WeatherData.plot()&#34;)
         
         mask = np.full(len(self.data[&#34;t&#34;]),True)
         if isinstance(kwargs[&#34;day&#34;],str):
@@ -284,14 +284,14 @@ data produces by the weather station.</p>
         
     #housekeeping funcs
     
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
 
         for key in kwargs:
             if key not in legallist:
                 raise IllegalArgument(key,funcname,legallist)
                 
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
  
         op = kwargs[key] if key in kwargs else default
@@ -312,39 +312,6 @@ data produces by the weather station.</p>
 </dl></div>
 <h3>Methods</h3>
 <dl>
-<dt id="agg_dim.weather.WeatherData.hk_errorhandling"><code class="name flex">
-<span>def <span class="ident">hk_errorhandling</span></span>(<span>self, kwargs, legallist, funcname)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
-    &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
-
-    for key in kwargs:
-        if key not in legallist:
-            raise IllegalArgument(key,funcname,legallist)</code></pre>
-</details>
-<div class="desc"><p>Checks if all passed kwargs are legal</p></div>
-</dd>
-<dt id="agg_dim.weather.WeatherData.hk_func_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
-
-    op = kwargs[key] if key in kwargs else default
-    return op</code></pre>
-</details>
-<div class="desc"><p>Gives kwargs a default value if they are not passed</p></div>
-</dd>
 <dt id="agg_dim.weather.WeatherData.plot"><code class="name flex">
 <span>def <span class="ident">plot</span></span>(<span>self, ax, y, **kwargs)</span>
 </code></dt>
@@ -406,8 +373,8 @@ data produces by the weather station.</p>
         }
     
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;WeatherData.plot()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;WeatherData.plot()&#34;)
     
     mask = np.full(len(self.data[&#34;t&#34;]),True)
     if isinstance(kwargs[&#34;day&#34;],str):
@@ -580,8 +547,6 @@ exported data.</dd>
 <li>
 <h4><code><a title="agg_dim.weather.WeatherData" href="#agg_dim.weather.WeatherData">WeatherData</a></code></h4>
 <ul class="">
-<li><code><a title="agg_dim.weather.WeatherData.hk_errorhandling" href="#agg_dim.weather.WeatherData.hk_errorhandling">hk_errorhandling</a></code></li>
-<li><code><a title="agg_dim.weather.WeatherData.hk_func_kwargs" href="#agg_dim.weather.WeatherData.hk_func_kwargs">hk_func_kwargs</a></code></li>
 <li><code><a title="agg_dim.weather.WeatherData.plot" href="#agg_dim.weather.WeatherData.plot">plot</a></code></li>
 <li><code><a title="agg_dim.weather.WeatherData.returndata" href="#agg_dim.weather.WeatherData.returndata">returndata</a></code></li>
 </ul>

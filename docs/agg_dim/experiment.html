@@ -262,6 +262,10 @@ file.</p>
         return_arrs : bool, optional
             If True, the function will return the arrays for the x and the y
             axis. The default is `False`.
+        desample : int, optional
+            If a value greater 0 is passed the data will be desampled to chunks
+            of &#39;desample&#39; seconds. E.g. a value of `desample=60` will give a
+            value for every minute.
 
         Returns
         -------
@@ -281,11 +285,12 @@ file.</p>
             &#34;scatter&#34;: True,
             &#34;color&#34; : &#34;tab:blue&#34;,
             &#34;pearson&#34; : True,
-            &#34;return_arrs&#34; : False
+            &#34;return_arrs&#34; : False,
+            &#34;desample&#34; : 0
             }
         for key,default in defaults.items():
-            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.plot()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.plot()&#34;)
         
         x_val,x_instrument = x.split(&#34;@&#34;)
         y_val,y_instrument = y.split(&#34;@&#34;)
@@ -309,16 +314,16 @@ file.</p>
                            + loaded)
             
         # crop
-        kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self.hk_checktime(
+        kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self._hk_checktime(
             x_instrument, 
             y_instrument, 
             kwargs[&#34;start&#34;], 
             kwargs[&#34;end&#34;])
         if isinstance(kwargs[&#34;start&#34;],str) or isinstance(kwargs[&#34;end&#34;],str):
-            xm = self.hk_timemask(x_instrument, 
+            xm = self._hk_timemask(x_instrument, 
                                   kwargs[&#34;start&#34;], 
                                   kwargs[&#34;end&#34;])
-            ym = self.hk_timemask(y_instrument,
+            ym = self._hk_timemask(y_instrument,
                                   kwargs[&#34;start&#34;],
                                   kwargs[&#34;end&#34;])
         else:
@@ -339,6 +344,20 @@ file.</p>
             
             xx = xdata[xm]
             yy = ydata[ym]
+         
+        if kwargs[&#34;desample&#34;] &gt; 0:
+            des = kwargs[&#34;desample&#34;]
+            n = len(xx) // des
+            y1 = yy[:n*des].reshape(-1,des).mean(axis=1)
+            yy = np.append(y1,np.mean(yy[n*des:]))
+            if x_val != &#34;t&#34;:
+                x1 = xx[:n*des].reshape(-1,des).mean(axis=1)
+                xx = np.append(x1,np.mean(xx[n*des:]))
+            else:
+                xx = np.append(
+                    xx[:n*des:des],xx[n*des]
+                    ) + dt.timedelta(seconds=des/2)
+            
             
         # plot
         if kwargs[&#34;scatter&#34;]:
@@ -469,8 +488,8 @@ file.</p>
             &#34;inverted&#34; : False
             }
         for key,default in defaults.items():
-            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.windrose()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.windrose()&#34;)
         
         #check ax and y
         if ax.name != &#34;polar&#34;:
@@ -490,16 +509,16 @@ file.</p>
             raise ValueError(f&#34;{y} is no legal y. Try one of {legalstr}&#34;)
 
         #crop
-        kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self.hk_checktime(
+        kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self._hk_checktime(
             kwargs[&#34;weatherdata&#34;], 
             y_instrument, 
             kwargs[&#34;start&#34;], 
             kwargs[&#34;end&#34;])
         if isinstance(kwargs[&#34;start&#34;],str) or isinstance(kwargs[&#34;end&#34;],str):
-            wind_m = self.hk_timemask(kwargs[&#34;weatherdata&#34;], 
+            wind_m = self._hk_timemask(kwargs[&#34;weatherdata&#34;], 
                                       kwargs[&#34;start&#34;],
                                       kwargs[&#34;end&#34;])
-            y_m = self.hk_timemask(y_instrument, 
+            y_m = self._hk_timemask(y_instrument, 
                                    kwargs[&#34;start&#34;], 
                                    kwargs[&#34;end&#34;])
         else:
@@ -619,7 +638,7 @@ file.</p>
             
     ## Housekeeping Funcs
     
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -629,7 +648,7 @@ file.</p>
         op = kwargs[key] if key in kwargs else default
         return op
     
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -640,7 +659,7 @@ file.</p>
             if key not in legallist:
                 raise IllegalArgument(key,funcname,legallist)
                 
-    def hk_checktime(self,x_instrument,y_instrument,start_str,end_str):
+    def _hk_checktime(self,x_instrument,y_instrument,start_str,end_str):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -690,7 +709,7 @@ file.</p>
         return start.strftime(&#34;%H:%M:%S&#34;),end.strftime(&#34;%H:%M:%S&#34;)
                 
                 
-    def hk_timemask(self,y,start_str,end_str):
+    def _hk_timemask(self,y,start_str,end_str):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -765,168 +784,6 @@ objects.</dd>
 </dl></div>
 <h3>Methods</h3>
 <dl>
-<dt id="agg_dim.experiment.Wrapper.hk_checktime"><code class="name flex">
-<span>def <span class="ident">hk_checktime</span></span>(<span>self, x_instrument, y_instrument, start_str, end_str)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_checktime(self,x_instrument,y_instrument,start_str,end_str):
-    &#34;&#34;&#34;
-    Housekeeping Func --&gt; Should not be used outside the object
-    
-    Checks if the given time window is outside one of the instruments
-    time windows and returns corrected start and end strings
-    &#34;&#34;&#34;
-    
-    x_t = self.data[x_instrument][&#34;t&#34;]
-    y_t = self.data[y_instrument][&#34;t&#34;]
-    
-    if start_str is not None:
-        start = dt.datetime.strptime(start_str, &#34;%H:%M:%S&#34;).replace(
-            year = x_t[0].year,
-            month = x_t[0].month,
-            day = x_t[0].day
-            )
-    else:
-        start = x_t[0]
-    if end_str is not None:
-        end = dt.datetime.strptime(end_str, &#34;%H:%M:%S&#34;).replace(
-            year = x_t[0].year,
-            month = x_t[0].month,
-            day = x_t[0].day
-            )
-    else:
-        end = x_t[-1]
-    if start &lt; x_t[0]:
-        start = x_t[0]
-    if end &gt; x_t[-1]:
-        end = x_t[-1]
-        
-    start = start.replace(
-        year = y_t[0].year,
-        month = y_t[0].month,
-        day = y_t[0].day
-        )
-    end = end.replace(
-        year = y_t[0].year,
-        month = y_t[0].month,
-        day = y_t[0].day
-        )
-    if start &lt; y_t[0]:
-        start = y_t[0]
-    if end &gt; y_t[-1]:
-        end = y_t[-1]
-    
-    return start.strftime(&#34;%H:%M:%S&#34;),end.strftime(&#34;%H:%M:%S&#34;)</code></pre>
-</details>
-<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
-<p>Checks if the given time window is outside one of the instruments
-time windows and returns corrected start and end strings</p></div>
-</dd>
-<dt id="agg_dim.experiment.Wrapper.hk_errorhandling"><code class="name flex">
-<span>def <span class="ident">hk_errorhandling</span></span>(<span>self, kwargs, legallist, funcname)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
-    &#34;&#34;&#34;
-    Housekeeping Func --&gt; Should not be used outside the object
-    
-    Checks if all passed kwargs are legal
-    &#34;&#34;&#34;
-
-    for key in kwargs:
-        if key not in legallist:
-            raise IllegalArgument(key,funcname,legallist)</code></pre>
-</details>
-<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
-<p>Checks if all passed kwargs are legal</p></div>
-</dd>
-<dt id="agg_dim.experiment.Wrapper.hk_func_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;
-    Housekeeping Func --&gt; Should not be used outside the object
-    
-    Gives kwargs a default value if they are not passed
-    &#34;&#34;&#34;
-
-    op = kwargs[key] if key in kwargs else default
-    return op</code></pre>
-</details>
-<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
-<p>Gives kwargs a default value if they are not passed</p></div>
-</dd>
-<dt id="agg_dim.experiment.Wrapper.hk_timemask"><code class="name flex">
-<span>def <span class="ident">hk_timemask</span></span>(<span>self, y, start_str, end_str)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_timemask(self,y,start_str,end_str):
-    &#34;&#34;&#34;
-    Housekeeping Func --&gt; Should not be used outside the object
-    
-    Returns a mask within start and end for an instrument y
-    &#34;&#34;&#34;
-    
-    try:
-        t = self.data[y][&#34;t&#34;]
-    except:
-        raise ValueError(f&#34;Instrument {y} is not loaded.&#34;)
-        
-    try:
-        if start_str is None:
-            start = t[0]
-        else:
-            start = dt.datetime.strptime(start_str,&#34;%H:%M:%S&#34;).replace(
-                year = t[0].year,
-                month = t[0].month,
-                day = t[0].day
-                )
-    except:
-        msg = f&#34;{start_str} is no legal format for the &#39;start&#39; &#34;
-        msg += &#34;kwarg. It needs to be &#39;HH:MM:SS&#39;.&#34;
-        raise ValueError(msg)
-    try:
-        if end_str is None:
-            end = t[-1]
-        else:
-            end = dt.datetime.strptime(end_str,&#34;%H:%M:%S&#34;).replace(
-                year = t[0].year,
-                month = t[0].month,
-                day = t[0].day
-                )
-    except:
-        msg = f&#34;{end_str} is no legal format for the &#39;end&#39; &#34;
-        msg += &#34;kwarg. It needs to be &#39;HH:MM:SS&#39;.&#34;
-        raise ValueError(msg)
-    
-    m = np.where(t&gt;=start,
-                 True,
-                 False)
-    m = np.where(t&lt;=end,
-                 m,
-                 False)
-    return m</code></pre>
-</details>
-<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
-<p>Returns a mask within start and end for an instrument y</p></div>
-</dd>
 <dt id="agg_dim.experiment.Wrapper.plot"><code class="name flex">
 <span>def <span class="ident">plot</span></span>(<span>self, ax, x, y, **kwargs)</span>
 </code></dt>
@@ -969,6 +826,10 @@ time windows and returns corrected start and end strings</p></div>
     return_arrs : bool, optional
         If True, the function will return the arrays for the x and the y
         axis. The default is `False`.
+    desample : int, optional
+        If a value greater 0 is passed the data will be desampled to chunks
+        of &#39;desample&#39; seconds. E.g. a value of `desample=60` will give a
+        value for every minute.
 
     Returns
     -------
@@ -988,11 +849,12 @@ time windows and returns corrected start and end strings</p></div>
         &#34;scatter&#34;: True,
         &#34;color&#34; : &#34;tab:blue&#34;,
         &#34;pearson&#34; : True,
-        &#34;return_arrs&#34; : False
+        &#34;return_arrs&#34; : False,
+        &#34;desample&#34; : 0
         }
     for key,default in defaults.items():
-        kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.plot()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.plot()&#34;)
     
     x_val,x_instrument = x.split(&#34;@&#34;)
     y_val,y_instrument = y.split(&#34;@&#34;)
@@ -1016,16 +878,16 @@ time windows and returns corrected start and end strings</p></div>
                        + loaded)
         
     # crop
-    kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self.hk_checktime(
+    kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self._hk_checktime(
         x_instrument, 
         y_instrument, 
         kwargs[&#34;start&#34;], 
         kwargs[&#34;end&#34;])
     if isinstance(kwargs[&#34;start&#34;],str) or isinstance(kwargs[&#34;end&#34;],str):
-        xm = self.hk_timemask(x_instrument, 
+        xm = self._hk_timemask(x_instrument, 
                               kwargs[&#34;start&#34;], 
                               kwargs[&#34;end&#34;])
-        ym = self.hk_timemask(y_instrument,
+        ym = self._hk_timemask(y_instrument,
                               kwargs[&#34;start&#34;],
                               kwargs[&#34;end&#34;])
     else:
@@ -1046,6 +908,20 @@ time windows and returns corrected start and end strings</p></div>
         
         xx = xdata[xm]
         yy = ydata[ym]
+     
+    if kwargs[&#34;desample&#34;] &gt; 0:
+        des = kwargs[&#34;desample&#34;]
+        n = len(xx) // des
+        y1 = yy[:n*des].reshape(-1,des).mean(axis=1)
+        yy = np.append(y1,np.mean(yy[n*des:]))
+        if x_val != &#34;t&#34;:
+            x1 = xx[:n*des].reshape(-1,des).mean(axis=1)
+            xx = np.append(x1,np.mean(xx[n*des:]))
+        else:
+            xx = np.append(
+                xx[:n*des:des],xx[n*des]
+                ) + dt.timedelta(seconds=des/2)
+        
         
     # plot
     if kwargs[&#34;scatter&#34;]:
@@ -1105,6 +981,10 @@ The default is <code>True</code>.</dd>
 <dt><strong><code>return_arrs</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>If True, the function will return the arrays for the x and the y
 axis. The default is <code>False</code>.</dd>
+<dt><strong><code>desample</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>If a value greater 0 is passed the data will be desampled to chunks
+of 'desample' seconds. E.g. a value of <code>desample=60</code> will give a
+value for every minute.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -1225,8 +1105,8 @@ if the kwarg <code>return_arrs</code> is True.</dd>
         &#34;inverted&#34; : False
         }
     for key,default in defaults.items():
-        kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.windrose()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.windrose()&#34;)
     
     #check ax and y
     if ax.name != &#34;polar&#34;:
@@ -1246,16 +1126,16 @@ if the kwarg <code>return_arrs</code> is True.</dd>
         raise ValueError(f&#34;{y} is no legal y. Try one of {legalstr}&#34;)
 
     #crop
-    kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self.hk_checktime(
+    kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self._hk_checktime(
         kwargs[&#34;weatherdata&#34;], 
         y_instrument, 
         kwargs[&#34;start&#34;], 
         kwargs[&#34;end&#34;])
     if isinstance(kwargs[&#34;start&#34;],str) or isinstance(kwargs[&#34;end&#34;],str):
-        wind_m = self.hk_timemask(kwargs[&#34;weatherdata&#34;], 
+        wind_m = self._hk_timemask(kwargs[&#34;weatherdata&#34;], 
                                   kwargs[&#34;start&#34;],
                                   kwargs[&#34;end&#34;])
-        y_m = self.hk_timemask(y_instrument, 
+        y_m = self._hk_timemask(y_instrument, 
                                kwargs[&#34;start&#34;], 
                                kwargs[&#34;end&#34;])
     else:
@@ -1550,11 +1430,7 @@ It can be accessed via <code>exp.wibs</code> and its data can be accessed throug
 <ul>
 <li>
 <h4><code><a title="agg_dim.experiment.Wrapper" href="#agg_dim.experiment.Wrapper">Wrapper</a></code></h4>
-<ul class="two-column">
-<li><code><a title="agg_dim.experiment.Wrapper.hk_checktime" href="#agg_dim.experiment.Wrapper.hk_checktime">hk_checktime</a></code></li>
-<li><code><a title="agg_dim.experiment.Wrapper.hk_errorhandling" href="#agg_dim.experiment.Wrapper.hk_errorhandling">hk_errorhandling</a></code></li>
-<li><code><a title="agg_dim.experiment.Wrapper.hk_func_kwargs" href="#agg_dim.experiment.Wrapper.hk_func_kwargs">hk_func_kwargs</a></code></li>
-<li><code><a title="agg_dim.experiment.Wrapper.hk_timemask" href="#agg_dim.experiment.Wrapper.hk_timemask">hk_timemask</a></code></li>
+<ul class="">
 <li><code><a title="agg_dim.experiment.Wrapper.plot" href="#agg_dim.experiment.Wrapper.plot">plot</a></code></li>
 <li><code><a title="agg_dim.experiment.Wrapper.windrose" href="#agg_dim.experiment.Wrapper.windrose">windrose</a></code></li>
 <li><code><a title="agg_dim.experiment.Wrapper.wrap" href="#agg_dim.experiment.Wrapper.wrap">wrap</a></code></li>

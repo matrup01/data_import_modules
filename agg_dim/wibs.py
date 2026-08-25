@@ -5,7 +5,7 @@ This Submodule provides the `WIBS` obj that can be used to read in wibs data
 
 import math
 import pickle
-from datetime import datetime,timezone
+from datetime import datetime,timezone,timedelta
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
@@ -130,8 +130,8 @@ class WIBS:
                 "chunklen" : 600
                 }
             for key,value in defaults.items():
-                self.hk_kwargs(kwargs, key, value)
-            self.hk_errorhandling(kwargs, defaults.keys(), "WIBS")
+                self._hk_kwargs(kwargs, key, value)
+            self._hk_errorhandling(kwargs, defaults.keys(), "WIBS")
             
             #setup variables
             self.bins = len(self.bin_borders)-1
@@ -793,6 +793,10 @@ class WIBS:
             Changes the location of the colorbar. The default is 'top'.
         togglecbar : bool, optional
             If False, the colorbar wont be shown. The default is True.
+        desample : int, optional
+            If a value greater 0 is passed the data will be desampled to chunks
+            of 'desample' seconds. E.g. a value of `desample=60` will give a
+            value for every minute.
 
         Returns
         -------
@@ -804,10 +808,11 @@ class WIBS:
                     "pad" : 0,
                     "orientation" : "horizontal",
                     "location" : "top",
-                    "togglecbar" : True}
+                    "togglecbar" : True,
+                    "desample" : 0}
         for key,default in defaults.items():
-            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-        self.hk_errorhandling(kwargs, defaults.keys(), "WIBS.heatmap()")
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "WIBS.heatmap()")
         
         try:
             yy = np.array(
@@ -819,7 +824,15 @@ class WIBS:
             raise IllegalValue(y, 
                                "WIBS.heatmap()", 
                                ["allparticles","a","b","c",
-                                "ab","ac","bc","abc"]) from kerr
+                                "ab","ac","bc","abc","nonfluor"]) from kerr
+        
+        if kwargs["desample"] > 0:
+            des = kwargs["desample"]
+            n = len(yy[0]) // des
+            y1 = yy[:,:n*des].reshape(len(yy),-1,des).mean(axis=2)
+            app = np.array([[np.mean(yy[i,n*des:]) for i in range(len(yy))]]).T
+            yy = np.append(y1,app,axis=1)
+        
         
         xlims = [self.data["t"][0],self.data["t"][-1]]
         xlims = md.date2num(xlims)
@@ -871,6 +884,10 @@ class WIBS:
         secondary : bool, optional
             If True, the plot will draw the axis on the right-hand side. 
             Should be used if the given ax is a twinx(). The default is False.
+        desample : int, optional
+            If a value greater 0 is passed the data will be desampled to chunks
+            of 'desample' seconds. E.g. a value of `desample=60` will give a
+            value for every minute.
         
         Returns
         -------
@@ -880,16 +897,24 @@ class WIBS:
 
         defaults = {"label" : "no label",
                     "color" : "tab:purple",
-                    "secondary" : False}
+                    "secondary" : False,
+                    "desample" : 0}
         for key,default in defaults.items():
-            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-        self.hk_errorhandling(kwargs, defaults.keys(), "WIBS.plot()")
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "WIBS.plot()")
         
         xx = self.data["t"]
         try:
             yy = self.data[y]
         except KeyError as kerr:
             raise IllegalValue("y", "WIBS.plot()",list(self.data)) from kerr
+            
+        if kwargs["desample"] > 0:
+            des = kwargs["desample"]
+            n = len(yy) // des
+            y1 = yy[:n*des].reshape(-1,des).mean(axis=1)
+            yy = np.append(y1,np.mean(yy[n*des:]))
+            xx = np.append(xx[:n*des:des],xx[n*des]) + timedelta(seconds=des/2)
             
         if self.details[y][1] != "No Unit":
             ylabel = f"{self.details[y][0]} in {self.details[y][1]}"
@@ -966,8 +991,8 @@ class WIBS:
                     "legacy" : False,
                     "ylog" : False}
         for key,default in defaults.items():
-            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-        self.hk_errorhandling(kwargs, defaults.keys(), "WIBS.stackedplot()")
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "WIBS.stackedplot()")
         
         m = np.array([True for i in self.data["t"]])
         if isinstance(kwargs["start"],str):
@@ -1093,8 +1118,8 @@ class WIBS:
                     "particletype" : None}
         
         for key,default in defaults.items():
-            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-        self.hk_errorhandling(kwargs, defaults.keys(), "WIBS.dndlogp()")
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "WIBS.dndlogp()")
         
         xx = np.array(self.bin_means)
         m = np.array([True for t in self.data["t"]])
@@ -1252,7 +1277,7 @@ class WIBS:
     
     #housekeeping funcs
     
-    def hk_kwargs(self,kwargs,key,default):
+    def _hk_kwargs(self,kwargs,key,default):
         """
         Housekeeping Func --> Should not be used outside the object
         
@@ -1263,7 +1288,7 @@ class WIBS:
         setattr(self,key,op)
         
         
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         """
         Housekeeping Func --> Should not be used outside the object
         
@@ -1274,7 +1299,7 @@ class WIBS:
         return op
     
     
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         """
         Housekeeping Func --> Should not be used outside the object
         

@@ -31,6 +31,13 @@ opc.plot(ax,"totalpartconc")
 plt.show()
 ```
 
+## If something breaks
+If a new release breaks your code, first consult the [changelog](https://github.com/matrup01/data_import_modules/blob/dev/docu/change.log)
+on github and see if some of the changes might affect your code.
+
+If you dont find anything or think you found a bug either fix it and make a
+pull request (preferred), open an issue on github or tell me.
+
 ## How to contribute
 See https://github.com/matrup01/data_import_modules
 """

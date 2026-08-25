@@ -705,8 +705,8 @@ setup used in our systems (ccs811,bme680 and sen55).</p>
                     &#34;secondary&#34; : False
             }
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;FlyingFlo_USB.plot()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;FlyingFlo_USB.plot()&#34;)
         
         #get plotdata
         try:
@@ -825,12 +825,33 @@ setup used in our systems (ccs811,bme680 and sen55).</p>
             op_details[key] = [val[1],val[2]]
             
         return op,op_details
+    
+    def append(self,ffusb):
+        &#34;&#34;&#34;
+        Adds another `FlyingFlo_USB` obj to the current one.
+
+        Parameters
+        ----------
+        ffusb : FlyingFlo_USB
+            The data of ffusb will be appended to self.
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        
+        for key in self.y:
+            self.y[key][0] = np.append(
+                self.y[key][0],
+                ffusb.y[key][0]
+                )
+        self.t = np.append(self.t,ffusb.t)
         
         
         
     #Housekeeping funcs
     
-    def hk_kwargs(self,kwargs,key,default):
+    def _hk_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
         
         op = kwargs[key] if key in kwargs else default
@@ -840,14 +861,14 @@ setup used in our systems (ccs811,bme680 and sen55).</p>
         setattr(self, key, op)
         
         
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
 
         op = kwargs[key] if key in kwargs else default
         return op
     
     
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
 
         for key in kwargs:
@@ -883,6 +904,47 @@ setup used in our systems (ccs811,bme680 and sen55).</p>
 </dl></div>
 <h3>Methods</h3>
 <dl>
+<dt id="agg_dim.lowcostsensors.FlyingFlo_USB.append"><code class="name flex">
+<span>def <span class="ident">append</span></span>(<span>self, ffusb)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def append(self,ffusb):
+    &#34;&#34;&#34;
+    Adds another `FlyingFlo_USB` obj to the current one.
+
+    Parameters
+    ----------
+    ffusb : FlyingFlo_USB
+        The data of ffusb will be appended to self.
+
+    Returns
+    -------
+    None
+    &#34;&#34;&#34;
+    
+    for key in self.y:
+        self.y[key][0] = np.append(
+            self.y[key][0],
+            ffusb.y[key][0]
+            )
+    self.t = np.append(self.t,ffusb.t)</code></pre>
+</details>
+<div class="desc"><p>Adds another <code><a title="agg_dim.lowcostsensors.FlyingFlo_USB" href="#agg_dim.lowcostsensors.FlyingFlo_USB">FlyingFlo_USB</a></code> obj to the current one.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ffusb</code></strong> :&ensp;<code><a title="agg_dim.lowcostsensors.FlyingFlo_USB" href="#agg_dim.lowcostsensors.FlyingFlo_USB">FlyingFlo_USB</a></code></dt>
+<dd>The data of ffusb will be appended to self.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+</dd>
 <dt id="agg_dim.lowcostsensors.FlyingFlo_USB.average"><code class="name flex">
 <span>def <span class="ident">average</span></span>(<span>self)</span>
 </code></dt>
@@ -968,58 +1030,6 @@ setup used in our systems (ccs811,bme680 and sen55).</p>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
 </dd>
-<dt id="agg_dim.lowcostsensors.FlyingFlo_USB.hk_errorhandling"><code class="name flex">
-<span>def <span class="ident">hk_errorhandling</span></span>(<span>self, kwargs, legallist, funcname)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
-    &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
-
-    for key in kwargs:
-        if key not in legallist:
-            raise IllegalArgument(key,funcname,legallist)</code></pre>
-</details>
-<div class="desc"><p>Checks if all passed kwargs are legal</p></div>
-</dd>
-<dt id="agg_dim.lowcostsensors.FlyingFlo_USB.hk_func_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
-
-    op = kwargs[key] if key in kwargs else default
-    return op</code></pre>
-</details>
-<div class="desc"><p>Gives kwargs a default value if they are not passed</p></div>
-</dd>
-<dt id="agg_dim.lowcostsensors.FlyingFlo_USB.hk_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
-    
-    op = kwargs[key] if key in kwargs else default
-    if type(op) == str:
-        if op ==&#34;null&#34;:
-            print(&#34;WARNING: Loaded file seems to have been produced either from another object than NewFData or another version of NewFData. Some functions may not be available.&#34;)
-    setattr(self, key, op)</code></pre>
-</details>
-<div class="desc"><p>Turns kwargs into attributes</p></div>
-</dd>
 <dt id="agg_dim.lowcostsensors.FlyingFlo_USB.plot"><code class="name flex">
 <span>def <span class="ident">plot</span></span>(<span>self, ax, y, **kwargs)</span>
 </code></dt>
@@ -1059,8 +1069,8 @@ setup used in our systems (ccs811,bme680 and sen55).</p>
                 &#34;secondary&#34; : False
         }
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;FlyingFlo_USB.plot()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;FlyingFlo_USB.plot()&#34;)
     
     #get plotdata
     try:
@@ -1794,11 +1804,9 @@ True-right axis). The default is False.</dd>
 <li>
 <h4><code><a title="agg_dim.lowcostsensors.FlyingFlo_USB" href="#agg_dim.lowcostsensors.FlyingFlo_USB">FlyingFlo_USB</a></code></h4>
 <ul class="two-column">
+<li><code><a title="agg_dim.lowcostsensors.FlyingFlo_USB.append" href="#agg_dim.lowcostsensors.FlyingFlo_USB.append">append</a></code></li>
 <li><code><a title="agg_dim.lowcostsensors.FlyingFlo_USB.average" href="#agg_dim.lowcostsensors.FlyingFlo_USB.average">average</a></code></li>
 <li><code><a title="agg_dim.lowcostsensors.FlyingFlo_USB.deviatefrommean" href="#agg_dim.lowcostsensors.FlyingFlo_USB.deviatefrommean">deviatefrommean</a></code></li>
-<li><code><a title="agg_dim.lowcostsensors.FlyingFlo_USB.hk_errorhandling" href="#agg_dim.lowcostsensors.FlyingFlo_USB.hk_errorhandling">hk_errorhandling</a></code></li>
-<li><code><a title="agg_dim.lowcostsensors.FlyingFlo_USB.hk_func_kwargs" href="#agg_dim.lowcostsensors.FlyingFlo_USB.hk_func_kwargs">hk_func_kwargs</a></code></li>
-<li><code><a title="agg_dim.lowcostsensors.FlyingFlo_USB.hk_kwargs" href="#agg_dim.lowcostsensors.FlyingFlo_USB.hk_kwargs">hk_kwargs</a></code></li>
 <li><code><a title="agg_dim.lowcostsensors.FlyingFlo_USB.plot" href="#agg_dim.lowcostsensors.FlyingFlo_USB.plot">plot</a></code></li>
 <li><code><a title="agg_dim.lowcostsensors.FlyingFlo_USB.quickplot" href="#agg_dim.lowcostsensors.FlyingFlo_USB.quickplot">quickplot</a></code></li>
 <li><code><a title="agg_dim.lowcostsensors.FlyingFlo_USB.returndata" href="#agg_dim.lowcostsensors.FlyingFlo_USB.returndata">returndata</a></code></li>

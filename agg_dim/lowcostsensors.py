@@ -656,8 +656,8 @@ class FlyingFlo_USB:
                     "secondary" : False
             }
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), "FlyingFlo_USB.plot()")
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "FlyingFlo_USB.plot()")
         
         #get plotdata
         try:
@@ -776,12 +776,33 @@ class FlyingFlo_USB:
             op_details[key] = [val[1],val[2]]
             
         return op,op_details
+    
+    def append(self,ffusb):
+        """
+        Adds another `FlyingFlo_USB` obj to the current one.
+
+        Parameters
+        ----------
+        ffusb : FlyingFlo_USB
+            The data of ffusb will be appended to self.
+
+        Returns
+        -------
+        None
+        """
+        
+        for key in self.y:
+            self.y[key][0] = np.append(
+                self.y[key][0],
+                ffusb.y[key][0]
+                )
+        self.t = np.append(self.t,ffusb.t)
         
         
         
     #Housekeeping funcs
     
-    def hk_kwargs(self,kwargs,key,default):
+    def _hk_kwargs(self,kwargs,key,default):
         """Turns kwargs into attributes"""
         
         op = kwargs[key] if key in kwargs else default
@@ -791,14 +812,14 @@ class FlyingFlo_USB:
         setattr(self, key, op)
         
         
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         """Gives kwargs a default value if they are not passed"""
 
         op = kwargs[key] if key in kwargs else default
         return op
     
     
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         """Checks if all passed kwargs are legal"""
 
         for key in kwargs:

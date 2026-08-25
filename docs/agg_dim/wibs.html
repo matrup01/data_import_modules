@@ -173,8 +173,8 @@ el.replaceWith(d);
                 &#34;chunklen&#34; : 600
                 }
             for key,value in defaults.items():
-                self.hk_kwargs(kwargs, key, value)
-            self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS&#34;)
+                self._hk_kwargs(kwargs, key, value)
+            self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS&#34;)
             
             #setup variables
             self.bins = len(self.bin_borders)-1
@@ -836,6 +836,10 @@ el.replaceWith(d);
             Changes the location of the colorbar. The default is &#39;top&#39;.
         togglecbar : bool, optional
             If False, the colorbar wont be shown. The default is True.
+        desample : int, optional
+            If a value greater 0 is passed the data will be desampled to chunks
+            of &#39;desample&#39; seconds. E.g. a value of `desample=60` will give a
+            value for every minute.
 
         Returns
         -------
@@ -847,10 +851,11 @@ el.replaceWith(d);
                     &#34;pad&#34; : 0,
                     &#34;orientation&#34; : &#34;horizontal&#34;,
                     &#34;location&#34; : &#34;top&#34;,
-                    &#34;togglecbar&#34; : True}
+                    &#34;togglecbar&#34; : True,
+                    &#34;desample&#34; : 0}
         for key,default in defaults.items():
-            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.heatmap()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.heatmap()&#34;)
         
         try:
             yy = np.array(
@@ -862,7 +867,15 @@ el.replaceWith(d);
             raise IllegalValue(y, 
                                &#34;WIBS.heatmap()&#34;, 
                                [&#34;allparticles&#34;,&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,
-                                &#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;]) from kerr
+                                &#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;,&#34;nonfluor&#34;]) from kerr
+        
+        if kwargs[&#34;desample&#34;] &gt; 0:
+            des = kwargs[&#34;desample&#34;]
+            n = len(yy[0]) // des
+            y1 = yy[:,:n*des].reshape(len(yy),-1,des).mean(axis=2)
+            app = np.array([[np.mean(yy[i,n*des:]) for i in range(len(yy))]]).T
+            yy = np.append(y1,app,axis=1)
+        
         
         xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
         xlims = md.date2num(xlims)
@@ -914,6 +927,10 @@ el.replaceWith(d);
         secondary : bool, optional
             If True, the plot will draw the axis on the right-hand side. 
             Should be used if the given ax is a twinx(). The default is False.
+        desample : int, optional
+            If a value greater 0 is passed the data will be desampled to chunks
+            of &#39;desample&#39; seconds. E.g. a value of `desample=60` will give a
+            value for every minute.
         
         Returns
         -------
@@ -923,16 +940,24 @@ el.replaceWith(d);
 
         defaults = {&#34;label&#34; : &#34;no label&#34;,
                     &#34;color&#34; : &#34;tab:purple&#34;,
-                    &#34;secondary&#34; : False}
+                    &#34;secondary&#34; : False,
+                    &#34;desample&#34; : 0}
         for key,default in defaults.items():
-            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.plot()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.plot()&#34;)
         
         xx = self.data[&#34;t&#34;]
         try:
             yy = self.data[y]
         except KeyError as kerr:
             raise IllegalValue(&#34;y&#34;, &#34;WIBS.plot()&#34;,list(self.data)) from kerr
+            
+        if kwargs[&#34;desample&#34;] &gt; 0:
+            des = kwargs[&#34;desample&#34;]
+            n = len(yy) // des
+            y1 = yy[:n*des].reshape(-1,des).mean(axis=1)
+            yy = np.append(y1,np.mean(yy[n*des:]))
+            xx = np.append(xx[:n*des:des],xx[n*des]) + timedelta(seconds=des/2)
             
         if self.details[y][1] != &#34;No Unit&#34;:
             ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
@@ -1009,8 +1034,8 @@ el.replaceWith(d);
                     &#34;legacy&#34; : False,
                     &#34;ylog&#34; : False}
         for key,default in defaults.items():
-            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.stackedplot()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.stackedplot()&#34;)
         
         m = np.array([True for i in self.data[&#34;t&#34;]])
         if isinstance(kwargs[&#34;start&#34;],str):
@@ -1136,8 +1161,8 @@ el.replaceWith(d);
                     &#34;particletype&#34; : None}
         
         for key,default in defaults.items():
-            kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.dndlogp()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.dndlogp()&#34;)
         
         xx = np.array(self.bin_means)
         m = np.array([True for t in self.data[&#34;t&#34;]])
@@ -1295,7 +1320,7 @@ el.replaceWith(d);
     
     #housekeeping funcs
     
-    def hk_kwargs(self,kwargs,key,default):
+    def _hk_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -1306,7 +1331,7 @@ el.replaceWith(d);
         setattr(self,key,op)
         
         
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -1317,7 +1342,7 @@ el.replaceWith(d);
         return op
     
     
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -1516,8 +1541,8 @@ peak RAM usage. The default is 600.</dd>
                 &#34;particletype&#34; : None}
     
     for key,default in defaults.items():
-        kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.dndlogp()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.dndlogp()&#34;)
     
     xx = np.array(self.bin_means)
     m = np.array([True for t in self.data[&#34;t&#34;]])
@@ -1666,6 +1691,10 @@ considering particle type, dont pass this kwarg.</dd>
         Changes the location of the colorbar. The default is &#39;top&#39;.
     togglecbar : bool, optional
         If False, the colorbar wont be shown. The default is True.
+    desample : int, optional
+        If a value greater 0 is passed the data will be desampled to chunks
+        of &#39;desample&#39; seconds. E.g. a value of `desample=60` will give a
+        value for every minute.
 
     Returns
     -------
@@ -1677,10 +1706,11 @@ considering particle type, dont pass this kwarg.</dd>
                 &#34;pad&#34; : 0,
                 &#34;orientation&#34; : &#34;horizontal&#34;,
                 &#34;location&#34; : &#34;top&#34;,
-                &#34;togglecbar&#34; : True}
+                &#34;togglecbar&#34; : True,
+                &#34;desample&#34; : 0}
     for key,default in defaults.items():
-        kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.heatmap()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.heatmap()&#34;)
     
     try:
         yy = np.array(
@@ -1692,7 +1722,15 @@ considering particle type, dont pass this kwarg.</dd>
         raise IllegalValue(y, 
                            &#34;WIBS.heatmap()&#34;, 
                            [&#34;allparticles&#34;,&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,
-                            &#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;]) from kerr
+                            &#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;,&#34;nonfluor&#34;]) from kerr
+    
+    if kwargs[&#34;desample&#34;] &gt; 0:
+        des = kwargs[&#34;desample&#34;]
+        n = len(yy[0]) // des
+        y1 = yy[:,:n*des].reshape(len(yy),-1,des).mean(axis=2)
+        app = np.array([[np.mean(yy[i,n*des:]) for i in range(len(yy))]]).T
+        yy = np.append(y1,app,axis=1)
+    
     
     xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
     xlims = md.date2num(xlims)
@@ -1743,73 +1781,13 @@ mpl axis</p>
 <dd>Changes the location of the colorbar. The default is 'top'.</dd>
 <dt><strong><code>togglecbar</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>If False, the colorbar wont be shown. The default is True.</dd>
+<dt><strong><code>desample</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>If a value greater 0 is passed the data will be desampled to chunks
+of 'desample' seconds. E.g. a value of <code>desample=60</code> will give a
+value for every minute.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
-</dd>
-<dt id="agg_dim.wibs.WIBS.hk_errorhandling"><code class="name flex">
-<span>def <span class="ident">hk_errorhandling</span></span>(<span>self, kwargs, legallist, funcname)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
-    &#34;&#34;&#34;
-    Housekeeping Func --&gt; Should not be used outside the object
-    
-    Checks if all passed kwargs are legal
-    &#34;&#34;&#34;
-
-    for key in kwargs:
-        if key not in legallist:
-            raise IllegalArgument(key,funcname,legallist)</code></pre>
-</details>
-<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
-<p>Checks if all passed kwargs are legal</p></div>
-</dd>
-<dt id="agg_dim.wibs.WIBS.hk_func_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;
-    Housekeeping Func --&gt; Should not be used outside the object
-    
-    Gives kwargs a default value if they are not passed
-    &#34;&#34;&#34;
-
-    op = kwargs[key] if key in kwargs else default
-    return op</code></pre>
-</details>
-<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
-<p>Gives kwargs a default value if they are not passed</p></div>
-</dd>
-<dt id="agg_dim.wibs.WIBS.hk_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;
-    Housekeeping Func --&gt; Should not be used outside the object
-    
-    Turns kwargs into attributes
-    &#34;&#34;&#34;
-
-    op = kwargs[key] if key in kwargs else default
-    setattr(self,key,op)</code></pre>
-</details>
-<div class="desc"><p>Housekeeping Func &ndash;&gt; Should not be used outside the object</p>
-<p>Turns kwargs into attributes</p></div>
 </dd>
 <dt id="agg_dim.wibs.WIBS.plot"><code class="name flex">
 <span>def <span class="ident">plot</span></span>(<span>self, ax, y, **kwargs)</span>
@@ -1840,6 +1818,10 @@ mpl axis</p>
     secondary : bool, optional
         If True, the plot will draw the axis on the right-hand side. 
         Should be used if the given ax is a twinx(). The default is False.
+    desample : int, optional
+        If a value greater 0 is passed the data will be desampled to chunks
+        of &#39;desample&#39; seconds. E.g. a value of `desample=60` will give a
+        value for every minute.
     
     Returns
     -------
@@ -1849,16 +1831,24 @@ mpl axis</p>
 
     defaults = {&#34;label&#34; : &#34;no label&#34;,
                 &#34;color&#34; : &#34;tab:purple&#34;,
-                &#34;secondary&#34; : False}
+                &#34;secondary&#34; : False,
+                &#34;desample&#34; : 0}
     for key,default in defaults.items():
-        kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.plot()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.plot()&#34;)
     
     xx = self.data[&#34;t&#34;]
     try:
         yy = self.data[y]
     except KeyError as kerr:
         raise IllegalValue(&#34;y&#34;, &#34;WIBS.plot()&#34;,list(self.data)) from kerr
+        
+    if kwargs[&#34;desample&#34;] &gt; 0:
+        des = kwargs[&#34;desample&#34;]
+        n = len(yy) // des
+        y1 = yy[:n*des].reshape(-1,des).mean(axis=1)
+        yy = np.append(y1,np.mean(yy[n*des:]))
+        xx = np.append(xx[:n*des:des],xx[n*des]) + timedelta(seconds=des/2)
         
     if self.details[y][1] != &#34;No Unit&#34;:
         ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
@@ -1898,6 +1888,10 @@ will be shown there. The default is 'no label'.</dd>
 <dt><strong><code>secondary</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>If True, the plot will draw the axis on the right-hand side.
 Should be used if the given ax is a twinx(). The default is False.</dd>
+<dt><strong><code>desample</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>If a value greater 0 is passed the data will be desampled to chunks
+of 'desample' seconds. E.g. a value of <code>desample=60</code> will give a
+value for every minute.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
@@ -2191,8 +2185,8 @@ exported data.</dd>
                 &#34;legacy&#34; : False,
                 &#34;ylog&#34; : False}
     for key,default in defaults.items():
-        kwargs[key] = self.hk_func_kwargs(kwargs, key, default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.stackedplot()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.stackedplot()&#34;)
     
     m = np.array([True for i in self.data[&#34;t&#34;]])
     if isinstance(kwargs[&#34;start&#34;],str):
@@ -2316,9 +2310,6 @@ stacked areas. The default is False.</dd>
 <li><code><a title="agg_dim.wibs.WIBS.append" href="#agg_dim.wibs.WIBS.append">append</a></code></li>
 <li><code><a title="agg_dim.wibs.WIBS.dndlogdp" href="#agg_dim.wibs.WIBS.dndlogdp">dndlogdp</a></code></li>
 <li><code><a title="agg_dim.wibs.WIBS.heatmap" href="#agg_dim.wibs.WIBS.heatmap">heatmap</a></code></li>
-<li><code><a title="agg_dim.wibs.WIBS.hk_errorhandling" href="#agg_dim.wibs.WIBS.hk_errorhandling">hk_errorhandling</a></code></li>
-<li><code><a title="agg_dim.wibs.WIBS.hk_func_kwargs" href="#agg_dim.wibs.WIBS.hk_func_kwargs">hk_func_kwargs</a></code></li>
-<li><code><a title="agg_dim.wibs.WIBS.hk_kwargs" href="#agg_dim.wibs.WIBS.hk_kwargs">hk_kwargs</a></code></li>
 <li><code><a title="agg_dim.wibs.WIBS.plot" href="#agg_dim.wibs.WIBS.plot">plot</a></code></li>
 <li><code><a title="agg_dim.wibs.WIBS.quickheatmap" href="#agg_dim.wibs.WIBS.quickheatmap">quickheatmap</a></code></li>
 <li><code><a title="agg_dim.wibs.WIBS.quickplot" href="#agg_dim.wibs.WIBS.quickplot">quickplot</a></code></li>

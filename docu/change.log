@@ -1,3 +1,30 @@
+######################### MR 25.08.2026 #########################
+#                      "Revamped Pops obj"                      #
+#                                                               #
+# - added a 'desample' kwarg to WIBS.plot() and WIBS.heatmap()  #
+#   and Wrapper.plot()                                          #
+# - added .append() methods to FlyingFlo_USB and OPC            #
+# - made hk methods private in every module                     #
+#                                                               #
+# - Pops was revamped and old stuff removed                     #
+#   - changed the datastructure to match other objs             #
+#   - added 't_no_beaglebone' kwarg to Pops.__init__() to make  #
+#     sure no beaglebone time is used for modern usecases.      #
+#   - removed Pops.importbg() and Pops.exportbg()               #
+#   - removed 'title' kwarg from init                           #
+#   - removed 'startcrop' and 'endcrop' kwargs from quickplot.  #
+#   - 'startcrop' and 'endcrop' kwargs were changed to 'start'  #
+#     and 'end' to match other objs                             #
+#   - added 'start' and 'end' kwargs and a deprecated warning   #
+#     to heatmap                                                #
+#   - added kwargs 'start', 'end' and 'cmap' to newheatmap      #
+#   - added kwargs 'start', 'end', 'scatter', 'color' and       #
+#     'label' to dndlogdp                                       #
+#   - removed Pops.cumulativeparticles() and Pops.crop()        #
+#   - added Pops.desample() and added a deprecated warning to   #
+#     Pops.average()                                            #
+#################################################################
+
 ######################### MR 18.08.2026 #########################
 #                "WIBS performance enhancement"                 #
 #                                                               #

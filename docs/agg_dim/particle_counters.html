@@ -95,8 +95,8 @@ read in pops and opc data</p>
                     &#34;end&#34; : None,
                     &#34;bins&#34; : [0.253,0.298,0.352,0.414,0.488,0.576,0.679,0.8,0.943,1.112,1.31,1.545,1.821,2.146,2.53,2.982,3.515,4.144,4.884,5.757,6.787,8,9.43,11.12,13.1,15.45,18.21,21.46,25.3,29.82,35.15]}
         for key,value in zip(defaults.keys(),defaults.values()):
-            self.hk_kwargs(kwargs, key, value)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;OPC&#34;)
+            self._hk_kwargs(kwargs, key, value)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC&#34;)
         
         if file[-4:] == &#34;.dat&#34;:
             cfile = file
@@ -253,8 +253,8 @@ read in pops and opc data</p>
                     &#34;setday&#34; : None}
         
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.plot()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.plot()&#34;)
         
         if kwargs[&#34;ylabel&#34;] == &#34;*&#34;:
             kwargs[&#34;ylabel&#34;] = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
@@ -317,8 +317,8 @@ read in pops and opc data</p>
                     &#34;cmap&#34; : &#34;RdYlBu_r&#34;}
         
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.heatmap()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.heatmap()&#34;)
                 
         #draw heatmap
         logdp = np.log10(self.bins)
@@ -374,8 +374,8 @@ read in pops and opc data</p>
                     &#34;scatter&#34; : False}
         
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.dndlogdp()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.dndlogdp()&#34;)
         
         #draw plot
         m = np.full(len(self.data[&#34;t&#34;]),True)
@@ -442,24 +442,44 @@ read in pops and opc data</p>
                     op.append(np.nan)
             op_dict[key] = np.array(op)
         return op_dict,self.details
+    
+    def append(self,opc):
+        &#34;&#34;&#34;
+        Adds another `OPC` obj to the current one.
+
+        Parameters
+        ----------
+        opc : OPC
+            The data of this obj will be appended to self.
+
+        Returns
+        -------
+        None
+        &#34;&#34;&#34;
+        
+        for key in self.data:
+            self.data[key] = np.append(
+                self.data[key],
+                opc.data[key]
+                )
         
         
     #housekeeping funcs    
-    def hk_kwargs(self,kwargs,key,default):
+    def _hk_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
         
         op = kwargs[key] if key in kwargs else default
         setattr(self,key,op)
         
         
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
  
         op = kwargs[key] if key in kwargs else default
         return op
     
     
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
         
         for key in kwargs:
@@ -491,6 +511,46 @@ read in pops and opc data</p>
 </dl></div>
 <h3>Methods</h3>
 <dl>
+<dt id="agg_dim.particle_counters.OPC.append"><code class="name flex">
+<span>def <span class="ident">append</span></span>(<span>self, opc)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def append(self,opc):
+    &#34;&#34;&#34;
+    Adds another `OPC` obj to the current one.
+
+    Parameters
+    ----------
+    opc : OPC
+        The data of this obj will be appended to self.
+
+    Returns
+    -------
+    None
+    &#34;&#34;&#34;
+    
+    for key in self.data:
+        self.data[key] = np.append(
+            self.data[key],
+            opc.data[key]
+            )</code></pre>
+</details>
+<div class="desc"><p>Adds another <code><a title="agg_dim.particle_counters.OPC" href="#agg_dim.particle_counters.OPC">OPC</a></code> obj to the current one.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>opc</code></strong> :&ensp;<code><a title="agg_dim.particle_counters.OPC" href="#agg_dim.particle_counters.OPC">OPC</a></code></dt>
+<dd>The data of this obj will be appended to self.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+</dd>
 <dt id="agg_dim.particle_counters.OPC.dndlogdp"><code class="name flex">
 <span>def <span class="ident">dndlogdp</span></span>(<span>self, ax, **kwargs)</span>
 </code></dt>
@@ -532,8 +592,8 @@ read in pops and opc data</p>
                 &#34;scatter&#34; : False}
     
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.dndlogdp()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.dndlogdp()&#34;)
     
     #draw plot
     m = np.full(len(self.data[&#34;t&#34;]),True)
@@ -625,8 +685,8 @@ read in pops and opc data</p>
                 &#34;cmap&#34; : &#34;RdYlBu_r&#34;}
     
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.heatmap()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.heatmap()&#34;)
             
     #draw heatmap
     logdp = np.log10(self.bins)
@@ -666,55 +726,6 @@ read in pops and opc data</p>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
-</dd>
-<dt id="agg_dim.particle_counters.OPC.hk_errorhandling"><code class="name flex">
-<span>def <span class="ident">hk_errorhandling</span></span>(<span>self, kwargs, legallist, funcname)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
-    &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
-    
-    for key in kwargs:
-        if key not in legallist:
-            raise IllegalArgument(key,funcname,legallist)</code></pre>
-</details>
-<div class="desc"><p>Checks if all passed kwargs are legal</p></div>
-</dd>
-<dt id="agg_dim.particle_counters.OPC.hk_func_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
-
-    op = kwargs[key] if key in kwargs else default
-    return op</code></pre>
-</details>
-<div class="desc"><p>Gives kwargs a default value if they are not passed</p></div>
-</dd>
-<dt id="agg_dim.particle_counters.OPC.hk_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
-    
-    op = kwargs[key] if key in kwargs else default
-    setattr(self,key,op)</code></pre>
-</details>
-<div class="desc"><p>Turns kwargs into attributes</p></div>
 </dd>
 <dt id="agg_dim.particle_counters.OPC.plot"><code class="name flex">
 <span>def <span class="ident">plot</span></span>(<span>self, ax, y, **kwargs)</span>
@@ -768,8 +779,8 @@ read in pops and opc data</p>
                 &#34;setday&#34; : None}
     
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.plot()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.plot()&#34;)
     
     if kwargs[&#34;ylabel&#34;] == &#34;*&#34;:
         kwargs[&#34;ylabel&#34;] = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
@@ -1024,8 +1035,8 @@ exported data.</dd>
                     &#34;wintertime&#34; : False,
                     &#34;layout&#34; : &#34;FlyingFlo2.0&#34;}
         for key,value in zip(defaults.keys(),defaults.values()):
-            self.hk_kwargs(kwargs, key, value)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;Pops&#34;)
+            self._hk_kwargs(kwargs, key, value)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops&#34;)
         
         #fix layout
         if isinstance(self.layout,str):
@@ -1045,7 +1056,7 @@ exported data.</dd>
                                    &#34;t&#34; : 1,
                                    &#34;flow&#34; : 38}
                 case &#34;FlyingFlo2.0&#34;:
-                    self.layout = {&#34;bins&#34; : list((36,52)),
+                    self.layout = {&#34;bins&#34; : list(range(36,52)),
                                    &#34;ydata&#34; : &#34;NULL&#34;,
                                    &#34;ydata2&#34; : [8,23,14],
                                    &#34;popstime&#34; : 3,
@@ -1209,11 +1220,11 @@ exported data.</dd>
         defaults = {&#34;startcrop&#34; : 0,
                     &#34;endcrop&#34; : 0}
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.quickplot()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.quickplot()&#34;)
         
         #find plotdata
-        plotx,ploty,label,ylabel = self.hk_findplottype(y)
+        plotx,ploty,label,ylabel = self._hk_findplottype(y)
         plotx = [plotx[i] for i in range(kwargs[&#34;startcrop&#34;],len(plotx)-kwargs[&#34;endcrop&#34;])]
         ploty = [ploty[i] for i in range(kwargs[&#34;startcrop&#34;],len(ploty)-kwargs[&#34;endcrop&#34;])]
             
@@ -1279,11 +1290,11 @@ exported data.</dd>
                     &#34;plotlabel&#34; : &#34;none&#34;,
                     &#34;usepopstime&#34; : False}
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.plot()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.plot()&#34;)
         
         #find plotdata
-        plotx,ploty,label,ylabel = self.hk_findplottype(y)
+        plotx,ploty,label,ylabel = self._hk_findplottype(y)
         if kwargs[&#34;usepopstime&#34;]:
             plotx = self.popstime
         plotx = [plotx[i] for i in range(kwargs[&#34;startcrop&#34;],len(plotx)-kwargs[&#34;endcrop&#34;])]
@@ -1330,7 +1341,7 @@ exported data.</dd>
         
         #convert to heatmapdata
         heatmapdata = [[self.pops_bins[j][i] / (math.log10(self.d_categories[j+1])-math.log10(self.d_categories[j])) for i in range(len(self.pops_bins[0])-1)] for j in range(len(self.pops_bins))]
-        heatmapdata = self.hk_replacezeros(heatmapdata)
+        heatmapdata = self._hk_replacezeros(heatmapdata)
         xx,yy = np.meshgrid(self.popstime,self.d_categories)
         
         #draw plot
@@ -1374,12 +1385,12 @@ exported data.</dd>
                     &#34;togglecbar&#34; : True,
                     &#34;pad&#34; : 0}
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.heatmap()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.heatmap()&#34;)
         
         #convert to heatmapdata
         heatmapdata = [[self.pops_bins[j][i] / (math.log10(self.d_categories[j+1])-math.log10(self.d_categories[j])) for i in range(len(self.pops_bins[0])-1)] for j in range(len(self.pops_bins))]
-        heatmapdata = self.hk_replacezeros(heatmapdata)
+        heatmapdata = self._hk_replacezeros(heatmapdata)
         xx,yy = np.meshgrid(self.popstime,self.d_categories)
         
         mask = np.array([[xx[i][j] for j in range(len(xx[i])-1)] for i in range(len(xx)-1)])
@@ -1427,11 +1438,11 @@ exported data.</dd>
                     &#34;location&#34; : &#34;top&#34;,
                     &#34;pad&#34; : 0}
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.newheatmap()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.newheatmap()&#34;)
         
         heatmapdata = [[self.pops_bins[j][i] / (math.log10(self.d_categories[j+1])-math.log10(self.d_categories[j])) for i in range(len(self.pops_bins[0])-1)] for j in range(len(self.pops_bins))]
-        heatmapdata = self.hk_replacezeros(heatmapdata)
+        heatmapdata = self._hk_replacezeros(heatmapdata)
         
         xlims = [self.t[0],self.t[-1]]
         xlims = md.date2num(xlims)
@@ -1490,15 +1501,14 @@ exported data.</dd>
 
         &#34;&#34;&#34;
         
+        print(&#34;test&#34;)
+        
         #calculate needed values
         means = np.array([np.mean(self.pops_bins[i]) for i in range(len(self.pops_bins))])
-        dndlogdp = [means[i]/(math.log10(self.d_categories[i+1]-math.log10(self.d_categories[i]))) for i in range(len(means))]
+        dndlogdp = [means[i]/(math.log10(self.d_categories[i+1])-math.log10(self.d_categories[i])) for i in range(len(means))]
         xvals = [self.d_categories[i] for i in range(len(means))]
         widths = [self.d_categories[i+1]-self.d_categories[i] for i in range(len(xvals))]
-        
-        print(self.title)
-        print(*dndlogdp)
-        
+
         #draw
         _,ax = plt.subplots()
         ax.bar(x=xvals,width=widths,align=&#34;edge&#34;,height=dndlogdp)
@@ -1573,7 +1583,7 @@ exported data.</dd>
 
         &#34;&#34;&#34;
         
-        _,data,label,unit = self.hk_findplottype(y)
+        _,data,label,unit = self._hk_findplottype(y)
         mean = np.mean(data)
         std = np.std(data,ddof=1)
         var = np.var(data,ddof=1)
@@ -1600,7 +1610,7 @@ exported data.</dd>
 
         &#34;&#34;&#34;
         
-        _,data,_,_ = self.hk_findplottype(y)
+        _,data,_,_ = self._hk_findplottype(y)
         mean = np.mean(data)
         std = np.std(data,ddof=1)
         var = np.var(data,ddof=1)
@@ -1865,7 +1875,7 @@ exported data.</dd>
         
         
     #housekeeping funcs    
-    def hk_kwargs(self,kwargs,key,default):
+    def _hk_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
         
         op = kwargs[key] if key in kwargs else default
@@ -1875,14 +1885,14 @@ exported data.</dd>
         setattr(self, key, op)
         
         
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
         
         op = kwargs[key] if key in kwargs else default
         return op
     
     
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
         
         for key in kwargs:
@@ -1890,7 +1900,7 @@ exported data.</dd>
                 raise IllegalArgument(key,funcname,legallist)
         
         
-    def hk_findplottype(self,y):
+    def _hk_findplottype(self,y):
         &#34;&#34;&#34;Finds plotdata for a given y&#34;&#34;&#34;
         
         #find correct plottype
@@ -1939,7 +1949,7 @@ exported data.</dd>
         raise ValueError(output)
         
         
-    def hk_replacezeros(self,data):
+    def _hk_replacezeros(self,data):
         &#34;&#34;&#34;replaces zeros for a logarithmic scale&#34;&#34;&#34;
         
         smallest = 10000
@@ -2400,12 +2410,12 @@ Calculates the mean of all pops bins and returns it.</p>
                 &#34;togglecbar&#34; : True,
                 &#34;pad&#34; : 0}
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.heatmap()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.heatmap()&#34;)
     
     #convert to heatmapdata
     heatmapdata = [[self.pops_bins[j][i] / (math.log10(self.d_categories[j+1])-math.log10(self.d_categories[j])) for i in range(len(self.pops_bins[0])-1)] for j in range(len(self.pops_bins))]
-    heatmapdata = self.hk_replacezeros(heatmapdata)
+    heatmapdata = self._hk_replacezeros(heatmapdata)
     xx,yy = np.meshgrid(self.popstime,self.d_categories)
     
     mask = np.array([[xx[i][j] for j in range(len(xx[i])-1)] for i in range(len(xx)-1)])
@@ -2442,140 +2452,6 @@ Calculates the mean of all pops bins and returns it.</p>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
-</dd>
-<dt id="agg_dim.particle_counters.Pops.hk_errorhandling"><code class="name flex">
-<span>def <span class="ident">hk_errorhandling</span></span>(<span>self, kwargs, legallist, funcname)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
-    &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
-    
-    for key in kwargs:
-        if key not in legallist:
-            raise IllegalArgument(key,funcname,legallist)</code></pre>
-</details>
-<div class="desc"><p>Checks if all passed kwargs are legal</p></div>
-</dd>
-<dt id="agg_dim.particle_counters.Pops.hk_findplottype"><code class="name flex">
-<span>def <span class="ident">hk_findplottype</span></span>(<span>self, y)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_findplottype(self,y):
-    &#34;&#34;&#34;Finds plotdata for a given y&#34;&#34;&#34;
-    
-    #find correct plottype
-    for i in range(len(self.plottypes)):
-        if self.plottypes[i][0] == y:
-            if isinstance(self.ydata,str):
-                raise SensorNotMounted(y, &#34;POPS&#34;)
-            plotx = self.t
-            ploty = self.ydata[i]
-            label = self.plottypes[i][1]
-            ylabel = self.plottypes[i][2] if not self.relative else &#34;% of background&#34;
-            if self.deviated:
-                ylabel = &#34;%  deviation from mean&#34;
-            
-            return plotx,ploty,label,ylabel
-        
-    
-    
-    for i in range(len(self.plottypes2)):
-        if y == self.plottypes2[i][0]:
-            plotx = self.t
-            ploty = self.ydata2[i]
-            label = self.plottypes2[i][1]
-            ylabel = self.plottypes2[i][2] if not self.relative else &#34;% of background&#34;
-            if self.deviated:
-                ylabel = &#34;%  deviation from mean&#34;
-        
-            return plotx,ploty,label,ylabel
-        
-    for i in range(16):
-        if &#34;&#34;.join([char for char in y if char.isdigit()]) == str(i):
-            plotx = self.t
-            ploty = self.pops_bins[i]
-            label = &#34;b&#34; + str(i)
-            ylabel = r&#34;Counts/$cm^3$&#34; if not self.relative else &#34;% of background&#34;
-            if self.deviated:
-                ylabel = &#34;%  deviation from mean&#34;
-            
-            return plotx,ploty,label,ylabel
-        
-    output = &#34;Unknown y: y must be one of the following strings: &#34; + &#34;&#34;.join([self.plottypes[i][0]+&#34;, &#34; for i in range(len(self.plottypes))])
-    output += &#34;&#34;.join([self.plottypes2[i][0]+&#34;, &#34; for i in range(len(self.plottypes2))])
-    output += &#34;&#34;.join([&#34;b&#34;+str(i)+&#34;, &#34; for i in range(15)])
-    output += &#34;b15&#34;
-    
-    raise ValueError(output)</code></pre>
-</details>
-<div class="desc"><p>Finds plotdata for a given y</p></div>
-</dd>
-<dt id="agg_dim.particle_counters.Pops.hk_func_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
-    
-    op = kwargs[key] if key in kwargs else default
-    return op</code></pre>
-</details>
-<div class="desc"><p>Gives kwargs a default value if they are not passed</p></div>
-</dd>
-<dt id="agg_dim.particle_counters.Pops.hk_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
-    
-    op = kwargs[key] if key in kwargs else default
-    if isinstance(op,str):
-        if op ==&#34;null&#34;:
-            print(&#34;WARNING: Loaded file seems to have been produced either from another object than NewFData or another version of NewFData. Some functions may not be available.&#34;)
-    setattr(self, key, op)</code></pre>
-</details>
-<div class="desc"><p>Turns kwargs into attributes</p></div>
-</dd>
-<dt id="agg_dim.particle_counters.Pops.hk_replacezeros"><code class="name flex">
-<span>def <span class="ident">hk_replacezeros</span></span>(<span>self, data)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_replacezeros(self,data):
-    &#34;&#34;&#34;replaces zeros for a logarithmic scale&#34;&#34;&#34;
-    
-    smallest = 10000
-    for element in data:
-        for i in range(len(element)):
-            if element[i] &lt; smallest and element[i] &gt; 0:
-                smallest = element[i]
-    for element in data:
-        for i in range(len(element)):
-            if element[i] &lt;= 0:
-                element[i] = np.nan
-    return data</code></pre>
-</details>
-<div class="desc"><p>replaces zeros for a logarithmic scale</p></div>
 </dd>
 <dt id="agg_dim.particle_counters.Pops.importbg"><code class="name flex">
 <span>def <span class="ident">importbg</span></span>(<span>self, bg)</span>
@@ -2649,11 +2525,11 @@ Imports a background in the form its exported through Pops.exportbg()</p>
                 &#34;location&#34; : &#34;top&#34;,
                 &#34;pad&#34; : 0}
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.newheatmap()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.newheatmap()&#34;)
     
     heatmapdata = [[self.pops_bins[j][i] / (math.log10(self.d_categories[j+1])-math.log10(self.d_categories[j])) for i in range(len(self.pops_bins[0])-1)] for j in range(len(self.pops_bins))]
-    heatmapdata = self.hk_replacezeros(heatmapdata)
+    heatmapdata = self._hk_replacezeros(heatmapdata)
     
     xlims = [self.t[0],self.t[-1]]
     xlims = md.date2num(xlims)
@@ -2748,11 +2624,11 @@ Imports a background in the form its exported through Pops.exportbg()</p>
                 &#34;plotlabel&#34; : &#34;none&#34;,
                 &#34;usepopstime&#34; : False}
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.plot()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.plot()&#34;)
     
     #find plotdata
-    plotx,ploty,label,ylabel = self.hk_findplottype(y)
+    plotx,ploty,label,ylabel = self._hk_findplottype(y)
     if kwargs[&#34;usepopstime&#34;]:
         plotx = self.popstime
     plotx = [plotx[i] for i in range(kwargs[&#34;startcrop&#34;],len(plotx)-kwargs[&#34;endcrop&#34;])]
@@ -2837,15 +2713,14 @@ Imports a background in the form its exported through Pops.exportbg()</p>
 
     &#34;&#34;&#34;
     
+    print(&#34;test&#34;)
+    
     #calculate needed values
     means = np.array([np.mean(self.pops_bins[i]) for i in range(len(self.pops_bins))])
-    dndlogdp = [means[i]/(math.log10(self.d_categories[i+1]-math.log10(self.d_categories[i]))) for i in range(len(means))]
+    dndlogdp = [means[i]/(math.log10(self.d_categories[i+1])-math.log10(self.d_categories[i])) for i in range(len(means))]
     xvals = [self.d_categories[i] for i in range(len(means))]
     widths = [self.d_categories[i+1]-self.d_categories[i] for i in range(len(xvals))]
-    
-    print(self.title)
-    print(*dndlogdp)
-    
+
     #draw
     _,ax = plt.subplots()
     ax.bar(x=xvals,width=widths,align=&#34;edge&#34;,height=dndlogdp)
@@ -2880,7 +2755,7 @@ Imports a background in the form its exported through Pops.exportbg()</p>
     
     #convert to heatmapdata
     heatmapdata = [[self.pops_bins[j][i] / (math.log10(self.d_categories[j+1])-math.log10(self.d_categories[j])) for i in range(len(self.pops_bins[0])-1)] for j in range(len(self.pops_bins))]
-    heatmapdata = self.hk_replacezeros(heatmapdata)
+    heatmapdata = self._hk_replacezeros(heatmapdata)
     xx,yy = np.meshgrid(self.popstime,self.d_categories)
     
     #draw plot
@@ -2928,11 +2803,11 @@ Imports a background in the form its exported through Pops.exportbg()</p>
     defaults = {&#34;startcrop&#34; : 0,
                 &#34;endcrop&#34; : 0}
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.quickplot()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.quickplot()&#34;)
     
     #find plotdata
-    plotx,ploty,label,ylabel = self.hk_findplottype(y)
+    plotx,ploty,label,ylabel = self._hk_findplottype(y)
     plotx = [plotx[i] for i in range(kwargs[&#34;startcrop&#34;],len(plotx)-kwargs[&#34;endcrop&#34;])]
     ploty = [ploty[i] for i in range(kwargs[&#34;startcrop&#34;],len(ploty)-kwargs[&#34;endcrop&#34;])]
         
@@ -3119,7 +2994,7 @@ Imports a background in the form its exported through Pops.exportbg()</p>
 
     &#34;&#34;&#34;
     
-    _,data,_,_ = self.hk_findplottype(y)
+    _,data,_,_ = self._hk_findplottype(y)
     mean = np.mean(data)
     std = np.std(data,ddof=1)
     var = np.var(data,ddof=1)
@@ -3165,7 +3040,7 @@ Imports a background in the form its exported through Pops.exportbg()</p>
 
     &#34;&#34;&#34;
     
-    _,data,label,unit = self.hk_findplottype(y)
+    _,data,label,unit = self._hk_findplottype(y)
     mean = np.mean(data)
     std = np.std(data,ddof=1)
     var = np.var(data,ddof=1)
@@ -3200,11 +3075,9 @@ Imports a background in the form its exported through Pops.exportbg()</p>
 <li>
 <h4><code><a title="agg_dim.particle_counters.OPC" href="#agg_dim.particle_counters.OPC">OPC</a></code></h4>
 <ul class="two-column">
+<li><code><a title="agg_dim.particle_counters.OPC.append" href="#agg_dim.particle_counters.OPC.append">append</a></code></li>
 <li><code><a title="agg_dim.particle_counters.OPC.dndlogdp" href="#agg_dim.particle_counters.OPC.dndlogdp">dndlogdp</a></code></li>
 <li><code><a title="agg_dim.particle_counters.OPC.heatmap" href="#agg_dim.particle_counters.OPC.heatmap">heatmap</a></code></li>
-<li><code><a title="agg_dim.particle_counters.OPC.hk_errorhandling" href="#agg_dim.particle_counters.OPC.hk_errorhandling">hk_errorhandling</a></code></li>
-<li><code><a title="agg_dim.particle_counters.OPC.hk_func_kwargs" href="#agg_dim.particle_counters.OPC.hk_func_kwargs">hk_func_kwargs</a></code></li>
-<li><code><a title="agg_dim.particle_counters.OPC.hk_kwargs" href="#agg_dim.particle_counters.OPC.hk_kwargs">hk_kwargs</a></code></li>
 <li><code><a title="agg_dim.particle_counters.OPC.plot" href="#agg_dim.particle_counters.OPC.plot">plot</a></code></li>
 <li><code><a title="agg_dim.particle_counters.OPC.returndata" href="#agg_dim.particle_counters.OPC.returndata">returndata</a></code></li>
 <li><code><a title="agg_dim.particle_counters.OPC.save" href="#agg_dim.particle_counters.OPC.save">save</a></code></li>
@@ -3222,11 +3095,6 @@ Imports a background in the form its exported through Pops.exportbg()</p>
 <li><code><a title="agg_dim.particle_counters.Pops.dndlogdp" href="#agg_dim.particle_counters.Pops.dndlogdp">dndlogdp</a></code></li>
 <li><code><a title="agg_dim.particle_counters.Pops.exportbg" href="#agg_dim.particle_counters.Pops.exportbg">exportbg</a></code></li>
 <li><code><a title="agg_dim.particle_counters.Pops.heatmap" href="#agg_dim.particle_counters.Pops.heatmap">heatmap</a></code></li>
-<li><code><a title="agg_dim.particle_counters.Pops.hk_errorhandling" href="#agg_dim.particle_counters.Pops.hk_errorhandling">hk_errorhandling</a></code></li>
-<li><code><a title="agg_dim.particle_counters.Pops.hk_findplottype" href="#agg_dim.particle_counters.Pops.hk_findplottype">hk_findplottype</a></code></li>
-<li><code><a title="agg_dim.particle_counters.Pops.hk_func_kwargs" href="#agg_dim.particle_counters.Pops.hk_func_kwargs">hk_func_kwargs</a></code></li>
-<li><code><a title="agg_dim.particle_counters.Pops.hk_kwargs" href="#agg_dim.particle_counters.Pops.hk_kwargs">hk_kwargs</a></code></li>
-<li><code><a title="agg_dim.particle_counters.Pops.hk_replacezeros" href="#agg_dim.particle_counters.Pops.hk_replacezeros">hk_replacezeros</a></code></li>
 <li><code><a title="agg_dim.particle_counters.Pops.importbg" href="#agg_dim.particle_counters.Pops.importbg">importbg</a></code></li>
 <li><code><a title="agg_dim.particle_counters.Pops.newheatmap" href="#agg_dim.particle_counters.Pops.newheatmap">newheatmap</a></code></li>
 <li><code><a title="agg_dim.particle_counters.Pops.plot" href="#agg_dim.particle_counters.Pops.plot">plot</a></code></li>

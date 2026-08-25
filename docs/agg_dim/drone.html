@@ -89,8 +89,8 @@ accessible in an easy way.</p>
                     &#34;end&#34; : &#34;*&#34;
             }
         for key,value in zip(defaults.keys(),defaults.values()):
-            self.hk_kwargs(kwargs, key, value)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper&#34;)
+            self._hk_kwargs(kwargs, key, value)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper&#34;)
         
         #variables
         self.data = {}
@@ -242,8 +242,8 @@ accessible in an easy way.</p>
                     &#34;targety&#34; : None
             }
         for key,def_val in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,def_val)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.returntarget()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,def_val)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.returntarget()&#34;)
         
         y1,y2 = y.split(&#34;_&#34;)
         op = self.data[y1][y2]
@@ -380,8 +380,8 @@ accessible in an easy way.</p>
                     &#34;cmap_max&#34; : None
             }
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.advancedflightmap()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.advancedflightmap()&#34;)
         
         name,yy = y.split(&#34;_&#34;)
         y = self.data[name][yy]
@@ -605,8 +605,8 @@ accessible in an easy way.</p>
                     &#34;targety&#34; : None}
         
         for key,def_val in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,def_val)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.plot()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,def_val)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.plot()&#34;)
         
         name,yy = y.split(&#34;_&#34;)
         y = self.data[name][yy]
@@ -735,8 +735,8 @@ accessible in an easy way.</p>
                     &#34;targety&#34; : None}
         
         for key,def_val in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,def_val)
-        self.hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.advancedplot()&#34;)
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,def_val)
+        self._hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.advancedplot()&#34;)
         
         xname,xx = x.split(&#34;_&#34;)
         yname,yy = y.split(&#34;_&#34;)
@@ -899,20 +899,20 @@ accessible in an easy way.</p>
         
             
     #housekeeping funcs
-    def hk_kwargs(self,kwargs,key,default):
+    def _hk_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
 
         op = kwargs[key] if key in kwargs else default
         setattr(self, key, op)
         
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
 
         for key in kwargs:
             if key not in legallist:
                 raise IllegalArgument(key,funcname,legallist)
                 
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
 
         op = kwargs[key] if key in kwargs else default
@@ -993,8 +993,8 @@ accessible in an easy way.</p>
                 &#34;cmap_max&#34; : None
         }
     for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.advancedflightmap()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.advancedflightmap()&#34;)
     
     name,yy = y.split(&#34;_&#34;)
     y = self.data[name][yy]
@@ -1257,8 +1257,8 @@ colour corresponding to the highest value at this value.</dd>
                 &#34;targety&#34; : None}
     
     for key,def_val in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,def_val)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.advancedplot()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,def_val)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.advancedplot()&#34;)
     
     xname,xx = x.split(&#34;_&#34;)
     yname,yy = y.split(&#34;_&#34;)
@@ -1462,55 +1462,6 @@ colour corresponding to the highest value at this value.</dd>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
 </dd>
-<dt id="agg_dim.drone.DroneWrapper.hk_errorhandling"><code class="name flex">
-<span>def <span class="ident">hk_errorhandling</span></span>(<span>self, kwargs, legallist, funcname)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_errorhandling(self,kwargs,legallist,funcname):
-    &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
-
-    for key in kwargs:
-        if key not in legallist:
-            raise IllegalArgument(key,funcname,legallist)</code></pre>
-</details>
-<div class="desc"><p>Checks if all passed kwargs are legal</p></div>
-</dd>
-<dt id="agg_dim.drone.DroneWrapper.hk_func_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_func_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_func_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
-
-    op = kwargs[key] if key in kwargs else default
-    return op</code></pre>
-</details>
-<div class="desc"><p>Gives kwargs a default value if they are not passed</p></div>
-</dd>
-<dt id="agg_dim.drone.DroneWrapper.hk_kwargs"><code class="name flex">
-<span>def <span class="ident">hk_kwargs</span></span>(<span>self, kwargs, key, default)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hk_kwargs(self,kwargs,key,default):
-    &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
-
-    op = kwargs[key] if key in kwargs else default
-    setattr(self, key, op)</code></pre>
-</details>
-<div class="desc"><p>Turns kwargs into attributes</p></div>
-</dd>
 <dt id="agg_dim.drone.DroneWrapper.plot"><code class="name flex">
 <span>def <span class="ident">plot</span></span>(<span>self, ax, y, **kwargs)</span>
 </code></dt>
@@ -1576,8 +1527,8 @@ colour corresponding to the highest value at this value.</dd>
                 &#34;targety&#34; : None}
     
     for key,def_val in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,def_val)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.plot()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,def_val)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.plot()&#34;)
     
     name,yy = y.split(&#34;_&#34;)
     y = self.data[name][yy]
@@ -1811,8 +1762,8 @@ colour corresponding to the highest value at this value.</dd>
                 &#34;targety&#34; : None
         }
     for key,def_val in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self.hk_func_kwargs(kwargs,key,def_val)
-    self.hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.returntarget()&#34;)
+        kwargs[key] = self._hk_func_kwargs(kwargs,key,def_val)
+    self._hk_errorhandling(kwargs, defaults.keys(), &#34;DroneWrapper.returntarget()&#34;)
     
     y1,y2 = y.split(&#34;_&#34;)
     op = self.data[y1][y2]
@@ -2372,9 +2323,6 @@ be wrapped.</dd>
 <li><code><a title="agg_dim.drone.DroneWrapper.advancedflightmap" href="#agg_dim.drone.DroneWrapper.advancedflightmap">advancedflightmap</a></code></li>
 <li><code><a title="agg_dim.drone.DroneWrapper.advancedplot" href="#agg_dim.drone.DroneWrapper.advancedplot">advancedplot</a></code></li>
 <li><code><a title="agg_dim.drone.DroneWrapper.flightmap" href="#agg_dim.drone.DroneWrapper.flightmap">flightmap</a></code></li>
-<li><code><a title="agg_dim.drone.DroneWrapper.hk_errorhandling" href="#agg_dim.drone.DroneWrapper.hk_errorhandling">hk_errorhandling</a></code></li>
-<li><code><a title="agg_dim.drone.DroneWrapper.hk_func_kwargs" href="#agg_dim.drone.DroneWrapper.hk_func_kwargs">hk_func_kwargs</a></code></li>
-<li><code><a title="agg_dim.drone.DroneWrapper.hk_kwargs" href="#agg_dim.drone.DroneWrapper.hk_kwargs">hk_kwargs</a></code></li>
 <li><code><a title="agg_dim.drone.DroneWrapper.plot" href="#agg_dim.drone.DroneWrapper.plot">plot</a></code></li>
 <li><code><a title="agg_dim.drone.DroneWrapper.returnattime" href="#agg_dim.drone.DroneWrapper.returnattime">returnattime</a></code></li>
 <li><code><a title="agg_dim.drone.DroneWrapper.returndata" href="#agg_dim.drone.DroneWrapper.returndata">returndata</a></code></li>

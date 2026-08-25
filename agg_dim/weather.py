@@ -135,8 +135,8 @@ class WeatherData:
             }
         
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), "WeatherData.plot()")
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "WeatherData.plot()")
         
         mask = np.full(len(self.data["t"]),True)
         if isinstance(kwargs["day"],str):
@@ -237,14 +237,14 @@ class WeatherData:
         
     #housekeeping funcs
     
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         """Checks if all passed kwargs are legal"""
 
         for key in kwargs:
             if key not in legallist:
                 raise IllegalArgument(key,funcname,legallist)
                 
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         """Gives kwargs a default value if they are not passed"""
  
         op = kwargs[key] if key in kwargs else default

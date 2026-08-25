@@ -211,8 +211,8 @@ class DroneWrapper:
                     "end" : "*"
             }
         for key,value in zip(defaults.keys(),defaults.values()):
-            self.hk_kwargs(kwargs, key, value)
-        self.hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper")
+            self._hk_kwargs(kwargs, key, value)
+        self._hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper")
         
         #variables
         self.data = {}
@@ -364,8 +364,8 @@ class DroneWrapper:
                     "targety" : None
             }
         for key,def_val in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,def_val)
-        self.hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.returntarget()")
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,def_val)
+        self._hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.returntarget()")
         
         y1,y2 = y.split("_")
         op = self.data[y1][y2]
@@ -502,8 +502,8 @@ class DroneWrapper:
                     "cmap_max" : None
             }
         for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,default)
-        self.hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.advancedflightmap()")
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        self._hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.advancedflightmap()")
         
         name,yy = y.split("_")
         y = self.data[name][yy]
@@ -727,8 +727,8 @@ class DroneWrapper:
                     "targety" : None}
         
         for key,def_val in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,def_val)
-        self.hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.plot()")
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,def_val)
+        self._hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.plot()")
         
         name,yy = y.split("_")
         y = self.data[name][yy]
@@ -857,8 +857,8 @@ class DroneWrapper:
                     "targety" : None}
         
         for key,def_val in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self.hk_func_kwargs(kwargs,key,def_val)
-        self.hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.advancedplot()")
+            kwargs[key] = self._hk_func_kwargs(kwargs,key,def_val)
+        self._hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.advancedplot()")
         
         xname,xx = x.split("_")
         yname,yy = y.split("_")
@@ -1021,20 +1021,20 @@ class DroneWrapper:
         
             
     #housekeeping funcs
-    def hk_kwargs(self,kwargs,key,default):
+    def _hk_kwargs(self,kwargs,key,default):
         """Turns kwargs into attributes"""
 
         op = kwargs[key] if key in kwargs else default
         setattr(self, key, op)
         
-    def hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self,kwargs,legallist,funcname):
         """Checks if all passed kwargs are legal"""
 
         for key in kwargs:
             if key not in legallist:
                 raise IllegalArgument(key,funcname,legallist)
                 
-    def hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self,kwargs,key,default):
         """Gives kwargs a default value if they are not passed"""
 
         op = kwargs[key] if key in kwargs else default
