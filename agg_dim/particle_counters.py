@@ -582,6 +582,8 @@ class Pops:
             )
         zeros = np.where(dndlogdp==0)
         dndlogdp[zeros] = np.nan
+        
+        
 
         
         xlims = [self.data["popstime"][0],self.data["popstime"][-1]]
@@ -1076,7 +1078,14 @@ class OPC:
             for i,row in enumerate(cdata):
                 cdata[i] = row.replace(",",".").split("\t")
                 cdata[i][0] = dt.datetime.strptime(cdata[i][0],"%d.%m.%Y %H:%M:%S")
-            cdata = np.array(cdata).transpose()
+            filemask = np.array(
+                [len(cdata[i])==len(cdata[0]) for i in range(len(cdata))]
+                )
+            helper = []
+            for i,boolean in enumerate(filemask):
+                if boolean:
+                    helper.append(cdata[i])
+            cdata = np.array(helper).transpose()
             self.data["t"] = cdata[0]
             self.details["t"] = ["time","CET"]
             self.data["t_noday"] = np.array([cdata[0][i].time() for i in range(len(cdata[0]))])
@@ -1098,7 +1107,11 @@ class OPC:
                 raise FileNotFoundError(f"File {self.mfile} not found. If it has been renamed or moved, pass the new name/path as 'mfile' to OPC.__init__()") from exc
             for i,row in enumerate(mdata):
                 mdata[i] = row.replace(",",".").split("\t")[1:]
-            mdata = np.array(mdata).transpose().astype(float)
+            helper = []
+            for i,boolean in enumerate(filemask):
+                if boolean:
+                    helper.append(mdata[i])
+            mdata = np.array(helper).transpose().astype(float)
             for key,val in zip(mhelper,mdata):
                 key = key[:-8]
                 self.data[key.lower()] = val
@@ -1113,7 +1126,11 @@ class OPC:
                 raise FileNotFoundError(f"File {self.dmfile} not found. If it has been renamed or moved, pass the new name/path as 'dmfile' to OPC.__init__()") from exc
             for i,row in enumerate(dmdata):
                 dmdata[i] = row.replace(",",".").split("\t")[1:]
-            dmdata = np.array(dmdata).transpose().astype(float)
+            helper = []
+            for i,boolean in enumerate(filemask):
+                if boolean:
+                    helper.append(dmdata[i])
+            dmdata = np.array(helper).transpose().astype(float)
             self.data["totalmassconc"] = np.sum(cdata,axis=0)
             self.details["totalmassconc"] = ["Mass Conc. over all channels","$\mu$g/m${}^3$"]
             for i,d in enumerate(cdata):
@@ -1288,7 +1305,22 @@ class OPC:
         logdp = np.log10(self.bins)
         dlogdp = np.array([(logdp[i+1]-logdp[i]) if i == 0 else logdp[i]-logdp[i-1] if i == len(logdp)-1 else (logdp[i+1]-logdp[i-1])/2 for i in range(len(logdp))])
         
-        y = np.array([self.data[f"b{size_bin}partconc"]/val for size_bin,val in zip(range(31),dlogdp)])
+        y = np.array([self.data[f"b{size_bin}partconc"]/val for size_bin,val in zip(range(31),dlogdp)]).T
+        heatmap_t = []
+        start_s = self.data["t"][0].second - self.data["t"][0].second % 10
+        t = self.data["t"][0].replace(second=start_s)
+        while t < self.data["t"][-1]:
+            heatmap_t.append(t)
+            t = t + dt.timedelta(seconds=10)
+        heatmap_t = np.array(heatmap_t)
+        tt = np.array([i.replace(second=i.second-i.second%10) for i in self.data["t"]])
+        yy = np.array([
+            [np.nan for i in range(31)] for j in heatmap_t
+            ])
+        for i,curr in enumerate(heatmap_t):
+            m = np.where(tt==curr,True,False)
+            mean = np.mean(y[m],axis=0)
+            yy[i] = mean.T
         
         xlims = [self.data["t"][0],self.data["t"][-1]]
         xlims = md.date2num(xlims)
@@ -1296,7 +1328,7 @@ class OPC:
         
         ax.set_yticks([i+0.5 for i in range(len(self.bins))],[f"{i:.2f}" for i in self.bins])
         
-        im = ax.imshow(y,aspect="auto",norm="log",extent=[xlims[0],xlims[1],0,len(dlogdp)],cmap=kwargs["cmap"],interpolation="none",origin="lower")
+        im = ax.imshow(yy.T,aspect="auto",norm="log",extent=[xlims[0],xlims[1],0,len(dlogdp)],cmap=kwargs["cmap"],interpolation="none",origin="lower")
         plt.colorbar(im,label="dN/dlog$D_p$ in cm${}^{-3}$",orientation=kwargs["orientation"],location=kwargs["location"],pad=kwargs["pad"])
         
         if kwargs["ylabel"] != None:

@@ -1,3 +1,12 @@
+######################### MR 17.09.2026 #########################
+#                   "OPC and WIBS bug fixes"                    #
+#                                                               #
+# - Fixed a bug, where WIBS dates where parsed incorrectly      #
+# - Fixed a bug, where OPC heatmaps were drawn incorrectly      #
+#   whenever the instrument wasnt running continously           #
+# - Fixed OPC module breaking on faulty lines in dat files.     #
+#################################################################
+
 ######################### MR 25.08.2026 #########################
 #                      "Revamped Pops obj"                      #
 #                                                               #

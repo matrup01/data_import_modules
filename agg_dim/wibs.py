@@ -164,13 +164,9 @@ class WIBS:
             ft_xe1 = np.transpose(list(ft3["Xe1_FluorPeak"]))
             ft_xe2 = np.transpose(list(ft3["Xe2_FluorPeak"]))
             self.start_FT = datetime.fromtimestamp(
-                list(ft3["Seconds"]
-                     )[0],
-                tz=timezone.utc).replace(
-                    year=int(self.FT_date[-4:]),
-                    month=int(self.FT_date[3:5]),
-                    day=int(self.FT_date[:2])
-                    )
+                list(ft3["Seconds"])[0],
+                tz=timezone.utc
+                )
             
             f = f"{self.FT_date}-{FT_time}/+0000"
             FT_time = datetime.strptime(f,"%d.%m.%Y-%H:%M:%S/%z")

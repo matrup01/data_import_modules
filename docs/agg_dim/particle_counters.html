@@ -112,7 +112,14 @@ read in pops and opc data</p>
             for i,row in enumerate(cdata):
                 cdata[i] = row.replace(&#34;,&#34;,&#34;.&#34;).split(&#34;\t&#34;)
                 cdata[i][0] = dt.datetime.strptime(cdata[i][0],&#34;%d.%m.%Y %H:%M:%S&#34;)
-            cdata = np.array(cdata).transpose()
+            filemask = np.array(
+                [len(cdata[i])==len(cdata[0]) for i in range(len(cdata))]
+                )
+            helper = []
+            for i,boolean in enumerate(filemask):
+                if boolean:
+                    helper.append(cdata[i])
+            cdata = np.array(helper).transpose()
             self.data[&#34;t&#34;] = cdata[0]
             self.details[&#34;t&#34;] = [&#34;time&#34;,&#34;CET&#34;]
             self.data[&#34;t_noday&#34;] = np.array([cdata[0][i].time() for i in range(len(cdata[0]))])
@@ -134,7 +141,11 @@ read in pops and opc data</p>
                 raise FileNotFoundError(f&#34;File {self.mfile} not found. If it has been renamed or moved, pass the new name/path as &#39;mfile&#39; to OPC.__init__()&#34;) from exc
             for i,row in enumerate(mdata):
                 mdata[i] = row.replace(&#34;,&#34;,&#34;.&#34;).split(&#34;\t&#34;)[1:]
-            mdata = np.array(mdata).transpose().astype(float)
+            helper = []
+            for i,boolean in enumerate(filemask):
+                if boolean:
+                    helper.append(mdata[i])
+            mdata = np.array(helper).transpose().astype(float)
             for key,val in zip(mhelper,mdata):
                 key = key[:-8]
                 self.data[key.lower()] = val
@@ -149,7 +160,11 @@ read in pops and opc data</p>
                 raise FileNotFoundError(f&#34;File {self.dmfile} not found. If it has been renamed or moved, pass the new name/path as &#39;dmfile&#39; to OPC.__init__()&#34;) from exc
             for i,row in enumerate(dmdata):
                 dmdata[i] = row.replace(&#34;,&#34;,&#34;.&#34;).split(&#34;\t&#34;)[1:]
-            dmdata = np.array(dmdata).transpose().astype(float)
+            helper = []
+            for i,boolean in enumerate(filemask):
+                if boolean:
+                    helper.append(dmdata[i])
+            dmdata = np.array(helper).transpose().astype(float)
             self.data[&#34;totalmassconc&#34;] = np.sum(cdata,axis=0)
             self.details[&#34;totalmassconc&#34;] = [&#34;Mass Conc. over all channels&#34;,&#34;$\mu$g/m${}^3$&#34;]
             for i,d in enumerate(cdata):
@@ -324,7 +339,22 @@ read in pops and opc data</p>
         logdp = np.log10(self.bins)
         dlogdp = np.array([(logdp[i+1]-logdp[i]) if i == 0 else logdp[i]-logdp[i-1] if i == len(logdp)-1 else (logdp[i+1]-logdp[i-1])/2 for i in range(len(logdp))])
         
-        y = np.array([self.data[f&#34;b{size_bin}partconc&#34;]/val for size_bin,val in zip(range(31),dlogdp)])
+        y = np.array([self.data[f&#34;b{size_bin}partconc&#34;]/val for size_bin,val in zip(range(31),dlogdp)]).T
+        heatmap_t = []
+        start_s = self.data[&#34;t&#34;][0].second - self.data[&#34;t&#34;][0].second % 10
+        t = self.data[&#34;t&#34;][0].replace(second=start_s)
+        while t &lt; self.data[&#34;t&#34;][-1]:
+            heatmap_t.append(t)
+            t = t + dt.timedelta(seconds=10)
+        heatmap_t = np.array(heatmap_t)
+        tt = np.array([i.replace(second=i.second-i.second%10) for i in self.data[&#34;t&#34;]])
+        yy = np.array([
+            [np.nan for i in range(31)] for j in heatmap_t
+            ])
+        for i,curr in enumerate(heatmap_t):
+            m = np.where(tt==curr,True,False)
+            mean = np.mean(y[m],axis=0)
+            yy[i] = mean.T
         
         xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
         xlims = md.date2num(xlims)
@@ -332,7 +362,7 @@ read in pops and opc data</p>
         
         ax.set_yticks([i+0.5 for i in range(len(self.bins))],[f&#34;{i:.2f}&#34; for i in self.bins])
         
-        im = ax.imshow(y,aspect=&#34;auto&#34;,norm=&#34;log&#34;,extent=[xlims[0],xlims[1],0,len(dlogdp)],cmap=kwargs[&#34;cmap&#34;],interpolation=&#34;none&#34;,origin=&#34;lower&#34;)
+        im = ax.imshow(yy.T,aspect=&#34;auto&#34;,norm=&#34;log&#34;,extent=[xlims[0],xlims[1],0,len(dlogdp)],cmap=kwargs[&#34;cmap&#34;],interpolation=&#34;none&#34;,origin=&#34;lower&#34;)
         plt.colorbar(im,label=&#34;dN/dlog$D_p$ in cm${}^{-3}$&#34;,orientation=kwargs[&#34;orientation&#34;],location=kwargs[&#34;location&#34;],pad=kwargs[&#34;pad&#34;])
         
         if kwargs[&#34;ylabel&#34;] != None:
@@ -692,7 +722,22 @@ read in pops and opc data</p>
     logdp = np.log10(self.bins)
     dlogdp = np.array([(logdp[i+1]-logdp[i]) if i == 0 else logdp[i]-logdp[i-1] if i == len(logdp)-1 else (logdp[i+1]-logdp[i-1])/2 for i in range(len(logdp))])
     
-    y = np.array([self.data[f&#34;b{size_bin}partconc&#34;]/val for size_bin,val in zip(range(31),dlogdp)])
+    y = np.array([self.data[f&#34;b{size_bin}partconc&#34;]/val for size_bin,val in zip(range(31),dlogdp)]).T
+    heatmap_t = []
+    start_s = self.data[&#34;t&#34;][0].second - self.data[&#34;t&#34;][0].second % 10
+    t = self.data[&#34;t&#34;][0].replace(second=start_s)
+    while t &lt; self.data[&#34;t&#34;][-1]:
+        heatmap_t.append(t)
+        t = t + dt.timedelta(seconds=10)
+    heatmap_t = np.array(heatmap_t)
+    tt = np.array([i.replace(second=i.second-i.second%10) for i in self.data[&#34;t&#34;]])
+    yy = np.array([
+        [np.nan for i in range(31)] for j in heatmap_t
+        ])
+    for i,curr in enumerate(heatmap_t):
+        m = np.where(tt==curr,True,False)
+        mean = np.mean(y[m],axis=0)
+        yy[i] = mean.T
     
     xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
     xlims = md.date2num(xlims)
@@ -700,7 +745,7 @@ read in pops and opc data</p>
     
     ax.set_yticks([i+0.5 for i in range(len(self.bins))],[f&#34;{i:.2f}&#34; for i in self.bins])
     
-    im = ax.imshow(y,aspect=&#34;auto&#34;,norm=&#34;log&#34;,extent=[xlims[0],xlims[1],0,len(dlogdp)],cmap=kwargs[&#34;cmap&#34;],interpolation=&#34;none&#34;,origin=&#34;lower&#34;)
+    im = ax.imshow(yy.T,aspect=&#34;auto&#34;,norm=&#34;log&#34;,extent=[xlims[0],xlims[1],0,len(dlogdp)],cmap=kwargs[&#34;cmap&#34;],interpolation=&#34;none&#34;,origin=&#34;lower&#34;)
     plt.colorbar(im,label=&#34;dN/dlog$D_p$ in cm${}^{-3}$&#34;,orientation=kwargs[&#34;orientation&#34;],location=kwargs[&#34;location&#34;],pad=kwargs[&#34;pad&#34;])
     
     if kwargs[&#34;ylabel&#34;] != None:
@@ -1509,6 +1554,8 @@ exported data.</dd>
             )
         zeros = np.where(dndlogdp==0)
         dndlogdp[zeros] = np.nan
+        
+        
 
         
         xlims = [self.data[&#34;popstime&#34;][0],self.data[&#34;popstime&#34;][-1]]
@@ -2497,6 +2544,8 @@ before this timestamp will be plotted.</dd>
         )
     zeros = np.where(dndlogdp==0)
     dndlogdp[zeros] = np.nan
+    
+    
 
     
     xlims = [self.data[&#34;popstime&#34;][0],self.data[&#34;popstime&#34;][-1]]
