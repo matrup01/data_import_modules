@@ -358,7 +358,7 @@ class Pops:
         
         try:
             self.data[y]
-        except ValueError:
+        except:
             legals = ",".join(self.data.keys())
             msg = f"{y} is no legal 'y' for Pops.plot(). Consider one of the "
             msg += "following: "
@@ -705,7 +705,7 @@ class Pops:
         dndlogdp = np.mean(dndlogdp,axis=1)
         xvals = self.d_categories[:-1]
         widths = self.d_categories[1:] - self.d_categories[:-1]
-        print(*dndlogdp)
+
         #draw
         _,ax = plt.subplots()
         ax.bar(x=xvals,width=widths,align="edge",height=dndlogdp)

@@ -33,6 +33,6 @@ pip install yourlocalpath/yourlocalfilename.whl
 
 If you are from AG Grothe you are welcome to add/improve on modules and commit into this repo. Please just keep the following things in mind:
 
-- Please add docstrings in numpydoc format (see https://numpydoc.readthedocs.io/en/latest/format.html), that can be automatically added to the docu. Also make add a block to change.log, to make it clear what has been changed.
+- Please add docstrings in numpydoc format (see https://numpydoc.readthedocs.io/en/latest/format.html), that can be automatically added to the docu. Also add a block to change.log, to make it clear what has been changed.
 - This repo only contains general purpose import classes for different instruments. Please dont add code for data analysis of a specific project!
 - Please add your changes to dev or create a new branch. Changes will be merged into main for new releases.
