@@ -1,3 +1,12 @@
+######################### MR 05.10.2026 #########################
+#                       "some wibs fixes"                       #
+#                                                               #
+# - fixed how non-fluorescent particles were calculated in WIBS #
+# - added 'cbar_minmax' kwarg to WIBS.heatmap()                 #
+# - fixed the 'togglecbar' kwarg in WIBS.heatmap()              #
+# - PEP8-ified all non-deprecated objs                          #
+#################################################################
+
 ######################### MR 17.09.2026 #########################
 #                   "OPC and WIBS bug fixes"                    #
 #                                                               #

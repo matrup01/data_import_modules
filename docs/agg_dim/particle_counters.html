@@ -60,7 +60,7 @@ read in pops and opc data</p>
 </summary>
 <pre><code class="python">class OPC:
 
-    def __init__(self,file,**kwargs):
+    def __init__(self, file, **kwargs):
         &#34;&#34;&#34;
         Initializes an OPC object
 
@@ -69,15 +69,24 @@ read in pops and opc data</p>
         file : str
             takes an OPC-produced ...-C.dat file.
         mfile : str, optional
-            takes an OPC-produced ...-M.dat file (if no mfile is given, the program will replace the C in the ...-C.dat file with an M and look for the filename at the same path).
+            takes an OPC-produced ...-M.dat file (if no mfile is given, 
+            the program will replace the C in the ...-C.dat file with an M 
+            and look for the filename at the same path).
         dmfile : str, optional
-            takes an OPC-produced ...-dM.dat file (if no dmfile is given, the program will replace the C in the ...-C.dat file with dM and look for the filename at the same path).
+            takes an OPC-produced ...-dM.dat file (if no dmfile is given, 
+            the program will replace the C in the ...-C.dat file with dM and 
+            look for the filename at the same path).
         start : str, optional
-            takes a str in &#39;hh:mm:ss&#39;-format and only imports data acquired after that timestamp.
+            takes a str in &#39;hh:mm:ss&#39;-format and only imports data acquired 
+            after that timestamp.
         end : str, optional
-            takes a str in &#39;hh:mm:ss&#39;-format and only imports data acquired before that timestamp.
+            takes a str in &#39;hh:mm:ss&#39;-format and only imports data acquired 
+            before that timestamp.
         bins : list of floats, optional
-            takes a list of the geometric means of the bins. The default is [0.253,0.298,0.352,0.414,0.488,0.576,0.679,0.8,0.943,1.112,1.31,1.545,1.821,2.146,2.53,2.982,3.515,4.144,4.884,5.757,6.787,8,9.43,11.12,13.1,15.45,18.21,21.46,25.3,29.82,35.15].
+            takes a list of the geometric means of the bins. The default is 
+            `[0.253,0.298,0.352,0.414,0.488,0.576,0.679,0.8,0.943,1.112,1.31,
+             1.545,1.821,2.146,2.53,2.982,3.515,4.144,4.884,5.757,6.787,8,
+             9.43,11.12,13.1,15.45,18.21,21.46,25.3,29.82,35.15]`.
             
         Attributes
         ----------
@@ -88,128 +97,152 @@ read in pops and opc data</p>
 
         &#34;&#34;&#34;
         
-        #kwargs
-        defaults = {&#34;mfile&#34; : file.replace(&#34;C.&#34;,&#34;M.&#34;),
-                    &#34;dmfile&#34; : file.replace(&#34;C.&#34;,&#34;dM.&#34;),
-                    &#34;start&#34; : None,
-                    &#34;end&#34; : None,
-                    &#34;bins&#34; : [0.253,0.298,0.352,0.414,0.488,0.576,0.679,0.8,0.943,1.112,1.31,1.545,1.821,2.146,2.53,2.982,3.515,4.144,4.884,5.757,6.787,8,9.43,11.12,13.1,15.45,18.21,21.46,25.3,29.82,35.15]}
-        for key,value in zip(defaults.keys(),defaults.values()):
+        # kwargs
+        defaults = {&#34;mfile&#34;: file.replace(&#34;C.&#34;, &#34;M.&#34;),
+                    &#34;dmfile&#34;: file.replace(&#34;C.&#34;, &#34;dM.&#34;),
+                    &#34;start&#34;: None,
+                    &#34;end&#34;: None,
+                    &#34;bins&#34;: [0.253, 0.298, 0.352, 0.414, 0.488, 0.576, 0.679,
+                             0.8, 0.943, 1.112, 1.31, 1.545, 1.821, 2.146,
+                             2.53, 2.982, 3.515, 4.144, 4.884, 5.757, 6.787,
+                             8, 9.43, 11.12, 13.1, 15.45, 18.21, 21.46, 25.3,
+                             29.82, 35.15]}
+        for key, value in zip(defaults.keys(), defaults.values()):
             self._hk_kwargs(kwargs, key, value)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC&#34;)
         
         if file[-4:] == &#34;.dat&#34;:
             cfile = file
-            
+
             self.data = {}
             self.details = {}
-            
-            #import cfile
+
+            # import cfile
             with open(cfile) as f:
                 cdata = list(f)[14:]
-                chelper = cdata[0].replace(&#34;,&#34;,&#34;.&#34;).split(&#34;\t&#34;)
+                chelper = cdata[0].replace(&#34;,&#34;, &#34;.&#34;).split(&#34;\t&#34;)
                 cdata = cdata[1:]
-            for i,row in enumerate(cdata):
-                cdata[i] = row.replace(&#34;,&#34;,&#34;.&#34;).split(&#34;\t&#34;)
-                cdata[i][0] = dt.datetime.strptime(cdata[i][0],&#34;%d.%m.%Y %H:%M:%S&#34;)
-            filemask = np.array(
-                [len(cdata[i])==len(cdata[0]) for i in range(len(cdata))]
+            for i, row in enumerate(cdata):
+                cdata[i] = row.replace(&#34;,&#34;, &#34;.&#34;).split(&#34;\t&#34;)
+                cdata[i][0] = dt.datetime.strptime(
+                    cdata[i][0],
+                    &#34;%d.%m.%Y %H:%M:%S&#34;
                 )
+            filemask = np.array(
+                [len(cdata[i]) == len(cdata[0]) for i in range(len(cdata))]
+            )
             helper = []
-            for i,boolean in enumerate(filemask):
+            for i, boolean in enumerate(filemask):
                 if boolean:
                     helper.append(cdata[i])
             cdata = np.array(helper).transpose()
             self.data[&#34;t&#34;] = cdata[0]
-            self.details[&#34;t&#34;] = [&#34;time&#34;,&#34;CET&#34;]
-            self.data[&#34;t_noday&#34;] = np.array([cdata[0][i].time() for i in range(len(cdata[0]))])
-            self.details[&#34;t_noday&#34;] = [&#34;time&#34;,&#34;CET&#34;]
-            cdata = cdata[1:].astype(float) / 1000 #convert from #/l to #/ccm
-            self.data[&#34;totalpartconc&#34;] = np.sum(cdata,axis=0)
-            self.details[&#34;totalpartconc&#34;] = [&#34;Part.Conc. over all channels&#34;,&#34;counts/cm${}^3$&#34;]
-            for i,d in enumerate(cdata):
+            self.details[&#34;t&#34;] = [&#34;time&#34;, &#34;CET&#34;]
+            self.data[&#34;t_noday&#34;] = np.array(
+                [cdata[0][i].time() for i in range(len(cdata[0]))]
+            )
+            self.details[&#34;t_noday&#34;] = [&#34;time&#34;, &#34;CET&#34;]
+            cdata = cdata[1:].astype(float) / 1000  # convert from #/l to #/ccm
+            self.data[&#34;totalpartconc&#34;] = np.sum(cdata, axis=0)
+            self.details[&#34;totalpartconc&#34;] = [&#34;Part.Conc. over all channels&#34;,
+                                             &#34;counts/cm${}^3$&#34;]
+            for i, d in enumerate(cdata):
                 self.data[f&#34;b{i}partconc&#34;] = d
-                self.details[f&#34;b{i}partconc&#34;] = [f&#34;Bin{i} ({chelper[i+1]})&#34;,&#34;counts/cm${}^3$&#34;]
+                self.details[f&#34;b{i}partconc&#34;] = [f&#34;Bin{i} ({chelper[i+1]})&#34;,
+                                                 &#34;counts/cm${}^3$&#34;]
                 
-            #import mfile
+            # import mfile
             try:
                 with open(self.mfile) as f:
                     mdata = list(f)[14:]
-                    mhelper = mdata[0].replace(&#34;,&#34;,&#34;.&#34;).split(&#34;\t&#34;)[1:]
+                    mhelper = mdata[0].replace(&#34;,&#34;, &#34;.&#34;).split(&#34;\t&#34;)[1:]
                     mdata = mdata[1:]
             except Exception as exc:
-                raise FileNotFoundError(f&#34;File {self.mfile} not found. If it has been renamed or moved, pass the new name/path as &#39;mfile&#39; to OPC.__init__()&#34;) from exc
-            for i,row in enumerate(mdata):
-                mdata[i] = row.replace(&#34;,&#34;,&#34;.&#34;).split(&#34;\t&#34;)[1:]
+                msg = f&#34;File {self.mfile} not found. If it has been renamed or&#34;
+                msg += &#34; moved, pass the new name/path as &#39;mfile&#39; to &#34;
+                msg += &#34;OPC.__init__()&#34;
+                raise FileNotFoundError(msg) from exc
+            for i, row in enumerate(mdata):
+                mdata[i] = row.replace(&#34;,&#34;, &#34;.&#34;).split(&#34;\t&#34;)[1:]
             helper = []
-            for i,boolean in enumerate(filemask):
+            for i, boolean in enumerate(filemask):
                 if boolean:
                     helper.append(mdata[i])
             mdata = np.array(helper).transpose().astype(float)
-            for key,val in zip(mhelper,mdata):
+            for key, val in zip(mhelper, mdata):
                 key = key[:-8]
                 self.data[key.lower()] = val
-                self.details[key.lower()] = [key,&#34;$\mu$g/m${}^3$&#34;]
+                self.details[key.lower()] = [key, &#34;μg/m${}^3$&#34;]
                 
-            #import dmfile
+            # import dmfile
             try:
                 with open(self.dmfile) as f:
                     dmdata = list(f)[14:]
                     dmdata = dmdata[1:]
             except Exception as exc:
-                raise FileNotFoundError(f&#34;File {self.dmfile} not found. If it has been renamed or moved, pass the new name/path as &#39;dmfile&#39; to OPC.__init__()&#34;) from exc
-            for i,row in enumerate(dmdata):
-                dmdata[i] = row.replace(&#34;,&#34;,&#34;.&#34;).split(&#34;\t&#34;)[1:]
+                msg = f&#34;File {self.dmfile} not found. If it has been renamed o&#34;
+                msg += &#34;r moved, pass the new name/path as &#39;dmfile&#39; to &#34;
+                msg += &#34;OPC.__init__()&#34;
+                raise FileNotFoundError(msg) from exc
+            for i, row in enumerate(dmdata):
+                dmdata[i] = row.replace(&#34;,&#34;, &#34;.&#34;).split(&#34;\t&#34;)[1:]
             helper = []
-            for i,boolean in enumerate(filemask):
+            for i, boolean in enumerate(filemask):
                 if boolean:
                     helper.append(dmdata[i])
             dmdata = np.array(helper).transpose().astype(float)
-            self.data[&#34;totalmassconc&#34;] = np.sum(cdata,axis=0)
-            self.details[&#34;totalmassconc&#34;] = [&#34;Mass Conc. over all channels&#34;,&#34;$\mu$g/m${}^3$&#34;]
-            for i,d in enumerate(cdata):
+            self.data[&#34;totalmassconc&#34;] = np.sum(cdata, axis=0)
+            self.details[&#34;totalmassconc&#34;] = [&#34;Mass Conc. over all channels&#34;,
+                                             &#34;μg/m${}^3$&#34;]
+            for i, d in enumerate(cdata):
                 self.data[f&#34;b{i}massconc&#34;] = d
-                self.details[f&#34;b{i}massconc&#34;] = [f&#34;Bin{i} ({chelper[i+1]})&#34;,&#34;$\mu$g/m${}^3$&#34;]
+                self.details[f&#34;b{i}massconc&#34;] = [f&#34;Bin{i} ({chelper[i+1]})&#34;,
+                                                 &#34;μg/m${}^3$&#34;]
                 
-            #crop
-            m = np.full(len(self.data[&#34;t_noday&#34;]),True)
+            # crop
+            m = np.full(len(self.data[&#34;t_noday&#34;]), True)
             if self.start != None:
-                tstart = dt.datetime.strptime(self.start,&#34;%H:%M:%S&#34;).time()
-                m = np.where(tstart &lt; self.data[&#34;t_noday&#34;],m,False)
+                tstart = dt.datetime.strptime(self.start, &#34;%H:%M:%S&#34;).time()
+                m = np.where(tstart &lt; self.data[&#34;t_noday&#34;], m, False)
             if self.end != None:
-                tend = dt.datetime.strptime(self.end,&#34;%H:%M:%S&#34;).time()
-                m = np.where(tend &gt; self.data[&#34;t_noday&#34;],m,False)
+                tend = dt.datetime.strptime(self.end, &#34;%H:%M:%S&#34;).time()
+                m = np.where(tend &gt; self.data[&#34;t_noday&#34;], m, False)
             for key in self.data:
                 self.data[key] = self.data[key][m]
                 
         elif file[-4:] == &#34;.opc&#34;:
-            with open(file,&#34;rb&#34;) as openfile:
-                self.data,self.details = pickle.load(openfile)
-            
-            #crop
-            m = np.full(len(self.data[&#34;t_noday&#34;]),True)
+            with open(file, &#34;rb&#34;) as openfile:
+                self.data, self.details = pickle.load(openfile)
+
+            # crop
+            m = np.full(len(self.data[&#34;t_noday&#34;]), True)
             if self.start != None:
-                tstart = dt.datetime.strptime(self.start,&#34;%H:%M:%S&#34;)
-                m = np.where(tstart &lt; self.data[&#34;t_noday&#34;],m,False)
+                tstart = dt.datetime.strptime(self.start, &#34;%H:%M:%S&#34;)
+                m = np.where(tstart &lt; self.data[&#34;t_noday&#34;], m, False)
             if self.end != None:
-                tend = dt.datetime.strptime(self.end,&#34;%H:%M:%S&#34;)
-                m = np.where(tend &gt; self.data[&#34;t_noday&#34;],m,False)
+                tend = dt.datetime.strptime(self.end, &#34;%H:%M:%S&#34;)
+                m = np.where(tend &gt; self.data[&#34;t_noday&#34;], m, False)
             for key in self.data:
                 self.data[key] = self.data[key][m]
                 
         else:
-            raise IllegalFileFormat(file.split(&#34;.&#34;)[1], &#34;dat or .opc&#34;, &#34;&#39;file&#39; argument in OPC.__init__()&#34;)
+            raise IllegalFileFormat(
+                file.split(&#34;.&#34;)[1],
+                &#34;dat or .opc&#34;,
+                &#34;&#39;file&#39; argument in OPC.__init__()&#34;
+                )
                 
                 
                 
-    def save(self,name):
+    def save(self, name):
         &#34;&#34;&#34;
         Saves the OPC object to an .opc file
 
         Parameters
         ----------
         name : str
-            This variable will be used as name and path where the .opc file is saved.
+            This variable will be used as name and path where the 
+            .opc file is saved.
 
         Returns
         -------
@@ -219,9 +252,9 @@ read in pops and opc data</p>
         
         if name[-4:] != &#34;.opc&#34;:
             name += &#34;.opc&#34;
-        op = [self.data,self.details]
-        
-        pickle.dump(op,open(name,&#34;wb&#34;),4)
+        op = [self.data, self.details]
+
+        pickle.dump(op, open(name, &#34;wb&#34;), 4)
         
         
     def plot(self,ax,y,**kwargs):
@@ -233,22 +266,34 @@ read in pops and opc data</p>
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
         y : str
-            This string is given to the OPC.data dict as a key, to determine which data should be plotted.
+            This string is given to the OPC.data dict as a key, to determine 
+            which data should be plotted.
         quakes : list of str, optional
-            Takes times in the form of &#34;HH:MM:SS&#34; and draws vertical lines on the plot at these times. The default is []
+            Takes times in the form of &#34;HH:MM:SS&#34; and draws vertical lines on 
+            the plot at these times. The default is []
         quakeslabel : str, optional
-            If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is &#34;no label&#34;
+            If quakes != [] this label will be used for the quake-lines if the 
+            plot contains a legend. The default is &#34;no label&#34;
         quakecolor : str, optional
-            Determines which color the quake-lines should have. The default is &#34;tab:purple&#34;
+            Determines which color the quake-lines should have. The default 
+            is &#34;tab:purple&#34;
         color : str, optional
             Determines the color of the plot. The default is &#34;tab:orange&#34;
         plotlabel : str, optional
-            This string is used as a label for the plot, if a legend is created. The default is &#34;no label&#34;
+            This string is used as a label for the plot, if a legend is 
+            created. The default is &#34;no label&#34;
         ylabel : str, optional
-            This string is used as a label for the y axis. If no ylabel is given it will be created like this: f&#34;OPC.details[y][0] in OPC.details[y][1]&#34;
+            This string is used as a label for the y axis. If no ylabel is 
+            given it will be created like this: 
+                f&#34;OPC.details[y][0] in OPC.details[y][1]&#34;
         secondary : bool, optional
-            If True, the plot will draw the axis on the right-hand side. Should be used if the given ax is a twinx(). The default is False.
-        setday : Takes a date in the format &#34;DDMMYYYY&#34; and moves the data to this day. Should be used if the data is plotted against data from another instrument that doesnt save a date. The default is None.
+            If True, the plot will draw the axis on the right-hand side. 
+            Should be used if the given ax is a twinx(). The default is False.
+        setday : str
+            Takes a date in the format &#34;DDMMYYYY&#34; and moves the data to 
+            this day. Should be used if the data is plotted against data 
+            from another instrument that doesnt save a date. 
+            The default is None.
 
 
         Returns
@@ -257,39 +302,51 @@ read in pops and opc data</p>
 
         &#34;&#34;&#34;
         
-        #import kwargs   
-        defaults = {&#34;quakes&#34; : [],
-                    &#34;quakeslabel&#34; : &#34;no label&#34;,
-                    &#34;quakecolor&#34; : &#34;tab:purple&#34;,
-                    &#34;color&#34; : &#34;tab:orange&#34;,
-                    &#34;plotlabel&#34; : &#34;no label&#34;,
-                    &#34;ylabel&#34; : &#34;*&#34;,
-                    &#34;secondary&#34; : False,
-                    &#34;setday&#34; : None}
-        
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        # import kwargs
+        defaults = {&#34;quakes&#34;: [],
+                    &#34;quakeslabel&#34;: &#34;no label&#34;,
+                    &#34;quakecolor&#34;: &#34;tab:purple&#34;,
+                    &#34;color&#34;: &#34;tab:orange&#34;,
+                    &#34;plotlabel&#34;: &#34;no label&#34;,
+                    &#34;ylabel&#34;: &#34;*&#34;,
+                    &#34;secondary&#34;: False,
+                    &#34;setday&#34;: None}
+
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.plot()&#34;)
-        
+
         if kwargs[&#34;ylabel&#34;] == &#34;*&#34;:
             kwargs[&#34;ylabel&#34;] = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
         
-        #draw plot
+        # draw plot
         x = self.data[&#34;t&#34;]
-        if isinstance(kwargs[&#34;setday&#34;],str):
-            date = [int(kwargs[&#34;setday&#34;][:2]),int(kwargs[&#34;setday&#34;][2:4]),int(kwargs[&#34;setday&#34;][4:])]
+        if isinstance(kwargs[&#34;setday&#34;], str):
+            date = [int(kwargs[&#34;setday&#34;][:2]),
+                    int(kwargs[&#34;setday&#34;][2:4]),
+                    int(kwargs[&#34;setday&#34;][4:])]
             for i in range(len(x)):
-                x[i] = x[i].replace(day=date[0],month=date[1],year=date[2])
+                x[i] = x[i].replace(day=date[0], month=date[1], year=date[2])
         try:
             y = self.data[y]
         except KeyError as kerr:
             raise IllegalValue(y, &#34;OPC.plot()&#34;, list(self.data)) from kerr
-        ax.plot(x,y,label=kwargs[&#34;plotlabel&#34;],color=kwargs[&#34;color&#34;])
+        ax.plot(x, y, label=kwargs[&#34;plotlabel&#34;], color=kwargs[&#34;color&#34;])
         ax.set_ylabel(kwargs[&#34;ylabel&#34;])
         ax.set_xlabel(&#34;CET&#34;)
         ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
         if len(kwargs[&#34;quakes&#34;]) != 0:
-            ax.vlines(x=[dt.datetime.strptime(element, &#34;%H:%M:%S&#34;)for element in kwargs[&#34;quakes&#34;]],ymin=min(y),ymax=max(y),color=kwargs[&#34;quakecolor&#34;],ls=&#34;dashed&#34;,label=kwargs[&#34;quakeslabel&#34;])
+            ax.vlines(
+                x=[dt.datetime.strptime(
+                    element,
+                    &#34;%H:%M:%S&#34;
+                )for element in kwargs[&#34;quakes&#34;]],
+                ymin=min(y),
+                ymax=max(y),
+                color=kwargs[&#34;quakecolor&#34;],
+                ls=&#34;dashed&#34;,
+                label=kwargs[&#34;quakeslabel&#34;]
+            )
         ax.tick_params(axis=&#39;y&#39;, colors=kwargs[&#34;color&#34;])
         ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])
         if not kwargs[&#34;secondary&#34;]:
@@ -299,7 +356,7 @@ read in pops and opc data</p>
             ax.spines[&#34;left&#34;].set_alpha(0)
             
             
-    def heatmap(self,ax,**kwargs):
+    def heatmap(self, ax, **kwargs):
         &#34;&#34;&#34;
         Draws a dndlogdp-heatmap over an existing mpl-axis
 
@@ -308,15 +365,18 @@ read in pops and opc data</p>
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
         ylabel : str, optional
-            Changes the label of the y-axis, if no ylabel is give it will say &#34;dN/dlogDp in ccm^-3&#34;.
+            Changes the label of the y-axis, if no ylabel is give it will 
+            say &#34;dN/dlogDp in ccm^-3&#34;.
         orientation : str, optional
-            Changes the orientation of the colorbar. The default is &#34;horizontal&#34;.
+            Changes the orientation of the colorbar. 
+            The default is &#34;horizontal&#34;.
         location : str, optional
             Changes the location of the colorbar. The default is &#34;top&#34;
         pad : float, optional
             Changes the padding between plot and colorbar. The default is 0.
         cmap : str, optional
-            Changes the colormap used for the heatmap. The default is &#34;RdYlBu_r&#34;.
+            Changes the colormap used for the heatmap. 
+            The default is &#34;RdYlBu_r&#34;.
 
         Returns
         -------
@@ -324,22 +384,32 @@ read in pops and opc data</p>
 
         &#34;&#34;&#34;
         
-        #import kwargs   
-        defaults = {&#34;ylabel&#34; : None,
-                    &#34;orientation&#34; : &#34;horizontal&#34;,
-                    &#34;location&#34; : &#34;top&#34;,
-                    &#34;pad&#34; : 0,
-                    &#34;cmap&#34; : &#34;RdYlBu_r&#34;}
+        # import kwargs
+        defaults = {&#34;ylabel&#34;: None,
+                    &#34;orientation&#34;: &#34;horizontal&#34;,
+                    &#34;location&#34;: &#34;top&#34;,
+                    &#34;pad&#34;: 0,
+                    &#34;cmap&#34;: &#34;RdYlBu_r&#34;}
         
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.heatmap()&#34;)
                 
-        #draw heatmap
+        # draw heatmap
         logdp = np.log10(self.bins)
-        dlogdp = np.array([(logdp[i+1]-logdp[i]) if i == 0 else logdp[i]-logdp[i-1] if i == len(logdp)-1 else (logdp[i+1]-logdp[i-1])/2 for i in range(len(logdp))])
-        
-        y = np.array([self.data[f&#34;b{size_bin}partconc&#34;]/val for size_bin,val in zip(range(31),dlogdp)]).T
+        dlogdp = np.array(
+            [(logdp[i+1]-logdp[i])
+             if i == 0
+             else logdp[i]-logdp[i-1]
+             if i == len(logdp)-1
+             else (logdp[i+1]-logdp[i-1])/2
+             for i in range(len(logdp))]
+        )
+
+        y = np.array(
+            [self.data[f&#34;b{size_bin}partconc&#34;]/val
+             for size_bin, val in zip(range(31), dlogdp)]
+        ).T
         heatmap_t = []
         start_s = self.data[&#34;t&#34;][0].second - self.data[&#34;t&#34;][0].second % 10
         t = self.data[&#34;t&#34;][0].replace(second=start_s)
@@ -347,23 +417,42 @@ read in pops and opc data</p>
             heatmap_t.append(t)
             t = t + dt.timedelta(seconds=10)
         heatmap_t = np.array(heatmap_t)
-        tt = np.array([i.replace(second=i.second-i.second%10) for i in self.data[&#34;t&#34;]])
-        yy = np.array([
-            [np.nan for i in range(31)] for j in heatmap_t
-            ])
-        for i,curr in enumerate(heatmap_t):
-            m = np.where(tt==curr,True,False)
-            mean = np.mean(y[m],axis=0)
+        tt = np.array(
+            [i.replace(second=i.second-i.second % 10) for i in self.data[&#34;t&#34;]]
+        )
+        yy = np.array(
+            [[np.nan for i in range(31)] for j in heatmap_t]
+        )
+        for i, curr in enumerate(heatmap_t):
+            m = np.where(tt == curr, True, False)
+            mean = np.mean(y[m], axis=0)
             yy[i] = mean.T
         
-        xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
+        xlims = [self.data[&#34;t&#34;][0], self.data[&#34;t&#34;][-1]]
         xlims = md.date2num(xlims)
         ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
         
-        ax.set_yticks([i+0.5 for i in range(len(self.bins))],[f&#34;{i:.2f}&#34; for i in self.bins])
-        
-        im = ax.imshow(yy.T,aspect=&#34;auto&#34;,norm=&#34;log&#34;,extent=[xlims[0],xlims[1],0,len(dlogdp)],cmap=kwargs[&#34;cmap&#34;],interpolation=&#34;none&#34;,origin=&#34;lower&#34;)
-        plt.colorbar(im,label=&#34;dN/dlog$D_p$ in cm${}^{-3}$&#34;,orientation=kwargs[&#34;orientation&#34;],location=kwargs[&#34;location&#34;],pad=kwargs[&#34;pad&#34;])
+        ax.set_yticks(
+            [i+0.5 for i in range(len(self.bins))],
+            [f&#34;{i:.2f}&#34; for i in self.bins]
+        )
+
+        im = ax.imshow(
+            yy.T,
+            aspect=&#34;auto&#34;,
+            norm=&#34;log&#34;,
+            extent=[xlims[0], xlims[1], 0, len(dlogdp)],
+            cmap=kwargs[&#34;cmap&#34;],
+            interpolation=&#34;none&#34;,
+            origin=&#34;lower&#34;
+        )
+        plt.colorbar(
+            im,
+            label=&#34;dN/dlog$D_p$ in cm${}^{-3}$&#34;,
+            orientation=kwargs[&#34;orientation&#34;],
+            location=kwargs[&#34;location&#34;],
+            pad=kwargs[&#34;pad&#34;]
+        )
         
         if kwargs[&#34;ylabel&#34;] != None:
             ax.set_ylabel(kwargs[&#34;ylabel&#34;])
@@ -371,22 +460,26 @@ read in pops and opc data</p>
             ax.set_ylabel(&#34;$D_P$ in $\mu$m&#34;)
             
             
-    def dndlogdp(self,ax,**kwargs):
+    def dndlogdp(self, ax, **kwargs):
         &#34;&#34;&#34;
-        Draws a bar-plot of the average dndlogdp number size distribution on an existing mpl-axis
+        Draws a bar-plot of the average dndlogdp number size distribution on 
+        an existing mpl-axis
 
         Parameters
         ----------
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
         start : str, optional
-            Takes a str of the form &#34;HH:MM:SS&#34; and only uses data acquired after this time for the average distribution. The default is None.
+            Takes a str of the form &#34;HH:MM:SS&#34; and only uses data acquired 
+            after this time for the average distribution. The default is None.
         end : str, optional
-            Takes a str of the form &#34;HH:MM:SS&#34; and only uses data acquired before this time for the average distribution. The default is None.
+            Takes a str of the form &#34;HH:MM:SS&#34; and only uses data acquired 
+            before this time for the average distribution. The default is None.
         logy : bool, optional
             If True, the y axis will be logarithmic. The default is False.
         ylabel : str, optional
-            Changes the label of the y-axis, if no ylabel is give it will say &#34;dN/dlogDp in ccm^-3&#34;.
+            Changes the label of the y-axis, if no ylabel is give it will 
+            say &#34;dN/dlogDp in ccm^-3&#34;.
         scatter : bool, optional
             If True, a scatterplot will be drawn instead of a bar plot.
 
@@ -396,43 +489,66 @@ read in pops and opc data</p>
 
         &#34;&#34;&#34;
         
-        #import kwargs   
+        # import kwargs
         defaults = {&#34;start&#34;: None,
-                    &#34;end&#34; : None,
-                    &#34;logy&#34; : False,
-                    &#34;ylabel&#34; : None,
-                    &#34;scatter&#34; : False}
+                    &#34;end&#34;: None,
+                    &#34;logy&#34;: False,
+                    &#34;ylabel&#34;: None,
+                    &#34;scatter&#34;: False}
         
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.dndlogdp()&#34;)
         
-        #draw plot
-        m = np.full(len(self.data[&#34;t&#34;]),True)
-        if isinstance(kwargs[&#34;start&#34;],str):
-            kwargs[&#34;start&#34;] = dt.datetime.strptime(kwargs[&#34;start&#34;], &#34;%H:%M:%S&#34;).time()
-            m = np.where(self.data[&#34;t_noday&#34;] &gt; kwargs[&#34;start&#34;],m,False)
-        if isinstance(kwargs[&#34;end&#34;],str):
-            kwargs[&#34;end&#34;] = dt.datetime.strptime(kwargs[&#34;end&#34;], &#34;%H:%M:%S&#34;).time()
-            m = np.where(self.data[&#34;t_noday&#34;] &lt; kwargs[&#34;end&#34;],m,False)
+        # draw plot
+        m = np.full(len(self.data[&#34;t&#34;]), True)
+        if isinstance(kwargs[&#34;start&#34;], str):
+            kwargs[&#34;start&#34;] = dt.datetime.strptime(
+                kwargs[&#34;start&#34;],
+                &#34;%H:%M:%S&#34;
+            ).time()
+            m = np.where(self.data[&#34;t_noday&#34;] &gt; kwargs[&#34;start&#34;], m, False)
+        if isinstance(kwargs[&#34;end&#34;], str):
+            kwargs[&#34;end&#34;] = dt.datetime.strptime(
+                kwargs[&#34;end&#34;],
+                &#34;%H:%M:%S&#34;
+            ).time()
+            m = np.where(self.data[&#34;t_noday&#34;] &lt; kwargs[&#34;end&#34;], m, False)
         
         
         logdp = np.log10(self.bins)
-        dlogdp = np.array([(logdp[i+1]-logdp[i]) if i == 0 else logdp[i]-logdp[i-1] if i == len(logdp)-1 else (logdp[i+1]-logdp[i-1])/2 for i in range(len(logdp))])
-        ddp = np.array([(self.bins[i+1]-self.bins[i]) if i == 0 else self.bins[i]-self.bins[i-1] if i == len(self.bins)-1 else (self.bins[i+1]-self.bins[i-1])/2 for i in range(len(self.bins))])
+        dlogdp = np.array(
+            [(logdp[i+1]-logdp[i])
+             if i == 0
+             else logdp[i]-logdp[i-1]
+             if i == len(logdp)-1
+             else (logdp[i+1]-logdp[i-1])/2
+             for i in range(len(logdp))]
+        )
+        ddp = np.array(
+            [(self.bins[i+1]-self.bins[i])
+             if i == 0
+             else self.bins[i]-self.bins[i-1]
+             if i == len(self.bins)-1
+             else (self.bins[i+1]-self.bins[i-1])/2
+             for i in range(len(self.bins))]
+        )
         
-        y = np.array([np.mean(self.data[f&#34;b{size_bin}partconc&#34;][m]/val) for size_bin,val in zip(range(31),dlogdp)])
+        y = np.array(
+            [np.mean(self.data[f&#34;b{size_bin}partconc&#34;][m]/val)
+             for size_bin, val in zip(range(31), dlogdp)]
+        )
         
         if kwargs[&#34;scatter&#34;]:
-            ax.scatter(self.bins,y)
+            ax.scatter(self.bins, y)
         else:
-            ax.bar(self.bins,y,width=ddp)
+            ax.bar(self.bins, y, width=ddp)
         ax.set_xscale(&#34;log&#34;)
         if kwargs[&#34;logy&#34;]:
             ax.set_yscale(&#34;log&#34;)
-            
+
         ax.set_xlabel(&#34;$D_P$ in $\mu$m&#34;)
-        if isinstance(kwargs[&#34;ylabel&#34;],str):
+        if isinstance(kwargs[&#34;ylabel&#34;], str):
             ax.set_ylabel(kwargs[&#34;ylabel&#34;])
         else:
             ax.set_ylabel(&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;)
@@ -458,7 +574,7 @@ read in pops and opc data</p>
         while ts &lt; self.data[&#34;t&#34;][-1]:
             ts = op_t[-1] + dt.timedelta(seconds=1)
             op_t.append(ts)
-        op_dict = {&#34;t&#34; : np.array(op_t)}
+        op_dict = {&#34;t&#34;: np.array(op_t)}
         
         for key in self.data.keys():
             if key == &#34;t&#34; or key == &#34;t_noday&#34;:
@@ -466,14 +582,15 @@ read in pops and opc data</p>
             op = []
             for t in op_t:
                 if t in self.data[&#34;t&#34;]:
-                    op_item = self.data[key][np.where(self.data[&#34;t&#34;]==t)[0][0]]
+                    op_item = self.data[key][np.where(
+                        self.data[&#34;t&#34;] == t)[0][0]]
                     op.append(op_item)
                 else:
                     op.append(np.nan)
             op_dict[key] = np.array(op)
-        return op_dict,self.details
+        return op_dict, self.details
     
-    def append(self,opc):
+    def append(self, opc):
         &#34;&#34;&#34;
         Adds another `OPC` obj to the current one.
 
@@ -491,30 +608,30 @@ read in pops and opc data</p>
             self.data[key] = np.append(
                 self.data[key],
                 opc.data[key]
-                )
+            )
         
         
-    #housekeeping funcs    
-    def _hk_kwargs(self,kwargs,key,default):
+    # housekeeping funcs
+    def _hk_kwargs(self, kwargs, key, default):
         &#34;&#34;&#34;Turns kwargs into attributes&#34;&#34;&#34;
         
         op = kwargs[key] if key in kwargs else default
-        setattr(self,key,op)
-        
-        
-    def _hk_func_kwargs(self,kwargs,key,default):
+        setattr(self, key, op)
+
+
+    def _hk_func_kwargs(self, kwargs, key, default):
         &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
- 
+
         op = kwargs[key] if key in kwargs else default
         return op
     
     
-    def _hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self, kwargs, legallist, funcname):
         &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
         
         for key in kwargs:
             if key not in legallist:
-                raise IllegalArgument(key,funcname,legallist)</code></pre>
+                raise IllegalArgument(key, funcname, legallist)</code></pre>
 </details>
 <div class="desc"><p>Initializes an OPC object</p>
 <h2 id="parameters">Parameters</h2>
@@ -522,15 +639,24 @@ read in pops and opc data</p>
 <dt><strong><code>file</code></strong> :&ensp;<code>str</code></dt>
 <dd>takes an OPC-produced &hellip;-C.dat file.</dd>
 <dt><strong><code>mfile</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>takes an OPC-produced &hellip;-M.dat file (if no mfile is given, the program will replace the C in the &hellip;-C.dat file with an M and look for the filename at the same path).</dd>
+<dd>takes an OPC-produced &hellip;-M.dat file (if no mfile is given,
+the program will replace the C in the &hellip;-C.dat file with an M
+and look for the filename at the same path).</dd>
 <dt><strong><code>dmfile</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>takes an OPC-produced &hellip;-dM.dat file (if no dmfile is given, the program will replace the C in the &hellip;-C.dat file with dM and look for the filename at the same path).</dd>
+<dd>takes an OPC-produced &hellip;-dM.dat file (if no dmfile is given,
+the program will replace the C in the &hellip;-C.dat file with dM and
+look for the filename at the same path).</dd>
 <dt><strong><code>start</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp.</dd>
+<dd>takes a str in 'hh:mm:ss'-format and only imports data acquired
+after that timestamp.</dd>
 <dt><strong><code>end</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp.</dd>
+<dd>takes a str in 'hh:mm:ss'-format and only imports data acquired
+before that timestamp.</dd>
 <dt><strong><code>bins</code></strong> :&ensp;<code>list</code> of <code>floats</code>, optional</dt>
-<dd>takes a list of the geometric means of the bins. The default is [0.253,0.298,0.352,0.414,0.488,0.576,0.679,0.8,0.943,1.112,1.31,1.545,1.821,2.146,2.53,2.982,3.515,4.144,4.884,5.757,6.787,8,9.43,11.12,13.1,15.45,18.21,21.46,25.3,29.82,35.15].</dd>
+<dd>takes a list of the geometric means of the bins. The default is
+<code>[0.253,0.298,0.352,0.414,0.488,0.576,0.679,0.8,0.943,1.112,1.31,
+1.545,1.821,2.146,2.53,2.982,3.515,4.144,4.884,5.757,6.787,8,
+9.43,11.12,13.1,15.45,18.21,21.46,25.3,29.82,35.15]</code>.</dd>
 </dl>
 <h2 id="attributes">Attributes</h2>
 <dl>
@@ -549,7 +675,7 @@ read in pops and opc data</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def append(self,opc):
+<pre><code class="python">def append(self, opc):
     &#34;&#34;&#34;
     Adds another `OPC` obj to the current one.
 
@@ -567,7 +693,7 @@ read in pops and opc data</p>
         self.data[key] = np.append(
             self.data[key],
             opc.data[key]
-            )</code></pre>
+        )</code></pre>
 </details>
 <div class="desc"><p>Adds another <code><a title="agg_dim.particle_counters.OPC" href="#agg_dim.particle_counters.OPC">OPC</a></code> obj to the current one.</p>
 <h2 id="parameters">Parameters</h2>
@@ -589,22 +715,26 @@ read in pops and opc data</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def dndlogdp(self,ax,**kwargs):
+<pre><code class="python">def dndlogdp(self, ax, **kwargs):
     &#34;&#34;&#34;
-    Draws a bar-plot of the average dndlogdp number size distribution on an existing mpl-axis
+    Draws a bar-plot of the average dndlogdp number size distribution on 
+    an existing mpl-axis
 
     Parameters
     ----------
     ax : Axes obj of mpl.axes module
         The plot will be drawn on this axis.
     start : str, optional
-        Takes a str of the form &#34;HH:MM:SS&#34; and only uses data acquired after this time for the average distribution. The default is None.
+        Takes a str of the form &#34;HH:MM:SS&#34; and only uses data acquired 
+        after this time for the average distribution. The default is None.
     end : str, optional
-        Takes a str of the form &#34;HH:MM:SS&#34; and only uses data acquired before this time for the average distribution. The default is None.
+        Takes a str of the form &#34;HH:MM:SS&#34; and only uses data acquired 
+        before this time for the average distribution. The default is None.
     logy : bool, optional
         If True, the y axis will be logarithmic. The default is False.
     ylabel : str, optional
-        Changes the label of the y-axis, if no ylabel is give it will say &#34;dN/dlogDp in ccm^-3&#34;.
+        Changes the label of the y-axis, if no ylabel is give it will 
+        say &#34;dN/dlogDp in ccm^-3&#34;.
     scatter : bool, optional
         If True, a scatterplot will be drawn instead of a bar plot.
 
@@ -614,60 +744,87 @@ read in pops and opc data</p>
 
     &#34;&#34;&#34;
     
-    #import kwargs   
+    # import kwargs
     defaults = {&#34;start&#34;: None,
-                &#34;end&#34; : None,
-                &#34;logy&#34; : False,
-                &#34;ylabel&#34; : None,
-                &#34;scatter&#34; : False}
+                &#34;end&#34;: None,
+                &#34;logy&#34;: False,
+                &#34;ylabel&#34;: None,
+                &#34;scatter&#34;: False}
     
-    for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    for key, default in zip(defaults.keys(), defaults.values()):
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.dndlogdp()&#34;)
     
-    #draw plot
-    m = np.full(len(self.data[&#34;t&#34;]),True)
-    if isinstance(kwargs[&#34;start&#34;],str):
-        kwargs[&#34;start&#34;] = dt.datetime.strptime(kwargs[&#34;start&#34;], &#34;%H:%M:%S&#34;).time()
-        m = np.where(self.data[&#34;t_noday&#34;] &gt; kwargs[&#34;start&#34;],m,False)
-    if isinstance(kwargs[&#34;end&#34;],str):
-        kwargs[&#34;end&#34;] = dt.datetime.strptime(kwargs[&#34;end&#34;], &#34;%H:%M:%S&#34;).time()
-        m = np.where(self.data[&#34;t_noday&#34;] &lt; kwargs[&#34;end&#34;],m,False)
+    # draw plot
+    m = np.full(len(self.data[&#34;t&#34;]), True)
+    if isinstance(kwargs[&#34;start&#34;], str):
+        kwargs[&#34;start&#34;] = dt.datetime.strptime(
+            kwargs[&#34;start&#34;],
+            &#34;%H:%M:%S&#34;
+        ).time()
+        m = np.where(self.data[&#34;t_noday&#34;] &gt; kwargs[&#34;start&#34;], m, False)
+    if isinstance(kwargs[&#34;end&#34;], str):
+        kwargs[&#34;end&#34;] = dt.datetime.strptime(
+            kwargs[&#34;end&#34;],
+            &#34;%H:%M:%S&#34;
+        ).time()
+        m = np.where(self.data[&#34;t_noday&#34;] &lt; kwargs[&#34;end&#34;], m, False)
     
     
     logdp = np.log10(self.bins)
-    dlogdp = np.array([(logdp[i+1]-logdp[i]) if i == 0 else logdp[i]-logdp[i-1] if i == len(logdp)-1 else (logdp[i+1]-logdp[i-1])/2 for i in range(len(logdp))])
-    ddp = np.array([(self.bins[i+1]-self.bins[i]) if i == 0 else self.bins[i]-self.bins[i-1] if i == len(self.bins)-1 else (self.bins[i+1]-self.bins[i-1])/2 for i in range(len(self.bins))])
+    dlogdp = np.array(
+        [(logdp[i+1]-logdp[i])
+         if i == 0
+         else logdp[i]-logdp[i-1]
+         if i == len(logdp)-1
+         else (logdp[i+1]-logdp[i-1])/2
+         for i in range(len(logdp))]
+    )
+    ddp = np.array(
+        [(self.bins[i+1]-self.bins[i])
+         if i == 0
+         else self.bins[i]-self.bins[i-1]
+         if i == len(self.bins)-1
+         else (self.bins[i+1]-self.bins[i-1])/2
+         for i in range(len(self.bins))]
+    )
     
-    y = np.array([np.mean(self.data[f&#34;b{size_bin}partconc&#34;][m]/val) for size_bin,val in zip(range(31),dlogdp)])
+    y = np.array(
+        [np.mean(self.data[f&#34;b{size_bin}partconc&#34;][m]/val)
+         for size_bin, val in zip(range(31), dlogdp)]
+    )
     
     if kwargs[&#34;scatter&#34;]:
-        ax.scatter(self.bins,y)
+        ax.scatter(self.bins, y)
     else:
-        ax.bar(self.bins,y,width=ddp)
+        ax.bar(self.bins, y, width=ddp)
     ax.set_xscale(&#34;log&#34;)
     if kwargs[&#34;logy&#34;]:
         ax.set_yscale(&#34;log&#34;)
-        
+
     ax.set_xlabel(&#34;$D_P$ in $\mu$m&#34;)
-    if isinstance(kwargs[&#34;ylabel&#34;],str):
+    if isinstance(kwargs[&#34;ylabel&#34;], str):
         ax.set_ylabel(kwargs[&#34;ylabel&#34;])
     else:
         ax.set_ylabel(&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;)</code></pre>
 </details>
-<div class="desc"><p>Draws a bar-plot of the average dndlogdp number size distribution on an existing mpl-axis</p>
+<div class="desc"><p>Draws a bar-plot of the average dndlogdp number size distribution on
+an existing mpl-axis</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
 <dd>The plot will be drawn on this axis.</dd>
 <dt><strong><code>start</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>Takes a str of the form "HH:MM:SS" and only uses data acquired after this time for the average distribution. The default is None.</dd>
+<dd>Takes a str of the form "HH:MM:SS" and only uses data acquired
+after this time for the average distribution. The default is None.</dd>
 <dt><strong><code>end</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>Takes a str of the form "HH:MM:SS" and only uses data acquired before this time for the average distribution. The default is None.</dd>
+<dd>Takes a str of the form "HH:MM:SS" and only uses data acquired
+before this time for the average distribution. The default is None.</dd>
 <dt><strong><code>logy</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>If True, the y axis will be logarithmic. The default is False.</dd>
 <dt><strong><code>ylabel</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>Changes the label of the y-axis, if no ylabel is give it will say "dN/dlogDp in ccm^-3".</dd>
+<dd>Changes the label of the y-axis, if no ylabel is give it will
+say "dN/dlogDp in ccm^-3".</dd>
 <dt><strong><code>scatter</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>If True, a scatterplot will be drawn instead of a bar plot.</dd>
 </dl>
@@ -682,7 +839,7 @@ read in pops and opc data</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def heatmap(self,ax,**kwargs):
+<pre><code class="python">def heatmap(self, ax, **kwargs):
     &#34;&#34;&#34;
     Draws a dndlogdp-heatmap over an existing mpl-axis
 
@@ -691,15 +848,18 @@ read in pops and opc data</p>
     ax : Axes obj of mpl.axes module
         The plot will be drawn on this axis.
     ylabel : str, optional
-        Changes the label of the y-axis, if no ylabel is give it will say &#34;dN/dlogDp in ccm^-3&#34;.
+        Changes the label of the y-axis, if no ylabel is give it will 
+        say &#34;dN/dlogDp in ccm^-3&#34;.
     orientation : str, optional
-        Changes the orientation of the colorbar. The default is &#34;horizontal&#34;.
+        Changes the orientation of the colorbar. 
+        The default is &#34;horizontal&#34;.
     location : str, optional
         Changes the location of the colorbar. The default is &#34;top&#34;
     pad : float, optional
         Changes the padding between plot and colorbar. The default is 0.
     cmap : str, optional
-        Changes the colormap used for the heatmap. The default is &#34;RdYlBu_r&#34;.
+        Changes the colormap used for the heatmap. 
+        The default is &#34;RdYlBu_r&#34;.
 
     Returns
     -------
@@ -707,22 +867,32 @@ read in pops and opc data</p>
 
     &#34;&#34;&#34;
     
-    #import kwargs   
-    defaults = {&#34;ylabel&#34; : None,
-                &#34;orientation&#34; : &#34;horizontal&#34;,
-                &#34;location&#34; : &#34;top&#34;,
-                &#34;pad&#34; : 0,
-                &#34;cmap&#34; : &#34;RdYlBu_r&#34;}
+    # import kwargs
+    defaults = {&#34;ylabel&#34;: None,
+                &#34;orientation&#34;: &#34;horizontal&#34;,
+                &#34;location&#34;: &#34;top&#34;,
+                &#34;pad&#34;: 0,
+                &#34;cmap&#34;: &#34;RdYlBu_r&#34;}
     
-    for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    for key, default in zip(defaults.keys(), defaults.values()):
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.heatmap()&#34;)
             
-    #draw heatmap
+    # draw heatmap
     logdp = np.log10(self.bins)
-    dlogdp = np.array([(logdp[i+1]-logdp[i]) if i == 0 else logdp[i]-logdp[i-1] if i == len(logdp)-1 else (logdp[i+1]-logdp[i-1])/2 for i in range(len(logdp))])
-    
-    y = np.array([self.data[f&#34;b{size_bin}partconc&#34;]/val for size_bin,val in zip(range(31),dlogdp)]).T
+    dlogdp = np.array(
+        [(logdp[i+1]-logdp[i])
+         if i == 0
+         else logdp[i]-logdp[i-1]
+         if i == len(logdp)-1
+         else (logdp[i+1]-logdp[i-1])/2
+         for i in range(len(logdp))]
+    )
+
+    y = np.array(
+        [self.data[f&#34;b{size_bin}partconc&#34;]/val
+         for size_bin, val in zip(range(31), dlogdp)]
+    ).T
     heatmap_t = []
     start_s = self.data[&#34;t&#34;][0].second - self.data[&#34;t&#34;][0].second % 10
     t = self.data[&#34;t&#34;][0].replace(second=start_s)
@@ -730,23 +900,42 @@ read in pops and opc data</p>
         heatmap_t.append(t)
         t = t + dt.timedelta(seconds=10)
     heatmap_t = np.array(heatmap_t)
-    tt = np.array([i.replace(second=i.second-i.second%10) for i in self.data[&#34;t&#34;]])
-    yy = np.array([
-        [np.nan for i in range(31)] for j in heatmap_t
-        ])
-    for i,curr in enumerate(heatmap_t):
-        m = np.where(tt==curr,True,False)
-        mean = np.mean(y[m],axis=0)
+    tt = np.array(
+        [i.replace(second=i.second-i.second % 10) for i in self.data[&#34;t&#34;]]
+    )
+    yy = np.array(
+        [[np.nan for i in range(31)] for j in heatmap_t]
+    )
+    for i, curr in enumerate(heatmap_t):
+        m = np.where(tt == curr, True, False)
+        mean = np.mean(y[m], axis=0)
         yy[i] = mean.T
     
-    xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
+    xlims = [self.data[&#34;t&#34;][0], self.data[&#34;t&#34;][-1]]
     xlims = md.date2num(xlims)
     ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
     
-    ax.set_yticks([i+0.5 for i in range(len(self.bins))],[f&#34;{i:.2f}&#34; for i in self.bins])
-    
-    im = ax.imshow(yy.T,aspect=&#34;auto&#34;,norm=&#34;log&#34;,extent=[xlims[0],xlims[1],0,len(dlogdp)],cmap=kwargs[&#34;cmap&#34;],interpolation=&#34;none&#34;,origin=&#34;lower&#34;)
-    plt.colorbar(im,label=&#34;dN/dlog$D_p$ in cm${}^{-3}$&#34;,orientation=kwargs[&#34;orientation&#34;],location=kwargs[&#34;location&#34;],pad=kwargs[&#34;pad&#34;])
+    ax.set_yticks(
+        [i+0.5 for i in range(len(self.bins))],
+        [f&#34;{i:.2f}&#34; for i in self.bins]
+    )
+
+    im = ax.imshow(
+        yy.T,
+        aspect=&#34;auto&#34;,
+        norm=&#34;log&#34;,
+        extent=[xlims[0], xlims[1], 0, len(dlogdp)],
+        cmap=kwargs[&#34;cmap&#34;],
+        interpolation=&#34;none&#34;,
+        origin=&#34;lower&#34;
+    )
+    plt.colorbar(
+        im,
+        label=&#34;dN/dlog$D_p$ in cm${}^{-3}$&#34;,
+        orientation=kwargs[&#34;orientation&#34;],
+        location=kwargs[&#34;location&#34;],
+        pad=kwargs[&#34;pad&#34;]
+    )
     
     if kwargs[&#34;ylabel&#34;] != None:
         ax.set_ylabel(kwargs[&#34;ylabel&#34;])
@@ -759,15 +948,18 @@ read in pops and opc data</p>
 <dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
 <dd>The plot will be drawn on this axis.</dd>
 <dt><strong><code>ylabel</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>Changes the label of the y-axis, if no ylabel is give it will say "dN/dlogDp in ccm^-3".</dd>
+<dd>Changes the label of the y-axis, if no ylabel is give it will
+say "dN/dlogDp in ccm^-3".</dd>
 <dt><strong><code>orientation</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>Changes the orientation of the colorbar. The default is "horizontal".</dd>
+<dd>Changes the orientation of the colorbar.
+The default is "horizontal".</dd>
 <dt><strong><code>location</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>Changes the location of the colorbar. The default is "top"</dd>
 <dt><strong><code>pad</code></strong> :&ensp;<code>float</code>, optional</dt>
 <dd>Changes the padding between plot and colorbar. The default is 0.</dd>
 <dt><strong><code>cmap</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>Changes the colormap used for the heatmap. The default is "RdYlBu_r".</dd>
+<dd>Changes the colormap used for the heatmap.
+The default is "RdYlBu_r".</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
@@ -789,22 +981,34 @@ read in pops and opc data</p>
     ax : Axes obj of mpl.axes module
         The plot will be drawn on this axis.
     y : str
-        This string is given to the OPC.data dict as a key, to determine which data should be plotted.
+        This string is given to the OPC.data dict as a key, to determine 
+        which data should be plotted.
     quakes : list of str, optional
-        Takes times in the form of &#34;HH:MM:SS&#34; and draws vertical lines on the plot at these times. The default is []
+        Takes times in the form of &#34;HH:MM:SS&#34; and draws vertical lines on 
+        the plot at these times. The default is []
     quakeslabel : str, optional
-        If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is &#34;no label&#34;
+        If quakes != [] this label will be used for the quake-lines if the 
+        plot contains a legend. The default is &#34;no label&#34;
     quakecolor : str, optional
-        Determines which color the quake-lines should have. The default is &#34;tab:purple&#34;
+        Determines which color the quake-lines should have. The default 
+        is &#34;tab:purple&#34;
     color : str, optional
         Determines the color of the plot. The default is &#34;tab:orange&#34;
     plotlabel : str, optional
-        This string is used as a label for the plot, if a legend is created. The default is &#34;no label&#34;
+        This string is used as a label for the plot, if a legend is 
+        created. The default is &#34;no label&#34;
     ylabel : str, optional
-        This string is used as a label for the y axis. If no ylabel is given it will be created like this: f&#34;OPC.details[y][0] in OPC.details[y][1]&#34;
+        This string is used as a label for the y axis. If no ylabel is 
+        given it will be created like this: 
+            f&#34;OPC.details[y][0] in OPC.details[y][1]&#34;
     secondary : bool, optional
-        If True, the plot will draw the axis on the right-hand side. Should be used if the given ax is a twinx(). The default is False.
-    setday : Takes a date in the format &#34;DDMMYYYY&#34; and moves the data to this day. Should be used if the data is plotted against data from another instrument that doesnt save a date. The default is None.
+        If True, the plot will draw the axis on the right-hand side. 
+        Should be used if the given ax is a twinx(). The default is False.
+    setday : str
+        Takes a date in the format &#34;DDMMYYYY&#34; and moves the data to 
+        this day. Should be used if the data is plotted against data 
+        from another instrument that doesnt save a date. 
+        The default is None.
 
 
     Returns
@@ -813,39 +1017,51 @@ read in pops and opc data</p>
 
     &#34;&#34;&#34;
     
-    #import kwargs   
-    defaults = {&#34;quakes&#34; : [],
-                &#34;quakeslabel&#34; : &#34;no label&#34;,
-                &#34;quakecolor&#34; : &#34;tab:purple&#34;,
-                &#34;color&#34; : &#34;tab:orange&#34;,
-                &#34;plotlabel&#34; : &#34;no label&#34;,
-                &#34;ylabel&#34; : &#34;*&#34;,
-                &#34;secondary&#34; : False,
-                &#34;setday&#34; : None}
-    
-    for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    # import kwargs
+    defaults = {&#34;quakes&#34;: [],
+                &#34;quakeslabel&#34;: &#34;no label&#34;,
+                &#34;quakecolor&#34;: &#34;tab:purple&#34;,
+                &#34;color&#34;: &#34;tab:orange&#34;,
+                &#34;plotlabel&#34;: &#34;no label&#34;,
+                &#34;ylabel&#34;: &#34;*&#34;,
+                &#34;secondary&#34;: False,
+                &#34;setday&#34;: None}
+
+    for key, default in zip(defaults.keys(), defaults.values()):
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;OPC.plot()&#34;)
-    
+
     if kwargs[&#34;ylabel&#34;] == &#34;*&#34;:
         kwargs[&#34;ylabel&#34;] = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
     
-    #draw plot
+    # draw plot
     x = self.data[&#34;t&#34;]
-    if isinstance(kwargs[&#34;setday&#34;],str):
-        date = [int(kwargs[&#34;setday&#34;][:2]),int(kwargs[&#34;setday&#34;][2:4]),int(kwargs[&#34;setday&#34;][4:])]
+    if isinstance(kwargs[&#34;setday&#34;], str):
+        date = [int(kwargs[&#34;setday&#34;][:2]),
+                int(kwargs[&#34;setday&#34;][2:4]),
+                int(kwargs[&#34;setday&#34;][4:])]
         for i in range(len(x)):
-            x[i] = x[i].replace(day=date[0],month=date[1],year=date[2])
+            x[i] = x[i].replace(day=date[0], month=date[1], year=date[2])
     try:
         y = self.data[y]
     except KeyError as kerr:
         raise IllegalValue(y, &#34;OPC.plot()&#34;, list(self.data)) from kerr
-    ax.plot(x,y,label=kwargs[&#34;plotlabel&#34;],color=kwargs[&#34;color&#34;])
+    ax.plot(x, y, label=kwargs[&#34;plotlabel&#34;], color=kwargs[&#34;color&#34;])
     ax.set_ylabel(kwargs[&#34;ylabel&#34;])
     ax.set_xlabel(&#34;CET&#34;)
     ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
     if len(kwargs[&#34;quakes&#34;]) != 0:
-        ax.vlines(x=[dt.datetime.strptime(element, &#34;%H:%M:%S&#34;)for element in kwargs[&#34;quakes&#34;]],ymin=min(y),ymax=max(y),color=kwargs[&#34;quakecolor&#34;],ls=&#34;dashed&#34;,label=kwargs[&#34;quakeslabel&#34;])
+        ax.vlines(
+            x=[dt.datetime.strptime(
+                element,
+                &#34;%H:%M:%S&#34;
+            )for element in kwargs[&#34;quakes&#34;]],
+            ymin=min(y),
+            ymax=max(y),
+            color=kwargs[&#34;quakecolor&#34;],
+            ls=&#34;dashed&#34;,
+            label=kwargs[&#34;quakeslabel&#34;]
+        )
     ax.tick_params(axis=&#39;y&#39;, colors=kwargs[&#34;color&#34;])
     ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])
     if not kwargs[&#34;secondary&#34;]:
@@ -860,23 +1076,35 @@ read in pops and opc data</p>
 <dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
 <dd>The plot will be drawn on this axis.</dd>
 <dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
-<dd>This string is given to the OPC.data dict as a key, to determine which data should be plotted.</dd>
+<dd>This string is given to the OPC.data dict as a key, to determine
+which data should be plotted.</dd>
 <dt><strong><code>quakes</code></strong> :&ensp;<code>list</code> of <code>str</code>, optional</dt>
-<dd>Takes times in the form of "HH:MM:SS" and draws vertical lines on the plot at these times. The default is []</dd>
+<dd>Takes times in the form of "HH:MM:SS" and draws vertical lines on
+the plot at these times. The default is []</dd>
 <dt><strong><code>quakeslabel</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>If quakes != [] this label will be used for the quake-lines if the plot contains a legend. The default is "no label"</dd>
+<dd>If quakes != [] this label will be used for the quake-lines if the
+plot contains a legend. The default is "no label"</dd>
 <dt><strong><code>quakecolor</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>Determines which color the quake-lines should have. The default is "tab:purple"</dd>
+<dd>Determines which color the quake-lines should have. The default
+is "tab:purple"</dd>
 <dt><strong><code>color</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>Determines the color of the plot. The default is "tab:orange"</dd>
 <dt><strong><code>plotlabel</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>This string is used as a label for the plot, if a legend is created. The default is "no label"</dd>
+<dd>This string is used as a label for the plot, if a legend is
+created. The default is "no label"</dd>
 <dt><strong><code>ylabel</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>This string is used as a label for the y axis. If no ylabel is given it will be created like this: f"OPC.details[y][0] in OPC.details[y][1]"</dd>
+<dd>This string is used as a label for the y axis. If no ylabel is
+given it will be created like this:
+f"OPC.details[y][0] in OPC.details[y][1]"</dd>
 <dt><strong><code>secondary</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>If True, the plot will draw the axis on the right-hand side. Should be used if the given ax is a twinx(). The default is False.</dd>
+<dd>If True, the plot will draw the axis on the right-hand side.
+Should be used if the given ax is a twinx(). The default is False.</dd>
+<dt><strong><code>setday</code></strong> :&ensp;<code>str</code></dt>
+<dd>Takes a date in the format "DDMMYYYY" and moves the data to
+this day. Should be used if the data is plotted against data
+from another instrument that doesnt save a date.
+The default is None.</dd>
 </dl>
-<p>setday : Takes a date in the format "DDMMYYYY" and moves the data to this day. Should be used if the data is plotted against data from another instrument that doesnt save a date. The default is None.</p>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
 </dd>
@@ -908,7 +1136,7 @@ read in pops and opc data</p>
     while ts &lt; self.data[&#34;t&#34;][-1]:
         ts = op_t[-1] + dt.timedelta(seconds=1)
         op_t.append(ts)
-    op_dict = {&#34;t&#34; : np.array(op_t)}
+    op_dict = {&#34;t&#34;: np.array(op_t)}
     
     for key in self.data.keys():
         if key == &#34;t&#34; or key == &#34;t_noday&#34;:
@@ -916,12 +1144,13 @@ read in pops and opc data</p>
         op = []
         for t in op_t:
             if t in self.data[&#34;t&#34;]:
-                op_item = self.data[key][np.where(self.data[&#34;t&#34;]==t)[0][0]]
+                op_item = self.data[key][np.where(
+                    self.data[&#34;t&#34;] == t)[0][0]]
                 op.append(op_item)
             else:
                 op.append(np.nan)
         op_dict[key] = np.array(op)
-    return op_dict,self.details</code></pre>
+    return op_dict, self.details</code></pre>
 </details>
 <div class="desc"><p>Returns a tuple containing all data in a standardized form. Important
 for communication with DroneWrapper or Wrapper objs.</p>
@@ -943,14 +1172,15 @@ exported data.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def save(self,name):
+<pre><code class="python">def save(self, name):
     &#34;&#34;&#34;
     Saves the OPC object to an .opc file
 
     Parameters
     ----------
     name : str
-        This variable will be used as name and path where the .opc file is saved.
+        This variable will be used as name and path where the 
+        .opc file is saved.
 
     Returns
     -------
@@ -960,15 +1190,16 @@ exported data.</dd>
     
     if name[-4:] != &#34;.opc&#34;:
         name += &#34;.opc&#34;
-    op = [self.data,self.details]
-    
-    pickle.dump(op,open(name,&#34;wb&#34;),4)</code></pre>
+    op = [self.data, self.details]
+
+    pickle.dump(op, open(name, &#34;wb&#34;), 4)</code></pre>
 </details>
 <div class="desc"><p>Saves the OPC object to an .opc file</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
-<dd>This variable will be used as name and path where the .opc file is saved.</dd>
+<dd>This variable will be used as name and path where the
+.opc file is saved.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
@@ -1062,161 +1293,175 @@ exported data.</dd>
                                             2.585,
                                             3.37]
              ]
-            )
+        )
         self.plottypes = [
-            [&#34;temp_bm680&#34;,&#34;temperature (bm680)&#34;,&#34;°C&#34;],
-            [&#34;hum_bm680&#34;,&#34;rel. humidity (bm680)&#34;,&#34;%&#34;],
-            [&#34;temp_sen55&#34;,&#34;temperature&#34;,&#34;°C&#34;],
-            [&#34;hum_sen55&#34;,&#34;rel. humidity&#34;,&#34;%&#34;],
-            [&#34;press&#34;,&#34;ambient pressure&#34;,&#34;hPa&#34;],
-            [&#34;gas&#34;,&#34;Gaswiderstand&#34;,r&#34;$\Ohm$&#34;],
-            [&#34;pm1&#34;,&#34;PM1.0&#34;,r&#34;$\mu$g/$m^3$&#34;],
-            [&#34;pm25&#34;,&#34;PM2.5&#34;,r&#34;$\mu$g/$m^3$&#34;],
-            [&#34;pm4&#34;,&#34;PM4.0&#34;,r&#34;$\mu$g/$m^3$&#34;],
-            [&#34;pm10&#34;,&#34;PM10.0&#34;,r&#34;$\mu$g/$m^3$&#34;],
-            [&#34;voc&#34;,&#34;VOC-Index&#34;,&#34;&#34;],
-            [&#34;nox&#34;,r&#34;$NO_X$-Index&#34;,&#34;&#34;],
-            [&#34;co2&#34;,r&#34;$CO_2$&#34;,&#34;ppm&#34;],
-            [&#34;tvoc&#34;,&#34;TVOC&#34;,&#34;ppb&#34;]
-            ]
+            [&#34;temp_bm680&#34;, &#34;temperature (bm680)&#34;, &#34;°C&#34;],
+            [&#34;hum_bm680&#34;, &#34;rel. humidity (bm680)&#34;, &#34;%&#34;],
+            [&#34;temp_sen55&#34;, &#34;temperature&#34;, &#34;°C&#34;],
+            [&#34;hum_sen55&#34;, &#34;rel. humidity&#34;, &#34;%&#34;],
+            [&#34;press&#34;, &#34;ambient pressure&#34;, &#34;hPa&#34;],
+            [&#34;gas&#34;, &#34;Gaswiderstand&#34;, r&#34;$\Ohm$&#34;],
+            [&#34;pm1&#34;, &#34;PM1.0&#34;, r&#34;$\mu$g/$m^3$&#34;],
+            [&#34;pm25&#34;, &#34;PM2.5&#34;, r&#34;$\mu$g/$m^3$&#34;],
+            [&#34;pm4&#34;, &#34;PM4.0&#34;, r&#34;$\mu$g/$m^3$&#34;],
+            [&#34;pm10&#34;, &#34;PM10.0&#34;, r&#34;$\mu$g/$m^3$&#34;],
+            [&#34;voc&#34;, &#34;VOC-Index&#34;, &#34;&#34;],
+            [&#34;nox&#34;, r&#34;$NO_X$-Index&#34;, &#34;&#34;],
+            [&#34;co2&#34;, r&#34;$CO_2$&#34;, &#34;ppm&#34;],
+            [&#34;tvoc&#34;, &#34;TVOC&#34;, &#34;ppb&#34;]
+        ]
         self.plottypes2 = [
-            [&#34;total&#34;,&#34;part. conc.&#34; , r&#34;Counts/$cm^3$&#34;],
-            [&#34;popstemp&#34;,&#34;temperature inside POPS-box&#34;,&#34;°C&#34;],
-            [&#34;boardtemp&#34;,&#34;boardtemp&#34;,&#34;°C&#34;],
-            [&#34;overpm25&#34;,&#34;PM2.5 from POPS&#34;,r&#34;Counts/$cm^3$&#34;],
-            [&#34;underpm25&#34;,&#34;particles smaller than 350 nm&#34;,r&#34;Counts/$cm^3$&#34;]
-            ]
+            [&#34;total&#34;, &#34;part. conc.&#34;, r&#34;Counts/$cm^3$&#34;],
+            [&#34;popstemp&#34;, &#34;temperature inside POPS-box&#34;, &#34;°C&#34;],
+            [&#34;boardtemp&#34;, &#34;boardtemp&#34;, &#34;°C&#34;],
+            [&#34;overpm25&#34;, &#34;PM2.5 from POPS&#34;, r&#34;Counts/$cm^3$&#34;],
+            [&#34;underpm25&#34;, &#34;particles smaller than 350 nm&#34;, r&#34;Counts/$cm^3$&#34;]
+        ]
         
-        #kwargs
-        defaults = {&#34;start&#34; : &#34;00:00:00&#34;,
-                    &#34;end&#34; : &#34;23:59:59&#34;,
-                    &#34;bgobj&#34; : &#34;none&#34;,
-                    &#34;timecorr&#34; : 2,
-                    &#34;relobj&#34; : &#34;none&#34;,
-                    &#34;deviate&#34; : False,
-                    &#34;wintertime&#34; : False,
-                    &#34;layout&#34; : &#34;FlyingFlo2.0&#34;,
-                    &#34;t_no_beaglebone&#34; : True}
-        for key,value in zip(defaults.keys(),defaults.values()):
+        # kwargs
+        defaults = {&#34;start&#34;: &#34;00:00:00&#34;,
+                    &#34;end&#34;: &#34;23:59:59&#34;,
+                    &#34;bgobj&#34;: &#34;none&#34;,
+                    &#34;timecorr&#34;: 2,
+                    &#34;relobj&#34;: &#34;none&#34;,
+                    &#34;deviate&#34;: False,
+                    &#34;wintertime&#34;: False,
+                    &#34;layout&#34;: &#34;FlyingFlo2.0&#34;,
+                    &#34;t_no_beaglebone&#34;: True}
+        for key, value in zip(defaults.keys(), defaults.values()):
             self._hk_kwargs(kwargs, key, value)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops&#34;)
         
-        #fix layout
-        if isinstance(self.layout,str):
+        # fix layout
+        if isinstance(self.layout, str):
             match self.layout:
                 case &#34;desktopmode&#34;:
-                    self.layout = {&#34;bins&#34; : list(range(33,49)),
-                                   &#34;ydata&#34; : &#34;NULL&#34;,
-                                   &#34;ydata2&#34; : [5,20,11],
-                                   &#34;popstime&#34; : 1,
-                                   &#34;t&#34; : -1,
-                                   &#34;flow&#34; : 15}
+                    self.layout = {&#34;bins&#34;: list(range(33, 49)),
+                                   &#34;ydata&#34;: &#34;NULL&#34;,
+                                   &#34;ydata2&#34;: [5, 20, 11],
+                                   &#34;popstime&#34;: 1,
+                                   &#34;t&#34;: -1,
+                                   &#34;flow&#34;: 15}
                 case &#34;box_pallnsdorfer&#34;:
-                    self.layout = {&#34;bins&#34; : list(range(56,72)),
-                                   &#34;ydata&#34; : [2,3,11,10,4,5,6,7,8,9,12,13,14,15],
-                                   &#34;ydata2&#34; : [28,43,34],
-                                   &#34;popstime&#34; : 23,
-                                   &#34;t&#34; : 1,
-                                   &#34;flow&#34; : 38}
+                    self.layout = {&#34;bins&#34;: list(range(56, 72)),
+                                   &#34;ydata&#34;: [2, 3, 11, 10, 4, 5, 6, 7, 8,
+                                             9, 12, 13, 14, 15],
+                                   &#34;ydata2&#34;: [28, 43, 34],
+                                   &#34;popstime&#34;: 23,
+                                   &#34;t&#34;: 1,
+                                   &#34;flow&#34;: 38}
                 case &#34;FlyingFlo2.0&#34;:
-                    self.layout = {&#34;bins&#34; : list(range(36,52)),
-                                   &#34;ydata&#34; : &#34;NULL&#34;,
-                                   &#34;ydata2&#34; : [8,23,14],
-                                   &#34;popstime&#34; : 3,
-                                   &#34;t&#34; : 1,
-                                   &#34;flow&#34; : 18}
+                    self.layout = {&#34;bins&#34;: list(range(36, 52)),
+                                   &#34;ydata&#34;: &#34;NULL&#34;,
+                                   &#34;ydata2&#34;: [8, 23, 14],
+                                   &#34;popstime&#34;: 3,
+                                   &#34;t&#34;: 1,
+                                   &#34;flow&#34;: 18}
                 case _:
-                    raise UnknownLayoutError(self.layout, 
+                    raise UnknownLayoutError(self.layout,
                                              [&#34;desktopmode&#34;,
                                               &#34;box_pallnsdorfer&#34;,
-                                              &#34;FlyingFlo2.0&#34;], 
+                                              &#34;FlyingFlo2.0&#34;],
                                              &#34;POPS&#34;)
         self.ydata = np.array(
             [det[0] for det in self.plottypes])
-        
+
         if self.filename.endswith(&#34;.csv&#34;):
-            with open(self.filename,&#34;r&#34;) as f:
+            with open(self.filename, &#34;r&#34;) as f:
                 data = list(f)[1:]
             for i in range(len(data)):
                 data[i] = data[i].split(&#34;,&#34;)
             newdata = []
             for dat in data:
-                if dat[0][0] == &#34;2&#34;: #only works for the next 974 years
+                if dat[0][0] == &#34;2&#34;:  # only works for the next 974 years
                     newdata.append(dat)
             data = newdata
             del newdata
             
-            #deletes last row if it hasnt been written completely
+            # deletes last row if it hasnt been written completely
             if len(data[0]) &gt; len(data[-1]):
                 data.pop(-1)
-                
-            wt_corr = dt.timedelta(0,3600) if self.wintertime else dt.timedelta(0,7200)
+
+            wt_corr = dt.timedelta(
+                0,
+                3600
+            ) if self.wintertime else dt.timedelta(
+                0,
+                7200
+            )
             
             self.data[&#34;popstime&#34;] = [dt.datetime.strptime(
                 &#34;00:00:00&#34;,
                 &#34;%H:%M:%S&#34;
-                )-dt.timedelta(
-                    0,
-                    self.timecorr
-                    )+wt_corr+dt.timedelta(
-                        0,
-                        float(data[i][self.layout[&#34;popstime&#34;]])
-                        ) for i in range(1,len(data))]
+            )-dt.timedelta(
+                0,
+                self.timecorr
+            )+wt_corr+dt.timedelta(
+                0,
+                float(data[i][self.layout[&#34;popstime&#34;]])
+            ) for i in range(1, len(data))]
             self.data[&#34;popstime&#34;] = np.array(self.data[&#34;popstime&#34;])
             if self.layout[&#34;t&#34;] &lt; 0:
                 self.data[&#34;t&#34;] = self.data[&#34;popstime&#34;]
             else:
                 self.data[&#34;t&#34;] = [dt.datetime.strptime(
                     data[i][self.layout[&#34;t&#34;]],
-                    &#34;%H:%M:%S&#34;) for i in range(1,len(data))]
+                    &#34;%H:%M:%S&#34;) for i in range(1, len(data))]
             self.data[&#34;t&#34;] = np.array(self.data[&#34;t&#34;])
             if self.t_no_beaglebone:
                 self.data[&#34;popstime&#34;] = self.data[&#34;t&#34;]
             
             flow = np.array(
-                [data[i][self.layout[&#34;flow&#34;]] for i in range(1,len(data))]
-                ).astype(float)
-            print(flow)
+                [data[i][self.layout[&#34;flow&#34;]] for i in range(1, len(data))]
+            ).astype(float)
             
             for i,b in enumerate(self.layout[&#34;bins&#34;]):
                 self.data[f&#34;b{i}cps&#34;] = np.array(
-                    [data[row][b] for row in range(1,len(data))]
+                    [data[row][b] for row in range(1, len(data))]
                     ).astype(float)
                 self.details[f&#34;b{i}cps&#34;] = [
                     f&#34;Particle Counts of Bin {i}&#34;,
                     &#34;#/s&#34;
-                    ]
+                ]
                 self.data[f&#34;b{i}partconc&#34;] = self.data[f&#34;b{i}cps&#34;] / flow
                 self.details[f&#34;b{i}partconc&#34;] = [
                     f&#34;Particle Concentration of Bin {i}&#34;,
                     &#34;#/s&#34;
-                    ]
+                ]
             
             if self.layout[&#34;ydata&#34;] != &#34;NULL&#34;:
-                for loc,dat in zip(self.layout[&#34;ydata&#34;],self.plottypes):
+                for loc, dat in zip(self.layout[&#34;ydata&#34;], self.plottypes):
                     self.data[dat[0]] = np.array(
-                        [data[i][loc] for i in range(1,len(data))]
-                        ).astype(float)
-                    self.details = [dat[1],dat[2]]
-            for loc,dat in zip(self.layout[&#34;ydata2&#34;],self.plottypes2):
-                self.data[dat[0]] = np.array(
-                    [data[i][loc] for i in range(1,len(data))]
+                        [data[i][loc] for i in range(1, len(data))]
                     ).astype(float)
-                self.details[dat[0]] = [dat[1],dat[2]]
+                    self.details = [dat[1], dat[2]]
+            for loc, dat in zip(self.layout[&#34;ydata2&#34;], self.plottypes2):
+                self.data[dat[0]] = np.array(
+                    [data[i][loc] for i in range(1, len(data))]
+                ).astype(float)
+                self.details[dat[0]] = [dat[1], dat[2]]
                 
-        #crop
-        m1 = self._hk_returncropmask(self.data[&#34;t&#34;], self.start, self.end)
-        m2 = self._hk_returncropmask(self.data[&#34;popstime&#34;], self.start,self.end)
+        # crop
+        m1 = self._hk_returncropmask(
+            self.data[&#34;t&#34;],
+            self.start,
+            self.end
+        )
+        m2 = self._hk_returncropmask(
+            self.data[&#34;popstime&#34;],
+            self.start,
+            self.end
+        )
         for key in self.data:
-            if key in self.ydata or key==&#34;t&#34;:
+            if key in self.ydata or key == &#34;t&#34;:
                 self.data[key] = self.data[key][m1]
             else:
                 self.data[key] = self.data[key][m2]
             
-        #correctbg
-        if isinstance(self.bgobj,Pops):
+        # correctbg
+        if isinstance(self.bgobj, Pops):
             self.importbg(self.bgobj.exportbg())
-            
+
             for key in self.data:
                 try:
                     self.data[key] = self.data[key]-np.nanmean(self.bgobj[key])
@@ -1225,18 +1470,18 @@ exported data.</dd>
                     msg += f&#34;it does not exist in {self.bgobj}&#34;
                     print(msg)
             
-        #make values relative
-        if isinstance(self.relobj,Pops):
+        # make values relative
+        if isinstance(self.relobj, Pops):
             self.relativevals(self.relobj)
             self.relative = True
-            
-        #make values relative to mean
+
+        # make values relative to mean
         if self.deviate:
             self.deviatefrommean()
             self.deviated = True
         
         
-    def quickplot(self,y):
+    def quickplot(self, y):
         &#34;&#34;&#34;
         Draws a plot y vs time
 
@@ -1252,19 +1497,19 @@ exported data.</dd>
         &#34;&#34;&#34;
         
         xx = self.data[&#34;t&#34;] if y in self.ydata else self.data[&#34;popstime&#34;]
-        yy = self.data[y]  
+        yy = self.data[y]
         label = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
             
-        #draw plot
-        _,ax = plt.subplots()
-        ax.plot(xx,yy,label=self.details[y][0])
+        # draw plot
+        _, ax = plt.subplots()
+        ax.plot(xx, yy, label=self.details[y][0])
         ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
         ax.set_ylabel(label)
         ax.legend()
         plt.show()
         
         
-    def plot(self,ax,y,**kwargs):
+    def plot(self, ax, y, **kwargs):
         &#34;&#34;&#34;
         Plots y over time on an existing mpl axis
 
@@ -1312,20 +1557,20 @@ exported data.</dd>
 
         &#34;&#34;&#34;
         
-        #kwargs
-        defaults = {&#34;start&#34; : &#34;none&#34;,
-                    &#34;end&#34; : &#34;none&#34;,
-                    &#34;quakes&#34; : [],
-                    &#34;quakeslabel&#34; : &#34;none&#34;,
-                    &#34;quakecolor&#34; : &#34;tab:pink&#34;,
-                    &#34;color&#34; : &#34;tab:blue&#34;,
-                    &#34;togglexticks&#34; : True,
-                    &#34;printstats&#34; : False,
-                    &#34;secondary&#34; : False,
-                    &#34;plotlabel&#34; : &#34;none&#34;,
-                    &#34;usepopstime&#34; : False}
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        # kwargs
+        defaults = {&#34;start&#34;: &#34;none&#34;,
+                    &#34;end&#34;: &#34;none&#34;,
+                    &#34;quakes&#34;: [],
+                    &#34;quakeslabel&#34;: &#34;none&#34;,
+                    &#34;quakecolor&#34;: &#34;tab:pink&#34;,
+                    &#34;color&#34;: &#34;tab:blue&#34;,
+                    &#34;togglexticks&#34;: True,
+                    &#34;printstats&#34;: False,
+                    &#34;secondary&#34;: False,
+                    &#34;plotlabel&#34;: &#34;none&#34;,
+                    &#34;usepopstime&#34;: False}
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.plot()&#34;)
         
         try:
@@ -1335,27 +1580,31 @@ exported data.</dd>
             msg = f&#34;{y} is no legal &#39;y&#39; for Pops.plot(). Consider one of the &#34;
             msg += &#34;following: &#34;
             raise ValueError(msg+legals)
-        
+
         if y in self.ydata and not kwargs[&#34;usepopstime&#34;]:
-            m = self._hk_returncropmask(self.data[&#34;t&#34;], 
-                                       kwargs[&#34;start&#34;], 
-                                       kwargs[&#34;end&#34;])
+            m = self._hk_returncropmask(
+                self.data[&#34;t&#34;],
+                kwargs[&#34;start&#34;],
+                kwargs[&#34;end&#34;]
+            )
             xx = self.data[&#34;t&#34;][m]
         else:
-            m = self._hk_returncropmask(self.data[&#34;popstime&#34;], 
-                                       kwargs[&#34;start&#34;], 
-                                       kwargs[&#34;end&#34;])
+            m = self._hk_returncropmask(
+                self.data[&#34;popstime&#34;],
+                kwargs[&#34;start&#34;],
+                kwargs[&#34;end&#34;]
+            )
             xx = self.data[&#34;popstime&#34;][m]
         yy = self.data[y][m]
-        
-        #change label
+
+        # change label
         if kwargs[&#34;plotlabel&#34;] != &#34;none&#34;:
             legendlabel = kwargs[&#34;plotlabel&#34;]
-        else: 
+        else:
             legendlabel = self.details[y][0]
-        
-        #draw plot
-        ax.plot(xx,yy,label=legendlabel,color=kwargs[&#34;color&#34;])
+
+        # draw plot
+        ax.plot(xx, yy, label=legendlabel, color=kwargs[&#34;color&#34;])
         ax.set_ylabel(f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;)
         ax.axes.xaxis.set_visible(kwargs[&#34;togglexticks&#34;])
         ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])
@@ -1377,14 +1626,15 @@ exported data.</dd>
         
         ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
         
-        #print stats
+        # print stats
         if kwargs[&#34;printstats&#34;]:
             mean = np.mean(yy)
-            std = np.std(yy,ddof=1)
-            var = np.var(yy,ddof=1)
-            print(f&#34;{legendlabel}:\n\tmean: {mean}\n\tstd:  {std}\n\tvar:  {var}&#34;)
+            std = np.std(yy, ddof=1)
+            var = np.var(yy, ddof=1)
+            ll = legendlabel
+            print(f&#34;{ll}:\n\tmean: {mean}\n\tstd:  {std}\n\tvar:  {var}&#34;)
         
-    
+        
     def quickheatmap(self):
         &#34;&#34;&#34;
         Draws a heatmap of dndlogdp number size distribution over time
@@ -1395,29 +1645,28 @@ exported data.</dd>
 
         &#34;&#34;&#34;
         
-        #convert to heatmapdata
-        
+        # convert to heatmapdata
         dlog = np.log10(self.d_categories)
         dndlogdp = np.array(
             [self.data[f&#34;b{i}partconc&#34;]/(dlog[i+1]-dlog[i])
              for i in range(len(dlog)-1)]
-            )[:,:-1]
-        zeros = np.where(dndlogdp==0)
+        )[:, :-1]
+        zeros = np.where(dndlogdp == 0)
         dndlogdp[zeros] = np.nan
-        xx,yy = np.meshgrid(self.data[&#34;popstime&#34;],self.d_categories)
+        xx, yy = np.meshgrid(self.data[&#34;popstime&#34;], self.d_categories)
         
-        #draw plot
-        _,ax = plt.subplots()
-        im = ax.pcolormesh(xx,yy,dndlogdp,cmap=&#34;RdYlBu_r&#34;,norm=LogNorm())
+        # draw plot
+        _, ax = plt.subplots()
+        im = ax.pcolormesh(xx, yy, dndlogdp, cmap=&#34;RdYlBu_r&#34;, norm=LogNorm())
         ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
         ax.set_yscale(&#34;log&#34;)
         ax.set_ylabel(&#34;Durchmesser in nm&#34;)
         ax.set_xlabel(&#34;CET&#34;)
-        plt.colorbar(im,ax=ax,label=&#34;dN/dlog$D_p$&#34;)
+        plt.colorbar(im, ax=ax, label=&#34;dN/dlog$D_p$&#34;)
         plt.show()
         
         
-    def heatmap(self,ax,**kwargs):
+    def heatmap(self, ax, **kwargs):
         &#34;&#34;&#34;
         Draws a dndlogdp heatmap over an existing mpl axis
         
@@ -1454,59 +1703,66 @@ exported data.</dd>
         msg += &#34;instead.&#34;
         print(msg)
         
-        #kwargs
-        defaults = {&#34;start&#34; : &#34;none&#34;,
-                    &#34;end&#34; : &#34;none&#34;,
-                    &#34;togglexticks&#34; : True,
-                    &#34;orientation&#34; : &#34;horizontal&#34;,
-                    &#34;location&#34; : &#34;top&#34;,
-                    &#34;togglecbar&#34; : True,
-                    &#34;pad&#34; : 0}
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        # kwargs
+        defaults = {&#34;start&#34;: &#34;none&#34;,
+                    &#34;end&#34;: &#34;none&#34;,
+                    &#34;togglexticks&#34;: True,
+                    &#34;orientation&#34;: &#34;horizontal&#34;,
+                    &#34;location&#34;: &#34;top&#34;,
+                    &#34;togglecbar&#34;: True,
+                    &#34;pad&#34;: 0}
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.heatmap()&#34;)
         
         dlog = np.log10(self.d_categories)
-        m = self._hk_returncropmask(self.data[&#34;popstime&#34;],
-                                   kwargs[&#34;start&#34;],
-                                   kwargs[&#34;end&#34;])
+        m = self._hk_returncropmask(
+            self.data[&#34;popstime&#34;],
+            kwargs[&#34;start&#34;],
+            kwargs[&#34;end&#34;]
+        )
         dndlogdp = np.array(
             [self.data[f&#34;b{i}partconc&#34;][m]/(dlog[i+1]-dlog[i])
              for i in range(len(dlog)-1)]
-            )
-        dndlogdp = np.where(dndlogdp==0,np.nan,dndlogdp)[:,:-1]
+        )
+        dndlogdp = np.where(dndlogdp == 0, np.nan, dndlogdp)[:, :-1]
         
-        xx,yy = np.meshgrid(self.data[&#34;popstime&#34;][m],self.d_categories)
+        xx, yy = np.meshgrid(self.data[&#34;popstime&#34;][m], self.d_categories)
         
-        #draw plot
-        im = ax.pcolormesh(xx,
-                           yy,
-                           dndlogdp,
-                           cmap=&#34;RdYlBu_r&#34;,
-                           norm=LogNorm(vmin=1,vmax=10000))
+        # draw plot
+        im = ax.pcolormesh(
+            xx,
+            yy,
+            dndlogdp,
+            cmap=&#34;RdYlBu_r&#34;,
+            norm=LogNorm(vmin=1, vmax=10000)
+        )
         ax.set_yscale(&#34;log&#34;)
         ax.set_ylabel(&#34;optical diameter $D_p$ in $\mu$m&#34;)
         ax.set_xlabel(&#34;CET&#34;)
         yticks = [str(i/1000) for i in self.d_categories]
-        for i,yt in enumerate(yticks):
+        for i, yt in enumerate(yticks):
             if len(yt) != 5:
                 yticks[i] += &#34;0&#34;
-        ax.set_yticks(self.d_categories,labels=yticks)
+        ax.set_yticks(self.d_categories, labels=yticks)
         ax.axes.xaxis.set_visible(kwargs[&#34;togglexticks&#34;])
         ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
         ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
         ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
         if kwargs[&#34;togglecbar&#34;]:
-            plt.colorbar(im,
-                         label=&#34;dN/dlog$D_p$&#34;,
-                         orientation=kwargs[&#34;orientation&#34;],
-                         location=kwargs[&#34;location&#34;],
-                         pad=kwargs[&#34;pad&#34;])
+            plt.colorbar(
+                im,
+                label=&#34;dN/dlog$D_p$&#34;,
+                orientation=kwargs[&#34;orientation&#34;],
+                location=kwargs[&#34;location&#34;],
+                pad=kwargs[&#34;pad&#34;]
+            )
             
             
-    def newheatmap(self,ax,**kwargs):
+    def newheatmap(self, ax, **kwargs):
         &#34;&#34;&#34;
-        Draws a dndlogdp heatmap with consistent y-increments over an existing mpl axis.
+        Draws a dndlogdp heatmap with consistent y-increments over an 
+        existing mpl axis.
 
         Parameters
         ----------
@@ -1519,7 +1775,8 @@ exported data.</dd>
             When &#39;end&#39; is given in the format &#34;HH:MM:SS&#34;, only data acquired
             before this timestamp will be plotted.
         orientation : str, optional
-            Changes the orientation of the colorbar. The default is &#34;horizontal&#34;.
+            Changes the orientation of the colorbar. 
+            The default is &#34;horizontal&#34;.
         location : str, optional
             Changes the location of the colorbar. The default is &#34;top&#34;.
         pad : float, optional
@@ -1533,63 +1790,67 @@ exported data.</dd>
 
         &#34;&#34;&#34;
         
-        #kwargs
-        defaults = {&#34;orientation&#34; : &#34;horizontal&#34;,
-                    &#34;location&#34; : &#34;top&#34;,
-                    &#34;pad&#34; : 0,
-                    &#34;start&#34; : &#34;none&#34;,
-                    &#34;end&#34; : &#34;none&#34;,
-                    &#34;cmap&#34; : &#34;RdYlBu_r&#34;}
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        # kwargs
+        defaults = {&#34;orientation&#34;: &#34;horizontal&#34;,
+                    &#34;location&#34;: &#34;top&#34;,
+                    &#34;pad&#34;: 0,
+                    &#34;start&#34;: &#34;none&#34;,
+                    &#34;end&#34;: &#34;none&#34;,
+                    &#34;cmap&#34;: &#34;RdYlBu_r&#34;}
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.heatmap()&#34;)
         
         dlog = np.log10(self.d_categories)
-        m = self._hk_returncropmask(self.data[&#34;popstime&#34;],
-                                   kwargs[&#34;start&#34;],
-                                   kwargs[&#34;end&#34;])
+        m = self._hk_returncropmask(
+            self.data[&#34;popstime&#34;],
+            kwargs[&#34;start&#34;],
+            kwargs[&#34;end&#34;]
+        )
         dndlogdp = np.array(
             [self.data[f&#34;b{i}partconc&#34;][m]/(dlog[i+1]-dlog[i])
              for i in range(len(dlog)-1)]
-            )
-        zeros = np.where(dndlogdp==0)
+        )
+        zeros = np.where(dndlogdp == 0)
         dndlogdp[zeros] = np.nan
-        
-        
 
-        
-        xlims = [self.data[&#34;popstime&#34;][0],self.data[&#34;popstime&#34;][-1]]
+        xlims = [self.data[&#34;popstime&#34;][0], self.data[&#34;popstime&#34;][-1]]
         xlims = md.date2num(xlims)
-        
-        im = ax.imshow(dndlogdp,
-                       aspect=&#34;auto&#34;,
-                       cmap=kwargs[&#34;cmap&#34;],
-                       norm=LogNorm(vmin=1,vmax=10000),
-                       extent=[xlims[0],xlims[1],0,len(self.d_categories)-1],
-                       origin=&#34;lower&#34;,
-                       interpolation=&#34;none&#34;)
-        labels = [np.sqrt(self.d_categories[i]*self.d_categories[i+1]) 
+
+        im = ax.imshow(
+            dndlogdp,
+            aspect=&#34;auto&#34;,
+            cmap=kwargs[&#34;cmap&#34;],
+            norm=LogNorm(vmin=1, vmax=10000),
+            extent=[xlims[0], xlims[1], 0, len(self.d_categories)-1],
+            origin=&#34;lower&#34;,
+            interpolation=&#34;none&#34;
+        )
+        labels = [np.sqrt(self.d_categories[i]*self.d_categories[i+1])
                   for i in range(len(self.d_categories)-1)]
-        labels = [str(round(labels[i]/1000,2)) for i in range(len(labels))]
+        labels = [str(round(labels[i]/1000, 2)) for i in range(len(labels))]
         ticks = list(range(len(self.d_categories)-1))
         ticks = [ticks[i]+0.5 for i in range(len(ticks))]
-        ax.set_yticks(ticks,labels=labels)
+        ax.set_yticks(ticks, labels=labels)
         ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
-        
-        plt.colorbar(im,
-                     label=&#34;dN/dlog$D_p$ in cm${}^{-3}$&#34;,
-                     orientation=kwargs[&#34;orientation&#34;],
-                     location=kwargs[&#34;location&#34;],
-                     pad=kwargs[&#34;pad&#34;])
+
+        plt.colorbar(
+            im,
+            label=&#34;dN/dlog$D_p$ in cm${}^{-3}$&#34;,
+            orientation=kwargs[&#34;orientation&#34;],
+            location=kwargs[&#34;location&#34;],
+            pad=kwargs[&#34;pad&#34;]
+        )
         
         ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
         ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
         ax.set_xlabel(&#34;CET&#34;)
         ax.set_ylabel(&#34;optical diameter $D_p$ in $\mu$m&#34;)
         
-    def dndlogdp(self,ax,**kwargs):
+    def dndlogdp(self, ax, **kwargs):
         &#34;&#34;&#34;
-        Draws a dndlogdp number size distribution histogram over an existing mpl axis
+        Draws a dndlogdp number size distribution histogram over 
+        an existing mpl axis
 
         Parameters
         ----------
@@ -1616,42 +1877,48 @@ exported data.</dd>
 
         &#34;&#34;&#34;
         
-        #kwargs
-        defaults = {&#34;start&#34; : &#34;none&#34;,
-                    &#34;end&#34; : &#34;none&#34;,
-                    &#34;scatter&#34; : False,
-                    &#34;color&#34; : &#34;tab:blue&#34;,
-                    &#34;label&#34; : &#34;no label&#34;}
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        # kwargs
+        defaults = {&#34;start&#34;: &#34;none&#34;,
+                    &#34;end&#34;: &#34;none&#34;,
+                    &#34;scatter&#34;: False,
+                    &#34;color&#34;: &#34;tab:blue&#34;,
+                    &#34;label&#34;: &#34;no label&#34;}
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.dndlogdp()&#34;)
         
-        #calculate needed values       
+        # calculate needed values
         dlog = np.log10(self.d_categories)
-        m = self._hk_returncropmask(self.data[&#34;popstime&#34;],
-                                   kwargs[&#34;start&#34;],
-                                   kwargs[&#34;end&#34;])
+        m = self._hk_returncropmask(
+            self.data[&#34;popstime&#34;],
+            kwargs[&#34;start&#34;],
+            kwargs[&#34;end&#34;]
+        )
         dndlogdp = np.array(
             [self.data[f&#34;b{i}partconc&#34;][m]/(dlog[i+1]-dlog[i])
              for i in range(len(dlog)-1)]
-            )
-        dndlogdp = np.mean(dndlogdp,axis=1)
+        )
+        dndlogdp = np.mean(dndlogdp, axis=1)
         xvals = self.d_categories[:-1]
         widths = self.d_categories[1:] - self.d_categories[:-1]
         
-        #draw plot
+        # draw plot
         if kwargs[&#34;scatter&#34;]:
-            ax.scatter(xvals,
-                       dndlogdp,
-                       color=kwargs[&#34;color&#34;],
-                       label=kwargs[&#34;label&#34;])
+            ax.scatter(
+                xvals,
+                dndlogdp,
+                color=kwargs[&#34;color&#34;],
+                label=kwargs[&#34;label&#34;]
+            )
         else:
-            ax.bar(x=xvals,
-                   width=widths,
-                   align=&#34;edge&#34;,
-                   height=dndlogdp,
-                   color=kwargs[&#34;color&#34;],
-                   label=kwargs[&#34;label&#34;])
+            ax.bar(
+                x=xvals,
+                width=widths,
+                align=&#34;edge&#34;,
+                height=dndlogdp,
+                color=kwargs[&#34;color&#34;],
+                label=kwargs[&#34;label&#34;]
+            )
         ax.set_yscale(&#34;log&#34;)
         ax.set_ylabel(&#34;dN/dlog$D_p$&#34;)
         ax.set_xscale(&#34;log&#34;)
@@ -1668,27 +1935,27 @@ exported data.</dd>
 
         &#34;&#34;&#34;
         
-        #calculate needed values
+        # calculate needed values
         dlog = np.log10(self.d_categories)
         dndlogdp = np.array(
             [self.data[f&#34;b{i}partconc&#34;]/(dlog[i+1]-dlog[i])
              for i in range(len(dlog)-1)]
-            )
-        dndlogdp = np.mean(dndlogdp,axis=1)
+        )
+        dndlogdp = np.mean(dndlogdp, axis=1)
         xvals = self.d_categories[:-1]
         widths = self.d_categories[1:] - self.d_categories[:-1]
-        print(*dndlogdp)
-        #draw
-        _,ax = plt.subplots()
-        ax.bar(x=xvals,width=widths,align=&#34;edge&#34;,height=dndlogdp)
+
+        # draw
+        _, ax = plt.subplots()
+        ax.bar(x=xvals, width=widths, align=&#34;edge&#34;, height=dndlogdp)
         ax.set_yscale(&#34;log&#34;)
         ax.set_ylabel(&#34;dN/dlog$D_p$&#34;)
         ax.set_xscale(&#34;log&#34;)
         ax.set_xlabel(&#34;$D_p$ in nm&#34;)
-        plt.show()        
+        plt.show()
         
         
-    def stats(self,y):
+    def stats(self, y):
         &#34;&#34;&#34;
         Prints mean, std and var of y to the console
 
@@ -1705,13 +1972,13 @@ exported data.</dd>
         
         data = self.data[y]
         mean = np.mean(data)
-        std = np.std(data,ddof=1)
-        var = np.var(data,ddof=1)
+        std = np.std(data, ddof=1)
+        var = np.var(data, ddof=1)
         print(f&#34;\nSTATS:\n{self.details[y][0]} in {self.details[y][1]}:&#34;)
         print(f&#34;\tmean {mean}\n\tstd  {std}\n\tvar  {var}&#34;)
     
-        
-    def returnstats(self,y):
+    
+    def returnstats(self, y):
         &#34;&#34;&#34;
         Returns a tuple of (mean,std,var)
 
@@ -1733,13 +2000,13 @@ exported data.</dd>
         
         data = self.data[&#34;y&#34;]
         mean = np.mean(data)
-        std = np.std(data,ddof=1)
-        var = np.var(data,ddof=1)
-        
-        return mean,std,var
+        std = np.std(data, ddof=1)
+        var = np.var(data, ddof=1)
+
+        return mean, std, var
     
     
-    def append(self,obj):
+    def append(self, obj):
         &#34;&#34;&#34;
         Takes another Pops obj and appends its data to this one
 
@@ -1756,7 +2023,7 @@ exported data.</dd>
             
         for key in self.data:
             try:
-                self.data[key] = np.append(self.data[key],obj.data[key])
+                self.data[key] = np.append(self.data[key], obj.data[key])
             except:
                 msg = f&#34;WARNING: {key} is not loaded in the Pops obj that &#34;
                 msg += &#34;should be appended&#34;
@@ -1764,14 +2031,16 @@ exported data.</dd>
                 
                 
                 
-    def add(self,obj):
+    def add(self, obj):
         &#34;&#34;&#34;
-        Takes a Pops obj and returns another Pops obj which contains the data of both objs without changing them
+        Takes a Pops obj and returns another Pops obj which contains 
+        the data of both objs without changing them
 
         Parameters
         ----------
         obj : Pops
-            Data of this obj will be in the returned obj together with the data of self.
+            Data of this obj will be in the returned obj together with 
+            the data of self.
 
         Returns
         -------
@@ -1781,15 +2050,15 @@ exported data.</dd>
         &#34;&#34;&#34;
                     
         newpops = Pops(file=self.filename)
-        
+
         for key in self.data:
             try:
-                newpops.data[key] = np.append(self.data[key],obj.data[key])
+                newpops.data[key] = np.append(self.data[key], obj.data[key])
             except:
                 msg = f&#34;WARNING: {key} is not loaded in the Pops obj that &#34;
                 msg += &#34;should be appended&#34;
                 print(msg)
-                
+
         return newpops
     
     
@@ -1808,18 +2077,19 @@ exported data.</dd>
                 mean = np.mean(self.data[key])
                 self.data[key] = ((self.data[key]/mean)-1)*100
                 self.details[key][1] = self.details[key][1] + &#34; (normalised)&#34;
-                
+
         self.deviated = True
     
     
-    def relativevals(self,bgobj):
+    def relativevals(self, bgobj):
         &#34;&#34;&#34;
         Changes all data to be expressed relative to the mean of the bgobj
 
         Parameters
         ----------
         bgobj : Pops
-            All data of self will be expressed relative to the data of this obj.
+            All data of self will be expressed relative to the data 
+            of this obj.
 
         Returns
         -------
@@ -1832,13 +2102,13 @@ exported data.</dd>
                 if key != &#34;t&#34; and key != &#34;popstime&#34;:
                     mean = np.mean(bgobj.data[key])
                     self.data[key] = ((self.data[key]/mean)-1)*100
-                    self.details[key][1] = f&#34;{self.details[key][1]} (normalised)&#34;
+                    self.details[key][1] += &#34; (normalised)&#34;
             except:
                 msg = f&#34;WARNING: {key} is not loaded in the Pops obj that &#34;
                 msg += &#34;should be appended. {key} will not be expressed &#34;
                 msg += &#34;relatively&#34;
                 print(msg)
-            
+
         self.relative = True
     
     
@@ -1861,7 +2131,7 @@ exported data.</dd>
         print(msg)
         self.desample(60)
     
-    def desample(self,samplesize):
+    def desample(self, samplesize):
         &#34;&#34;&#34;
         Averages all data by a custom amount of seconds
         
@@ -1885,30 +2155,30 @@ exported data.</dd>
                     yy = self.data[key][:n1*samplesize].reshape(
                         -1,
                         samplesize
-                        ).mean(axis=1)
+                    ).mean(axis=1)
                     self.data[key] = np.append(
                         yy,
                         np.mean(self.data[key][n1*samplesize:])
-                        )
+                    )
                 else:
                     yy = self.data[key][:n2*samplesize].reshape(
                         -1,
                         samplesize
-                        ).mean(axis=1)
+                    ).mean(axis=1)
                     self.data[key] = np.append(
                         yy,
                         np.mean(self.data[key][n2*samplesize:])
-                        )
+                    )
             elif key == &#34;t&#34;:
                 self.data[key] = np.append(
                     self.data[key][:n1*samplesize:samplesize],
                     self.data[key][n1*samplesize]
-                    ) + dt.timedelta(seconds=samplesize/2)
+                ) + dt.timedelta(seconds=samplesize/2)
             else:
                 self.data[key] = np.append(
                     self.data[key][:n2*samplesize:samplesize],
                     self.data[key][n2*samplesize]
-                    ) + dt.timedelta(seconds=samplesize/2)
+                ) + dt.timedelta(seconds=samplesize/2)
         
         
     def returndata(self):
@@ -1919,17 +2189,19 @@ exported data.</dd>
         Returns
         -------
         op : dict {str : np.array}
-            This dict contains all data in the form of np.arrays indexed by their name.
+            This dict contains all data in the form of np.arrays indexed by 
+            their name.
         op_details : dict {str : [str,str]}
-            This dict contains a description and a unit for all the data saved in op.
+            This dict contains a description and a unit for all the data 
+            saved in op.
 
         &#34;&#34;&#34;
         
-        return self.data,self.details
+        return self.data, self.details
         
-        
-    #housekeeping funcs    
-    def _hk_kwargs(self,kwargs,key,default):
+    
+    # housekeeping funcs
+    def _hk_kwargs(self, kwargs, key, default):
         &#34;&#34;&#34;
         @private
         Housekeeping Func --&gt; no usecase outside obj
@@ -1941,7 +2213,7 @@ exported data.</dd>
         setattr(self, key, op)
         
         
-    def _hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self, kwargs, key, default):
         &#34;&#34;&#34;
         @private
         Housekeeping func --&gt; no usecase outside obj
@@ -1953,7 +2225,7 @@ exported data.</dd>
         return op
     
     
-    def _hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self, kwargs, legallist, funcname):
         &#34;&#34;&#34;
         @private
         Housekeeping func --&gt; no usecase outside obj
@@ -1963,10 +2235,9 @@ exported data.</dd>
         
         for key in kwargs:
             if key not in legallist:
-                raise IllegalArgument(key,funcname,legallist)
+                raise IllegalArgument(key, funcname, legallist)
 
- 
-    def _hk_returncropmask(self,cropby,start,end):
+    def _hk_returncropmask(self, cropby, start, end):
         &#34;&#34;&#34;
         @private
         Housekeeping Func --&gt; no usecase outside obj 
@@ -1981,18 +2252,18 @@ exported data.</dd>
             start = dt.datetime.strptime(
                 f&#34;{y}.{m}.{d}-{start}&#34;,
                 &#34;%Y.%m.%d-%H:%M:%S&#34;
-                )
+            )
         else:
-            start = dt.datetime(1199,1,1,11,11,11)
+            start = dt.datetime(1199, 1, 1, 11, 11, 11)
         if end != &#34;none&#34;:
             end = dt.datetime.strptime(
                 f&#34;{y}.{m}.{d}-{end}&#34;,
                 &#34;%Y.%m.%d-%H:%M:%S&#34;
-                )
+            )
         else:
-            end = dt.datetime(2999,1,1,11,11,11)
-            
-        return np.array([start&lt;=i&lt;=end for i in cropby])</code></pre>
+            end = dt.datetime(2999, 1, 1, 11, 11, 11)
+
+        return np.array([start &lt;= i &lt;= end for i in cropby])</code></pre>
 </details>
 <div class="desc"><p>Obj to read in data produced by Pops</p>
 <h2 id="parameters">Parameters</h2>
@@ -2050,14 +2321,16 @@ stored in <code>self.data</code></dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add(self,obj):
+<pre><code class="python">def add(self, obj):
     &#34;&#34;&#34;
-    Takes a Pops obj and returns another Pops obj which contains the data of both objs without changing them
+    Takes a Pops obj and returns another Pops obj which contains 
+    the data of both objs without changing them
 
     Parameters
     ----------
     obj : Pops
-        Data of this obj will be in the returned obj together with the data of self.
+        Data of this obj will be in the returned obj together with 
+        the data of self.
 
     Returns
     -------
@@ -2067,22 +2340,24 @@ stored in <code>self.data</code></dd>
     &#34;&#34;&#34;
                 
     newpops = Pops(file=self.filename)
-    
+
     for key in self.data:
         try:
-            newpops.data[key] = np.append(self.data[key],obj.data[key])
+            newpops.data[key] = np.append(self.data[key], obj.data[key])
         except:
             msg = f&#34;WARNING: {key} is not loaded in the Pops obj that &#34;
             msg += &#34;should be appended&#34;
             print(msg)
-            
+
     return newpops</code></pre>
 </details>
-<div class="desc"><p>Takes a Pops obj and returns another Pops obj which contains the data of both objs without changing them</p>
+<div class="desc"><p>Takes a Pops obj and returns another Pops obj which contains
+the data of both objs without changing them</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>obj</code></strong> :&ensp;<code><a title="agg_dim.particle_counters.Pops" href="#agg_dim.particle_counters.Pops">Pops</a></code></dt>
-<dd>Data of this obj will be in the returned obj together with the data of self.</dd>
+<dd>Data of this obj will be in the returned obj together with
+the data of self.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -2098,7 +2373,7 @@ stored in <code>self.data</code></dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def append(self,obj):
+<pre><code class="python">def append(self, obj):
     &#34;&#34;&#34;
     Takes another Pops obj and appends its data to this one
 
@@ -2115,7 +2390,7 @@ stored in <code>self.data</code></dd>
         
     for key in self.data:
         try:
-            self.data[key] = np.append(self.data[key],obj.data[key])
+            self.data[key] = np.append(self.data[key], obj.data[key])
         except:
             msg = f&#34;WARNING: {key} is not loaded in the Pops obj that &#34;
             msg += &#34;should be appended&#34;
@@ -2174,7 +2449,7 @@ soon since it was succeeded by Pops.desample.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def desample(self,samplesize):
+<pre><code class="python">def desample(self, samplesize):
     &#34;&#34;&#34;
     Averages all data by a custom amount of seconds
     
@@ -2198,30 +2473,30 @@ soon since it was succeeded by Pops.desample.</p>
                 yy = self.data[key][:n1*samplesize].reshape(
                     -1,
                     samplesize
-                    ).mean(axis=1)
+                ).mean(axis=1)
                 self.data[key] = np.append(
                     yy,
                     np.mean(self.data[key][n1*samplesize:])
-                    )
+                )
             else:
                 yy = self.data[key][:n2*samplesize].reshape(
                     -1,
                     samplesize
-                    ).mean(axis=1)
+                ).mean(axis=1)
                 self.data[key] = np.append(
                     yy,
                     np.mean(self.data[key][n2*samplesize:])
-                    )
+                )
         elif key == &#34;t&#34;:
             self.data[key] = np.append(
                 self.data[key][:n1*samplesize:samplesize],
                 self.data[key][n1*samplesize]
-                ) + dt.timedelta(seconds=samplesize/2)
+            ) + dt.timedelta(seconds=samplesize/2)
         else:
             self.data[key] = np.append(
                 self.data[key][:n2*samplesize:samplesize],
                 self.data[key][n2*samplesize]
-                ) + dt.timedelta(seconds=samplesize/2)</code></pre>
+            ) + dt.timedelta(seconds=samplesize/2)</code></pre>
 </details>
 <div class="desc"><p>Averages all data by a custom amount of seconds</p>
 <h2 id="parameters">Parameters</h2>
@@ -2256,7 +2531,7 @@ soon since it was succeeded by Pops.desample.</p>
             mean = np.mean(self.data[key])
             self.data[key] = ((self.data[key]/mean)-1)*100
             self.details[key][1] = self.details[key][1] + &#34; (normalised)&#34;
-            
+
     self.deviated = True</code></pre>
 </details>
 <div class="desc"><p>Changes all data to be expressed relative to the mean</p>
@@ -2271,9 +2546,10 @@ soon since it was succeeded by Pops.desample.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def dndlogdp(self,ax,**kwargs):
+<pre><code class="python">def dndlogdp(self, ax, **kwargs):
     &#34;&#34;&#34;
-    Draws a dndlogdp number size distribution histogram over an existing mpl axis
+    Draws a dndlogdp number size distribution histogram over 
+    an existing mpl axis
 
     Parameters
     ----------
@@ -2300,48 +2576,55 @@ soon since it was succeeded by Pops.desample.</p>
 
     &#34;&#34;&#34;
     
-    #kwargs
-    defaults = {&#34;start&#34; : &#34;none&#34;,
-                &#34;end&#34; : &#34;none&#34;,
-                &#34;scatter&#34; : False,
-                &#34;color&#34; : &#34;tab:blue&#34;,
-                &#34;label&#34; : &#34;no label&#34;}
-    for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    # kwargs
+    defaults = {&#34;start&#34;: &#34;none&#34;,
+                &#34;end&#34;: &#34;none&#34;,
+                &#34;scatter&#34;: False,
+                &#34;color&#34;: &#34;tab:blue&#34;,
+                &#34;label&#34;: &#34;no label&#34;}
+    for key, default in zip(defaults.keys(), defaults.values()):
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.dndlogdp()&#34;)
     
-    #calculate needed values       
+    # calculate needed values
     dlog = np.log10(self.d_categories)
-    m = self._hk_returncropmask(self.data[&#34;popstime&#34;],
-                               kwargs[&#34;start&#34;],
-                               kwargs[&#34;end&#34;])
+    m = self._hk_returncropmask(
+        self.data[&#34;popstime&#34;],
+        kwargs[&#34;start&#34;],
+        kwargs[&#34;end&#34;]
+    )
     dndlogdp = np.array(
         [self.data[f&#34;b{i}partconc&#34;][m]/(dlog[i+1]-dlog[i])
          for i in range(len(dlog)-1)]
-        )
-    dndlogdp = np.mean(dndlogdp,axis=1)
+    )
+    dndlogdp = np.mean(dndlogdp, axis=1)
     xvals = self.d_categories[:-1]
     widths = self.d_categories[1:] - self.d_categories[:-1]
     
-    #draw plot
+    # draw plot
     if kwargs[&#34;scatter&#34;]:
-        ax.scatter(xvals,
-                   dndlogdp,
-                   color=kwargs[&#34;color&#34;],
-                   label=kwargs[&#34;label&#34;])
+        ax.scatter(
+            xvals,
+            dndlogdp,
+            color=kwargs[&#34;color&#34;],
+            label=kwargs[&#34;label&#34;]
+        )
     else:
-        ax.bar(x=xvals,
-               width=widths,
-               align=&#34;edge&#34;,
-               height=dndlogdp,
-               color=kwargs[&#34;color&#34;],
-               label=kwargs[&#34;label&#34;])
+        ax.bar(
+            x=xvals,
+            width=widths,
+            align=&#34;edge&#34;,
+            height=dndlogdp,
+            color=kwargs[&#34;color&#34;],
+            label=kwargs[&#34;label&#34;]
+        )
     ax.set_yscale(&#34;log&#34;)
     ax.set_ylabel(&#34;dN/dlog$D_p$&#34;)
     ax.set_xscale(&#34;log&#34;)
     ax.set_xlabel(&#34;$D_p$ in nm&#34;)</code></pre>
 </details>
-<div class="desc"><p>Draws a dndlogdp number size distribution histogram over an existing mpl axis</p>
+<div class="desc"><p>Draws a dndlogdp number size distribution histogram over
+an existing mpl axis</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
@@ -2372,7 +2655,7 @@ The default is False.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def heatmap(self,ax,**kwargs):
+<pre><code class="python">def heatmap(self, ax, **kwargs):
     &#34;&#34;&#34;
     Draws a dndlogdp heatmap over an existing mpl axis
     
@@ -2409,54 +2692,60 @@ The default is False.</dd>
     msg += &#34;instead.&#34;
     print(msg)
     
-    #kwargs
-    defaults = {&#34;start&#34; : &#34;none&#34;,
-                &#34;end&#34; : &#34;none&#34;,
-                &#34;togglexticks&#34; : True,
-                &#34;orientation&#34; : &#34;horizontal&#34;,
-                &#34;location&#34; : &#34;top&#34;,
-                &#34;togglecbar&#34; : True,
-                &#34;pad&#34; : 0}
-    for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    # kwargs
+    defaults = {&#34;start&#34;: &#34;none&#34;,
+                &#34;end&#34;: &#34;none&#34;,
+                &#34;togglexticks&#34;: True,
+                &#34;orientation&#34;: &#34;horizontal&#34;,
+                &#34;location&#34;: &#34;top&#34;,
+                &#34;togglecbar&#34;: True,
+                &#34;pad&#34;: 0}
+    for key, default in zip(defaults.keys(), defaults.values()):
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.heatmap()&#34;)
     
     dlog = np.log10(self.d_categories)
-    m = self._hk_returncropmask(self.data[&#34;popstime&#34;],
-                               kwargs[&#34;start&#34;],
-                               kwargs[&#34;end&#34;])
+    m = self._hk_returncropmask(
+        self.data[&#34;popstime&#34;],
+        kwargs[&#34;start&#34;],
+        kwargs[&#34;end&#34;]
+    )
     dndlogdp = np.array(
         [self.data[f&#34;b{i}partconc&#34;][m]/(dlog[i+1]-dlog[i])
          for i in range(len(dlog)-1)]
-        )
-    dndlogdp = np.where(dndlogdp==0,np.nan,dndlogdp)[:,:-1]
+    )
+    dndlogdp = np.where(dndlogdp == 0, np.nan, dndlogdp)[:, :-1]
     
-    xx,yy = np.meshgrid(self.data[&#34;popstime&#34;][m],self.d_categories)
+    xx, yy = np.meshgrid(self.data[&#34;popstime&#34;][m], self.d_categories)
     
-    #draw plot
-    im = ax.pcolormesh(xx,
-                       yy,
-                       dndlogdp,
-                       cmap=&#34;RdYlBu_r&#34;,
-                       norm=LogNorm(vmin=1,vmax=10000))
+    # draw plot
+    im = ax.pcolormesh(
+        xx,
+        yy,
+        dndlogdp,
+        cmap=&#34;RdYlBu_r&#34;,
+        norm=LogNorm(vmin=1, vmax=10000)
+    )
     ax.set_yscale(&#34;log&#34;)
     ax.set_ylabel(&#34;optical diameter $D_p$ in $\mu$m&#34;)
     ax.set_xlabel(&#34;CET&#34;)
     yticks = [str(i/1000) for i in self.d_categories]
-    for i,yt in enumerate(yticks):
+    for i, yt in enumerate(yticks):
         if len(yt) != 5:
             yticks[i] += &#34;0&#34;
-    ax.set_yticks(self.d_categories,labels=yticks)
+    ax.set_yticks(self.d_categories, labels=yticks)
     ax.axes.xaxis.set_visible(kwargs[&#34;togglexticks&#34;])
     ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
     ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
     ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
     if kwargs[&#34;togglecbar&#34;]:
-        plt.colorbar(im,
-                     label=&#34;dN/dlog$D_p$&#34;,
-                     orientation=kwargs[&#34;orientation&#34;],
-                     location=kwargs[&#34;location&#34;],
-                     pad=kwargs[&#34;pad&#34;])</code></pre>
+        plt.colorbar(
+            im,
+            label=&#34;dN/dlog$D_p$&#34;,
+            orientation=kwargs[&#34;orientation&#34;],
+            location=kwargs[&#34;location&#34;],
+            pad=kwargs[&#34;pad&#34;]
+        )</code></pre>
 </details>
 <div class="desc"><p>Draws a dndlogdp heatmap over an existing mpl axis</p>
 <div class="admonition deprecated">
@@ -2494,9 +2783,10 @@ before this timestamp will be plotted.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def newheatmap(self,ax,**kwargs):
+<pre><code class="python">def newheatmap(self, ax, **kwargs):
     &#34;&#34;&#34;
-    Draws a dndlogdp heatmap with consistent y-increments over an existing mpl axis.
+    Draws a dndlogdp heatmap with consistent y-increments over an 
+    existing mpl axis.
 
     Parameters
     ----------
@@ -2509,7 +2799,8 @@ before this timestamp will be plotted.</dd>
         When &#39;end&#39; is given in the format &#34;HH:MM:SS&#34;, only data acquired
         before this timestamp will be plotted.
     orientation : str, optional
-        Changes the orientation of the colorbar. The default is &#34;horizontal&#34;.
+        Changes the orientation of the colorbar. 
+        The default is &#34;horizontal&#34;.
     location : str, optional
         Changes the location of the colorbar. The default is &#34;top&#34;.
     pad : float, optional
@@ -2523,61 +2814,65 @@ before this timestamp will be plotted.</dd>
 
     &#34;&#34;&#34;
     
-    #kwargs
-    defaults = {&#34;orientation&#34; : &#34;horizontal&#34;,
-                &#34;location&#34; : &#34;top&#34;,
-                &#34;pad&#34; : 0,
-                &#34;start&#34; : &#34;none&#34;,
-                &#34;end&#34; : &#34;none&#34;,
-                &#34;cmap&#34; : &#34;RdYlBu_r&#34;}
-    for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    # kwargs
+    defaults = {&#34;orientation&#34;: &#34;horizontal&#34;,
+                &#34;location&#34;: &#34;top&#34;,
+                &#34;pad&#34;: 0,
+                &#34;start&#34;: &#34;none&#34;,
+                &#34;end&#34;: &#34;none&#34;,
+                &#34;cmap&#34;: &#34;RdYlBu_r&#34;}
+    for key, default in zip(defaults.keys(), defaults.values()):
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.heatmap()&#34;)
     
     dlog = np.log10(self.d_categories)
-    m = self._hk_returncropmask(self.data[&#34;popstime&#34;],
-                               kwargs[&#34;start&#34;],
-                               kwargs[&#34;end&#34;])
+    m = self._hk_returncropmask(
+        self.data[&#34;popstime&#34;],
+        kwargs[&#34;start&#34;],
+        kwargs[&#34;end&#34;]
+    )
     dndlogdp = np.array(
         [self.data[f&#34;b{i}partconc&#34;][m]/(dlog[i+1]-dlog[i])
          for i in range(len(dlog)-1)]
-        )
-    zeros = np.where(dndlogdp==0)
+    )
+    zeros = np.where(dndlogdp == 0)
     dndlogdp[zeros] = np.nan
-    
-    
 
-    
-    xlims = [self.data[&#34;popstime&#34;][0],self.data[&#34;popstime&#34;][-1]]
+    xlims = [self.data[&#34;popstime&#34;][0], self.data[&#34;popstime&#34;][-1]]
     xlims = md.date2num(xlims)
-    
-    im = ax.imshow(dndlogdp,
-                   aspect=&#34;auto&#34;,
-                   cmap=kwargs[&#34;cmap&#34;],
-                   norm=LogNorm(vmin=1,vmax=10000),
-                   extent=[xlims[0],xlims[1],0,len(self.d_categories)-1],
-                   origin=&#34;lower&#34;,
-                   interpolation=&#34;none&#34;)
-    labels = [np.sqrt(self.d_categories[i]*self.d_categories[i+1]) 
+
+    im = ax.imshow(
+        dndlogdp,
+        aspect=&#34;auto&#34;,
+        cmap=kwargs[&#34;cmap&#34;],
+        norm=LogNorm(vmin=1, vmax=10000),
+        extent=[xlims[0], xlims[1], 0, len(self.d_categories)-1],
+        origin=&#34;lower&#34;,
+        interpolation=&#34;none&#34;
+    )
+    labels = [np.sqrt(self.d_categories[i]*self.d_categories[i+1])
               for i in range(len(self.d_categories)-1)]
-    labels = [str(round(labels[i]/1000,2)) for i in range(len(labels))]
+    labels = [str(round(labels[i]/1000, 2)) for i in range(len(labels))]
     ticks = list(range(len(self.d_categories)-1))
     ticks = [ticks[i]+0.5 for i in range(len(ticks))]
-    ax.set_yticks(ticks,labels=labels)
+    ax.set_yticks(ticks, labels=labels)
     ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
-    
-    plt.colorbar(im,
-                 label=&#34;dN/dlog$D_p$ in cm${}^{-3}$&#34;,
-                 orientation=kwargs[&#34;orientation&#34;],
-                 location=kwargs[&#34;location&#34;],
-                 pad=kwargs[&#34;pad&#34;])
+
+    plt.colorbar(
+        im,
+        label=&#34;dN/dlog$D_p$ in cm${}^{-3}$&#34;,
+        orientation=kwargs[&#34;orientation&#34;],
+        location=kwargs[&#34;location&#34;],
+        pad=kwargs[&#34;pad&#34;]
+    )
     
     ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
     ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
     ax.set_xlabel(&#34;CET&#34;)
     ax.set_ylabel(&#34;optical diameter $D_p$ in $\mu$m&#34;)</code></pre>
 </details>
-<div class="desc"><p>Draws a dndlogdp heatmap with consistent y-increments over an existing mpl axis.</p>
+<div class="desc"><p>Draws a dndlogdp heatmap with consistent y-increments over an
+existing mpl axis.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
@@ -2589,7 +2884,8 @@ after this timestamp will be plotted.</dd>
 <dd>When 'end' is given in the format "HH:MM:SS", only data acquired
 before this timestamp will be plotted.</dd>
 <dt><strong><code>orientation</code></strong> :&ensp;<code>str</code>, optional</dt>
-<dd>Changes the orientation of the colorbar. The default is "horizontal".</dd>
+<dd>Changes the orientation of the colorbar.
+The default is "horizontal".</dd>
 <dt><strong><code>location</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>Changes the location of the colorbar. The default is "top".</dd>
 <dt><strong><code>pad</code></strong> :&ensp;<code>float</code>, optional</dt>
@@ -2608,7 +2904,7 @@ before this timestamp will be plotted.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def plot(self,ax,y,**kwargs):
+<pre><code class="python">def plot(self, ax, y, **kwargs):
     &#34;&#34;&#34;
     Plots y over time on an existing mpl axis
 
@@ -2656,20 +2952,20 @@ before this timestamp will be plotted.</dd>
 
     &#34;&#34;&#34;
     
-    #kwargs
-    defaults = {&#34;start&#34; : &#34;none&#34;,
-                &#34;end&#34; : &#34;none&#34;,
-                &#34;quakes&#34; : [],
-                &#34;quakeslabel&#34; : &#34;none&#34;,
-                &#34;quakecolor&#34; : &#34;tab:pink&#34;,
-                &#34;color&#34; : &#34;tab:blue&#34;,
-                &#34;togglexticks&#34; : True,
-                &#34;printstats&#34; : False,
-                &#34;secondary&#34; : False,
-                &#34;plotlabel&#34; : &#34;none&#34;,
-                &#34;usepopstime&#34; : False}
-    for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    # kwargs
+    defaults = {&#34;start&#34;: &#34;none&#34;,
+                &#34;end&#34;: &#34;none&#34;,
+                &#34;quakes&#34;: [],
+                &#34;quakeslabel&#34;: &#34;none&#34;,
+                &#34;quakecolor&#34;: &#34;tab:pink&#34;,
+                &#34;color&#34;: &#34;tab:blue&#34;,
+                &#34;togglexticks&#34;: True,
+                &#34;printstats&#34;: False,
+                &#34;secondary&#34;: False,
+                &#34;plotlabel&#34;: &#34;none&#34;,
+                &#34;usepopstime&#34;: False}
+    for key, default in zip(defaults.keys(), defaults.values()):
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops.plot()&#34;)
     
     try:
@@ -2679,27 +2975,31 @@ before this timestamp will be plotted.</dd>
         msg = f&#34;{y} is no legal &#39;y&#39; for Pops.plot(). Consider one of the &#34;
         msg += &#34;following: &#34;
         raise ValueError(msg+legals)
-    
+
     if y in self.ydata and not kwargs[&#34;usepopstime&#34;]:
-        m = self._hk_returncropmask(self.data[&#34;t&#34;], 
-                                   kwargs[&#34;start&#34;], 
-                                   kwargs[&#34;end&#34;])
+        m = self._hk_returncropmask(
+            self.data[&#34;t&#34;],
+            kwargs[&#34;start&#34;],
+            kwargs[&#34;end&#34;]
+        )
         xx = self.data[&#34;t&#34;][m]
     else:
-        m = self._hk_returncropmask(self.data[&#34;popstime&#34;], 
-                                   kwargs[&#34;start&#34;], 
-                                   kwargs[&#34;end&#34;])
+        m = self._hk_returncropmask(
+            self.data[&#34;popstime&#34;],
+            kwargs[&#34;start&#34;],
+            kwargs[&#34;end&#34;]
+        )
         xx = self.data[&#34;popstime&#34;][m]
     yy = self.data[y][m]
-    
-    #change label
+
+    # change label
     if kwargs[&#34;plotlabel&#34;] != &#34;none&#34;:
         legendlabel = kwargs[&#34;plotlabel&#34;]
-    else: 
+    else:
         legendlabel = self.details[y][0]
-    
-    #draw plot
-    ax.plot(xx,yy,label=legendlabel,color=kwargs[&#34;color&#34;])
+
+    # draw plot
+    ax.plot(xx, yy, label=legendlabel, color=kwargs[&#34;color&#34;])
     ax.set_ylabel(f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;)
     ax.axes.xaxis.set_visible(kwargs[&#34;togglexticks&#34;])
     ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])
@@ -2721,12 +3021,13 @@ before this timestamp will be plotted.</dd>
     
     ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
     
-    #print stats
+    # print stats
     if kwargs[&#34;printstats&#34;]:
         mean = np.mean(yy)
-        std = np.std(yy,ddof=1)
-        var = np.var(yy,ddof=1)
-        print(f&#34;{legendlabel}:\n\tmean: {mean}\n\tstd:  {std}\n\tvar:  {var}&#34;)</code></pre>
+        std = np.std(yy, ddof=1)
+        var = np.var(yy, ddof=1)
+        ll = legendlabel
+        print(f&#34;{ll}:\n\tmean: {mean}\n\tstd:  {std}\n\tvar:  {var}&#34;)</code></pre>
 </details>
 <div class="desc"><p>Plots y over time on an existing mpl axis</p>
 <h2 id="parameters">Parameters</h2>
@@ -2788,24 +3089,24 @@ if layout="box_pallnsdorfer". The default is False.</dd>
 
     &#34;&#34;&#34;
     
-    #calculate needed values
+    # calculate needed values
     dlog = np.log10(self.d_categories)
     dndlogdp = np.array(
         [self.data[f&#34;b{i}partconc&#34;]/(dlog[i+1]-dlog[i])
          for i in range(len(dlog)-1)]
-        )
-    dndlogdp = np.mean(dndlogdp,axis=1)
+    )
+    dndlogdp = np.mean(dndlogdp, axis=1)
     xvals = self.d_categories[:-1]
     widths = self.d_categories[1:] - self.d_categories[:-1]
-    print(*dndlogdp)
-    #draw
-    _,ax = plt.subplots()
-    ax.bar(x=xvals,width=widths,align=&#34;edge&#34;,height=dndlogdp)
+
+    # draw
+    _, ax = plt.subplots()
+    ax.bar(x=xvals, width=widths, align=&#34;edge&#34;, height=dndlogdp)
     ax.set_yscale(&#34;log&#34;)
     ax.set_ylabel(&#34;dN/dlog$D_p$&#34;)
     ax.set_xscale(&#34;log&#34;)
     ax.set_xlabel(&#34;$D_p$ in nm&#34;)
-    plt.show()        </code></pre>
+    plt.show()</code></pre>
 </details>
 <div class="desc"><p>Draws a dndlogdp number size distribution histogram</p>
 <h2 id="returns">Returns</h2>
@@ -2829,25 +3130,24 @@ if layout="box_pallnsdorfer". The default is False.</dd>
 
     &#34;&#34;&#34;
     
-    #convert to heatmapdata
-    
+    # convert to heatmapdata
     dlog = np.log10(self.d_categories)
     dndlogdp = np.array(
         [self.data[f&#34;b{i}partconc&#34;]/(dlog[i+1]-dlog[i])
          for i in range(len(dlog)-1)]
-        )[:,:-1]
-    zeros = np.where(dndlogdp==0)
+    )[:, :-1]
+    zeros = np.where(dndlogdp == 0)
     dndlogdp[zeros] = np.nan
-    xx,yy = np.meshgrid(self.data[&#34;popstime&#34;],self.d_categories)
+    xx, yy = np.meshgrid(self.data[&#34;popstime&#34;], self.d_categories)
     
-    #draw plot
-    _,ax = plt.subplots()
-    im = ax.pcolormesh(xx,yy,dndlogdp,cmap=&#34;RdYlBu_r&#34;,norm=LogNorm())
+    # draw plot
+    _, ax = plt.subplots()
+    im = ax.pcolormesh(xx, yy, dndlogdp, cmap=&#34;RdYlBu_r&#34;, norm=LogNorm())
     ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
     ax.set_yscale(&#34;log&#34;)
     ax.set_ylabel(&#34;Durchmesser in nm&#34;)
     ax.set_xlabel(&#34;CET&#34;)
-    plt.colorbar(im,ax=ax,label=&#34;dN/dlog$D_p$&#34;)
+    plt.colorbar(im, ax=ax, label=&#34;dN/dlog$D_p$&#34;)
     plt.show()</code></pre>
 </details>
 <div class="desc"><p>Draws a heatmap of dndlogdp number size distribution over time</p>
@@ -2862,7 +3162,7 @@ if layout="box_pallnsdorfer". The default is False.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def quickplot(self,y):
+<pre><code class="python">def quickplot(self, y):
     &#34;&#34;&#34;
     Draws a plot y vs time
 
@@ -2878,12 +3178,12 @@ if layout="box_pallnsdorfer". The default is False.</dd>
     &#34;&#34;&#34;
     
     xx = self.data[&#34;t&#34;] if y in self.ydata else self.data[&#34;popstime&#34;]
-    yy = self.data[y]  
+    yy = self.data[y]
     label = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
         
-    #draw plot
-    _,ax = plt.subplots()
-    ax.plot(xx,yy,label=self.details[y][0])
+    # draw plot
+    _, ax = plt.subplots()
+    ax.plot(xx, yy, label=self.details[y][0])
     ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
     ax.set_ylabel(label)
     ax.legend()
@@ -2906,14 +3206,15 @@ if layout="box_pallnsdorfer". The default is False.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def relativevals(self,bgobj):
+<pre><code class="python">def relativevals(self, bgobj):
     &#34;&#34;&#34;
     Changes all data to be expressed relative to the mean of the bgobj
 
     Parameters
     ----------
     bgobj : Pops
-        All data of self will be expressed relative to the data of this obj.
+        All data of self will be expressed relative to the data 
+        of this obj.
 
     Returns
     -------
@@ -2926,20 +3227,21 @@ if layout="box_pallnsdorfer". The default is False.</dd>
             if key != &#34;t&#34; and key != &#34;popstime&#34;:
                 mean = np.mean(bgobj.data[key])
                 self.data[key] = ((self.data[key]/mean)-1)*100
-                self.details[key][1] = f&#34;{self.details[key][1]} (normalised)&#34;
+                self.details[key][1] += &#34; (normalised)&#34;
         except:
             msg = f&#34;WARNING: {key} is not loaded in the Pops obj that &#34;
             msg += &#34;should be appended. {key} will not be expressed &#34;
             msg += &#34;relatively&#34;
             print(msg)
-        
+
     self.relative = True</code></pre>
 </details>
 <div class="desc"><p>Changes all data to be expressed relative to the mean of the bgobj</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>bgobj</code></strong> :&ensp;<code><a title="agg_dim.particle_counters.Pops" href="#agg_dim.particle_counters.Pops">Pops</a></code></dt>
-<dd>All data of self will be expressed relative to the data of this obj.</dd>
+<dd>All data of self will be expressed relative to the data
+of this obj.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
@@ -2960,22 +3262,26 @@ if layout="box_pallnsdorfer". The default is False.</dd>
     Returns
     -------
     op : dict {str : np.array}
-        This dict contains all data in the form of np.arrays indexed by their name.
+        This dict contains all data in the form of np.arrays indexed by 
+        their name.
     op_details : dict {str : [str,str]}
-        This dict contains a description and a unit for all the data saved in op.
+        This dict contains a description and a unit for all the data 
+        saved in op.
 
     &#34;&#34;&#34;
     
-    return self.data,self.details</code></pre>
+    return self.data, self.details</code></pre>
 </details>
 <div class="desc"><p>Returns a tuple containing all data in a standardized form.
 Important for communication with <code>DroneWrapper</code> or <code>Wrapper</code> objs.</p>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><strong><code>op</code></strong> :&ensp;<code>dict {str : np.array}</code></dt>
-<dd>This dict contains all data in the form of np.arrays indexed by their name.</dd>
+<dd>This dict contains all data in the form of np.arrays indexed by
+their name.</dd>
 <dt><strong><code>op_details</code></strong> :&ensp;<code>dict {str : [str,str]}</code></dt>
-<dd>This dict contains a description and a unit for all the data saved in op.</dd>
+<dd>This dict contains a description and a unit for all the data
+saved in op.</dd>
 </dl></div>
 </dd>
 <dt id="agg_dim.particle_counters.Pops.returnstats"><code class="name flex">
@@ -2986,7 +3292,7 @@ Important for communication with <code>DroneWrapper</code> or <code>Wrapper</cod
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def returnstats(self,y):
+<pre><code class="python">def returnstats(self, y):
     &#34;&#34;&#34;
     Returns a tuple of (mean,std,var)
 
@@ -3008,10 +3314,10 @@ Important for communication with <code>DroneWrapper</code> or <code>Wrapper</cod
     
     data = self.data[&#34;y&#34;]
     mean = np.mean(data)
-    std = np.std(data,ddof=1)
-    var = np.var(data,ddof=1)
-    
-    return mean,std,var</code></pre>
+    std = np.std(data, ddof=1)
+    var = np.var(data, ddof=1)
+
+    return mean, std, var</code></pre>
 </details>
 <div class="desc"><p>Returns a tuple of (mean,std,var)</p>
 <h2 id="parameters">Parameters</h2>
@@ -3037,7 +3343,7 @@ Important for communication with <code>DroneWrapper</code> or <code>Wrapper</cod
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def stats(self,y):
+<pre><code class="python">def stats(self, y):
     &#34;&#34;&#34;
     Prints mean, std and var of y to the console
 
@@ -3054,8 +3360,8 @@ Important for communication with <code>DroneWrapper</code> or <code>Wrapper</cod
     
     data = self.data[y]
     mean = np.mean(data)
-    std = np.std(data,ddof=1)
-    var = np.var(data,ddof=1)
+    std = np.std(data, ddof=1)
+    var = np.var(data, ddof=1)
     print(f&#34;\nSTATS:\n{self.details[y][0]} in {self.details[y][1]}:&#34;)
     print(f&#34;\tmean {mean}\n\tstd  {std}\n\tvar  {var}&#34;)</code></pre>
 </details>

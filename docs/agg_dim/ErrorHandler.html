@@ -64,9 +64,11 @@ module agg_dim. From outside the module there is no real usecase.</p>
         
         if len(legallist) != 0:
             legalstr = &#34;, &#34;.join(legallist)
-            self.message = arg + &#34; isn&#39;t a legal kwarg for &#34; + func + &#34;\nLegal arguments: &#34; + legalstr
+            self.message = (f&#34;{arg} isn&#39;t a legal kwarg for {func}\n&#34;
+                            f&#34;Legal arguments: {legalstr}&#34;)
         else:
-            self.message = arg + &#34; isn&#39;t a legal kwarg for &#34; + func + &#34;\nCheck for typos or consult documentation: &#34;
+            self.message = (f&#34;{arg} isn&#39;t a legal kwarg for {func}\n&#34;
+                            &#34;Check for typos or consult documentation.&#34;)
         super().__init__(self.message)</code></pre>
 </details>
 <div class="desc"><p>Common base class for all non-exit exceptions.</p></div>
@@ -89,7 +91,8 @@ module agg_dim. From outside the module there is no real usecase.</p>
     
     def __init__(self,wrongfile,correctfile,argname):
         
-        self.message = &#34;.&#34; + wrongfile + &#34;-files are not legal as &#34; + argname + &#34;. Expected file: .&#34; + correctfile
+        self.message = (f&#34;.{wrongfile}-files are not legal as {argname}. &#34;
+                        f&#34;Expected file: .{correctfile}&#34;)
         super().__init__(self.message)</code></pre>
 </details>
 <div class="desc"><p>Common base class for all non-exit exceptions.</p></div>
@@ -113,7 +116,9 @@ module agg_dim. From outside the module there is no real usecase.</p>
     def __init__(self,illegalvar,funcname,legallist):
 
         legalstrings = &#34;, &#34;.join(legallist)
-        self.message = &#34;Illegal &#34; + illegalvar + &#34; was given for &#34; + funcname + &#34;\nCheck for typos or if needed data is loaded\nLegal &#34; + illegalvar + &#34;s: &#34; + legalstrings
+        self.message = (f&#34;Illegal {illegalvar} was given for {funcname}\n&#34;
+                        &#34;Check for typos or if needed data is loaded\n&#34;
+                        f&#34;Legal {illegalvar}s: {legalstrings}&#34;)
         super().__init__(self.message)</code></pre>
 </details>
 <div class="desc"><p>Common base class for all non-exit exceptions.</p></div>
@@ -138,7 +143,8 @@ module agg_dim. From outside the module there is no real usecase.</p>
         
         
         legalstr = &#34;, &#34;.join(legallist)
-        self.message = givenvar + &#34; is not plottable in &#34; + funcname + &#34;\nLegal strings: &#34; + legalstr
+        self.message = (f&#34;{givenvar} is not plottable in {funcname}\n&#34;
+                        f&#34;Legal strings: {legalstr}&#34;)
         super().__init__(self.message)</code></pre>
 </details>
 <div class="desc"><p>Common base class for all non-exit exceptions.</p></div>
@@ -161,7 +167,9 @@ module agg_dim. From outside the module there is no real usecase.</p>
     
     def __init__(self,illegalvar,instrument):
         
-        self.message = illegalvar + &#34; cant be used here, since the corresponding sensor is not mounted onto &#34; + instrument + &#34; in the given layout&#34;
+        self.message = (f&#34;{illegalvar} can&#39;t be used here, since the &#34;
+                        &#34;corresponding sensor is not mounted onto &#34;
+                        f&#34;{instrument} in the given layout.&#34;)
         super().__init__(self.message)</code></pre>
 </details>
 <div class="desc"><p>Common base class for all non-exit exceptions.</p></div>
@@ -185,7 +193,9 @@ module agg_dim. From outside the module there is no real usecase.</p>
     def __init__(self,illegal,legallist,instrument):
         
         legal = &#34;, &#34;.join(legallist)
-        self.message = f&#34;{illegal} is no legal layout for {instrument}. You can use a custom layout or use one of the known layouts: {legal}&#34;
+        self.message = (f&#34;{illegal} is no legal layout for {instrument} &#34;
+                        &#34;You can use a custom layout or use one of the known&#34;
+                        f&#34; layouts: {legal}&#34;)
         super().__init__(self.message)</code></pre>
 </details>
 <div class="desc"><p>Common base class for all non-exit exceptions.</p></div>

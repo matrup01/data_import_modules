@@ -184,7 +184,7 @@ class Dronedata:
         
 class DroneWrapper:
     
-    def __init__(self,file,**kwargs):
+    def __init__(self, file, **kwargs):
         """
         inits DroneWrapper object
 
@@ -193,11 +193,14 @@ class DroneWrapper:
         file : str
             takes a Drone produced .csv file.
         dronetype : str, optional
-            specifies which drone was used to read csv correctly (currently implemented: "BladeScapes","Own"). The default is "BladeScapes".
+            specifies which drone was used to read csv correctly (currently 
+            implemented: "BladeScapes","Own"). The default is "BladeScapes".
         start : str, optional
-            if a str of the form "HH:MM:SS" is given, all data acquired before this timestamp wont be used
+            if a str of the form "HH:MM:SS" is given, all data acquired 
+            before this timestamp wont be used
         end : str, optional
-            if a str of the form "HH:MM:SS" is given, all data acquired after this timestamp wont be used
+            if a str of the form "HH:MM:SS" is given, all data acquired 
+            after this timestamp wont be used
 
         Returns
         -------
@@ -205,40 +208,55 @@ class DroneWrapper:
 
         """
         
-        #kwargs
-        defaults = {"dronetype" : "BladeScapes",
-                    "start" : "*",
-                    "end" : "*"
-            }
-        for key,value in zip(defaults.keys(),defaults.values()):
+        # kwargs
+        defaults = {"dronetype": "BladeScapes",
+                    "start": "*",
+                    "end": "*"
+                    }
+        for key, value in zip(defaults.keys(), defaults.values()):
             self._hk_kwargs(kwargs, key, value)
         self._hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper")
-        
-        #variables
+
+        # variables
         self.data = {}
-        self.details = {"Drone" : {"height" : ["Height AGL","m AGL"],
-                                   "long" : ["longitude","eastern longitude"], 
-                                   "lat" : ["latitude","nothern latitude"]}}
+        self.details = {"Drone": {"height": ["Height AGL", "m AGL"],
+                                  "long": ["longitude", "eastern longitude"],
+                                  "lat": ["latitude", "nothern latitude"]}}
          
         match file.split(".")[-1]:
             case "csv":
-        
+
                 with open(file) as f:
-                    data = list(csv.reader(f,delimiter=","))
-                    
+                    data = list(csv.reader(f, delimiter=","))
+
                 match self.dronetype.lower():
                     case "own":
                         self.data["Drone"] = {
-                            "t" : np.array([dt.datetime.strptime(data[i][1].replace(",","."),"%I:%M:%S.%f %p").replace(microsecond=0) for i in range(1,len(data))]),
-                            #data: [height,long,lat,ws]
-                            "height" : np.array([float(data[i][6].replace(",",".")) for i in range(1,len(data))]),
-                            "long" : np.array([float(data[i][5].replace(",",".")) for i in range(1,len(data))]),
-                            "lat" : np.array([float(data[i][4].replace(",",".")) for i in range(1,len(data))]),
-                            }
+                            "t": np.array(
+                                [dt.datetime.strptime(
+                                    data[i][1].replace(",", "."),
+                                    "%I:%M:%S.%f %p"
+                                ).replace(microsecond=0)
+                                    for i in range(1, len(data))]
+                            ),
+                            # data: [height,long,lat,ws]
+                            "height": np.array(
+                                [float(data[i][6].replace(",", "."))
+                                 for i in range(1, len(data))]
+                            ),
+                            "long": np.array(
+                                [float(data[i][5].replace(",", "."))
+                                 for i in range(1, len(data))]
+                            ),
+                            "lat": np.array(
+                                [float(data[i][4].replace(",", "."))
+                                 for i in range(1, len(data))]
+                            )
+                        }
                     case "bladescapes":
                         current_time = data[1][1][:-4]
                         takeoff_alt = float(data[1][12])
-                        h_appender, long_appender, lat_appender = [],[],[]
+                        h_appender, long_appender, lat_appender = [], [], []
                         t, h, long, lat = [], [], [], []
                         for line in data[1:]:
                             if line[1][:-4] == current_time:
@@ -246,7 +264,12 @@ class DroneWrapper:
                                 long_appender.append(float(line[11]))
                                 lat_appender.append(float(line[10]))
                             else:
-                                t.append(dt.datetime.strptime(current_time.replace(".","-"),"%Y-%m-%d %H:%M:%S"))
+                                t.append(
+                                    dt.datetime.strptime(
+                                        current_time.replace(".", "-"),
+                                        "%Y-%m-%d %H:%M:%S"
+                                    )
+                                )
                                 h.append(np.mean(h_appender))
                                 long.append(np.mean(long_appender))
                                 lat.append(np.mean(lat_appender))
@@ -256,46 +279,60 @@ class DroneWrapper:
                                 current_time = line[1][:-4]
                                 
                             self.data["Drone"] = {
-                                "t" : np.array(t),
-                                "height" : np.array(h),
-                                "long" : np.array(long),
-                                "lat" : np.array(lat)
-                                }
+                                "t": np.array(t),
+                                "height": np.array(h),
+                                "long": np.array(long),
+                                "lat": np.array(lat)
+                            }
                             
-                #crop
+                # crop
                 if self.start != "*":
                     for i in range(len(self.data["Drone"]["t"])):
-                        if dt.datetime.strptime(self.start,"%H:%M:%S").time() <= self.data["Drone"]["t"][i].time():
+                        if dt.datetime.strptime(
+                                self.start,
+                                "%H:%M:%S"
+                        ).time() <= self.data["Drone"]["t"][i].time():
                             break
                     start_i = i
-                else: start_i = 0
+                else:
+                    start_i = 0
                 
                 if self.end != "*":
                     for i in range(len(self.data["Drone"]["t"])):
-                        if dt.datetime.strptime(self.end,"%H:%M:%S") <= self.data["Drone"]["t"][i]:
+                        if dt.datetime.strptime(
+                                self.end,
+                                "%H:%M:%S"
+                        ) <= self.data["Drone"]["t"][i]:
                             break
                     end_i = i
                 else: end_i = len(self.data["Drone"]["t"])-1
                 
                 for key in self.data["Drone"]:
-                    self.data["Drone"][key] = self.data["Drone"][key][start_i:end_i]
+                    si, ei = start_i, end_i
+                    self.data["Drone"][key] = self.data["Drone"][key][si:ei]
             
             case "flight":
-                with open(file,"rb") as openfile:
+                with open(file, "rb") as openfile:
                     self.data, self.details = pickle.load(openfile)
             
             case _:
-                raise IllegalFileFormat(file.split(".")[-1], ".csv or .flight", "DroneWrapper arguments")
+                raise IllegalFileFormat(
+                    file.split(".")[-1],
+                    ".csv or .flight",
+                    "DroneWrapper arguments"
+                )
                  
                 
-    def wrap(self,name,obj):
+    def wrap(self, name, obj):
         """
-        adds an instance of a data class (Pops,NewFData or FlyingFlo_USB) to the DroneWrapper
+        adds an instance of a data class (Pops,NewFData or FlyingFlo_USB) to 
+        the DroneWrapper
 
         Parameters
         ----------
         name : str
-            name that is used to find the data from the wrapped object (key in DroneWrapper.data and DroneWrapper.details).
+            name that is used to find the data from the wrapped object 
+            (key in DroneWrapper.data and DroneWrapper.details).
         obj : Pops, NewFData or FlyingFlo_USB
             Object which should  be wrapped.
 
@@ -311,14 +348,15 @@ class DroneWrapper:
         self.details[name] = details
         
     
-    def returndata(self,nested=False):
+    def returndata(self, nested=False):
         """
         
 
         Parameters
         ----------
         nested : bool, optional
-            if nested, the wrapped data of other objects is also returned. The default is False.
+            if nested, the wrapped data of other objects is also returned. 
+            The default is False.
 
         Returns
         -------
@@ -330,11 +368,11 @@ class DroneWrapper:
         """
         
         if nested:
-            return self.data,self.details
-        return self.data["Drone"],self.details["Drone"]
+            return self.data, self.details
+        return self.data["Drone"], self.details["Drone"]
         
         
-    def returntarget(self,y,**kwargs):
+    def returntarget(self, y, **kwargs):
         """
         returns target array
 
@@ -343,13 +381,17 @@ class DroneWrapper:
         y : str
            decides which data should be returned.
         targetfunc : func, optional
-            decides how to check target1, target2 and targety (only works if these variables are given). The default checks for if the target value lies between target1 and target2. consult docu to see correct function layout.
+            decides how to check target1, target2 and targety (only works 
+            if these variables are given). The default checks for if the 
+            target value lies between target1 and target2. consult docu to 
+            see correct function layout.
         target1 : float, optional
             takes a value that is checked in targetfunc
         target2 : float, optional
             takes a value taht is checked in targetfunc
         targety : str, optional
-            takes a legal y-string (depends on wrapped objects) and hands the corresponding data to targetfunc
+            takes a legal y-string (depends on wrapped objects) and hands 
+            the corresponding data to targetfunc
 
         Returns
         -------
@@ -357,31 +399,38 @@ class DroneWrapper:
 
         """
         
-        #import kwargs
-        defaults = {"targetfunc" : None,
-                    "target1" : None,
-                    "target2" : None,
-                    "targety" : None
-            }
-        for key,def_val in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,def_val)
-        self._hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.returntarget()")
+        # import kwargs
+        defaults = {"targetfunc": None,
+                    "target1": None,
+                    "target2": None,
+                    "targety": None
+                    }
+        for key, def_val in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, def_val)
+        self._hk_errorhandling(
+            kwargs,
+            defaults.keys(),
+            "DroneWrapper.returntarget()"
+        )
         
-        y1,y2 = y.split("_")
+        y1, y2 = y.split("_")
         op = self.data[y1][y2]
-        
-        if kwargs["target1"] != None and kwargs["target2"] != None and kwargs["targety"] != None:
+
+        tg1, tg2, tgy = kwargs["target1"], kwargs["target2"], kwargs["targety"]
+        if tg1 != None and tg2 != None and tgy != None:
             if kwargs["targetfunc"] == None:
-                def default(t1,t2,ty):
-                    m = np.where(t1<ty,True,False)
-                    m = np.where(ty<t2,m,False)
+                def default(t1, t2, ty):
+                    m = np.where(t1 < ty, True, False)
+                    m = np.where(ty < t2, m, False)
                     return m
                 kwargs["targetfunc"] = default
                 
-            ty1,ty2 = kwargs["targety"].split("_")
-                
-            xt = [self.data[y1]["t"][i].time() for i in range(len(self.data[y1]["t"]))]
-            yt = [self.data[ty1]["t"][i].time() for i in range(len(self.data[ty1]["t"]))]
+            ty1, ty2 = kwargs["targety"].split("_")
+
+            xt = [self.data[y1]["t"][i].time()
+                  for i in range(len(self.data[y1]["t"]))]
+            yt = [self.data[ty1]["t"][i].time()
+                  for i in range(len(self.data[ty1]["t"]))]
             
             if xt[0] in yt:
                 x_start = 0
@@ -401,26 +450,29 @@ class DroneWrapper:
                 else:
                     x_end = len(xt)
                     y_end = y_start + (x_end - x_start)
-                    
+
             op = op[x_start:x_end]
             ty = self.data[ty1][ty2][y_start:y_end]
-                
-            m = kwargs["targetfunc"](kwargs["target1"],kwargs["target2"],ty)
+
+            m = kwargs["targetfunc"](kwargs["target1"], kwargs["target2"], ty)
             op = op[m]
             
         return op
         
-        
-    def flightmap(self,zoomstart=21,colors=["brown","white","blue"]):
+    
+    def flightmap(self, zoomstart=21, colors=["brown", "white", "blue"]):
         """
         plots the height AGL of the drone over an OSM Map in your browser
 
         Parameters
         ----------
         zoomstart : int, optional
-            decides on which zoomlevel the map should be rendered (can be changed while using the map by turning the mousewheel). The default is 21.
+            decides on which zoomlevel the map should be rendered (can be 
+            changed while using the map by turning the mousewheel). 
+            The default is 21.
         colors : list of str, optional
-            changes the color used for the colormap. The default is ["brown","white","blue"].
+            changes the color used for the colormap. 
+            The default is ["brown","white","blue"].
 
         Returns
         -------
@@ -436,45 +488,79 @@ class DroneWrapper:
             if np.isnan(_long[i]):
                 _long[i] = _long[i-1] if i != 0 else _lat[-1]
         
-        x_start = (max(self.data["Drone"]["lat"]) + min(self.data["Drone"]["lat"])) / 2
-        y_start = (max(self.data["Drone"]["long"]) + min(self.data["Drone"]["long"])) / 2
+        x_start = (max(self.data["Drone"]["lat"]) +
+                   min(self.data["Drone"]["lat"])) / 2
+        y_start = (max(self.data["Drone"]["long"]) +
+                   min(self.data["Drone"]["long"])) / 2
         
-        cmap = cm.LinearColormap(colors=colors,vmin=min(self.data["Drone"]["height"]),vmax=max(self.data["Drone"]["height"]),caption="Height AGL in m")
+        cmap = cm.LinearColormap(
+            colors=colors,
+            vmin=min(self.data["Drone"]["height"]),
+            vmax=max(self.data["Drone"]["height"]),
+            caption="Height AGL in m"
+        )
+
+        output = folium.Map(
+            location=(x_start, y_start),
+            control_scale=True,
+            zoom_start=zoomstart,
+            max_zoom=50
+        )
         
-        output = folium.Map(location=(x_start,y_start),control_scale=True,zoom_start=zoomstart,max_zoom=50)
-        
-        for height,long,lat in zip(self.data["Drone"]["height"],self.data["Drone"]["long"],self.data["Drone"]["lat"]):
-            folium.Circle(location=[lat,long],radius=0.1,fill=True,color=cmap(height)).add_to(output)
-            
+        for height, long, lat in zip(
+                self.data["Drone"]["height"],
+                self.data["Drone"]["long"],
+                self.data["Drone"]["lat"]
+        ):
+            folium.Circle(
+                location=[lat, long],
+                radius=0.1,
+                fill=True,
+                color=cmap(height)
+            ).add_to(output)
+
         output.add_child(cmap)
-        
+
         output.show_in_browser()
         
         
-    def advancedflightmap(self,y,**kwargs):
+    def advancedflightmap(self, y, **kwargs):
         """
         plots data of any wrapped obj over an OSM Map in your browser
 
         Parameters
         ----------
         y : str
-            decides which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of).
+            decides which data should be plotted. Takes str in the form of 
+            name_yy where name is the name of a wrapped obj (or "Drone" if 
+            data from the drone is used) and yy is a plottype (must be legal 
+            for the class the wrapped obj is an instance of).
         zoomstart : str, optional
-            decides on which zoomlevel the map should be rendered (can be changed while using the map by turning the mousewheel). The default is 21.
+            decides on which zoomlevel the map should be rendered (can be 
+            changed while using the map by turning the mousewheel). 
+            The default is 21.
         colors : list of str, optional
-            changes the color used for the colormap. The default is ["purple","blue","yellow","red"].
+            changes the color used for the colormap. The default 
+            is ["purple","blue","yellow","red"].
         target_height : int|float, optional
-            if a target height is given, only data in the height-range of target_height+-height_deviation is plotted
+            if a target height is given, only data in the height-range of 
+            target_height+-height_deviation is plotted
         height_deviation : int|float, optional
-            specifies the range for the target height (only usefull if a target_height is given). The default is 1.
+            specifies the range for the target height (only usefull if a 
+            target_height is given). The default is 1.
         bettermap : bool, optional
-            if True a grid of the values is calculated and plotted instead of single datapoints. The default is False.
+            if True a grid of the values is calculated and plotted instead of 
+            single datapoints. The default is False.
         bettermap_resolution : int, optional
-            only usefull if bettermap=True. A grid of bettermap_resolution x bettermap_resolution will be used to plot the data. The default is 15.
+            only usefull if bettermap=True. A grid of bettermap_resolution x 
+            bettermap_resolution will be used to plot the data. 
+            The default is 15.
         mapimage : str, optional
-            if a mapimage is given and a mapimage.png and mapimage.tfw exist, the png will be plotted onto the map
+            if a mapimage is given and a mapimage.png and mapimage.tfw exist, 
+            the png will be plotted onto the map
         save_loc : str, optional
-            if a save_loc is given, the map will be saved as a html file and not displayed in the browser
+            if a save_loc is given, the map will be saved as a html file and 
+            not displayed in the browser
         cmap_min : float, optional
             if a `cmap_min` is given, the colormap will be scaled to have the
             colour corresponding to the lowest value at this value.
@@ -488,28 +574,34 @@ class DroneWrapper:
 
         """
         
-        #import kwargs
-        defaults = {"zoomstart" : 21,
-                    "colors" : ["purple","blue","yellow","red"],
-                    "target_height" : "none",
-                    "height_deviation" : 1,
-                    "bettermap" : False,
-                    "bettermap_resolution" : 15,
-                    "bettermap_minimumcounts" : 0,
-                    "mapimage" : None,
-                    "save_loc" : None,
-                    "cmap_min" : None,
-                    "cmap_max" : None
-            }
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
-        self._hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.advancedflightmap()")
-        
-        name,yy = y.split("_")
+        # import kwargs
+        defaults = {"zoomstart": 21,
+                    "colors": ["purple", "blue", "yellow", "red"],
+                    "target_height": "none",
+                    "height_deviation": 1,
+                    "bettermap": False,
+                    "bettermap_resolution": 15,
+                    "bettermap_minimumcounts": 0,
+                    "mapimage": None,
+                    "save_loc": None,
+                    "cmap_min": None,
+                    "cmap_max": None
+                    }
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
+        self._hk_errorhandling(
+            kwargs,
+            defaults.keys(),
+            "DroneWrapper.advancedflightmap()"
+        )
+
+        name, yy = y.split("_")
         y = self.data[name][yy]
-        
-        xt = [self.data["Drone"]["t"][i].time() for i in range(len(self.data["Drone"]["t"]))]
-        yt = [self.data[name]["t"][i].time() for i in range(len(self.data[name]["t"]))]
+
+        xt = [self.data["Drone"]["t"][i].time()
+              for i in range(len(self.data["Drone"]["t"]))]
+        yt = [self.data[name]["t"][i].time()
+              for i in range(len(self.data[name]["t"]))]
         
         if xt[0] in yt:
             x_start = 0
@@ -529,25 +621,31 @@ class DroneWrapper:
             else:
                 x_end = len(xt)
                 y_end = y_start + (x_end - x_start)
-                
+
         lat = self.data["Drone"]["lat"][x_start:x_end]
         long = self.data["Drone"]["long"][x_start:x_end]
         y = self.data[name][yy][y_start:y_end]
-        
+
         m1 = np.isfinite(lat)
         m2 = np.isfinite(long)
         m3 = np.isfinite(y)
         m = m1 & m2 & m3
-        
+
         lat = lat[m]
         long = long[m]
         y = y[m]
         
-        if not isinstance(kwargs["target_height"],str):
+        if not isinstance(kwargs["target_height"], str):
             height = self.data["Drone"]["height"][x_start:x_end]
             height = height[m]
-            m1 = np.greater_equal(height,kwargs["target_height"]-kwargs["height_deviation"])
-            m2 = np.less_equal(height,kwargs["target_height"]+kwargs["height_deviation"])
+            m1 = np.greater_equal(
+                height,
+                kwargs["target_height"]-kwargs["height_deviation"]
+            )
+            m2 = np.less_equal(
+                height,
+                kwargs["target_height"]+kwargs["height_deviation"]
+            )
             m = m1 & m2
             lat = lat[m]
             long = long[m]
@@ -561,39 +659,72 @@ class DroneWrapper:
             vmax = kwargs["cmap_max"]
         else:
             vmax = max(y)
-            
+
         if not kwargs["bettermap"]:
             x1_start = (max(lat) + min(lat)) / 2
             x2_start = (max(long) + min(long)) / 2
             
-            
-            cmap = cm.LinearColormap(colors=kwargs["colors"],vmin=vmin,vmax=vmax,caption=f"{self.details[name][yy][0]} in {self.details[name][yy][1]}")
-            output = folium.Map(location=(x1_start,x2_start),control_scale=True,zoom_start=kwargs["zoomstart"],max_zoom=50)
+            cap = f"{self.details[name][yy][0]} in {self.details[name][yy][1]}"
+            cmap = cm.LinearColormap(
+                colors=kwargs["colors"],
+                vmin=vmin,
+                vmax=vmax,
+                caption=cap
+            )
+            output = folium.Map(
+                location=(x1_start, x2_start),
+                control_scale=True,
+                zoom_start=kwargs["zoomstart"],
+                max_zoom=50
+            )
             
             if kwargs["mapimage"] != None:
                 try:
                     with open(f"{kwargs['mapimage']}.tfw") as f:
                         tfw = f.read().split("\n")
-                        
+
                     png = Image.open(f"{kwargs['mapimage']}.png")
                     pixelheight = png.height
                     pixelwidth = png.width
-                        
-                    lowerleft_utm = (float(tfw[4]),float(tfw[5])+pixelheight*float(tfw[3]))
-                    upperright_utm = (float(tfw[4])+pixelwidth*float(tfw[0]),float(tfw[5]))
+
+                    lowerleft_utm = (float(tfw[4]),
+                                     float(tfw[5])+pixelheight*float(tfw[3]))
+                    upperright_utm = (float(tfw[4])+pixelwidth*float(tfw[0]),
+                                      float(tfw[5]))
+
+                    lower_left_lat, lower_left_long = utm.to_latlon(
+                        lowerleft_utm[0],
+                        lowerleft_utm[1],
+                        33,
+                        "T"
+                    )
+                    upper_right_lat, upper_right_long = utm.to_latlon(
+                        upperright_utm[0],
+                        upperright_utm[1],
+                        33,
+                        "T"
+                    )
     
-                    lower_left_lat,lower_left_long = utm.to_latlon(lowerleft_utm[0], lowerleft_utm[1], 33,"T")
-                    upper_right_lat,upper_right_long = utm.to_latlon(upperright_utm[0], upperright_utm[1], 33,"T")
-    
-                    img = folium.raster_layers.ImageOverlay("C:/Users/mrupp/OneDrive - TU Wien/Wieland, Florian's files - DATA/Field Measurements/2025-08-05 and 07_Stmk/Orthofoto_DSM/Orthofoto_DSM/Steinalpl_Duerrieglalm-Graben_Orthofoto.png", 
-                                                            [[lower_left_lat,lower_left_long],[upper_right_lat,upper_right_long]])
+                    img = folium.raster_layers.ImageOverlay(
+                        "C:/Users/mrupp/OneDrive - TU Wien/Wieland, Florian's files - DATA/Field Measurements/2025-08-05 and 07_Stmk/Orthofoto_DSM/Orthofoto_DSM/Steinalpl_Duerrieglalm-Graben_Orthofoto.png",
+                        [[lower_left_lat, lower_left_long],
+                         [upper_right_lat, upper_right_long]]
+                    )
                     img.add_to(output)
                 except Exception:
-                    print("Problem with mapimage. Make sure that you give a valid path for .tfw and .png without the file ending.")
+                    msg = "Problem with mapimage. Make sure that you give a "
+                    msg += "valid path for .tfw and .png without the file "
+                    msg += "ending."
+                    print(msg)
     
-            for _y,_long,_lat in zip(y,long,lat):
-                folium.Circle(location=[_lat,_long],radius=0.1,fill=True,color=cmap(_y)).add_to(output)
-                    
+            for _y, _long, _lat in zip(y, long, lat):
+                folium.Circle(
+                    location=[_lat, _long],
+                    radius=0.1,
+                    fill=True,
+                    color=cmap(_y)
+                ).add_to(output)
+
             output.add_child(cmap)
             
             if kwargs["save_loc"] == None:
@@ -602,66 +733,114 @@ class DroneWrapper:
                 output.save(kwargs["save_loc"])
         else:
             res = kwargs["bettermap_resolution"]
-            map_array = np.zeros((res,res,2))
+            map_array = np.zeros((res, res, 2))
             min_lat = min(lat)
             max_lat = max(lat)
             min_long = min(long)
             max_long = max(long)
-            lats = np.array([ min_lat + (max_lat-min_lat)/res*i for i in range(res+1)],float)
-            longs = np.array([min_long + (max_long-min_long)/res*i for i in range(res+1)],float)
+            lats = np.array(
+                [min_lat + (max_lat-min_lat)/res*i for i in range(res+1)],
+                float
+            )
+            longs = np.array(
+                [min_long + (max_long-min_long)/res*i for i in range(res+1)],
+                float
+            )
             
-            #@njit(float64[:,:,:],(float64[:,:,:],float64[:],float64[:],float64[:],float64[:],float64[:]))
-            def calcmap(nb_map_array,nb_lats,nb_longs,nb_y,nb_lat,nb_long):
+            # @njit(float64[:,:,:],(float64[:,:,:],float64[:],float64[:],float64[:],float64[:],float64[:]))
+            def calcmap(nb_map_array, 
+                        nb_lats, 
+                        nb_longs, 
+                        nb_y, 
+                        nb_lat, 
+                        nb_long):
                 for i in range(len(nb_y)):
                     for x in range(res):
-                        if nb_lat[i] >= nb_lats[x] and nb_lat[i] <= nb_lats[x+1]:
+                        if nb_lat[i]>=nb_lats[x] and nb_lat[i]<=nb_lats[x+1]:
                             for y in range(res):
-                                if nb_long[i] >= nb_longs[y] and nb_long[i] <= nb_longs[y+1]:
+                                if (nb_long[i]>=nb_longs[y] 
+                                    and nb_long[i]<=nb_longs[y+1]):
                                     nb_map_array[x][y][0] += nb_y[i]
                                     nb_map_array[x][y][1] += 1
-                                    
+
                 return nb_map_array
              
-            map_array = calcmap(map_array,lats,longs,y,lat,long)
-            map_array_2d = np.zeros((res,res))
+            map_array = calcmap(map_array, lats, longs, y, lat, long)
+            map_array_2d = np.zeros((res, res))
+            mincnt = kwargs["bettermap_minimumcounts"]
             for xx in range(len(map_array)):
                 for yi in range(len(map_array)):
-                    map_array_2d[xx][yi] = map_array[xx][yi][0] / map_array[xx][yi][1] if map_array[xx][yi][1] != 0 else 0
-                    if kwargs["bettermap_minimumcounts"] > map_array[xx][yi][1]:
+                    map_arr = map_array[xx][yi]
+                    map_array_2d[xx][yi] = map_arr[0] / \
+                        map_arr[1] if map_arr[1] != 0 else 0
+                    if mincnt > map_arr[1]:
                         map_array_2d[xx][yi] = 0
                     
             x1_start = (max(lat) + min(lat)) / 2
             x2_start = (max(long) + min(long)) / 2
             
-            cmap = cm.LinearColormap(colors=kwargs["colors"],vmin=vmin,vmax=vmax,caption=f"{self.details[name][yy][0]} in {self.details[name][yy][1]}")
-            output = folium.Map(location=(x1_start,x2_start),control_scale=True,zoom_start=kwargs["zoomstart"],max_zoom=50)
+            cap = f"{self.details[name][yy][0]} in {self.details[name][yy][1]}"
+            cmap = cm.LinearColormap(
+                colors=kwargs["colors"],
+                vmin=vmin,
+                vmax=vmax,
+                caption=cap
+            )
+            output = folium.Map(
+                location=(x1_start, x2_start),
+                control_scale=True,
+                zoom_start=kwargs["zoomstart"],
+                max_zoom=50
+            )
             
             if kwargs["mapimage"] != None:
                 try:
                     with open(f"{kwargs['mapimage']}.tfw") as f:
                         tfw = f.read().split("\n")
-                        
+
                     png = Image.open(f"{kwargs['mapimage']}.png")
                     pixelheight = png.height
                     pixelwidth = png.width
-                        
-                    lowerleft_utm = (float(tfw[4]),float(tfw[5])+pixelheight*float(tfw[3]))
-                    upperright_utm = (float(tfw[4])+pixelwidth*float(tfw[0]),float(tfw[5]))
-    
-                    lower_left_lat,lower_left_long = utm.to_latlon(lowerleft_utm[0], lowerleft_utm[1], 33,"T")
-                    upper_right_lat,upper_right_long = utm.to_latlon(upperright_utm[0], upperright_utm[1], 33,"T")
-    
-                    img = folium.raster_layers.ImageOverlay("C:/Users/mrupp/OneDrive - TU Wien/Wieland, Florian's files - DATA/Field Measurements/2025-08-05 and 07_Stmk/Orthofoto_DSM/Orthofoto_DSM/Steinalpl_Duerrieglalm-Graben_Orthofoto.png", 
-                                                            [[lower_left_lat,lower_left_long],[upper_right_lat,upper_right_long]])
+
+                    lowerleft_utm = (float(tfw[4]),
+                                     float(tfw[5])+pixelheight*float(tfw[3]))
+                    upperright_utm = (float(tfw[4])+pixelwidth*float(tfw[0]),
+                                      float(tfw[5]))
+
+                    lower_left_lat, lower_left_long = utm.to_latlon(
+                        lowerleft_utm[0],
+                        lowerleft_utm[1],
+                        33,
+                        "T"
+                    )
+                    upper_right_lat, upper_right_long = utm.to_latlon(
+                        upperright_utm[0],
+                        upperright_utm[1],
+                        33,
+                        "T"
+                    )
+
+                    img = folium.raster_layers.ImageOverlay(
+                        "C:/Users/mrupp/OneDrive - TU Wien/Wieland, Florian's files - DATA/Field Measurements/2025-08-05 and 07_Stmk/Orthofoto_DSM/Orthofoto_DSM/Steinalpl_Duerrieglalm-Graben_Orthofoto.png",
+                        [[lower_left_lat, lower_left_long],
+                         [upper_right_lat, upper_right_long]])
                     img.add_to(output)
                 except Exception:
-                    print("Problem with mapimage. Make sure that you give a valid path for .tfw and .png without the file ending.")
+                    msg = "Problem with mapimage. Make sure that you give a "
+                    msg += "valid path for .tfw and .png without the file "
+                    msg += "ending."
+                    print(msg)
     
             for x in range(res):
                 for y in range(res):
                     if map_array_2d[x][y] != 0:
-                        folium.Rectangle([(lats[x],longs[y]),(lats[x+1],longs[y+1])],fill=True,color=cmap(map_array_2d[x][y]),fill_opacity=1).add_to(output)
-                    
+                        folium.Rectangle(
+                            [(lats[x], longs[y]), (lats[x+1], longs[y+1])],
+                            fill=True,
+                            color=cmap(map_array_2d[x][y]),
+                            fill_opacity=1
+                        ).add_to(output)
+
             output.add_child(cmap)
             
             if kwargs["save_loc"] == None:
@@ -670,7 +849,7 @@ class DroneWrapper:
                 output.save(kwargs["save_loc"])
         
         
-    def plot(self,ax,y,**kwargs):
+    def plot(self, ax, y, **kwargs):
         """
         plots Drone-produced data over time on an mpl-axis
 
@@ -679,31 +858,43 @@ class DroneWrapper:
         ax : mpl-axis
             takes a mpl-axis on which the data will be plotted.
         y : str
-            decides which data will be plotted (legal: "height", "long", "lat").
+            decides which data will be plotted 
+            (legal: "height", "long", "lat").
         quakes : [str], optional
-            takes a list of "HH:MM:SS"-strings and draws vertical lines at these times. The default is [].
+            takes a list of "HH:MM:SS"-strings and draws vertical lines at 
+            these times. The default is [].
         quakeslabel : str, optional
-            a label that is used for the quakes if a legend is drawn. The default is "no label".g
+            a label that is used for the quakes if a legend is drawn. 
+            The default is "no label".g
         quakecolor : str, optional
             decides the color of the quake-lines. The default is "tab:purple".
         color : str, optional
             decides the color of the plot. The defaultl is "tab:green"
         plotlabel : str, optional
-            a label that is used for the plot if a legend is drawn. The default is "no label".
+            a label that is used for the plot if a legend is drawn. The 
+            default is "no label".
         ylabel : str, optional
-            a label that is used for the y-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given y
+            a label that is used for the y-axis, if none is given it will 
+            be "value in unit", where value and unit are retrieved from 
+            the given y
         secondary : bool, optional
-            if True the plot will be drawn on the right y-axis. The default is False.
+            if True the plot will be drawn on the right y-axis. The default 
+            is False.
         masknan : bool, optional
-            if True NaN values are masked out to draw a uninterupted plot. The default is True.
+            if True NaN values are masked out to draw a uninterupted plot. 
+            The default is True.
         targetfunc : func, optional
-            decides how to check target1, target2 and targety (only works if these variables are given). The default checks for if the target value lies between target1 and target2. consult docu to see correct function layout.
+            decides how to check target1, target2 and targety (only works 
+            if these variables are given). The default checks for if the 
+            target value lies between target1 and target2. consult docu to 
+            see correct function layout.
         target1 : float, optional
             takes a value that is checked in targetfunc
         target2 : float, optional
             takes a value taht is checked in targetfunc
         targety : str, optional
-            takes a legal y-string (depends on wrapped objects) and hands the corresponding data to targetfunc
+            takes a legal y-string (depends on wrapped objects) and hands 
+            the corresponding data to targetfunc
         
 
         Returns
@@ -712,41 +903,46 @@ class DroneWrapper:
 
         """
         
-        #import kwargs   
-        defaults = {"quakes" : [],
-                    "quakeslabel" : "no label",
-                    "quakecolor" : "tab:purple",
-                    "color" : "tab:green",
-                    "plotlabel" : "no label",
-                    "ylabel" : "*",
-                    "secondary" : False,
-                    "masknan" : True,
-                    "targetfunc" : None,
-                    "target1" : None,
-                    "target2" : None,
-                    "targety" : None}
-        
-        for key,def_val in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,def_val)
+        # import kwargs
+        defaults = {"quakes": [],
+                    "quakeslabel": "no label",
+                    "quakecolor": "tab:purple",
+                    "color": "tab:green",
+                    "plotlabel": "no label",
+                    "ylabel": "*",
+                    "secondary": False,
+                    "masknan": True,
+                    "targetfunc": None,
+                    "target1": None,
+                    "target2": None,
+                    "targety": None}
+
+        for key, def_val in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, def_val)
         self._hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.plot()")
         
-        name,yy = y.split("_")
+        name, yy = y.split("_")
         y = self.data[name][yy]
-        x = np.array([i.replace(day=1,month=1,year=1900) for i in self.data[name]["t"]])   
+        x = np.array(
+            [i.replace(day=1, month=1, year=1900)
+             for i in self.data[name]["t"]]
+        )
         
-        if kwargs["target1"] != None and kwargs["target2"] != None and kwargs["targety"] != None:
+        tg1, tg2, tgy = kwargs["target1"], kwargs["target2"], kwargs["targety"]
+        if tg1 != None and tg2 != None and tgy != None:
             if kwargs["targetfunc"] == None:
-                def default(t1,t2,ty):
-                    m = np.where(t1<ty,True,False)
-                    m = np.where(ty<t2,m,False)
+                def default(t1, t2, ty):
+                    m = np.where(t1 < ty, True, False)
+                    m = np.where(ty < t2, m, False)
                     return m
                 kwargs["targetfunc"] = default
-                
-            ty1,ty2 = kwargs["targety"].split("_")
+
+            ty1, ty2 = kwargs["targety"].split("_")
                 
             xt = [i.time() for i in x]
-            yt = [self.data[ty1]["t"][i].time() for i in range(len(self.data[ty1]["t"]))]
-            
+            yt = [self.data[ty1]["t"][i].time()
+                  for i in range(len(self.data[ty1]["t"]))]
+
             if xt[0] in yt:
                 x_start = 0
                 y_start = yt.index(xt[0])
@@ -765,31 +961,40 @@ class DroneWrapper:
                 else:
                     x_end = len(xt)
                     y_end = y_start + (x_end - x_start)
-                    
+
             x = x[x_start:x_end]
             y = y[x_start:x_end]
             
             ty = self.data[ty1][ty2][y_start:y_end]
-                
-            m = kwargs["targetfunc"](kwargs["target1"],kwargs["target2"],ty)
+
+            m = kwargs["targetfunc"](kwargs["target1"], kwargs["target2"], ty)
             y = y[m]
             x = x[m]
-        
+
         if kwargs["masknan"]:
             m = np.isfinite(y)
             y = y[m]
             x = x[m]
         
         if kwargs["ylabel"] == "*":
-            kwargs["ylabel"] = f"{self.details[name][yy][0]} in {self.details[name][yy][1]}"
+            yl = f"{self.details[name][yy][0]} in {self.details[name][yy][1]}"
+            kwargs["ylabel"] = yl
         
-        #draw plot
-        ax.plot(x,y,label=kwargs["plotlabel"],color=kwargs["color"])
+        # draw plot
+        ax.plot(x, y, label=kwargs["plotlabel"], color=kwargs["color"])
         ax.set_ylabel(kwargs["ylabel"])
         ax.set_xlabel("CET")
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         if len(kwargs["quakes"]) != 0:
-            ax.vlines(x=[dt.datetime.strptime(element, "%H:%M:%S")for element in kwargs["quakes"]],ymin=min(y),ymax=max(y),color=kwargs["quakecolor"],ls="dashed",label=kwargs["quakeslabel"])
+            ax.vlines(
+                x=[dt.datetime.strptime(element, "%H:%M:%S")
+                   for element in kwargs["quakes"]],
+                ymin=min(y),
+                ymax=max(y),
+                color=kwargs["quakecolor"],
+                ls="dashed",
+                label=kwargs["quakeslabel"]
+            )
         ax.tick_params(axis='y', colors=kwargs["color"])
         ax.axes.yaxis.label.set_color(kwargs["color"])
         if not kwargs["secondary"]:
@@ -799,7 +1004,7 @@ class DroneWrapper:
             ax.spines["left"].set_alpha(0)
         
         
-    def advancedplot(self,ax,x,y,**kwargs):
+    def advancedplot(self, ax, x, y, **kwargs):
         """
         plots x-data over y-data on a mpl-axis
 
@@ -808,33 +1013,51 @@ class DroneWrapper:
         ax : mpl-axis
             takes a mpl-axis on which the data will be plotted.
         x : str
-            decides over which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of; if the plot should be over time use "name_t").
+            decides over which data should be plotted. Takes str in the form 
+            of name_yy where name is the name of a wrapped obj (or "Drone" if 
+            data from the drone is used) and yy is a plottype (must be legal 
+            for the class the wrapped obj is an instance of; if the plot 
+            should be over time use "name_t").
         y : str
-            decides which data should be plotted. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of).
+            decides which data should be plotted. Takes str in the form of 
+            name_yy where name is the name of a wrapped obj (or "Drone" if 
+            data from the drone is used) and yy is a plottype (must be legal 
+            for the class the wrapped obj is an instance of).
         color : str, optional
             decides the color of the plot. The default is "tab:green".
         plotlabel : str, optional
-            a label that is used for the plot if a legend is drawn. The default is "no label".
+            a label that is used for the plot if a legend is drawn. 
+            The default is "no label".
         xlabel : str, optional
-            a label that is used for the x-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given x
+            a label that is used for the x-axis, if none is given it will be 
+            "value in unit", where value and unit are retrieved from the 
+            given x
         ylabel : str, optional
-            a label that is used for the y-axis, if none is given it will be "value in unit", where value and unit are retrieved from the given y
+            a label that is used for the y-axis, if none is given it will 
+            be "value in unit", where value and unit are retrieved from the 
+            given y
         scatter : bool, optional
             if True the data is plotted as a scatterplot. The default is False.
         secondary : bool, optional
-            f True the plot will be drawn on the right y-axis. The default is False.
+            f True the plot will be drawn on the right y-axis. The default 
+            is False.
         masknan : bool, optional
-            if True NaN values are masked out to draw a uninterupted plot. The default is True
+            if True NaN values are masked out to draw a uninterupted plot. 
+            The default is True
         showpearsonr : bool, optional
             if True Pearsons R will be calculated. The default is True
         targetfunc : func, optional
-            decides how to check target1, target2 and targety (only works if these variables are given). The default checks for if the target value lies between target1 and target2. consult docu to see correct function layout.
+            decides how to check target1, target2 and targety (only works 
+            if these variables are given). The default checks for if the 
+            target value lies between target1 and target2. consult docu to 
+            see correct function layout.
         target1 : float, optional
             takes a value that is checked in targetfunc
         target2 : float, optional
             takes a value taht is checked in targetfunc
         targety : str, optional
-            takes a legal y-string (depends on wrapped objects) and hands the corresponding data to targetfunc
+            takes a legal y-string (depends on wrapped objects) and hands 
+            the corresponding data to targetfunc
 
         Returns
         -------
@@ -842,28 +1065,34 @@ class DroneWrapper:
 
         """
         
-        #import kwargs   
-        defaults = {"color" : "tab:green",
-                    "plotlabel" : "no label",
-                    "xlabel" : "*",
-                    "ylabel" : "*",
-                    "scatter" : False,
-                    "secondary" : False,
-                    "masknan" : True,
-                    "showpearsonr" : True,
-                    "targetfunc" : None,
-                    "target1" : None,
-                    "target2" : None,
-                    "targety" : None}
+        # import kwargs
+        defaults = {"color": "tab:green",
+                    "plotlabel": "no label",
+                    "xlabel": "*",
+                    "ylabel": "*",
+                    "scatter": False,
+                    "secondary": False,
+                    "masknan": True,
+                    "showpearsonr": True,
+                    "targetfunc": None,
+                    "target1": None,
+                    "target2": None,
+                    "targety": None}
+
+        for key, def_val in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, def_val)
+        self._hk_errorhandling(
+            kwargs,
+            defaults.keys(),
+            "DroneWrapper.advancedplot()"
+        )
         
-        for key,def_val in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,def_val)
-        self._hk_errorhandling(kwargs, defaults.keys(), "DroneWrapper.advancedplot()")
-        
-        xname,xx = x.split("_")
-        yname,yy = y.split("_")
-        xt = [self.data[xname]["t"][i].time() for i in range(len(self.data[xname]["t"]))]
-        yt = [self.data[yname]["t"][i].time() for i in range(len(self.data[yname]["t"]))]
+        xname, xx = x.split("_")
+        yname, yy = y.split("_")
+        xt = [self.data[xname]["t"][i].time()
+              for i in range(len(self.data[xname]["t"]))]
+        yt = [self.data[yname]["t"][i].time()
+              for i in range(len(self.data[yname]["t"]))]
         
         if xt[0] in yt:
             x_start = 0
@@ -883,22 +1112,24 @@ class DroneWrapper:
             else:
                 x_end = len(xt)
                 y_end = y_start + (x_end - x_start)
-                
+
         x = self.data[xname][xx][x_start:x_end]
         y = self.data[yname][yy][y_start:y_end]
         
-        if kwargs["target1"] != None and kwargs["target2"] != None and kwargs["targety"] != None:
+        tg1, tg2, tgy = kwargs["target1"], kwargs["target2"], kwargs["targety"]
+        if tg1 != None and tg2 != None and tgy != None:
             if kwargs["targetfunc"] == None:
-                def default(t1,t2,ty):
-                    m = np.where(t1<ty,True,False)
-                    m = np.where(ty<t2,m,False)
+                def default(t1, t2, ty):
+                    m = np.where(t1 < ty, True, False)
+                    m = np.where(ty < t2, m, False)
                     return m
                 kwargs["targetfunc"] = default
-                
-            ty1,ty2 = kwargs["targety"].split("_")
-                
+
+            ty1, ty2 = kwargs["targety"].split("_")
+
             xt = xt[x_start:x_end]
-            yt = [self.data[ty1]["t"][i].time() for i in range(len(self.data[ty1]["t"]))]
+            yt = [self.data[ty1]["t"][i].time()
+                  for i in range(len(self.data[ty1]["t"]))]
             
             if xt[0] in yt:
                 x_start = 0
@@ -923,8 +1154,8 @@ class DroneWrapper:
             y = y[x_start:x_end]
             
             ty = self.data[ty1][ty2][y_start:y_end]
-                
-            m = kwargs["targetfunc"](kwargs["target1"],kwargs["target2"],ty)
+
+            m = kwargs["targetfunc"](kwargs["target1"], kwargs["target2"], ty)
             y = y[m]
             x = x[m]
         
@@ -936,11 +1167,15 @@ class DroneWrapper:
             y = y[mask]
         
         if kwargs["xlabel"] == "*":
-            kwargs["xlabel"] = f"{self.details[xname][xx][0]} in {self.details[xname][xx][1]}"
+            xl = f"{self.details[xname][xx][0]} "
+            xl += f"in {self.details[xname][xx][1]}"
+            kwargs["xlabel"] = xl
         if kwargs["ylabel"] == "*":
-            kwargs["ylabel"] = f"{self.details[yname][yy][0]} in {self.details[yname][yy][1]}"
+            yl = f"{self.details[yname][yy][0]} "
+            yl += f"in {self.details[yname][yy][1]}"
+            kwargs["ylabel"] = yl
             
-        #calc Pearson
+        # calc Pearson
         if kwargs["showpearsonr"]:
             xx = x - np.mean(x)
             yy = y - np.mean(y)
@@ -950,17 +1185,21 @@ class DroneWrapper:
             sqy = np.sum(yy**2)
             r = sp/(np.sqrt(sqx*sqy))
             
-        #draw plot
+        # draw plot
         if kwargs["scatter"]:
-            ax.scatter(x,y,label=kwargs["plotlabel"],color=kwargs["color"])
+            ax.scatter(x, y, label=kwargs["plotlabel"], color=kwargs["color"])
         else:
-            ax.plot(x,y,label=kwargs["plotlabel"],color=kwargs["color"])
+            ax.plot(x, y, label=kwargs["plotlabel"], color=kwargs["color"])
         ax.set_ylabel(kwargs["ylabel"])
         ax.set_xlabel(kwargs["xlabel"])
         ax.tick_params(axis='y', colors=kwargs["color"])
         ax.axes.yaxis.label.set_color(kwargs["color"])
         if kwargs["showpearsonr"]:
-            ax.annotate(f"Pearson's R: {r:.3f}",(0.9,0.9),xycoords='axes fraction')
+            ax.annotate(
+                f"Pearson's R: {r:.3f}",
+                (0.9, 0.9),
+                xycoords='axes fraction'
+            )
         if not kwargs["secondary"]:
             ax.spines["left"].set_color(kwargs["color"])
         else:
@@ -983,11 +1222,11 @@ class DroneWrapper:
 
         """
         
-        op = (self.data,self.details)
+        op = (self.data, self.details)
         if filename[-7:] != ".flight":
             filename += ".flight"
-        with open(filename,"wb") as openfile:    
-            pickle.dump(op,openfile,4)
+        with open(filename, "wb") as openfile:
+            pickle.dump(op, openfile, 4)
         
         
     def returnattime(self, y, timestamp):
@@ -997,9 +1236,13 @@ class DroneWrapper:
         Parameters
         ----------
         y : str
-            decides which datatype should be returned. Takes str in the form of name_yy where name is the name of a wrapped obj (or "Drone" if data from the drone is used) and yy is a plottype (must be legal for the class the wrapped obj is an instance of).
+            decides which datatype should be returned. Takes str in the form 
+            of name_yy where name is the name of a wrapped obj (or "Drone" 
+            if data from the drone is used) and yy is a plottype (must be 
+            legal for the class the wrapped obj is an instance of).
         timestamp : str
-            decides which data should be returned. Takes a str in the format "hh:mm:ss".
+            decides which data should be returned. Takes a str in the 
+            format "hh:mm:ss".
 
         Returns
         -------
@@ -1008,10 +1251,14 @@ class DroneWrapper:
         """
         
         y1 = y.split("_")[0]
-        tt = dt.datetime.strptime(timestamp,"%H:%M:%S")
+        tt = dt.datetime.strptime(timestamp, "%H:%M:%S")
         found = False
-        tt = tt.replace(day=self.data[y1]["t"][0].day,month=self.data[y1]["t"][0].month,year=self.data[y1]["t"][0].year)
-        for i,ts in enumerate(self.data[y1]["t"]):
+        tt = tt.replace(
+            day=self.data[y1]["t"][0].day,
+            month=self.data[y1]["t"][0].month,
+            year=self.data[y1]["t"][0].year
+        )
+        for i, ts in enumerate(self.data[y1]["t"]):
             if ts - tt == dt.timedelta(0):
                 found = True
                 break
@@ -1019,24 +1266,25 @@ class DroneWrapper:
             return self.data[y1][y.split("_")[1]][i]
         raise IndexError("given timestamp wasnt found in dataset")
         
-            
-    #housekeeping funcs
-    def _hk_kwargs(self,kwargs,key,default):
+        
+    # housekeeping funcs
+    def _hk_kwargs(self, kwargs, key, default):
         """Turns kwargs into attributes"""
 
         op = kwargs[key] if key in kwargs else default
         setattr(self, key, op)
-        
-    def _hk_errorhandling(self,kwargs,legallist,funcname):
+
+
+    def _hk_errorhandling(self, kwargs, legallist, funcname):
         """Checks if all passed kwargs are legal"""
 
         for key in kwargs:
             if key not in legallist:
-                raise IllegalArgument(key,funcname,legallist)
-                
-    def _hk_func_kwargs(self,kwargs,key,default):
+                raise IllegalArgument(key, funcname, legallist)
+
+
+    def _hk_func_kwargs(self, kwargs, key, default):
         """Gives kwargs a default value if they are not passed"""
 
         op = kwargs[key] if key in kwargs else default
         return op
-            
