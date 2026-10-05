@@ -72,10 +72,9 @@ file.</p>
         Wrapper obj that is loaded from the file.
     &#34;&#34;&#34;
     
-    
     if path[-11:] != &#34;.experiment&#34;:
         raise ValueError(&#34;This is not a .experiment file!&#34;)
-    with open(path,&#34;rb&#34;) as loadpath:
+    with open(path, &#34;rb&#34;) as loadpath:
         return pickle.load(loadpath)</code></pre>
 </details>
 <div class="desc"><p>Loads a .experiment file and returns a <code><a title="agg_dim.experiment.Wrapper" href="#agg_dim.experiment.Wrapper">Wrapper</a></code>.</p>
@@ -98,7 +97,7 @@ file.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def save_experiment(wrapper,path):
+<pre><code class="python">def save_experiment(wrapper, path):
     &#34;&#34;&#34;
     Saves a `Wrapper` into a .experiment file.
 
@@ -116,8 +115,8 @@ file.</p>
     
     if path[-11:] != &#34;.experiment&#34;:
         path.append(&#34;.experiment&#34;)
-    with open(path,&#34;wb&#34;) as dumppath:
-        pickle.dump(wrapper,dumppath,4)</code></pre>
+    with open(path, &#34;wb&#34;) as dumppath:
+        pickle.dump(wrapper, dumppath, 4)</code></pre>
 </details>
 <div class="desc"><p>Saves a <code><a title="agg_dim.experiment.Wrapper" href="#agg_dim.experiment.Wrapper">Wrapper</a></code> into a .experiment file.</p>
 <h2 id="parameters">Parameters</h2>
@@ -149,7 +148,7 @@ file.</p>
 </summary>
 <pre><code class="python">class Wrapper:
     
-    def __init__(self,day=1,month=1,year=1900):
+    def __init__(self, day=1, month=1, year=1900):
         &#34;&#34;&#34;
         inits a Wrapper object.
 
@@ -186,7 +185,7 @@ file.</p>
         self.year = year
         
         
-    def wrap(self,obj,name):
+    def wrap(self, obj, name):
         &#34;&#34;&#34;
         Includes an Object into the Wrapper, by including its data and details
         into the corresponding dicts and saving the object in Wrapper.name
@@ -215,20 +214,19 @@ file.</p>
         `Wrapper` methods.
         &#34;&#34;&#34;
         
-        
-        data,details = obj.returndata()
+        data, details = obj.returndata()
         self.data[name] = data
         self.details[name] = details
         for i in range(len(self.data[name][&#34;t&#34;])):
             self.data[name][&#34;t&#34;][i] = self.data[name][&#34;t&#34;][i].replace(
-                day = self.day,
-                month = self.month,
-                year = self.year
-                )
-        
-        setattr(self,name,obj)
-        
-    def plot(self,ax,x,y,**kwargs):
+                day=self.day,
+                month=self.month,
+                year=self.year
+            )
+
+        setattr(self, name, obj)
+
+    def plot(self, ax, x, y, **kwargs):
         &#34;&#34;&#34;
         Plots two data arrays against each other.
 
@@ -237,11 +235,11 @@ file.</p>
         ax : Axes obj of mpl.axes module
             The plot will be drawn on this axis.
         x : str
-            Takes a str in the format `&#39;plottype@instrument&#39;` and uses it on the 
-            x-axis. E.g.: `&#39;total_partconc@wibs&#39;`
+            Takes a str in the format `&#39;plottype@instrument&#39;` and uses it on 
+            the x-axis. E.g.: `&#39;total_partconc@wibs&#39;`
         y : str
-            Takes a str in the format `&#39;plottype@instrument&#39;` and uses it on the 
-            y-axis. E.g.: `&#39;total_partconc@wibs&#39;`
+            Takes a str in the format `&#39;plottype@instrument&#39;` and uses it on 
+            the y-axis. E.g.: `&#39;total_partconc@wibs&#39;`
         
         Other Parameters
         ----------------
@@ -277,59 +275,67 @@ file.</p>
             if the kwarg `return_arrs` is True.
         &#34;&#34;&#34;
         
-        
-        #kwargs
+        # kwargs
         defaults = {
-            &#34;start&#34; : None,
-            &#34;end&#34; : None,
+            &#34;start&#34;: None,
+            &#34;end&#34;: None,
             &#34;scatter&#34;: True,
-            &#34;color&#34; : &#34;tab:blue&#34;,
-            &#34;pearson&#34; : True,
-            &#34;return_arrs&#34; : False,
-            &#34;desample&#34; : 0
-            }
-        for key,default in defaults.items():
+            &#34;color&#34;: &#34;tab:blue&#34;,
+            &#34;pearson&#34;: True,
+            &#34;return_arrs&#34;: False,
+            &#34;desample&#34;: 0
+        }
+        for key, default in defaults.items():
             kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.plot()&#34;)
-        
-        x_val,x_instrument = x.split(&#34;@&#34;)
-        y_val,y_instrument = y.split(&#34;@&#34;)
-        
+
+        x_val, x_instrument = x.split(&#34;@&#34;)
+        y_val, y_instrument = y.split(&#34;@&#34;)
+
         # check x and y
         if x_instrument not in self.data.keys():
             loaded = &#34;,&#34;.join(list(self.data.keys()))
-            raise KeyError(f&#34;{x_instrument} is not loaded. Try one of: &#34;
-                           + loaded)
+            raise KeyError(
+                f&#34;{x_instrument} is not loaded. Try one of: {loaded}&#34;
+            )
         if x_val not in self.data[x_instrument].keys():
             loaded = &#34;,&#34;.join(list(self.data[x_instrument].keys()))
-            raise KeyError(f&#34;{x_val} is not legal for {x_instrument}. Try: &#34;
-                           + loaded)
+            raise KeyError(
+                f&#34;{x_val} is not legal for {x_instrument}. Try: {loaded}&#34;
+            )
         if y_instrument not in self.data.keys():
             loaded = &#34;,&#34;.join(list(self.data.keys()))
-            raise KeyError(f&#34;{y_instrument} is not loaded. Try one of: &#34;
-                           + loaded)
+            raise KeyError(
+                f&#34;{y_instrument} is not loaded. Try one of: {loaded}&#34;
+            )
         if y_val not in self.data[y_instrument].keys():
             loaded = &#34;,&#34;.join(list(self.data[y_instrument].keys()))
-            raise KeyError(f&#34;{y_val} is not legal for {y_instrument}. Try: &#34;
-                           + loaded)
+            raise KeyError(
+                f&#34;{y_val} is not legal for {y_instrument}. Try: {loaded}&#34;
+            )
             
         # crop
-        kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self._hk_checktime(
-            x_instrument, 
-            y_instrument, 
-            kwargs[&#34;start&#34;], 
-            kwargs[&#34;end&#34;])
-        if isinstance(kwargs[&#34;start&#34;],str) or isinstance(kwargs[&#34;end&#34;],str):
-            xm = self._hk_timemask(x_instrument, 
-                                  kwargs[&#34;start&#34;], 
-                                  kwargs[&#34;end&#34;])
-            ym = self._hk_timemask(y_instrument,
-                                  kwargs[&#34;start&#34;],
-                                  kwargs[&#34;end&#34;])
+        kwargs[&#34;start&#34;], kwargs[&#34;end&#34;] = self._hk_checktime(
+            x_instrument,
+            y_instrument,
+            kwargs[&#34;start&#34;],
+            kwargs[&#34;end&#34;]
+        )
+        if isinstance(kwargs[&#34;start&#34;], str) or isinstance(kwargs[&#34;end&#34;], str):
+            xm = self._hk_timemask(
+                x_instrument,
+                kwargs[&#34;start&#34;],
+                kwargs[&#34;end&#34;]
+            )
+            ym = self._hk_timemask(
+                y_instrument,
+                kwargs[&#34;start&#34;],
+                kwargs[&#34;end&#34;]
+            )
         else:
             xm = np.array([True for t in self.data[x_instrument][&#34;t&#34;]])
             ym = np.array([True for t in self.data[y_instrument][&#34;t&#34;]])
-            
+
         # find x and y data
         if x_instrument == y_instrument:
             xx = self.data[x_instrument][x_val][xm]
@@ -339,41 +345,44 @@ file.</p>
             yt = self.data[y_instrument][&#34;t&#34;][ym]
             xdata = self.data[x_instrument][x_val][xm]
             ydata = self.data[y_instrument][y_val][ym]
-            xm = np.isin(xt,yt)
-            ym = np.isin(yt,xt)
-            
+            xm = np.isin(xt, yt)
+            ym = np.isin(yt, xt)
+
             xx = xdata[xm]
             yy = ydata[ym]
          
         if kwargs[&#34;desample&#34;] &gt; 0:
             des = kwargs[&#34;desample&#34;]
             n = len(xx) // des
-            y1 = yy[:n*des].reshape(-1,des).mean(axis=1)
-            yy = np.append(y1,np.mean(yy[n*des:]))
+            y1 = yy[:n*des].reshape(-1, des).mean(axis=1)
+            yy = np.append(y1, np.mean(yy[n*des:]))
             if x_val != &#34;t&#34;:
-                x1 = xx[:n*des].reshape(-1,des).mean(axis=1)
-                xx = np.append(x1,np.mean(xx[n*des:]))
+                x1 = xx[:n*des].reshape(-1, des).mean(axis=1)
+                xx = np.append(x1, np.mean(xx[n*des:]))
             else:
                 xx = np.append(
-                    xx[:n*des:des],xx[n*des]
-                    ) + dt.timedelta(seconds=des/2)
-            
+                    xx[:n*des:des], xx[n*des]
+                ) + dt.timedelta(seconds=des/2)
             
         # plot
         if kwargs[&#34;scatter&#34;]:
-            ax.scatter(xx,yy,color=kwargs[&#34;color&#34;])
+            ax.scatter(xx, yy, color=kwargs[&#34;color&#34;])
         else:
-            ax.plot(xx,yy,color=kwargs[&#34;color&#34;])
+            ax.plot(xx, yy, color=kwargs[&#34;color&#34;])
         if x_val != &#34;t&#34;:
-            ax.set_xlabel(self.details[x_instrument][x_val][0]
-                          + &#34; in &#34;
-                          + self.details[x_instrument][x_val][1])
+            ax.set_xlabel(
+                self.details[x_instrument][x_val][0]
+                + &#34; in &#34;
+                + self.details[x_instrument][x_val][1]
+            )
         else:
             ax.set_xlabel(&#34;CET&#34;)
-        ax.set_ylabel(self.details[y_instrument][y_val][0]
-                      + &#34; in &#34;
-                      + self.details[y_instrument][y_val][1])
-            
+        ax.set_ylabel(
+            self.details[y_instrument][y_val][0]
+            + &#34; in &#34;
+            + self.details[y_instrument][y_val][1]
+        )
+
         if kwargs[&#34;pearson&#34;]:
             x = xx - np.mean(xx)
             y = yy - np.mean(yy)
@@ -382,12 +391,12 @@ file.</p>
             sqy = np.sum(y**2)
             r = sp/(np.sqrt(sqx*sqy))
             print(f&#34;Pearson&#39;s R: {r:.3f}&#34;)
-            
+
         if kwargs[&#34;return_arrs&#34;]:
-            return xx,yy
+            return xx, yy
+
         
-        
-    def windrose(self,ax,y,**kwargs):
+    def windrose(self, ax, y, **kwargs):
         &#34;&#34;&#34;
         Plots a heatmap of y on a windrose plot, where the theta angle
         corresponds to the cardinal direction and the radius corresponds to 
@@ -467,36 +476,35 @@ file.</p>
         None
         &#34;&#34;&#34;
         
-        
-        #kwargs
+        # kwargs
         defaults = {
-            &#34;weatherdata&#34; : &#34;weather&#34;,
-            &#34;start&#34; : None,
-            &#34;end&#34; : None,
+            &#34;weatherdata&#34;: &#34;weather&#34;,
+            &#34;start&#34;: None,
+            &#34;end&#34;: None,
             &#34;scatter&#34;: True,
-            &#34;scatter_color&#34; : &#34;tab:blue&#34;,
-            &#34;colormap&#34; : &#34;viridis&#34;,
-            &#34;min_threshold&#34; : 0,
-            &#34;sectors&#34; : 4,
-            &#34;bins&#34; : 3,
-            &#34;heatmap_lim&#34; : None,
-            &#34;windspeed_lim&#34; : None,
-            &#34;startangle&#34; : 0,
-            &#34;usedegrees&#34; : False,
-            &#34;theta&#34; : &#34;winddir&#34;,
-            &#34;radius&#34; : &#34;wind&#34;,
-            &#34;inverted&#34; : False
-            }
-        for key,default in defaults.items():
+            &#34;scatter_color&#34;: &#34;tab:blue&#34;,
+            &#34;colormap&#34;: &#34;viridis&#34;,
+            &#34;min_threshold&#34;: 0,
+            &#34;sectors&#34;: 4,
+            &#34;bins&#34;: 3,
+            &#34;heatmap_lim&#34;: None,
+            &#34;windspeed_lim&#34;: None,
+            &#34;startangle&#34;: 0,
+            &#34;usedegrees&#34;: False,
+            &#34;theta&#34;: &#34;winddir&#34;,
+            &#34;radius&#34;: &#34;wind&#34;,
+            &#34;inverted&#34;: False
+        }
+        for key, default in defaults.items():
             kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.windrose()&#34;)
-        
-        #check ax and y
+
+        # check ax and y
         if ax.name != &#34;polar&#34;:
-            msg = &#34;The passed ax has to be polar for Wrapper.windrose() to&#34;
-            msg += &#34; work properly.&#34;
+            msg = (&#34;The passed ax has to be polar for Wrapper.windrose() to&#34;
+                   &#34; work properly&#34;)
             raise ValueError(msg)
-        y_data,y_instrument = y.split(&#34;@&#34;)
+        y_data, y_instrument = y.split(&#34;@&#34;)
         try:
             self.data[y_instrument][y_data]
         except:
@@ -508,137 +516,153 @@ file.</p>
             legalstr = &#34;,&#34;.join(legallist)
             raise ValueError(f&#34;{y} is no legal y. Try one of {legalstr}&#34;)
 
-        #crop
-        kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self._hk_checktime(
-            kwargs[&#34;weatherdata&#34;], 
-            y_instrument, 
-            kwargs[&#34;start&#34;], 
-            kwargs[&#34;end&#34;])
-        if isinstance(kwargs[&#34;start&#34;],str) or isinstance(kwargs[&#34;end&#34;],str):
-            wind_m = self._hk_timemask(kwargs[&#34;weatherdata&#34;], 
-                                      kwargs[&#34;start&#34;],
-                                      kwargs[&#34;end&#34;])
-            y_m = self._hk_timemask(y_instrument, 
-                                   kwargs[&#34;start&#34;], 
-                                   kwargs[&#34;end&#34;])
+        # crop
+        kwargs[&#34;start&#34;], kwargs[&#34;end&#34;] = self._hk_checktime(
+            kwargs[&#34;weatherdata&#34;],
+            y_instrument,
+            kwargs[&#34;start&#34;],
+            kwargs[&#34;end&#34;]
+        )
+        if isinstance(kwargs[&#34;start&#34;], str) or isinstance(kwargs[&#34;end&#34;], str):
+            wind_m = self._hk_timemask(
+                kwargs[&#34;weatherdata&#34;],
+                kwargs[&#34;start&#34;],
+                kwargs[&#34;end&#34;]
+            )
+            y_m = self._hk_timemask(
+                y_instrument,
+                kwargs[&#34;start&#34;],
+                kwargs[&#34;end&#34;]
+            )
         else:
             wind_m = np.array(
                 [True for i in self.data[kwargs[&#34;weatherdata&#34;]][&#34;t&#34;]]
-                )
+            )
             y_m = np.array(
                 [True for i in self.data[y_instrument][&#34;t&#34;]]
-                )
+            )
         
-        #load data
+        # load data
         winddir = kwargs[&#34;theta&#34;]
         if self.details[kwargs[&#34;weatherdata&#34;]][winddir][1] == &#34;°&#34;:
             theta = np.radians(
                 self.data[kwargs[&#34;weatherdata&#34;]][winddir][wind_m]
-                )
+            )
         else:
             theta = self.data[kwargs[&#34;weatherdata&#34;]][winddir][wind_m]
         if kwargs[&#34;inverted&#34;]:
             theta = (theta + np.pi) % (2*np.pi)
         r = self.data[kwargs[&#34;weatherdata&#34;]][kwargs[&#34;radius&#34;]][wind_m]
         z = self.data[y_instrument][y_data][y_m]
-        
-        if (np.count_nonzero(wind_m) == 0 
-            or np.count_nonzero(y_m) == 0):
+
+        if (np.count_nonzero(wind_m) == 0
+                or np.count_nonzero(y_m) == 0):
             raise ValueError(&#34;There are no values in the given timeframe&#34;)
         
-        #transform data an plot
-        kwargs[&#34;startangle&#34;] = kwargs[&#34;startangle&#34;]%(360/kwargs[&#34;sectors&#34;])
+        # transform data an plot
+        kwargs[&#34;startangle&#34;] = kwargs[&#34;startangle&#34;] % (360/kwargs[&#34;sectors&#34;])
         kwargs[&#34;startangle&#34;] = np.radians(kwargs[&#34;startangle&#34;])
-        sector_borders = np.linspace(kwargs[&#34;startangle&#34;], 
-                                     2*np.pi+kwargs[&#34;startangle&#34;],
-                                     kwargs[&#34;sectors&#34;]+1)
+        sector_borders = np.linspace(
+            kwargs[&#34;startangle&#34;],
+            2*np.pi+kwargs[&#34;startangle&#34;],
+            kwargs[&#34;sectors&#34;]+1
+        )
         sector_borders = sector_borders % (2*np.pi)
         if kwargs[&#34;windspeed_lim&#34;] is None:
-            bin_borders = np.linspace(0,np.max(r),kwargs[&#34;bins&#34;]+1)
+            bin_borders = np.linspace(0, np.max(r), kwargs[&#34;bins&#34;]+1)
         else:
-            bin_borders = np.linspace(0,
-                                      kwargs[&#34;windspeed_lim&#34;],
-                                      kwargs[&#34;bins&#34;]+1)
-        
-        darr = np.zeros((kwargs[&#34;bins&#34;],kwargs[&#34;sectors&#34;]))
+            bin_borders = np.linspace(
+                0,
+                kwargs[&#34;windspeed_lim&#34;],
+                kwargs[&#34;bins&#34;]+1
+            )
+
+        darr = np.zeros((kwargs[&#34;bins&#34;], kwargs[&#34;sectors&#34;]))
         for b in range(kwargs[&#34;bins&#34;]):
-            bm = np.where(r&gt;=bin_borders[b],True,False)
-            bm = np.where(r&lt;=bin_borders[b+1],bm,False)
+            bm = np.where(r &gt;= bin_borders[b], True, False)
+            bm = np.where(r &lt;= bin_borders[b+1], bm, False)
             for sec in range(kwargs[&#34;sectors&#34;]):
                 if sector_borders[sec] &lt; sector_borders[sec+1]:
-                    sm = np.where(theta&gt;=sector_borders[sec],bm,False)
-                    sm = np.where(theta&lt;=sector_borders[sec+1],sm,False)
+                    sm = np.where(theta &gt;= sector_borders[sec], bm, False)
+                    sm = np.where(theta &lt;= sector_borders[sec+1], sm, False)
                 else:
-                    sm1 = np.where(theta&gt;=sector_borders[sec],
-                                  True,
-                                  False)
-                    sm2 =  np.where(theta&lt;=sector_borders[sec+1],
-                                  True,
-                                  False)
+                    sm1 = np.where(
+                        theta &gt;= sector_borders[sec],
+                        True,
+                        False
+                    )
+                    sm2 = np.where(
+                        theta &lt;= sector_borders[sec+1],
+                        True,
+                        False
+                    )
                     sm = sm1 | sm2
                     sm = sm &amp; bm
-                
+
                 if np.count_nonzero(sm) &lt; kwargs[&#34;min_threshold&#34;]:
                     darr[b][sec] = np.nan
                 else:
                     darr[b][sec] = np.nanmean(z[sm])
         cm = colormaps[kwargs[&#34;colormap&#34;]]
-        if (kwargs[&#34;heatmap_lim&#34;] is not None 
-            and len(kwargs[&#34;heatmap_lim&#34;]) == 2):
+        if (kwargs[&#34;heatmap_lim&#34;] is not None
+                and len(kwargs[&#34;heatmap_lim&#34;]) == 2):
             minval = kwargs[&#34;heatmap_lim&#34;][0]
             maxval = kwargs[&#34;heatmap_lim&#34;][1]
         else:
             minval = np.nanmin(darr)
             maxval = np.nanmax(darr)
-        
+
         for b in range(kwargs[&#34;bins&#34;]):
             for sec in range(kwargs[&#34;sectors&#34;]):
                 color = (darr[b][sec]-minval)/(maxval-minval)
                 if sector_borders[sec] &lt; sector_borders[sec+1]:
                     ax.bar(
-                        x=(sector_borders[sec]+sector_borders[sec+1])/2, 
-                        height=bin_borders[b+1]-bin_borders[b], 
-                        width=sector_borders[sec+1]-sector_borders[sec], 
-                        bottom=bin_borders[b], 
+                        x=(sector_borders[sec]+sector_borders[sec+1])/2,
+                        height=bin_borders[b+1]-bin_borders[b],
+                        width=sector_borders[sec+1]-sector_borders[sec],
+                        bottom=bin_borders[b],
                         color=cm(color)
                     )
                 else:
                     ax.bar(
-                        x=(sector_borders[sec]+2*np.pi)/2, 
-                        height=bin_borders[b+1]-bin_borders[b], 
-                        width=2*np.pi-sector_borders[sec], 
-                        bottom=bin_borders[b], 
+                        x=(sector_borders[sec]+2*np.pi)/2,
+                        height=bin_borders[b+1]-bin_borders[b],
+                        width=2*np.pi-sector_borders[sec],
+                        bottom=bin_borders[b],
                         color=cm(color)
                     )
                     ax.bar(
-                        x=sector_borders[sec+1]/2, 
-                        height=bin_borders[b+1]-bin_borders[b], 
-                        width=sector_borders[sec+1], 
-                        bottom=bin_borders[b], 
+                        x=sector_borders[sec+1]/2,
+                        height=bin_borders[b+1]-bin_borders[b],
+                        width=sector_borders[sec+1],
+                        bottom=bin_borders[b],
                         color=cm(color)
                     )
-                    
-        #misc plotting
+
+        # misc plotting
         if kwargs[&#34;scatter&#34;]:
-            ax.scatter(theta,r,color=kwargs[&#34;scatter_color&#34;])
+            ax.scatter(theta, r, color=kwargs[&#34;scatter_color&#34;])
         if not kwargs[&#34;usedegrees&#34;]:
-            ax.set_thetagrids([0,90,180,270],[&#34;N&#34;,&#34;E&#34;,&#34;S&#34;,&#34;W&#34;])
+            ax.set_thetagrids([0, 90, 180, 270], [&#34;N&#34;, &#34;E&#34;, &#34;S&#34;, &#34;W&#34;])
         ax.set_theta_direction(-1)
         ax.set_theta_zero_location(&#34;N&#34;)
         ffig = ax.figure
-        c = ScalarMappable(Normalize(minval,maxval),kwargs[&#34;colormap&#34;])
-        label = self.details[y_instrument][y_data][0] 
+        c = ScalarMappable(Normalize(minval, maxval), kwargs[&#34;colormap&#34;])
+        label = self.details[y_instrument][y_data][0]
         label += &#34; in &#34;
         label += self.details[y_instrument][y_data][1]
-        ffig.colorbar(c,
-                      ax=ax,
-                      label=label)
+        ffig.colorbar(
+            c,
+            ax=ax,
+            label=label
+        )
         ffig.tight_layout()
         
             
     ## Housekeeping Funcs
     
-    def _hk_func_kwargs(self,kwargs,key,default):
+    
+    def _hk_func_kwargs(self, kwargs, key, default):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -648,7 +672,8 @@ file.</p>
         op = kwargs[key] if key in kwargs else default
         return op
     
-    def _hk_errorhandling(self,kwargs,legallist,funcname):
+    
+    def _hk_errorhandling(self, kwargs, legallist, funcname):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -657,9 +682,10 @@ file.</p>
 
         for key in kwargs:
             if key not in legallist:
-                raise IllegalArgument(key,funcname,legallist)
-                
-    def _hk_checktime(self,x_instrument,y_instrument,start_str,end_str):
+                raise IllegalArgument(key, funcname, legallist)
+
+
+    def _hk_checktime(self, x_instrument, y_instrument, start_str, end_str):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -669,47 +695,47 @@ file.</p>
         
         x_t = self.data[x_instrument][&#34;t&#34;]
         y_t = self.data[y_instrument][&#34;t&#34;]
-        
+
         if start_str is not None:
             start = dt.datetime.strptime(start_str, &#34;%H:%M:%S&#34;).replace(
-                year = x_t[0].year,
-                month = x_t[0].month,
-                day = x_t[0].day
-                )
+                year=x_t[0].year,
+                month=x_t[0].month,
+                day=x_t[0].day
+            )
         else:
             start = x_t[0]
         if end_str is not None:
             end = dt.datetime.strptime(end_str, &#34;%H:%M:%S&#34;).replace(
-                year = x_t[0].year,
-                month = x_t[0].month,
-                day = x_t[0].day
-                )
+                year=x_t[0].year,
+                month=x_t[0].month,
+                day=x_t[0].day
+            )
         else:
             end = x_t[-1]
         if start &lt; x_t[0]:
             start = x_t[0]
         if end &gt; x_t[-1]:
             end = x_t[-1]
-            
+
         start = start.replace(
-            year = y_t[0].year,
-            month = y_t[0].month,
-            day = y_t[0].day
-            )
+            year=y_t[0].year,
+            month=y_t[0].month,
+            day=y_t[0].day
+        )
         end = end.replace(
-            year = y_t[0].year,
-            month = y_t[0].month,
-            day = y_t[0].day
-            )
+            year=y_t[0].year,
+            month=y_t[0].month,
+            day=y_t[0].day
+        )
         if start &lt; y_t[0]:
             start = y_t[0]
         if end &gt; y_t[-1]:
             end = y_t[-1]
-        
-        return start.strftime(&#34;%H:%M:%S&#34;),end.strftime(&#34;%H:%M:%S&#34;)
+
+        return start.strftime(&#34;%H:%M:%S&#34;), end.strftime(&#34;%H:%M:%S&#34;)
                 
                 
-    def _hk_timemask(self,y,start_str,end_str):
+    def _hk_timemask(self, y, start_str, end_str):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -720,38 +746,38 @@ file.</p>
             t = self.data[y][&#34;t&#34;]
         except:
             raise ValueError(f&#34;Instrument {y} is not loaded.&#34;)
-            
+
         try:
             if start_str is None:
                 start = t[0]
             else:
-                start = dt.datetime.strptime(start_str,&#34;%H:%M:%S&#34;).replace(
-                    year = t[0].year,
-                    month = t[0].month,
-                    day = t[0].day
-                    )
+                start = dt.datetime.strptime(start_str, &#34;%H:%M:%S&#34;).replace(
+                    year=t[0].year,
+                    month=t[0].month,
+                    day=t[0].day
+                )
         except:
-            msg = f&#34;{start_str} is no legal format for the &#39;start&#39; &#34;
-            msg += &#34;kwarg. It needs to be &#39;HH:MM:SS&#39;.&#34;
+            msg = (f&#34;{start_str} is no legal format for the &#39;start&#39; &#34;
+                   &#34;kwarg. It needs to be &#39;HH:MM:SS&#39;.&#34;)
             raise ValueError(msg)
         try:
             if end_str is None:
                 end = t[-1]
             else:
-                end = dt.datetime.strptime(end_str,&#34;%H:%M:%S&#34;).replace(
-                    year = t[0].year,
-                    month = t[0].month,
-                    day = t[0].day
-                    )
+                end = dt.datetime.strptime(end_str, &#34;%H:%M:%S&#34;).replace(
+                    year=t[0].year,
+                    month=t[0].month,
+                    day=t[0].day
+                )
         except:
-            msg = f&#34;{end_str} is no legal format for the &#39;end&#39; &#34;
-            msg += &#34;kwarg. It needs to be &#39;HH:MM:SS&#39;.&#34;
+            msg = (f&#34;{end_str} is no legal format for the &#39;end&#39; &#34;
+                   &#34;kwarg. It needs to be &#39;HH:MM:SS&#39;.&#34;)
             raise ValueError(msg)
-        
-        m = np.where(t&gt;=start,
+
+        m = np.where(t &gt;= start,
                      True,
                      False)
-        m = np.where(t&lt;=end,
+        m = np.where(t &lt;= end,
                      m,
                      False)
         return m</code></pre>
@@ -792,7 +818,7 @@ objects.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def plot(self,ax,x,y,**kwargs):
+<pre><code class="python">def plot(self, ax, x, y, **kwargs):
     &#34;&#34;&#34;
     Plots two data arrays against each other.
 
@@ -801,11 +827,11 @@ objects.</dd>
     ax : Axes obj of mpl.axes module
         The plot will be drawn on this axis.
     x : str
-        Takes a str in the format `&#39;plottype@instrument&#39;` and uses it on the 
-        x-axis. E.g.: `&#39;total_partconc@wibs&#39;`
+        Takes a str in the format `&#39;plottype@instrument&#39;` and uses it on 
+        the x-axis. E.g.: `&#39;total_partconc@wibs&#39;`
     y : str
-        Takes a str in the format `&#39;plottype@instrument&#39;` and uses it on the 
-        y-axis. E.g.: `&#39;total_partconc@wibs&#39;`
+        Takes a str in the format `&#39;plottype@instrument&#39;` and uses it on 
+        the y-axis. E.g.: `&#39;total_partconc@wibs&#39;`
     
     Other Parameters
     ----------------
@@ -841,59 +867,67 @@ objects.</dd>
         if the kwarg `return_arrs` is True.
     &#34;&#34;&#34;
     
-    
-    #kwargs
+    # kwargs
     defaults = {
-        &#34;start&#34; : None,
-        &#34;end&#34; : None,
+        &#34;start&#34;: None,
+        &#34;end&#34;: None,
         &#34;scatter&#34;: True,
-        &#34;color&#34; : &#34;tab:blue&#34;,
-        &#34;pearson&#34; : True,
-        &#34;return_arrs&#34; : False,
-        &#34;desample&#34; : 0
-        }
-    for key,default in defaults.items():
+        &#34;color&#34;: &#34;tab:blue&#34;,
+        &#34;pearson&#34;: True,
+        &#34;return_arrs&#34;: False,
+        &#34;desample&#34;: 0
+    }
+    for key, default in defaults.items():
         kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.plot()&#34;)
-    
-    x_val,x_instrument = x.split(&#34;@&#34;)
-    y_val,y_instrument = y.split(&#34;@&#34;)
-    
+
+    x_val, x_instrument = x.split(&#34;@&#34;)
+    y_val, y_instrument = y.split(&#34;@&#34;)
+
     # check x and y
     if x_instrument not in self.data.keys():
         loaded = &#34;,&#34;.join(list(self.data.keys()))
-        raise KeyError(f&#34;{x_instrument} is not loaded. Try one of: &#34;
-                       + loaded)
+        raise KeyError(
+            f&#34;{x_instrument} is not loaded. Try one of: {loaded}&#34;
+        )
     if x_val not in self.data[x_instrument].keys():
         loaded = &#34;,&#34;.join(list(self.data[x_instrument].keys()))
-        raise KeyError(f&#34;{x_val} is not legal for {x_instrument}. Try: &#34;
-                       + loaded)
+        raise KeyError(
+            f&#34;{x_val} is not legal for {x_instrument}. Try: {loaded}&#34;
+        )
     if y_instrument not in self.data.keys():
         loaded = &#34;,&#34;.join(list(self.data.keys()))
-        raise KeyError(f&#34;{y_instrument} is not loaded. Try one of: &#34;
-                       + loaded)
+        raise KeyError(
+            f&#34;{y_instrument} is not loaded. Try one of: {loaded}&#34;
+        )
     if y_val not in self.data[y_instrument].keys():
         loaded = &#34;,&#34;.join(list(self.data[y_instrument].keys()))
-        raise KeyError(f&#34;{y_val} is not legal for {y_instrument}. Try: &#34;
-                       + loaded)
+        raise KeyError(
+            f&#34;{y_val} is not legal for {y_instrument}. Try: {loaded}&#34;
+        )
         
     # crop
-    kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self._hk_checktime(
-        x_instrument, 
-        y_instrument, 
-        kwargs[&#34;start&#34;], 
-        kwargs[&#34;end&#34;])
-    if isinstance(kwargs[&#34;start&#34;],str) or isinstance(kwargs[&#34;end&#34;],str):
-        xm = self._hk_timemask(x_instrument, 
-                              kwargs[&#34;start&#34;], 
-                              kwargs[&#34;end&#34;])
-        ym = self._hk_timemask(y_instrument,
-                              kwargs[&#34;start&#34;],
-                              kwargs[&#34;end&#34;])
+    kwargs[&#34;start&#34;], kwargs[&#34;end&#34;] = self._hk_checktime(
+        x_instrument,
+        y_instrument,
+        kwargs[&#34;start&#34;],
+        kwargs[&#34;end&#34;]
+    )
+    if isinstance(kwargs[&#34;start&#34;], str) or isinstance(kwargs[&#34;end&#34;], str):
+        xm = self._hk_timemask(
+            x_instrument,
+            kwargs[&#34;start&#34;],
+            kwargs[&#34;end&#34;]
+        )
+        ym = self._hk_timemask(
+            y_instrument,
+            kwargs[&#34;start&#34;],
+            kwargs[&#34;end&#34;]
+        )
     else:
         xm = np.array([True for t in self.data[x_instrument][&#34;t&#34;]])
         ym = np.array([True for t in self.data[y_instrument][&#34;t&#34;]])
-        
+
     # find x and y data
     if x_instrument == y_instrument:
         xx = self.data[x_instrument][x_val][xm]
@@ -903,41 +937,44 @@ objects.</dd>
         yt = self.data[y_instrument][&#34;t&#34;][ym]
         xdata = self.data[x_instrument][x_val][xm]
         ydata = self.data[y_instrument][y_val][ym]
-        xm = np.isin(xt,yt)
-        ym = np.isin(yt,xt)
-        
+        xm = np.isin(xt, yt)
+        ym = np.isin(yt, xt)
+
         xx = xdata[xm]
         yy = ydata[ym]
      
     if kwargs[&#34;desample&#34;] &gt; 0:
         des = kwargs[&#34;desample&#34;]
         n = len(xx) // des
-        y1 = yy[:n*des].reshape(-1,des).mean(axis=1)
-        yy = np.append(y1,np.mean(yy[n*des:]))
+        y1 = yy[:n*des].reshape(-1, des).mean(axis=1)
+        yy = np.append(y1, np.mean(yy[n*des:]))
         if x_val != &#34;t&#34;:
-            x1 = xx[:n*des].reshape(-1,des).mean(axis=1)
-            xx = np.append(x1,np.mean(xx[n*des:]))
+            x1 = xx[:n*des].reshape(-1, des).mean(axis=1)
+            xx = np.append(x1, np.mean(xx[n*des:]))
         else:
             xx = np.append(
-                xx[:n*des:des],xx[n*des]
-                ) + dt.timedelta(seconds=des/2)
-        
+                xx[:n*des:des], xx[n*des]
+            ) + dt.timedelta(seconds=des/2)
         
     # plot
     if kwargs[&#34;scatter&#34;]:
-        ax.scatter(xx,yy,color=kwargs[&#34;color&#34;])
+        ax.scatter(xx, yy, color=kwargs[&#34;color&#34;])
     else:
-        ax.plot(xx,yy,color=kwargs[&#34;color&#34;])
+        ax.plot(xx, yy, color=kwargs[&#34;color&#34;])
     if x_val != &#34;t&#34;:
-        ax.set_xlabel(self.details[x_instrument][x_val][0]
-                      + &#34; in &#34;
-                      + self.details[x_instrument][x_val][1])
+        ax.set_xlabel(
+            self.details[x_instrument][x_val][0]
+            + &#34; in &#34;
+            + self.details[x_instrument][x_val][1]
+        )
     else:
         ax.set_xlabel(&#34;CET&#34;)
-    ax.set_ylabel(self.details[y_instrument][y_val][0]
-                  + &#34; in &#34;
-                  + self.details[y_instrument][y_val][1])
-        
+    ax.set_ylabel(
+        self.details[y_instrument][y_val][0]
+        + &#34; in &#34;
+        + self.details[y_instrument][y_val][1]
+    )
+
     if kwargs[&#34;pearson&#34;]:
         x = xx - np.mean(xx)
         y = yy - np.mean(yy)
@@ -946,9 +983,9 @@ objects.</dd>
         sqy = np.sum(y**2)
         r = sp/(np.sqrt(sqx*sqy))
         print(f&#34;Pearson&#39;s R: {r:.3f}&#34;)
-        
+
     if kwargs[&#34;return_arrs&#34;]:
-        return xx,yy</code></pre>
+        return xx, yy</code></pre>
 </details>
 <div class="desc"><p>Plots two data arrays against each other.</p>
 <h2 id="parameters">Parameters</h2>
@@ -956,11 +993,11 @@ objects.</dd>
 <dt><strong><code>ax</code></strong> :&ensp;<code>Axes obj</code> of <code>mpl.axes module</code></dt>
 <dd>The plot will be drawn on this axis.</dd>
 <dt><strong><code>x</code></strong> :&ensp;<code>str</code></dt>
-<dd>Takes a str in the format <code>'plottype@instrument'</code> and uses it on the
-x-axis. E.g.: <code>'total_partconc@wibs'</code></dd>
+<dd>Takes a str in the format <code>'plottype@instrument'</code> and uses it on
+the x-axis. E.g.: <code>'total_partconc@wibs'</code></dd>
 <dt><strong><code>y</code></strong> :&ensp;<code>str</code></dt>
-<dd>Takes a str in the format <code>'plottype@instrument'</code> and uses it on the
-y-axis. E.g.: <code>'total_partconc@wibs'</code></dd>
+<dd>Takes a str in the format <code>'plottype@instrument'</code> and uses it on
+the y-axis. E.g.: <code>'total_partconc@wibs'</code></dd>
 </dl>
 <h2 id="other-parameters">Other Parameters</h2>
 <dl>
@@ -1004,7 +1041,7 @@ if the kwarg <code>return_arrs</code> is True.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def windrose(self,ax,y,**kwargs):
+<pre><code class="python">def windrose(self, ax, y, **kwargs):
     &#34;&#34;&#34;
     Plots a heatmap of y on a windrose plot, where the theta angle
     corresponds to the cardinal direction and the radius corresponds to 
@@ -1084,36 +1121,35 @@ if the kwarg <code>return_arrs</code> is True.</dd>
     None
     &#34;&#34;&#34;
     
-    
-    #kwargs
+    # kwargs
     defaults = {
-        &#34;weatherdata&#34; : &#34;weather&#34;,
-        &#34;start&#34; : None,
-        &#34;end&#34; : None,
+        &#34;weatherdata&#34;: &#34;weather&#34;,
+        &#34;start&#34;: None,
+        &#34;end&#34;: None,
         &#34;scatter&#34;: True,
-        &#34;scatter_color&#34; : &#34;tab:blue&#34;,
-        &#34;colormap&#34; : &#34;viridis&#34;,
-        &#34;min_threshold&#34; : 0,
-        &#34;sectors&#34; : 4,
-        &#34;bins&#34; : 3,
-        &#34;heatmap_lim&#34; : None,
-        &#34;windspeed_lim&#34; : None,
-        &#34;startangle&#34; : 0,
-        &#34;usedegrees&#34; : False,
-        &#34;theta&#34; : &#34;winddir&#34;,
-        &#34;radius&#34; : &#34;wind&#34;,
-        &#34;inverted&#34; : False
-        }
-    for key,default in defaults.items():
+        &#34;scatter_color&#34;: &#34;tab:blue&#34;,
+        &#34;colormap&#34;: &#34;viridis&#34;,
+        &#34;min_threshold&#34;: 0,
+        &#34;sectors&#34;: 4,
+        &#34;bins&#34;: 3,
+        &#34;heatmap_lim&#34;: None,
+        &#34;windspeed_lim&#34;: None,
+        &#34;startangle&#34;: 0,
+        &#34;usedegrees&#34;: False,
+        &#34;theta&#34;: &#34;winddir&#34;,
+        &#34;radius&#34;: &#34;wind&#34;,
+        &#34;inverted&#34;: False
+    }
+    for key, default in defaults.items():
         kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;Wrapper.windrose()&#34;)
-    
-    #check ax and y
+
+    # check ax and y
     if ax.name != &#34;polar&#34;:
-        msg = &#34;The passed ax has to be polar for Wrapper.windrose() to&#34;
-        msg += &#34; work properly.&#34;
+        msg = (&#34;The passed ax has to be polar for Wrapper.windrose() to&#34;
+               &#34; work properly&#34;)
         raise ValueError(msg)
-    y_data,y_instrument = y.split(&#34;@&#34;)
+    y_data, y_instrument = y.split(&#34;@&#34;)
     try:
         self.data[y_instrument][y_data]
     except:
@@ -1125,131 +1161,146 @@ if the kwarg <code>return_arrs</code> is True.</dd>
         legalstr = &#34;,&#34;.join(legallist)
         raise ValueError(f&#34;{y} is no legal y. Try one of {legalstr}&#34;)
 
-    #crop
-    kwargs[&#34;start&#34;],kwargs[&#34;end&#34;] = self._hk_checktime(
-        kwargs[&#34;weatherdata&#34;], 
-        y_instrument, 
-        kwargs[&#34;start&#34;], 
-        kwargs[&#34;end&#34;])
-    if isinstance(kwargs[&#34;start&#34;],str) or isinstance(kwargs[&#34;end&#34;],str):
-        wind_m = self._hk_timemask(kwargs[&#34;weatherdata&#34;], 
-                                  kwargs[&#34;start&#34;],
-                                  kwargs[&#34;end&#34;])
-        y_m = self._hk_timemask(y_instrument, 
-                               kwargs[&#34;start&#34;], 
-                               kwargs[&#34;end&#34;])
+    # crop
+    kwargs[&#34;start&#34;], kwargs[&#34;end&#34;] = self._hk_checktime(
+        kwargs[&#34;weatherdata&#34;],
+        y_instrument,
+        kwargs[&#34;start&#34;],
+        kwargs[&#34;end&#34;]
+    )
+    if isinstance(kwargs[&#34;start&#34;], str) or isinstance(kwargs[&#34;end&#34;], str):
+        wind_m = self._hk_timemask(
+            kwargs[&#34;weatherdata&#34;],
+            kwargs[&#34;start&#34;],
+            kwargs[&#34;end&#34;]
+        )
+        y_m = self._hk_timemask(
+            y_instrument,
+            kwargs[&#34;start&#34;],
+            kwargs[&#34;end&#34;]
+        )
     else:
         wind_m = np.array(
             [True for i in self.data[kwargs[&#34;weatherdata&#34;]][&#34;t&#34;]]
-            )
+        )
         y_m = np.array(
             [True for i in self.data[y_instrument][&#34;t&#34;]]
-            )
+        )
     
-    #load data
+    # load data
     winddir = kwargs[&#34;theta&#34;]
     if self.details[kwargs[&#34;weatherdata&#34;]][winddir][1] == &#34;°&#34;:
         theta = np.radians(
             self.data[kwargs[&#34;weatherdata&#34;]][winddir][wind_m]
-            )
+        )
     else:
         theta = self.data[kwargs[&#34;weatherdata&#34;]][winddir][wind_m]
     if kwargs[&#34;inverted&#34;]:
         theta = (theta + np.pi) % (2*np.pi)
     r = self.data[kwargs[&#34;weatherdata&#34;]][kwargs[&#34;radius&#34;]][wind_m]
     z = self.data[y_instrument][y_data][y_m]
-    
-    if (np.count_nonzero(wind_m) == 0 
-        or np.count_nonzero(y_m) == 0):
+
+    if (np.count_nonzero(wind_m) == 0
+            or np.count_nonzero(y_m) == 0):
         raise ValueError(&#34;There are no values in the given timeframe&#34;)
     
-    #transform data an plot
-    kwargs[&#34;startangle&#34;] = kwargs[&#34;startangle&#34;]%(360/kwargs[&#34;sectors&#34;])
+    # transform data an plot
+    kwargs[&#34;startangle&#34;] = kwargs[&#34;startangle&#34;] % (360/kwargs[&#34;sectors&#34;])
     kwargs[&#34;startangle&#34;] = np.radians(kwargs[&#34;startangle&#34;])
-    sector_borders = np.linspace(kwargs[&#34;startangle&#34;], 
-                                 2*np.pi+kwargs[&#34;startangle&#34;],
-                                 kwargs[&#34;sectors&#34;]+1)
+    sector_borders = np.linspace(
+        kwargs[&#34;startangle&#34;],
+        2*np.pi+kwargs[&#34;startangle&#34;],
+        kwargs[&#34;sectors&#34;]+1
+    )
     sector_borders = sector_borders % (2*np.pi)
     if kwargs[&#34;windspeed_lim&#34;] is None:
-        bin_borders = np.linspace(0,np.max(r),kwargs[&#34;bins&#34;]+1)
+        bin_borders = np.linspace(0, np.max(r), kwargs[&#34;bins&#34;]+1)
     else:
-        bin_borders = np.linspace(0,
-                                  kwargs[&#34;windspeed_lim&#34;],
-                                  kwargs[&#34;bins&#34;]+1)
-    
-    darr = np.zeros((kwargs[&#34;bins&#34;],kwargs[&#34;sectors&#34;]))
+        bin_borders = np.linspace(
+            0,
+            kwargs[&#34;windspeed_lim&#34;],
+            kwargs[&#34;bins&#34;]+1
+        )
+
+    darr = np.zeros((kwargs[&#34;bins&#34;], kwargs[&#34;sectors&#34;]))
     for b in range(kwargs[&#34;bins&#34;]):
-        bm = np.where(r&gt;=bin_borders[b],True,False)
-        bm = np.where(r&lt;=bin_borders[b+1],bm,False)
+        bm = np.where(r &gt;= bin_borders[b], True, False)
+        bm = np.where(r &lt;= bin_borders[b+1], bm, False)
         for sec in range(kwargs[&#34;sectors&#34;]):
             if sector_borders[sec] &lt; sector_borders[sec+1]:
-                sm = np.where(theta&gt;=sector_borders[sec],bm,False)
-                sm = np.where(theta&lt;=sector_borders[sec+1],sm,False)
+                sm = np.where(theta &gt;= sector_borders[sec], bm, False)
+                sm = np.where(theta &lt;= sector_borders[sec+1], sm, False)
             else:
-                sm1 = np.where(theta&gt;=sector_borders[sec],
-                              True,
-                              False)
-                sm2 =  np.where(theta&lt;=sector_borders[sec+1],
-                              True,
-                              False)
+                sm1 = np.where(
+                    theta &gt;= sector_borders[sec],
+                    True,
+                    False
+                )
+                sm2 = np.where(
+                    theta &lt;= sector_borders[sec+1],
+                    True,
+                    False
+                )
                 sm = sm1 | sm2
                 sm = sm &amp; bm
-            
+
             if np.count_nonzero(sm) &lt; kwargs[&#34;min_threshold&#34;]:
                 darr[b][sec] = np.nan
             else:
                 darr[b][sec] = np.nanmean(z[sm])
     cm = colormaps[kwargs[&#34;colormap&#34;]]
-    if (kwargs[&#34;heatmap_lim&#34;] is not None 
-        and len(kwargs[&#34;heatmap_lim&#34;]) == 2):
+    if (kwargs[&#34;heatmap_lim&#34;] is not None
+            and len(kwargs[&#34;heatmap_lim&#34;]) == 2):
         minval = kwargs[&#34;heatmap_lim&#34;][0]
         maxval = kwargs[&#34;heatmap_lim&#34;][1]
     else:
         minval = np.nanmin(darr)
         maxval = np.nanmax(darr)
-    
+
     for b in range(kwargs[&#34;bins&#34;]):
         for sec in range(kwargs[&#34;sectors&#34;]):
             color = (darr[b][sec]-minval)/(maxval-minval)
             if sector_borders[sec] &lt; sector_borders[sec+1]:
                 ax.bar(
-                    x=(sector_borders[sec]+sector_borders[sec+1])/2, 
-                    height=bin_borders[b+1]-bin_borders[b], 
-                    width=sector_borders[sec+1]-sector_borders[sec], 
-                    bottom=bin_borders[b], 
+                    x=(sector_borders[sec]+sector_borders[sec+1])/2,
+                    height=bin_borders[b+1]-bin_borders[b],
+                    width=sector_borders[sec+1]-sector_borders[sec],
+                    bottom=bin_borders[b],
                     color=cm(color)
                 )
             else:
                 ax.bar(
-                    x=(sector_borders[sec]+2*np.pi)/2, 
-                    height=bin_borders[b+1]-bin_borders[b], 
-                    width=2*np.pi-sector_borders[sec], 
-                    bottom=bin_borders[b], 
+                    x=(sector_borders[sec]+2*np.pi)/2,
+                    height=bin_borders[b+1]-bin_borders[b],
+                    width=2*np.pi-sector_borders[sec],
+                    bottom=bin_borders[b],
                     color=cm(color)
                 )
                 ax.bar(
-                    x=sector_borders[sec+1]/2, 
-                    height=bin_borders[b+1]-bin_borders[b], 
-                    width=sector_borders[sec+1], 
-                    bottom=bin_borders[b], 
+                    x=sector_borders[sec+1]/2,
+                    height=bin_borders[b+1]-bin_borders[b],
+                    width=sector_borders[sec+1],
+                    bottom=bin_borders[b],
                     color=cm(color)
                 )
-                
-    #misc plotting
+
+    # misc plotting
     if kwargs[&#34;scatter&#34;]:
-        ax.scatter(theta,r,color=kwargs[&#34;scatter_color&#34;])
+        ax.scatter(theta, r, color=kwargs[&#34;scatter_color&#34;])
     if not kwargs[&#34;usedegrees&#34;]:
-        ax.set_thetagrids([0,90,180,270],[&#34;N&#34;,&#34;E&#34;,&#34;S&#34;,&#34;W&#34;])
+        ax.set_thetagrids([0, 90, 180, 270], [&#34;N&#34;, &#34;E&#34;, &#34;S&#34;, &#34;W&#34;])
     ax.set_theta_direction(-1)
     ax.set_theta_zero_location(&#34;N&#34;)
     ffig = ax.figure
-    c = ScalarMappable(Normalize(minval,maxval),kwargs[&#34;colormap&#34;])
-    label = self.details[y_instrument][y_data][0] 
+    c = ScalarMappable(Normalize(minval, maxval), kwargs[&#34;colormap&#34;])
+    label = self.details[y_instrument][y_data][0]
     label += &#34; in &#34;
     label += self.details[y_instrument][y_data][1]
-    ffig.colorbar(c,
-                  ax=ax,
-                  label=label)
+    ffig.colorbar(
+        c,
+        ax=ax,
+        label=label
+    )
     ffig.tight_layout()</code></pre>
 </details>
 <div class="desc"><p>Plots a heatmap of y on a windrose plot, where the theta angle
@@ -1338,7 +1389,7 @@ plot the angle the wind blows to. The default is <code>False</code>.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def wrap(self,obj,name):
+<pre><code class="python">def wrap(self, obj, name):
     &#34;&#34;&#34;
     Includes an Object into the Wrapper, by including its data and details
     into the corresponding dicts and saving the object in Wrapper.name
@@ -1367,18 +1418,17 @@ plot the angle the wind blows to. The default is <code>False</code>.</dd>
     `Wrapper` methods.
     &#34;&#34;&#34;
     
-    
-    data,details = obj.returndata()
+    data, details = obj.returndata()
     self.data[name] = data
     self.details[name] = details
     for i in range(len(self.data[name][&#34;t&#34;])):
         self.data[name][&#34;t&#34;][i] = self.data[name][&#34;t&#34;][i].replace(
-            day = self.day,
-            month = self.month,
-            year = self.year
-            )
-    
-    setattr(self,name,obj)</code></pre>
+            day=self.day,
+            month=self.month,
+            year=self.year
+        )
+
+    setattr(self, name, obj)</code></pre>
 </details>
 <div class="desc"><p>Includes an Object into the Wrapper, by including its data and details
 into the corresponding dicts and saving the object in Wrapper.name</p>

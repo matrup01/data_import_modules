@@ -58,7 +58,7 @@ el.replaceWith(d);
 </summary>
 <pre><code class="python">class WIBS:
     
-    def __init__(self,file,FT_file=&#34;&#34;,FT_time=&#34;hh:mm:ss&#34;,**kwargs):
+    def __init__(self, file, FT_file=&#34;&#34;, FT_time=&#34;hh:mm:ss&#34;, **kwargs):
         &#34;&#34;&#34;
         Inits the WIBS obj
 
@@ -136,85 +136,81 @@ el.replaceWith(d);
         &#34;&#34;&#34;
         
         if file[-5:] == &#34;.wibs&#34;:
-            
-            with open(file,&#34;rb&#34;) as openfile:
+            with open(file, &#34;rb&#34;) as openfile:
                 ip = pickle.load(openfile)
-            
+
             for arg in ip.keys():
                 setattr(self, arg, ip[arg])
-            
-            #catch legacy .wibs obj that did not save self.bin_borders
+
+            # catch legacy .wibs obj that did not save self.bin_borders
             try:
                 self.bin_borders
             except AttributeError:
-                msg = &#34;Caution! The loaded .wibs file was saved before the &#34;
-                msg += &#34;attribute &#39;bin_borders&#39; was introduced. If WIBS.dndlog&#34;
-                msg += &#34;dp() is used, you have to pass the bin borders &#34;
-                msg += &#34;manually.&#34;
-                print(msg)
-                
-                #default Value
-                self.bin_borders = [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,
-                                    1.7,2,2.5,3,3.5,4,5,10,15,20,100]
+                print(&#34;Caution! The loaded .wibs file was saved before the &#34;
+                      &#34;attribute &#39;bin_borders&#39; was introduced. If WIBS.dndlog&#34;
+                      &#34;dp() is used, you have to pass the bin borders &#34;
+                      &#34;manually.&#34;)
+
+                # default Value
+                self.bin_borders = [0.5, 0.55, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.4,
+                                    1.7, 2, 2.5, 3, 3.5, 4, 5, 10, 15, 20, 100]
                 
         else:
-        
-            #import kwargs
+            # import kwargs
             defaults = {
-                &#34;FT_sigma&#34; : 3,
-                &#34;bin_borders&#34; : [0.5,0.55,0.6,0.7,0.8,0.9,1,1.2,1.4,
-                                 1.7,2,2.5,3,3.5,4,5,10,15,20,100],
-                &#34;flow&#34; : 0.3*1000/60,
-                &#34;fixed&#34; : None, #[float,flat,float]
-                &#34;start&#34; : None,
-                &#34;end&#34; : None,
-                &#34;FT_date&#34; : &#34;01.01.2000&#34;,
-                &#34;channels&#34; :  [&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,&#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;,&#34;nonfluor&#34;],
-                &#34;chunklen&#34; : 600
-                }
-            for key,value in defaults.items():
+                &#34;FT_sigma&#34;: 3,
+                &#34;bin_borders&#34;: [0.5, 0.55, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.4,
+                                1.7, 2, 2.5, 3, 3.5, 4, 5, 10, 15, 20, 100],
+                &#34;flow&#34;: 0.3*1000/60,
+                &#34;fixed&#34;: None,
+                &#34;start&#34;: None,
+                &#34;end&#34;: None,
+                &#34;FT_date&#34;: &#34;01.01.2000&#34;,
+                &#34;channels&#34;:  [&#34;a&#34;, &#34;b&#34;, &#34;c&#34;, &#34;ab&#34;, &#34;ac&#34;,
+                              &#34;bc&#34;, &#34;abc&#34;, &#34;nonfluor&#34;],
+                &#34;chunklen&#34;: 600
+            }
+            for key, value in defaults.items():
                 self._hk_kwargs(kwargs, key, value)
             self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS&#34;)
             
-            #setup variables
+            # setup variables
             self.bins = len(self.bin_borders)-1
-            bm = [math.sqrt(self.bin_borders[i] * self.bin_borders[i+1]) 
+            bm = [math.sqrt(self.bin_borders[i] * self.bin_borders[i+1])
                   for i in range(self.bins)]
             self.bin_means = bm
             self.data = {}
             self.rawdata = {}
-            self.details = {} #[name,unit]
+            self.details = {}  # [name,unit]
             if self.fixed is not None:
                 self.fl1_FTbg = self.fixed[0]
                 self.fl2_FTbg = self.fixed[1]
                 self.fl3_FTbg = self.fixed[2]
                       
-            #load Forced Trigger
-            
+            # load Forced Trigger
             if FT_file == &#34;&#34;:
-                msg = &#34;WIBS needs a FT_file unless preprocessed data &#34;
-                msg += &#34;(.wibs-file) is used&#34;
-                raise KeyError(msg)
-    
+                raise KeyError(&#34;WIBS needs a FT_file unless preprocessed data &#34;
+                               &#34;(.wibs-file) is used&#34;)
+
             try:
-                ft = h5py.File(FT_file,&#34;r&#34;)
+                ft = h5py.File(FT_file, &#34;r&#34;)
             except Exception as exc:
                 msg = &#34;Cant find FT_file at given path&#34;
                 raise FileNotFoundError(msg) from exc
             ft2 = ft[&#34;NEO&#34;]
             ft3 = ft2[&#34;ParticleData&#34;]
-            
+
             ft_xe1 = np.transpose(list(ft3[&#34;Xe1_FluorPeak&#34;]))
             ft_xe2 = np.transpose(list(ft3[&#34;Xe2_FluorPeak&#34;]))
             self.start_FT = datetime.fromtimestamp(
                 list(ft3[&#34;Seconds&#34;])[0],
                 tz=timezone.utc
-                )
+            )
             
             f = f&#34;{self.FT_date}-{FT_time}/+0000&#34;
-            FT_time = datetime.strptime(f,&#34;%d.%m.%Y-%H:%M:%S/%z&#34;)
+            FT_time = datetime.strptime(f, &#34;%d.%m.%Y-%H:%M:%S/%z&#34;)
             timecorr = FT_time - self.start_FT
-            
+
             if self.fixed is None:
                 f1 = ft_xe1[0]
                 self.fl1_FTbg = np.nanmean(f1) + self.FT_sigma * np.nanstd(f1)
@@ -223,57 +219,64 @@ el.replaceWith(d);
                 f3 = ft_xe2[1]
                 self.fl3_FTbg = np.nanmean(f3) + self.FT_sigma * np.nanstd(f3)
             
-            
-            #load file
-            if isinstance(file,str):
+            # load file
+            if isinstance(file, str):
                 try:
-                    f = h5py.File(file,&#34;r&#34;)
+                    f = h5py.File(file, &#34;r&#34;)
                 except Exception as exc:
                     msg = &#34;Cant find file at given path&#34;
                     raise FileNotFoundError(msg) from exc
                 f2 = f[&#34;NEO&#34;]
                 f3 = f2[&#39;ParticleData&#39;]
-                
+
                 wibstime = list(f3[&#34;Seconds&#34;])
                 self.timehandler = np.array(wibstime).astype(np.uint32)
-                
+
                 xe1 = np.transpose(list(f3[&#34;Xe1_FluorPeak&#34;]))
                 xe2 = np.transpose(list(f3[&#34;Xe2_FluorPeak&#34;]))
-                
+
                 self.rawdata[&#34;size&#34;] = np.array(list(f3[&#34;Size_um&#34;]))
                 self.rawdata[&#34;excited&#34;] = np.array(
                     list(f3[&#34;Flag_Excited&#34;])
-                    ).astype(bool)
-                self.rawdata[&#34;Fl1&#34;] = np.where(xe1[0] &gt;= self.fl1_FTbg, 
-                                               True, False)
-                self.rawdata[&#34;Fl2&#34;] = np.where(xe1[1] &gt;= self.fl2_FTbg, 
-                                               True, False)
-                self.rawdata[&#34;Fl3&#34;] = np.where(xe2[1] &gt;= self.fl3_FTbg, 
-                                               True, False)
-                
-    
-            #load files
-            elif isinstance(file,list):
-    
+                ).astype(bool)
+                self.rawdata[&#34;Fl1&#34;] = np.where(
+                    xe1[0] &gt;= self.fl1_FTbg,
+                    True,
+                    False
+                )
+                self.rawdata[&#34;Fl2&#34;] = np.where(
+                    xe1[1] &gt;= self.fl2_FTbg,
+                    True,
+                    False
+                )
+                self.rawdata[&#34;Fl3&#34;] = np.where(
+                    xe2[1] &gt;= self.fl3_FTbg,
+                    True,
+                    False
+                )
+
+            # load files
+            elif isinstance(file, list):
+
                 firstfile = True
-                
+
                 for ff in file:
-                    f = h5py.File(ff,&#34;r&#34;)
+                    f = h5py.File(ff, &#34;r&#34;)
                     f2 = f[&#34;NEO&#34;]
                     f3 = f2[&#39;ParticleData&#39;]
-                    
+
                     filetime = list(f3[&#34;Seconds&#34;])
                     th = np.array(filetime).astype(np.uint32)
-                    
+
                     xe1 = np.transpose(list(f3[&#34;Xe1_FluorPeak&#34;]))
                     xe2 = np.transpose(list(f3[&#34;Xe2_FluorPeak&#34;]))
                     if len(xe1) == 0 or len(xe2) == 0:
                         continue
-                    
+
                     filecounts = np.array(list(f3[&#34;Size_um&#34;]))
                     file_excited = np.array(
                         list(f3[&#34;Flag_Excited&#34;])
-                        ).astype(bool)
+                    ).astype(bool)
                     filefl1 = np.where(xe1[0] &gt;= self.fl1_FTbg, True, False)
                     filefl2 = np.where(xe1[1] &gt;= self.fl2_FTbg, True, False)
                     filefl3 = np.where(xe2[1] &gt;= self.fl3_FTbg, True, False)
@@ -290,44 +293,49 @@ el.replaceWith(d);
                         self.timehandler = np.append(
                             self.timehandler,
                             th
-                            ).astype(np.uint32)
+                        ).astype(np.uint32)
                         self.rawdata[&#34;size&#34;] = np.append(self.rawdata[&#34;size&#34;],
                                                          filecounts)
                         self.rawdata[&#34;excited&#34;] = np.append(
                             self.rawdata[&#34;excited&#34;],
                             file_excited
-                            )
-                        self.rawdata[&#34;Fl1&#34;] = np.append(self.rawdata[&#34;Fl1&#34;],
-                                                        filefl1)
-                        self.rawdata[&#34;Fl2&#34;] = np.append(self.rawdata[&#34;Fl2&#34;],
-                                                        filefl2)
-                        self.rawdata[&#34;Fl3&#34;] = np.append(self.rawdata[&#34;Fl3&#34;],
-                                                        filefl3)
+                        )
+                        self.rawdata[&#34;Fl1&#34;] = np.append(
+                            self.rawdata[&#34;Fl1&#34;],
+                            filefl1
+                        )
+                        self.rawdata[&#34;Fl2&#34;] = np.append(
+                            self.rawdata[&#34;Fl2&#34;],
+                            filefl2
+                        )
+                        self.rawdata[&#34;Fl3&#34;] = np.append(
+                            self.rawdata[&#34;Fl3&#34;],
+                            filefl3
+                        )
                
-             
-            if isinstance(self.start,str):
+            if isinstance(self.start, str):
                 wb_date = datetime.utcfromtimestamp(self.timehandler[0])
                 f = f&#34;{self.FT_date}-{self.start}/+0000&#34;
-                starttime = datetime.strptime(f,&#34;%d.%m.%Y-%H:%M:%S/%z&#34;)
+                starttime = datetime.strptime(f, &#34;%d.%m.%Y-%H:%M:%S/%z&#34;)
                 starttime = int(starttime.replace(
                     year=wb_date.year,
                     month=wb_date.month,
                     day=wb_date.day
-                    ).timestamp())
+                ).timestamp())
                 if int(timecorr.total_seconds()) &gt;= 0:
                     start_m = np.where(
-                        (self.timehandler 
-                         + int(timecorr.total_seconds())) &gt; starttime, 
-                        True, 
+                        (self.timehandler
+                         + int(timecorr.total_seconds())) &gt; starttime,
+                        True,
                         False
-                        )
+                    )
                 else:
                     offset = abs(int(timecorr.total_seconds()))
                     start_m = np.where(
-                        (self.timehandler - offset) &gt; starttime, 
-                        True, 
+                        (self.timehandler - offset) &gt; starttime,
+                        True,
                         False
-                        )
+                    )
                 self.timehandler = self.timehandler[start_m]
                 self.rawdata[&#34;size&#34;] = self.rawdata[&#34;size&#34;][start_m]
                 self.rawdata[&#34;excited&#34;] = self.rawdata[&#34;excited&#34;][start_m]
@@ -335,29 +343,31 @@ el.replaceWith(d);
                 self.rawdata[&#34;Fl2&#34;] = self.rawdata[&#34;Fl2&#34;][start_m]
                 self.rawdata[&#34;Fl3&#34;] = self.rawdata[&#34;Fl3&#34;][start_m]
                 del start_m
-            if isinstance(self.end,str):
+            if isinstance(self.end, str):
                 wb_date = datetime.utcfromtimestamp(self.timehandler[0])
                 f = f&#34;{self.FT_date}-{self.end}/+0000&#34;
-                endtime = datetime.strptime(f,&#34;%d.%m.%Y-%H:%M:%S/%z&#34;)
+                endtime = datetime.strptime(f, &#34;%d.%m.%Y-%H:%M:%S/%z&#34;)
                 endtime = np.uint32(endtime.replace(
                     year=wb_date.year,
                     month=wb_date.month,
                     day=wb_date.day
-                    ).timestamp())
+                ).timestamp())
                 
                 if int(timecorr.total_seconds()) &gt;= 0:
                     end_m = np.where(
-                        (self.timehandler 
+                        (self.timehandler
                          + int(timecorr.total_seconds())) &lt; endtime,
                         True,
                         False
-                        )
+                    )
                 else:
                     offset = abs(int(timecorr.total_seconds()))
-                    end_m = np.where((self.timehandler - offset) &lt; endtime,
-                                     True,
-                                     False)
-                self.timehandler = self.timehandler[end_m] 
+                    end_m = np.where(
+                        (self.timehandler - offset) &lt; endtime,
+                        True,
+                        False
+                    )
+                self.timehandler = self.timehandler[end_m]
                 self.rawdata[&#34;size&#34;] = self.rawdata[&#34;size&#34;][end_m]
                 self.rawdata[&#34;excited&#34;] = self.rawdata[&#34;excited&#34;][end_m]
                 self.rawdata[&#34;Fl1&#34;] = self.rawdata[&#34;Fl1&#34;][end_m]
@@ -365,21 +375,20 @@ el.replaceWith(d);
                 self.rawdata[&#34;Fl3&#34;] = self.rawdata[&#34;Fl3&#34;][end_m]
                 del end_m
     
-                
-            #process data
+            # process data
             self.data[&#34;t&#34;] = np.array(
-                [datetime.utcfromtimestamp(timestamp) 
+                [datetime.utcfromtimestamp(timestamp)
                  for timestamp in range(self.timehandler[0],
                                         self.timehandler[-1])]
-                ) + timecorr
+            ) + timecorr
             self.date = [self.data[&#34;t&#34;][0].day,
                          self.data[&#34;t&#34;][0].month,
                          self.data[&#34;t&#34;][0].year]
-            
-            lower=int(self.timehandler[0]//1)
-            upper=lower+self.chunklen
-            chunkmask=np.where(self.timehandler&gt;=lower,True,False)
-            chunkmask=np.where(self.timehandler&lt;upper,chunkmask,False)
+
+            lower = int(self.timehandler[0]//1)
+            upper = lower+self.chunklen
+            chunkmask = np.where(self.timehandler &gt;= lower, True, False)
+            chunkmask = np.where(self.timehandler &lt; upper, chunkmask, False)
             chunktime = self.timehandler[chunkmask]
             chunksize = self.rawdata[&#34;size&#34;][chunkmask]
             chunkexc = self.rawdata[&#34;excited&#34;][chunkmask]
@@ -389,138 +398,147 @@ el.replaceWith(d);
             del chunkmask
             
             time_mask = np.array(
-                [np.where(chunktime==i,True,False) 
-                 for i in range(lower,upper)]
-                )
-                    
-            #part_conc &amp; #/s
+                [np.where(chunktime == i, True, False)
+                 for i in range(lower, upper)]
+            )
+
+            # part_conc &amp; #/s
             for bin_no in range(self.bins):
-                m = np.where(self.bin_borders[bin_no] &lt; chunksize,
-                             True,
-                             False)
-                m = np.where(self.bin_borders[bin_no+1] &gt; chunksize,
-                             m,
-                             False)
+                m = np.where(
+                    self.bin_borders[bin_no] &lt; chunksize,
+                    True,
+                    False
+                )
+                m = np.where(
+                    self.bin_borders[bin_no+1] &gt; chunksize,
+                    m,
+                    False
+                )
                 bin_handler = time_mask &amp; m
                 self.data[f&#34;bin{bin_no}_cps&#34;] = np.array(
                     [np.count_nonzero(arr) for arr in bin_handler]
-                    )
+                )
                 del bin_handler
                 pc = f&#34;bin{bin_no}_partconc&#34;
                 cps = f&#34;bin{bin_no}_cps&#34;
                 self.data[pc] = self.data[cps] / self.flow
                 self.details[pc] = [f&#34;Particle Conc. (bin{bin_no}) &#34;,
                                     &#34;#/cm${}^3$&#34;]
-                self.details[cps] = [f&#34;Particle Counts (Bin{bin_no})&#34;,&#34;#/s&#34;]
-                
-            #dndlogdp
+                self.details[cps] = [f&#34;Particle Counts (Bin{bin_no})&#34;, &#34;#/s&#34;]
+
+            # dndlogdp
             for bin_no in range(self.bins):
                 log_binwidth = np.log10(
                     self.bin_borders[bin_no+1]
-                    )-np.log10(self.bin_borders[bin_no])
+                )-np.log10(self.bin_borders[bin_no])
                 dn = f&#34;bin{bin_no}_dndlogdp&#34;
                 pc = f&#34;bin{bin_no}_partconc&#34;
                 self.data[dn] = self.data[pc] / log_binwidth
                 self.details[dn] = [f&#34;dN/dlog$D_P$ (Bin{bin_no})&#34;,
                                     &#34;µm${}^{-1}$&#34;]
                 
-            #total
-            m = np.where(self.bin_borders[0] &lt; chunksize,True,False)
-            m = np.where(self.bin_borders[-1] &gt; chunksize,m,False)
+            # total
+            m = np.where(self.bin_borders[0] &lt; chunksize, True, False)
+            m = np.where(self.bin_borders[-1] &gt; chunksize, m, False)
             total_handler = time_mask &amp; m
             self.data[&#34;total_cps&#34;] = np.array(
                 [np.count_nonzero(arr) for arr in total_handler]
-                )
+            )
             del total_handler
-            self.details[&#34;total_cps&#34;] = [&#34;Particle Counts&#34;,&#34;#/s&#34;]
+            self.details[&#34;total_cps&#34;] = [&#34;Particle Counts&#34;, &#34;#/s&#34;]
             
-            
-            #excited
+            # excited
             ex_handler = time_mask &amp; chunkexc
             self.data[&#34;excited&#34;] = np.array(
                 [np.count_nonzero(arr) for arr in ex_handler]
-                )
+            )
             del ex_handler
-            self.details[&#34;excited&#34;] = [&#34;Particle Counts (excited)&#34;,&#34;#/s&#34;]
+            self.details[&#34;excited&#34;] = [&#34;Particle Counts (excited)&#34;, &#34;#/s&#34;]
             self.data[&#34;excited_fraction&#34;] = np.divide(
                 self.data[&#34;excited&#34;],
                 self.data[&#34;total_cps&#34;],
-                out=np.ones(self.data[&#34;excited&#34;].shape,dtype=float),
-                where=self.data[&#34;total_cps&#34;]!=0
-                )
+                out=np.ones(self.data[&#34;excited&#34;].shape, dtype=float),
+                where=self.data[&#34;total_cps&#34;] != 0
+            )
             self.details[&#34;excited_fraction&#34;] = [
-                &#34;Fraction of excited Particles&#34;, 
+                &#34;Fraction of excited Particles&#34;,
                 &#34;No Unit&#34;
-                ]
-            
-            
-            #fluorescence channels
+            ]
+
+            # fluorescence channels
             fl1_handler = time_mask &amp; chunkfl1
             fl2_handler = time_mask &amp; chunkfl2
             fl3_handler = time_mask &amp; chunkfl3
-            
+
             self.data[&#34;fl1&#34;] = np.array(
                 [np.count_nonzero(arr) for arr in fl1_handler]
-                )/self.data[&#34;excited_fraction&#34;]
+            )/self.data[&#34;excited_fraction&#34;]
             self.data[&#34;fl2&#34;] = np.array(
                 [np.count_nonzero(arr) for arr in fl2_handler]
-                )/self.data[&#34;excited_fraction&#34;]
+            )/self.data[&#34;excited_fraction&#34;]
             self.data[&#34;fl3&#34;] = np.array(
                 [np.count_nonzero(arr) for arr in fl3_handler]
-                )/self.data[&#34;excited_fraction&#34;]
-            for i in [1,2,3]:
-                self.details[f&#34;fl{i}&#34;] = [f&#34;Particle Counts (Fl{i})&#34;,&#34;#/s&#34;]
+            )/self.data[&#34;excited_fraction&#34;]
+            for i in [1, 2, 3]:
+                self.details[f&#34;fl{i}&#34;] = [f&#34;Particle Counts (Fl{i})&#34;, &#34;#/s&#34;]
                 self.details[f&#34;fl{i}_fraction&#34;] = [
                     f&#34;Fluorescent Fraction (Fl{i})&#34;,
                     &#34;No Unit&#34;
-                    ]
-            
-            def createmask(a,b,c,string):
+                ]
+
+            def createmask(a, b, c, string):
                 a = a if &#34;a&#34; in string else ~a
                 b = b if &#34;b&#34; in string else ~b
                 c = c if &#34;c&#34; in string else ~c
-                
-                op = a&amp;b
-                return op&amp;c
+
+                op = a &amp; b
+                return op &amp; c
             
             for channel in self.channels:
-                channel_mask = createmask(fl1_handler,
-                                          fl2_handler,
-                                          fl3_handler,
-                                          channel)
+                if channel == &#34;nonfluor&#34;:
+                    continue
+                channel_mask = createmask(
+                    fl1_handler,
+                    fl2_handler,
+                    fl3_handler,
+                    channel
+                )
                 for bin_no in range(self.bins):
-                    m =np.where(
+                    m = np.where(
                         self.bin_borders[bin_no] &lt; chunksize,
                         True,
                         False
-                        )
+                    )
                     m = np.where(
                         self.bin_borders[bin_no+1] &gt; chunksize,
                         m,
-                        False)
+                        False
+                    )
                     m = channel_mask &amp; m
                     cps = f&#34;{channel}_bin{bin_no}_cps&#34;
-                    
+
                     self.data[cps] = np.array(
                         [np.count_nonzero(arr) for arr in m]
-                        )
+                    )
                     del m
                     self.details[cps] = [
                         f&#34;Counts of {channel}-Particles (Bin{bin_no})&#34;,
                         &#34;#/s&#34;
-                        ]
-                    
-                   
+                    ]
+
                 del channel_mask
-                
-                
+  
                 
             lower = upper
             upper = lower + self.chunklen
             
             while lower &lt;= self.timehandler[-1]:
-                chunkmask=np.where(self.timehandler&gt;=lower,True,False)
-                chunkmask=np.where(self.timehandler&lt;upper,chunkmask,False)
+                chunkmask = np.where(self.timehandler &gt;= lower, True, False)
+                chunkmask = np.where(
+                    self.timehandler &lt; upper, 
+                    chunkmask, 
+                    False
+                    )
                 chunktime = self.timehandler[chunkmask]
                 chunksize = self.rawdata[&#34;size&#34;][chunkmask]
                 chunkexc = self.rawdata[&#34;excited&#34;][chunkmask]
@@ -531,139 +549,162 @@ el.replaceWith(d);
                 
                 if upper &lt; self.timehandler[-1]:
                     time_mask = np.array(
-                        [np.where(chunktime==i,True,False) 
-                         for i in range(lower,upper)]
-                        )
+                        [np.where(chunktime == i, True, False)
+                         for i in range(lower, upper)]
+                    )
                 else:
                     time_mask = np.array(
-                        [np.where(chunktime==i,True,False) 
-                         for i in range(lower,self.timehandler[-1])]
-                        )
+                        [np.where(chunktime == i, True, False)
+                         for i in range(lower, self.timehandler[-1])]
+                    )
                         
-                #part_conc &amp; #/s &amp; dndlogdp
+                # part_conc &amp; #/s &amp; dndlogdp
                 for bin_no in range(self.bins):
-                    m = np.where(self.bin_borders[bin_no] &lt; chunksize,
-                                 True,
-                                 False)
-                    m = np.where(self.bin_borders[bin_no+1] &gt; chunksize,
-                                 m,
-                                 False)
+                    m = np.where(
+                        self.bin_borders[bin_no] &lt; chunksize,
+                        True,
+                        False
+                    )
+                    m = np.where(
+                        self.bin_borders[bin_no+1] &gt; chunksize,
+                        m,
+                        False
+                    )
                     bin_handler = time_mask &amp; m
                     dat = np.array(
                         [np.count_nonzero(arr) for arr in bin_handler]
-                        )
+                    )
                     del bin_handler
                     pc = f&#34;bin{bin_no}_partconc&#34;
                     cps = f&#34;bin{bin_no}_cps&#34;
-                    self.data[cps] = np.append(self.data[cps],dat)
+                    self.data[cps] = np.append(self.data[cps], dat)
                     dat = dat / self.flow
-                    self.data[pc] = np.append(self.data[pc],dat)
-                    
+                    self.data[pc] = np.append(self.data[pc], dat)
+
                     log_binwidth = np.log10(
                         self.bin_borders[bin_no+1]
-                        )-np.log10(self.bin_borders[bin_no])
+                    )-np.log10(self.bin_borders[bin_no])
                     dn = f&#34;bin{bin_no}_dndlogdp&#34;
                     dat = dat / log_binwidth
-                    self.data[dn] = np.append(self.data[dn],dat)
+                    self.data[dn] = np.append(self.data[dn], dat)
                     
-                #total
-                m = np.where(self.bin_borders[0] &lt; chunksize,True,False)
-                m = np.where(self.bin_borders[-1] &gt; chunksize,m,False)
+                # total
+                m = np.where(self.bin_borders[0] &lt; chunksize, True, False)
+                m = np.where(self.bin_borders[-1] &gt; chunksize, m, False)
                 total_handler = time_mask &amp; m
                 dat = np.array(
                     [np.count_nonzero(arr) for arr in total_handler]
-                    )
+                )
                 del total_handler
-                self.data[&#34;total_cps&#34;] = np.append(self.data[&#34;total_cps&#34;],dat)
+                self.data[&#34;total_cps&#34;] = np.append(self.data[&#34;total_cps&#34;], dat)
                 
-                #excited
+                # excited
                 ex_handler = time_mask &amp; chunkexc
                 ex = np.array(
                     [np.count_nonzero(arr) for arr in ex_handler]
-                    )
-                self.data[&#34;excited&#34;] = np.append(self.data[&#34;excited&#34;],ex)
+                )
+                self.data[&#34;excited&#34;] = np.append(self.data[&#34;excited&#34;], ex)
                 del ex_handler
                 exfrac = np.divide(
                     ex,
                     dat,
-                    out=np.ones(ex.shape,dtype=float),
-                    where=dat!=0
-                    )
+                    out=np.ones(ex.shape, dtype=float),
+                    where=dat != 0
+                )
                 self.data[&#34;excited_fraction&#34;] = np.append(
                     self.data[&#34;excited_fraction&#34;],
                     exfrac
-                    )
+                )
                 
-                
-                #fluorescence channels
+                # fluorescence channels
                 fl1_handler = time_mask &amp; chunkfl1
                 fl2_handler = time_mask &amp; chunkfl2
                 fl3_handler = time_mask &amp; chunkfl3
-                
+
                 fl1 = np.array(
                     [np.count_nonzero(arr) for arr in fl1_handler]
-                    )/exfrac
-                self.data[&#34;fl1&#34;] = np.append(self.data[&#34;fl1&#34;],fl1)
+                )/exfrac
+                self.data[&#34;fl1&#34;] = np.append(self.data[&#34;fl1&#34;], fl1)
                 fl2 = np.array(
                     [np.count_nonzero(arr) for arr in fl2_handler]
-                    )/exfrac
-                self.data[&#34;fl2&#34;] = np.append(self.data[&#34;fl2&#34;],fl2)
+                )/exfrac
+                self.data[&#34;fl2&#34;] = np.append(self.data[&#34;fl2&#34;], fl2)
                 fl3 = np.array(
                     [np.count_nonzero(arr) for arr in fl3_handler]
-                    )/exfrac
-                self.data[&#34;fl3&#34;] = np.append(self.data[&#34;fl3&#34;],fl3)
-                
+                )/exfrac
+                self.data[&#34;fl3&#34;] = np.append(self.data[&#34;fl3&#34;], fl3)
                 
                 for channel in self.channels:
-                    channel_mask = createmask(fl1_handler,
-                                              fl2_handler,
-                                              fl3_handler,
-                                              channel)
+                    if channel == &#34;nonfluor&#34;:
+                        continue
+                    channel_mask = createmask(
+                        fl1_handler,
+                        fl2_handler,
+                        fl3_handler,
+                        channel
+                    )
                     for bin_no in range(self.bins):
-                        m =np.where(
+                        m = np.where(
                             self.bin_borders[bin_no] &lt; chunksize,
                             True,
                             False
-                            )
+                        )
                         m = np.where(
                             self.bin_borders[bin_no+1] &gt; chunksize,
                             m,
-                            False)
+                            False
+                        )
                         m = channel_mask &amp; m
-                        cps = f&#34;{channel}_bin{bin_no}_cps&#34;                        
+                        cps = f&#34;{channel}_bin{bin_no}_cps&#34;
                         dat = np.array(
                             [np.count_nonzero(arr) for arr in m]
-                            )
-                        self.data[cps] = np.append(self.data[cps],dat)
+                        )
+                        self.data[cps] = np.append(self.data[cps], dat)
                         del m
-                       
+
                     del channel_mask
-                    
+
                     
                 lower = upper
                 upper = lower + self.chunklen
                     
             self.data[&#34;total_partconc&#34;] = self.data[&#34;total_cps&#34;] / self.flow
-            self.details[&#34;total_partconc&#34;] = [&#34;Particle Conc.&#34;,&#34;#/cm${}^3$&#34;]
-            
+            self.details[&#34;total_partconc&#34;] = [&#34;Particle Conc.&#34;, &#34;#/cm${}^3$&#34;]
+
             self.data[&#34;fl1_fraction&#34;] = np.divide(
                 self.data[&#34;fl1&#34;],
                 self.data[&#34;total_cps&#34;],
-                out=np.zeros(self.data[&#34;fl1&#34;].shape,dtype=float),
-                where=self.data[&#34;total_cps&#34;]!=0
-                )
+                out=np.zeros(self.data[&#34;fl1&#34;].shape, dtype=float),
+                where=self.data[&#34;total_cps&#34;] != 0
+            )
             self.data[&#34;fl2_fraction&#34;] = np.divide(
                 self.data[&#34;fl2&#34;],
                 self.data[&#34;total_cps&#34;],
-                out=np.zeros(self.data[&#34;fl2&#34;].shape,dtype=float),
-                where=self.data[&#34;total_cps&#34;]!=0
-                )
+                out=np.zeros(self.data[&#34;fl2&#34;].shape, dtype=float),
+                where=self.data[&#34;total_cps&#34;] != 0
+            )
             self.data[&#34;fl3_fraction&#34;] = np.divide(
                 self.data[&#34;fl3&#34;],
                 self.data[&#34;total_cps&#34;],
-                out=np.zeros(self.data[&#34;fl3&#34;].shape,dtype=float),
-                where=self.data[&#34;total_cps&#34;]!=0
-                )
+                out=np.zeros(self.data[&#34;fl3&#34;].shape, dtype=float),
+                where=self.data[&#34;total_cps&#34;] != 0
+            )
+            
+            if &#34;nonfluor&#34; in self.channels:
+                channels = []
+                for ch in self.channels:
+                    if ch != &#34;nonfluor&#34;:
+                        channels.append(ch)
+                for bin_no in range(self.bins):
+                    app = np.array(
+                        [self.data[f&#34;{ch}_bin{bin_no}_cps&#34;] for ch in channels]
+                    )
+                    app = self.data[f&#34;bin{bin_no}_cps&#34;] - np.sum(app, axis=0)
+                    self.data[f&#34;nonfluor_bin{bin_no}_cps&#34;] = app
+                    self.details[cps] = [
+                        f&#34;Counts of non-fluorescent Particles (Bin{bin_no})&#34;,
+                        &#34;#/s&#34;
+                        ]
             
             for channel in self.channels:
                 cps = f&#34;{channel}_total_cps&#34;
@@ -671,18 +712,20 @@ el.replaceWith(d);
                 fr = f&#34;{channel}_fraction&#34;
                 cps = f&#34;{channel}_total_cps&#34;
                 self.data[cps] = np.sum(
-                    [self.data[f&#34;{channel}_bin{i}_cps&#34;] 
+                    [self.data[f&#34;{channel}_bin{i}_cps&#34;]
                      for i in range(self.bins)],
                     axis=0
-                    )
+                )
                 self.data[pc] = self.data[cps] / self.flow
                 self.data[fr] = np.divide(
                     self.data[cps],
                     self.data[&#34;total_cps&#34;],
-                    out=np.zeros(self.data[f&#34;{channel}_total_cps&#34;].shape,
-                                 dtype=float),
-                    where=self.data[&#34;total_cps&#34;]!=0
-                    )
+                    out=np.zeros(
+                        self.data[f&#34;{channel}_total_cps&#34;].shape,
+                        dtype=float
+                    ),
+                    where=self.data[&#34;total_cps&#34;] != 0
+                )
                 self.details[cps] = [f&#34;Particle Counts of {channel}-Particles&#34;,
                                      &#34;#/s&#34;]
                 self.details[pc] = [f&#34;Particle Conc. of {channel}-Particles&#34;,
@@ -697,23 +740,23 @@ el.replaceWith(d);
                     self.details[pc] = [
                         f&#34;Particle Conc. of {channel}-Particles (bin{bin_no})&#34;,
                         &#34;#/cm${}^3$&#34;
-                        ]
+                    ]
                     log_binwidth = np.log10(
                         self.bin_borders[bin_no+1]
-                        )-np.log10(self.bin_borders[bin_no])
+                    )-np.log10(self.bin_borders[bin_no])
                     self.data[dn] = self.data[pc] / log_binwidth
                     self.details[dn] = [
                         f&#34;dN/dlog$D_P$ of {channel}-Particles (Bin{bin_no})&#34;,
                         &#34;cm$^{-3}$&#34;
-                        ]
-                
+                    ]
+
             del self.timehandler
             del self.start
             del self.end
             del self.FT_date
             
     
-    def quickplot(self,y):
+    def quickplot(self, y):
         &#34;&#34;&#34;
         Plots the given y over time
 
@@ -728,15 +771,19 @@ el.replaceWith(d);
 
         &#34;&#34;&#34;
         
-        #error handling
+        # error handling
         xx = self.data[&#34;t&#34;]
         try:
             yy = self.data[y]
         except KeyError as kerr:
-            raise IllegalValue(y, &#34;WIBS.quickplot()&#34;,list(self.data)) from kerr
+            raise IllegalValue(
+                y, 
+                &#34;WIBS.quickplot()&#34;,
+                list(self.data)
+            ) from kerr
                 
-        #draw plot
-        _,ax = plt.subplots()
+        # draw plot
+        _, ax = plt.subplots()
 
         ax.set_xlabel(&#34;CET&#34;)
         if self.details[y][1] != &#34;No Unit&#34;:
@@ -744,15 +791,15 @@ el.replaceWith(d);
         else:
             ylabel = self.details[y][0]
         ax.set_ylabel(ylabel)
-        
+
         ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
-        
-        ax.plot(xx,yy)
-        
+
+        ax.plot(xx, yy)
+
         plt.show()
         
         
-    def quickheatmap(self,y):
+    def quickheatmap(self, y):
         &#34;&#34;&#34;
         Draws a dndlogdp number size distribution heatmap
 
@@ -767,48 +814,52 @@ el.replaceWith(d);
 
         &#34;&#34;&#34;
         
-        #error handling
+        # error handling
         try:
             yy = np.array(
                 [self.data[f&#34;{y}_bin{i}_dndlogdp&#34;] for i in range(self.bins)]
-                ) if y != &#34;allparticles&#34; else np.array(
-                    [self.data[f&#34;bin{i}_dndlogdp&#34;] for i in range(self.bins)]
-                    )
+            ) if y != &#34;allparticles&#34; else np.array(
+                [self.data[f&#34;bin{i}_dndlogdp&#34;] for i in range(self.bins)]
+            )
         except KeyError as kerr:
-            raise IllegalValue(y, 
-                               &#34;WIBS.quickheatmap&#34;, 
-                               [&#34;allparticles&#34;,&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,
-                                &#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;]) from kerr
-        
-        xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
+            raise IllegalValue(
+                y,
+                &#34;WIBS.quickheatmap&#34;,
+                [&#34;allparticles&#34;, &#34;a&#34;, &#34;b&#34;, &#34;c&#34;,
+                 &#34;ab&#34;, &#34;ac&#34;, &#34;bc&#34;, &#34;abc&#34;]
+            ) from kerr
+
+        xlims = [self.data[&#34;t&#34;][0], self.data[&#34;t&#34;][-1]]
         xlims = md.date2num(xlims)
             
         #draw plot
         _,ax = plt.subplots()
         
-        im = ax.imshow(yy,
-                       aspect=&#34;auto&#34;,
-                       norm=&#34;log&#34;,
-                       extent=[xlims[0],xlims[1],0,self.bins]
-                       ,cmap=&#34;RdYlBu_r&#34;,
-                       interpolation=&#34;none&#34;,
-                       origin=&#34;lower&#34;)
+        im = ax.imshow(
+            yy,
+            aspect=&#34;auto&#34;,
+            norm=&#34;log&#34;,
+            extent=[xlims[0], xlims[1], 0, self.bins],
+            cmap=&#34;RdYlBu_r&#34;,
+            interpolation=&#34;none&#34;,
+            origin=&#34;lower&#34;
+        )
         ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
         ax.set_ylabel(&#34;$D_P$ in µm&#34;)
         ax.set_xlabel(&#34;CET&#34;)
-        
-        labels = [str(round(label,2)) for label in self.bin_means]
+
+        labels = [str(round(label, 2)) for label in self.bin_means]
         ticks = [tick+0.5 for tick in range(self.bins)]
-        ax.set_yticks(ticks,labels=labels)
-        
+        ax.set_yticks(ticks, labels=labels)
+
         ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
         ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
-        plt.colorbar(im,ax=ax,label=&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;)
-        
+        plt.colorbar(im, ax=ax, label=&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;)
+
         plt.show()
         
         
-    def heatmap(self,ax,y,**kwargs):
+    def heatmap(self, ax, y, **kwargs):
         &#34;&#34;&#34;
         Draws a dndlogdp number size distribution heatmap over an existing 
         mpl axis
@@ -836,6 +887,9 @@ el.replaceWith(d);
             If a value greater 0 is passed the data will be desampled to chunks
             of &#39;desample&#39; seconds. E.g. a value of `desample=60` will give a
             value for every minute.
+        cbar_minmax : tuple of float of len 2
+            If &#39;cbar_minmax&#39; is given, the coloarbar limits will be set to 
+            its values.
 
         Returns
         -------
@@ -843,66 +897,88 @@ el.replaceWith(d);
 
         &#34;&#34;&#34;
         
-        defaults = {&#34;cmap&#34; : &#34;RdYlBu_r&#34;,
-                    &#34;pad&#34; : 0,
-                    &#34;orientation&#34; : &#34;horizontal&#34;,
-                    &#34;location&#34; : &#34;top&#34;,
-                    &#34;togglecbar&#34; : True,
-                    &#34;desample&#34; : 0}
-        for key,default in defaults.items():
+        defaults = {&#34;cmap&#34;: &#34;RdYlBu_r&#34;,
+                    &#34;pad&#34;: 0,
+                    &#34;orientation&#34;: &#34;horizontal&#34;,
+                    &#34;location&#34;: &#34;top&#34;,
+                    &#34;togglecbar&#34;: True,
+                    &#34;desample&#34;: 0,
+                    &#34;cbar_minmax&#34;: None}
+        for key, default in defaults.items():
             kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.heatmap()&#34;)
-        
+
         try:
             yy = np.array(
                 [self.data[f&#34;{y}_bin{i}_dndlogdp&#34;] for i in range(self.bins)]
-                ) if y != &#34;allparticles&#34; else np.array(
-                    [self.data[f&#34;bin{i}_dndlogdp&#34;] for i in range(self.bins)]
-                    )
+            ) if y != &#34;allparticles&#34; else np.array(
+                [self.data[f&#34;bin{i}_dndlogdp&#34;] for i in range(self.bins)]
+            )
         except KeyError as kerr:
-            raise IllegalValue(y, 
-                               &#34;WIBS.heatmap()&#34;, 
-                               [&#34;allparticles&#34;,&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,
-                                &#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;,&#34;nonfluor&#34;]) from kerr
+            raise IllegalValue(
+                y,
+                &#34;WIBS.heatmap()&#34;,
+                [&#34;allparticles&#34;, &#34;a&#34;, &#34;b&#34;, &#34;c&#34;,
+                 &#34;ab&#34;, &#34;ac&#34;, &#34;bc&#34;, &#34;abc&#34;, &#34;nonfluor&#34;]
+            ) from kerr
         
         if kwargs[&#34;desample&#34;] &gt; 0:
             des = kwargs[&#34;desample&#34;]
             n = len(yy[0]) // des
-            y1 = yy[:,:n*des].reshape(len(yy),-1,des).mean(axis=2)
-            app = np.array([[np.mean(yy[i,n*des:]) for i in range(len(yy))]]).T
-            yy = np.append(y1,app,axis=1)
+            y1 = yy[:, :n*des].reshape(len(yy), -1, des).mean(axis=2)
+            app = np.array(
+                [[np.mean(yy[i, n*des:]) for i in range(len(yy))]]
+            ).T
+            yy = np.append(y1, app, axis=1)
         
-        
-        xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
+        xlims = [self.data[&#34;t&#34;][0], self.data[&#34;t&#34;][-1]]
         xlims = md.date2num(xlims)
-            
-        #draw plot
-        im = ax.imshow(yy,
-                       aspect=&#34;auto&#34;,
-                       norm=&#34;log&#34;,
-                       extent=[xlims[0],xlims[1],0,self.bins],
-                       cmap=kwargs[&#34;cmap&#34;],
-                       interpolation=&#34;none&#34;,
-                       origin=&#34;lower&#34;)
+
+        # draw plot
+        if kwargs[&#34;cbar_minmax&#34;] is not None:
+            im = ax.imshow(
+                yy,
+                aspect=&#34;auto&#34;,
+                norm=&#34;log&#34;,
+                extent=[xlims[0], xlims[1], 0, self.bins],
+                cmap=kwargs[&#34;cmap&#34;],
+                interpolation=&#34;none&#34;,
+                origin=&#34;lower&#34;,
+                vmin=kwargs[&#34;cbar_minmax&#34;][0],
+                vmax=kwargs[&#34;cbar_minmax&#34;][1]
+            )
+        else:
+            im = ax.imshow(
+                yy,
+                aspect=&#34;auto&#34;,
+                norm=&#34;log&#34;,
+                extent=[xlims[0], xlims[1], 0, self.bins],
+                cmap=kwargs[&#34;cmap&#34;],
+                interpolation=&#34;none&#34;,
+                origin=&#34;lower&#34;
+            )
         ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
         ax.set_ylabel(&#34;$D_P$ in µm&#34;)
         ax.set_xlabel(&#34;CET&#34;)
         
-        labels = [str(round(label,2)) for label in self.bin_means]
+        labels = [str(round(label, 2)) for label in self.bin_means]
         ticks = [tick+0.5 for tick in range(self.bins)]
-        ax.set_yticks(ticks,labels=labels)
-        
+        ax.set_yticks(ticks, labels=labels)
+
         ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
         ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
-        plt.colorbar(im,
-                     ax=ax,
-                     label=&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;,
-                     pad=kwargs[&#34;pad&#34;],
-                     orientation=kwargs[&#34;orientation&#34;],
-                     location=kwargs[&#34;location&#34;])
+        if kwargs[&#34;togglecbar&#34;]:
+            plt.colorbar(
+                im,
+                ax=ax,
+                label=&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;,
+                pad=kwargs[&#34;pad&#34;],
+                orientation=kwargs[&#34;orientation&#34;],
+                location=kwargs[&#34;location&#34;]
+            )
         
     
-    def plot(self,ax,y,**kwargs):
+    def plot(self, ax, y, **kwargs):
         &#34;&#34;&#34;
         Plots y over time on an existing mpl axis.
 
@@ -934,39 +1010,42 @@ el.replaceWith(d);
 
         &#34;&#34;&#34;
 
-        defaults = {&#34;label&#34; : &#34;no label&#34;,
-                    &#34;color&#34; : &#34;tab:purple&#34;,
-                    &#34;secondary&#34; : False,
-                    &#34;desample&#34; : 0}
-        for key,default in defaults.items():
+        defaults = {&#34;label&#34;: &#34;no label&#34;,
+                    &#34;color&#34;: &#34;tab:purple&#34;,
+                    &#34;secondary&#34;: False,
+                    &#34;desample&#34;: 0}
+        for key, default in defaults.items():
             kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.plot()&#34;)
-        
+
         xx = self.data[&#34;t&#34;]
         try:
             yy = self.data[y]
         except KeyError as kerr:
-            raise IllegalValue(&#34;y&#34;, &#34;WIBS.plot()&#34;,list(self.data)) from kerr
+            raise IllegalValue(&#34;y&#34;, &#34;WIBS.plot()&#34;, list(self.data)) from kerr
             
         if kwargs[&#34;desample&#34;] &gt; 0:
             des = kwargs[&#34;desample&#34;]
             n = len(yy) // des
-            y1 = yy[:n*des].reshape(-1,des).mean(axis=1)
-            yy = np.append(y1,np.mean(yy[n*des:]))
-            xx = np.append(xx[:n*des:des],xx[n*des]) + timedelta(seconds=des/2)
+            y1 = yy[:n*des].reshape(-1, des).mean(axis=1)
+            yy = np.append(y1, np.mean(yy[n*des:]))
+            xx = np.append(
+                xx[:n*des:des],
+                xx[n*des]
+            ) + timedelta(seconds=des/2)
             
         if self.details[y][1] != &#34;No Unit&#34;:
             ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
         else:
             ylabel = self.details[y][0]
             
-        #draw plot
-        ax.plot(xx,yy,label=kwargs[&#34;label&#34;],color=kwargs[&#34;color&#34;])
-        
+        # draw plot
+        ax.plot(xx, yy, label=kwargs[&#34;label&#34;], color=kwargs[&#34;color&#34;])
+
         ax.set_xlabel(&#34;CET&#34;)
         ax.set_ylabel(ylabel)
         ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
-        
+
         ax.tick_params(axis=&#39;y&#39;, colors=kwargs[&#34;color&#34;])
         ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])
         if not kwargs[&#34;secondary&#34;]:
@@ -977,7 +1056,7 @@ el.replaceWith(d);
             
     
     ## needs docstring and improvement and testing
-    def stackedplot(self,ax,**kwargs):
+    def stackedplot(self, ax, **kwargs):
         &#34;&#34;&#34;
         Creates a Stacked Plot on an existing axis.
 
@@ -1019,37 +1098,36 @@ el.replaceWith(d);
         None
         &#34;&#34;&#34;
         
-        
-        defaults = {&#34;start&#34; : None,
-                    &#34;end&#34; : None,
-                    &#34;log&#34; : True,
-                    &#34;xlabel&#34; : &#34;D$_p$ in µm&#34;,
-                    &#34;ylabel&#34; : &#34;Fraction&#34;,
-                    &#34;legend&#34; : True,
-                    &#34;normalize&#34; : True,
-                    &#34;legacy&#34; : False,
-                    &#34;ylog&#34; : False}
-        for key,default in defaults.items():
+        defaults = {&#34;start&#34;: None,
+                    &#34;end&#34;: None,
+                    &#34;log&#34;: True,
+                    &#34;xlabel&#34;: &#34;D$_p$ in µm&#34;,
+                    &#34;ylabel&#34;: &#34;Fraction&#34;,
+                    &#34;legend&#34;: True,
+                    &#34;normalize&#34;: True,
+                    &#34;legacy&#34;: False,
+                    &#34;ylog&#34;: False}
+        for key, default in defaults.items():
             kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.stackedplot()&#34;)
-        
+
         m = np.array([True for i in self.data[&#34;t&#34;]])
-        if isinstance(kwargs[&#34;start&#34;],str):
-            kwargs[&#34;start&#34;] = datetime.strptime(kwargs[&#34;start&#34;],&#34;%H:%M:%S&#34;)
+        if isinstance(kwargs[&#34;start&#34;], str):
+            kwargs[&#34;start&#34;] = datetime.strptime(kwargs[&#34;start&#34;], &#34;%H:%M:%S&#34;)
             kwargs[&#34;start&#34;] = kwargs[&#34;start&#34;].replace(
                 year=self.data[&#34;t&#34;][0].year,
-                month = self.data[&#34;t&#34;][0].month,
-                day = self.data[&#34;t&#34;][0].day
-                )
-            m = np.where(kwargs[&#34;start&#34;]&lt;self.data[&#34;t&#34;],m,False)
-        if isinstance(kwargs[&#34;end&#34;],str):
-            kwargs[&#34;end&#34;] = datetime.strptime(kwargs[&#34;end&#34;],&#34;%H:%M:%S&#34;)
+                month=self.data[&#34;t&#34;][0].month,
+                day=self.data[&#34;t&#34;][0].day
+            )
+            m = np.where(kwargs[&#34;start&#34;] &lt; self.data[&#34;t&#34;], m, False)
+        if isinstance(kwargs[&#34;end&#34;], str):
+            kwargs[&#34;end&#34;] = datetime.strptime(kwargs[&#34;end&#34;], &#34;%H:%M:%S&#34;)
             kwargs[&#34;end&#34;] = kwargs[&#34;end&#34;].replace(
-                year = self.data[&#34;t&#34;][0].year,
-                month = self.data[&#34;t&#34;][0].month,
-                day = self.data[&#34;t&#34;][0].day
-                )
-            m = np.where(kwargs[&#34;end&#34;]&gt;self.data[&#34;t&#34;],m,False)
+                year=self.data[&#34;t&#34;][0].year,
+                month=self.data[&#34;t&#34;][0].month,
+                day=self.data[&#34;t&#34;][0].day
+            )
+            m = np.where(kwargs[&#34;end&#34;] &gt; self.data[&#34;t&#34;], m, False)
         
         leg = &#34;partconc&#34; if kwargs[&#34;legacy&#34;] else &#34;dndlogdp&#34;
         xx = self.bin_means
@@ -1058,30 +1136,34 @@ el.replaceWith(d);
             totals.append(np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m]))
             totals[i] = 1 if totals[i] == 0 else totals[i]
         vals = np.array([0 for i in xx])
-        for ch in [&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,&#34;ab&#34;,&#34;bc&#34;,&#34;ac&#34;,&#34;abc&#34;]:
+        for ch in [&#34;a&#34;, &#34;b&#34;, &#34;c&#34;, &#34;ab&#34;, &#34;bc&#34;, &#34;ac&#34;, &#34;abc&#34;]:
             new_vals = []
             for i in range(len(xx)):
                 new_vals.append(
                     np.nanmean(self.data[f&#34;{ch}_bin{i}_{leg}&#34;][m])
-                    )
+                )
             new_vals = np.array(new_vals) + vals
             if kwargs[&#34;normalize&#34;]:
-                ax.fill_between(xx,vals/totals,new_vals/totals,label=ch)
+                ax.fill_between(xx, vals/totals, new_vals/totals, label=ch)
             else:
-                ax.fill_between(xx,vals,new_vals,label=ch)
+                ax.fill_between(xx, vals, new_vals, label=ch)
             vals = new_vals
         if kwargs[&#34;normalize&#34;]:
-            ax.fill_between(xx,vals/totals,
-                            [1 for i in xx],
-                            label=&#34;non fluorescent&#34;)
+            ax.fill_between(
+                xx,
+                vals/totals,
+                [1 for i in xx],
+                label=&#34;non fluorescent&#34;
+            )
         else:
-            totals = [
-                np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m]) 
-                for i in range(len(xx))
-                ]
-            ax.fill_between(xx,vals,
-                            totals,
-                            label=&#34;non fluorescent&#34;)
+            totals = [np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m])
+                      for i in range(len(xx))]
+            ax.fill_between(
+                xx,
+                vals,
+                totals,
+                label=&#34;non fluorescent&#34;
+            )
         
         if kwargs[&#34;log&#34;]:
             ax.set_xscale(&#34;log&#34;)
@@ -1093,7 +1175,7 @@ el.replaceWith(d);
         ax.set_ylabel(kwargs[&#34;ylabel&#34;])
         
         
-    def dndlogdp(self,ax, **kwargs):
+    def dndlogdp(self, ax, **kwargs):
         &#34;&#34;&#34;
         Creates a dN/dlogDp plot on an existing mpl axis.
 
@@ -1143,85 +1225,86 @@ el.replaceWith(d);
         None
         &#34;&#34;&#34;
         
-        
-        #kwargs
-        defaults = {&#34;start&#34; : None,
-                    &#34;end&#34; : None,
-                    &#34;log&#34; : True,
-                    &#34;xlabel&#34; : &#34;D$_p$ in μm&#34;,
-                    &#34;ylabel&#34; : &#34;dN/dlogD$_p$ in cm{^{-3}$&#34;,
-                    &#34;scatter&#34; : False,
-                    &#34;scatter_color&#34; : &#34;tab:blue&#34;,
-                    &#34;scatter_line&#34; : True,
-                    &#34;bin_borders&#34; : None,
-                    &#34;particletype&#34; : None}
-        
-        for key,default in defaults.items():
+        # kwargs
+        defaults = {&#34;start&#34;: None,
+                    &#34;end&#34;: None,
+                    &#34;log&#34;: True,
+                    &#34;xlabel&#34;: &#34;D$_p$ in μm&#34;,
+                    &#34;ylabel&#34;: &#34;dN/dlogD$_p$ in cm{^{-3}$&#34;,
+                    &#34;scatter&#34;: False,
+                    &#34;scatter_color&#34;: &#34;tab:blue&#34;,
+                    &#34;scatter_line&#34;: True,
+                    &#34;bin_borders&#34;: None,
+                    &#34;particletype&#34;: None}
+
+        for key, default in defaults.items():
             kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.dndlogp()&#34;)
-        
+
         xx = np.array(self.bin_means)
         m = np.array([True for t in self.data[&#34;t&#34;]])
-        
-        if isinstance(kwargs[&#34;start&#34;],str):
+
+        if isinstance(kwargs[&#34;start&#34;], str):
             dd = self.data[&#34;t&#34;][0].day
             mm = self.data[&#34;t&#34;][0].month
             yy = self.data[&#34;t&#34;][0].year
-            start = datetime.strptime(kwargs[&#34;start&#34;],
-                                      &#34;%H:%M:%S&#34;
-                                      ).replace(day=dd,
-                                                month=mm,
-                                                year=yy)
-            m = np.where(self.data[&#34;t&#34;]&gt;=start,m,False)
-        if isinstance(kwargs[&#34;end&#34;],str):
+            start = datetime.strptime(
+                kwargs[&#34;start&#34;],
+                &#34;%H:%M:%S&#34;
+            ).replace(day=dd, month=mm, year=yy)
+            m = np.where(self.data[&#34;t&#34;] &gt;= start, m, False)
+        if isinstance(kwargs[&#34;end&#34;], str):
             dd = self.data[&#34;t&#34;][0].day
             mm = self.data[&#34;t&#34;][0].month
             yy = self.data[&#34;t&#34;][0].year
-            end = datetime.strptime(kwargs[&#34;end&#34;],
-                                    &#34;%H:%M:%S&#34;
-                                    ).replace(day=dd,
-                                              month=mm,
-                                              year=yy)
-            m = np.where(self.data[&#34;t&#34;]&lt;=end,m,False)
+            end = datetime.strptime(
+                kwargs[&#34;end&#34;],
+                &#34;%H:%M:%S&#34;
+            ).replace(day=dd, month=mm, year=yy)
+            m = np.where(self.data[&#34;t&#34;] &lt;= end, m, False)
             
         if kwargs[&#34;particletype&#34;] is None:
-            yy = np.array([np.nanmean(self.data[f&#34;bin{i}_dndlogdp&#34;][m]) 
+            yy = np.array([np.nanmean(self.data[f&#34;bin{i}_dndlogdp&#34;][m])
                            for i in range(self.bins)])
         else:
             try:
                 pt = kwargs[&#34;particletype&#34;]
                 yy = np.array(
-                    [np.nanmean(self.data[f&#34;{pt}_bin{i}_dndlogdp&#34;][m]) 
+                    [np.nanmean(self.data[f&#34;{pt}_bin{i}_dndlogdp&#34;][m])
                      for i in range(self.bins)]
-                    )
+                )
             except:
-                msg = f&#34;{kwargs[&#39;particletype&#39;]} is not a legal particletype. &#34;
-                msg += &#34;Legal particle types are a, b, c, ab, ac, bc or abc. &#34;
-                msg += &#34;If you want to plot the particle number size distribut&#34;
-                msg += &#34;ion of all particles, leave the kwarg &#39;particletype&#39; &#34;
-                msg += &#34;blank.&#34;
-                raise ValueError(msg)
+                raise ValueError(f&#34;{kwargs[&#39;particletype&#39;]} is not a legal &#34;
+                                 &#34;particletype. Legal particle types are a, b,&#34;
+                                 &#34; c, ab, ac, bc or abc. If you want to plot &#34;
+                                 &#34;the particle number size distribution of &#34;
+                                 &#34;all particles, leave the kwarg &#34;
+                                 &#34;&#39;particletype&#39; blank&#34;)
      
         if kwargs[&#34;scatter&#34;]:
-            ax.scatter(xx,yy,color=kwargs[&#34;scatter_color&#34;])
+            ax.scatter(xx, yy, color=kwargs[&#34;scatter_color&#34;])
             if kwargs[&#34;scatter_line&#34;]:
-                ax.plot(xx,yy,
-                        color=kwargs[&#34;scatter_color&#34;],
-                        linestyle=&#34;dashed&#34;)
+                ax.plot(
+                    xx,
+                    yy,
+                    color=kwargs[&#34;scatter_color&#34;],
+                    linestyle=&#34;dashed&#34;
+                )
         else:
-            if isinstance(kwargs[&#34;bin_borders&#34;],list):
+            if isinstance(kwargs[&#34;bin_borders&#34;], list):
                 bb = kwargs[&#34;bin_borders&#34;]
             else:
                 try:
                     bb = self.bin_borders
                 except AttributeError:
-                    msg = &#34;bin_borders attribute does not exist. The loaded&#34;
-                    msg += &#34; .wibs file was probably created before the attri&#34;
-                    msg += &#34;bute was introduced. Try passing &#39;bin_borders&#39;&#34;
-                    msg += &#34; manually in WIBS.dndlogdp() or consult docu.&#34;
-                    raise AttributeError(msg)
+                    raise AttributeError(&#34;bin_borders attribute does not &#34;
+                                         &#34;exist. The loaded .wibs file was &#34;
+                                         &#34;probably created before the attrib&#34;
+                                         &#34;ute was introduced. Try passing &#34;
+                                         &#34;&#39;bin_borders&#39; manually in WIBS.dndlo&#34;
+                                         &#34;gdp() or consult docu.&#34;)
             width = np.array([bb[i+1]-bb[i] for i in range(self.bins)])
-            ax.bar(xx,yy,width*0.8,align=&#34;center&#34;)
+            ax.bar(xx, yy, width*0.8, align=&#34;center&#34;)
         if kwargs[&#34;log&#34;]:
             ax.set_xscale(&#34;log&#34;)
         ax.set_xlabel(&#34;D$_p$ in μm&#34;)
@@ -1244,24 +1327,24 @@ el.replaceWith(d);
         &#34;&#34;&#34;
         
         op = {
-            &#34;bins&#34; : self.bins,
-            &#34;bin_means&#34; : self.bin_means,
-            &#34;bin_borders&#34; : self.bin_borders,
-            &#34;data&#34; : self.data,
-            &#34;rawdata&#34; : self.rawdata,
-            &#34;details&#34; : self.details,
-            &#34;fl1_FTbg&#34; : self.fl1_FTbg,
-            &#34;fl2_FTbg&#34; : self.fl2_FTbg,
-            &#34;fl3_FTbg&#34; : self.fl3_FTbg,
-            &#34;FT_sigma&#34; : self.FT_sigma,
-            &#34;flow&#34; : self.flow
-            }
+            &#34;bins&#34;: self.bins,
+            &#34;bin_means&#34;: self.bin_means,
+            &#34;bin_borders&#34;: self.bin_borders,
+            &#34;data&#34;: self.data,
+            &#34;rawdata&#34;: self.rawdata,
+            &#34;details&#34;: self.details,
+            &#34;fl1_FTbg&#34;: self.fl1_FTbg,
+            &#34;fl2_FTbg&#34;: self.fl2_FTbg,
+            &#34;fl3_FTbg&#34;: self.fl3_FTbg,
+            &#34;FT_sigma&#34;: self.FT_sigma,
+            &#34;flow&#34;: self.flow
+        }
         
         if path[-5:] != &#34;.wibs&#34;:
             path += &#34;.wibs&#34;
-          
-        with open(path,&#34;wb&#34;) as dumppath:
-            pickle.dump(op,dumppath,4)
+
+        with open(path, &#34;wb&#34;) as dumppath:
+            pickle.dump(op, dumppath, 4)
             
             
     def returndata(self):
@@ -1280,20 +1363,19 @@ el.replaceWith(d);
             exported data.
         &#34;&#34;&#34;
         
-        
         op_t = []
         for t in self.data[&#34;t&#34;]:
             op_t.append(t.replace(microsecond=0))
-        op_data = {&#34;t&#34;:np.array(op_t)}
+        op_data = {&#34;t&#34;: np.array(op_t)}
         for key in self.data.keys():
             if key == &#34;t&#34;:
                 continue
             op_data[key] = self.data[key]
-        
-        return op_data,self.details
-    
 
-    def append(self,wibs2):
+        return op_data, self.details
+
+
+    def append(self, wibs2):
         &#34;&#34;&#34;
         Adds another `WIBS` obj to the current one.
 
@@ -1311,12 +1393,11 @@ el.replaceWith(d);
             self.data[key] = np.append(
                 self.data[key],
                 wibs2.data[key]
-                )
+            )
 
     
     #housekeeping funcs
-    
-    def _hk_kwargs(self,kwargs,key,default):
+    def _hk_kwargs(self, kwargs, key, default):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -1324,10 +1405,10 @@ el.replaceWith(d);
         &#34;&#34;&#34;
 
         op = kwargs[key] if key in kwargs else default
-        setattr(self,key,op)
+        setattr(self, key, op)
         
         
-    def _hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self, kwargs, key, default):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -1338,7 +1419,7 @@ el.replaceWith(d);
         return op
     
     
-    def _hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self, kwargs, legallist, funcname):
         &#34;&#34;&#34;
         Housekeeping Func --&gt; Should not be used outside the object
         
@@ -1347,7 +1428,7 @@ el.replaceWith(d);
 
         for key in kwargs:
             if key not in legallist:
-                raise IllegalArgument(key,funcname,legallist)</code></pre>
+                raise IllegalArgument(key, funcname, legallist)</code></pre>
 </details>
 <div class="desc"><p>Inits the WIBS obj</p>
 <h2 id="parameters">Parameters</h2>
@@ -1433,7 +1514,7 @@ peak RAM usage. The default is 600.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def append(self,wibs2):
+<pre><code class="python">def append(self, wibs2):
     &#34;&#34;&#34;
     Adds another `WIBS` obj to the current one.
 
@@ -1451,7 +1532,7 @@ peak RAM usage. The default is 600.</dd>
         self.data[key] = np.append(
             self.data[key],
             wibs2.data[key]
-            )</code></pre>
+        )</code></pre>
 </details>
 <div class="desc"><p>Adds another <code><a title="agg_dim.wibs.WIBS" href="#agg_dim.wibs.WIBS">WIBS</a></code> obj to the current one.</p>
 <h2 id="parameters">Parameters</h2>
@@ -1473,7 +1554,7 @@ peak RAM usage. The default is 600.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def dndlogdp(self,ax, **kwargs):
+<pre><code class="python">def dndlogdp(self, ax, **kwargs):
     &#34;&#34;&#34;
     Creates a dN/dlogDp plot on an existing mpl axis.
 
@@ -1523,85 +1604,86 @@ peak RAM usage. The default is 600.</dd>
     None
     &#34;&#34;&#34;
     
-    
-    #kwargs
-    defaults = {&#34;start&#34; : None,
-                &#34;end&#34; : None,
-                &#34;log&#34; : True,
-                &#34;xlabel&#34; : &#34;D$_p$ in μm&#34;,
-                &#34;ylabel&#34; : &#34;dN/dlogD$_p$ in cm{^{-3}$&#34;,
-                &#34;scatter&#34; : False,
-                &#34;scatter_color&#34; : &#34;tab:blue&#34;,
-                &#34;scatter_line&#34; : True,
-                &#34;bin_borders&#34; : None,
-                &#34;particletype&#34; : None}
-    
-    for key,default in defaults.items():
+    # kwargs
+    defaults = {&#34;start&#34;: None,
+                &#34;end&#34;: None,
+                &#34;log&#34;: True,
+                &#34;xlabel&#34;: &#34;D$_p$ in μm&#34;,
+                &#34;ylabel&#34;: &#34;dN/dlogD$_p$ in cm{^{-3}$&#34;,
+                &#34;scatter&#34;: False,
+                &#34;scatter_color&#34;: &#34;tab:blue&#34;,
+                &#34;scatter_line&#34;: True,
+                &#34;bin_borders&#34;: None,
+                &#34;particletype&#34;: None}
+
+    for key, default in defaults.items():
         kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.dndlogp()&#34;)
-    
+
     xx = np.array(self.bin_means)
     m = np.array([True for t in self.data[&#34;t&#34;]])
-    
-    if isinstance(kwargs[&#34;start&#34;],str):
+
+    if isinstance(kwargs[&#34;start&#34;], str):
         dd = self.data[&#34;t&#34;][0].day
         mm = self.data[&#34;t&#34;][0].month
         yy = self.data[&#34;t&#34;][0].year
-        start = datetime.strptime(kwargs[&#34;start&#34;],
-                                  &#34;%H:%M:%S&#34;
-                                  ).replace(day=dd,
-                                            month=mm,
-                                            year=yy)
-        m = np.where(self.data[&#34;t&#34;]&gt;=start,m,False)
-    if isinstance(kwargs[&#34;end&#34;],str):
+        start = datetime.strptime(
+            kwargs[&#34;start&#34;],
+            &#34;%H:%M:%S&#34;
+        ).replace(day=dd, month=mm, year=yy)
+        m = np.where(self.data[&#34;t&#34;] &gt;= start, m, False)
+    if isinstance(kwargs[&#34;end&#34;], str):
         dd = self.data[&#34;t&#34;][0].day
         mm = self.data[&#34;t&#34;][0].month
         yy = self.data[&#34;t&#34;][0].year
-        end = datetime.strptime(kwargs[&#34;end&#34;],
-                                &#34;%H:%M:%S&#34;
-                                ).replace(day=dd,
-                                          month=mm,
-                                          year=yy)
-        m = np.where(self.data[&#34;t&#34;]&lt;=end,m,False)
+        end = datetime.strptime(
+            kwargs[&#34;end&#34;],
+            &#34;%H:%M:%S&#34;
+        ).replace(day=dd, month=mm, year=yy)
+        m = np.where(self.data[&#34;t&#34;] &lt;= end, m, False)
         
     if kwargs[&#34;particletype&#34;] is None:
-        yy = np.array([np.nanmean(self.data[f&#34;bin{i}_dndlogdp&#34;][m]) 
+        yy = np.array([np.nanmean(self.data[f&#34;bin{i}_dndlogdp&#34;][m])
                        for i in range(self.bins)])
     else:
         try:
             pt = kwargs[&#34;particletype&#34;]
             yy = np.array(
-                [np.nanmean(self.data[f&#34;{pt}_bin{i}_dndlogdp&#34;][m]) 
+                [np.nanmean(self.data[f&#34;{pt}_bin{i}_dndlogdp&#34;][m])
                  for i in range(self.bins)]
-                )
+            )
         except:
-            msg = f&#34;{kwargs[&#39;particletype&#39;]} is not a legal particletype. &#34;
-            msg += &#34;Legal particle types are a, b, c, ab, ac, bc or abc. &#34;
-            msg += &#34;If you want to plot the particle number size distribut&#34;
-            msg += &#34;ion of all particles, leave the kwarg &#39;particletype&#39; &#34;
-            msg += &#34;blank.&#34;
-            raise ValueError(msg)
+            raise ValueError(f&#34;{kwargs[&#39;particletype&#39;]} is not a legal &#34;
+                             &#34;particletype. Legal particle types are a, b,&#34;
+                             &#34; c, ab, ac, bc or abc. If you want to plot &#34;
+                             &#34;the particle number size distribution of &#34;
+                             &#34;all particles, leave the kwarg &#34;
+                             &#34;&#39;particletype&#39; blank&#34;)
  
     if kwargs[&#34;scatter&#34;]:
-        ax.scatter(xx,yy,color=kwargs[&#34;scatter_color&#34;])
+        ax.scatter(xx, yy, color=kwargs[&#34;scatter_color&#34;])
         if kwargs[&#34;scatter_line&#34;]:
-            ax.plot(xx,yy,
-                    color=kwargs[&#34;scatter_color&#34;],
-                    linestyle=&#34;dashed&#34;)
+            ax.plot(
+                xx,
+                yy,
+                color=kwargs[&#34;scatter_color&#34;],
+                linestyle=&#34;dashed&#34;
+            )
     else:
-        if isinstance(kwargs[&#34;bin_borders&#34;],list):
+        if isinstance(kwargs[&#34;bin_borders&#34;], list):
             bb = kwargs[&#34;bin_borders&#34;]
         else:
             try:
                 bb = self.bin_borders
             except AttributeError:
-                msg = &#34;bin_borders attribute does not exist. The loaded&#34;
-                msg += &#34; .wibs file was probably created before the attri&#34;
-                msg += &#34;bute was introduced. Try passing &#39;bin_borders&#39;&#34;
-                msg += &#34; manually in WIBS.dndlogdp() or consult docu.&#34;
-                raise AttributeError(msg)
+                raise AttributeError(&#34;bin_borders attribute does not &#34;
+                                     &#34;exist. The loaded .wibs file was &#34;
+                                     &#34;probably created before the attrib&#34;
+                                     &#34;ute was introduced. Try passing &#34;
+                                     &#34;&#39;bin_borders&#39; manually in WIBS.dndlo&#34;
+                                     &#34;gdp() or consult docu.&#34;)
         width = np.array([bb[i+1]-bb[i] for i in range(self.bins)])
-        ax.bar(xx,yy,width*0.8,align=&#34;center&#34;)
+        ax.bar(xx, yy, width*0.8, align=&#34;center&#34;)
     if kwargs[&#34;log&#34;]:
         ax.set_xscale(&#34;log&#34;)
     ax.set_xlabel(&#34;D$_p$ in μm&#34;)
@@ -1663,7 +1745,7 @@ considering particle type, dont pass this kwarg.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def heatmap(self,ax,y,**kwargs):
+<pre><code class="python">def heatmap(self, ax, y, **kwargs):
     &#34;&#34;&#34;
     Draws a dndlogdp number size distribution heatmap over an existing 
     mpl axis
@@ -1691,6 +1773,9 @@ considering particle type, dont pass this kwarg.</dd>
         If a value greater 0 is passed the data will be desampled to chunks
         of &#39;desample&#39; seconds. E.g. a value of `desample=60` will give a
         value for every minute.
+    cbar_minmax : tuple of float of len 2
+        If &#39;cbar_minmax&#39; is given, the coloarbar limits will be set to 
+        its values.
 
     Returns
     -------
@@ -1698,63 +1783,85 @@ considering particle type, dont pass this kwarg.</dd>
 
     &#34;&#34;&#34;
     
-    defaults = {&#34;cmap&#34; : &#34;RdYlBu_r&#34;,
-                &#34;pad&#34; : 0,
-                &#34;orientation&#34; : &#34;horizontal&#34;,
-                &#34;location&#34; : &#34;top&#34;,
-                &#34;togglecbar&#34; : True,
-                &#34;desample&#34; : 0}
-    for key,default in defaults.items():
+    defaults = {&#34;cmap&#34;: &#34;RdYlBu_r&#34;,
+                &#34;pad&#34;: 0,
+                &#34;orientation&#34;: &#34;horizontal&#34;,
+                &#34;location&#34;: &#34;top&#34;,
+                &#34;togglecbar&#34;: True,
+                &#34;desample&#34;: 0,
+                &#34;cbar_minmax&#34;: None}
+    for key, default in defaults.items():
         kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.heatmap()&#34;)
-    
+
     try:
         yy = np.array(
             [self.data[f&#34;{y}_bin{i}_dndlogdp&#34;] for i in range(self.bins)]
-            ) if y != &#34;allparticles&#34; else np.array(
-                [self.data[f&#34;bin{i}_dndlogdp&#34;] for i in range(self.bins)]
-                )
+        ) if y != &#34;allparticles&#34; else np.array(
+            [self.data[f&#34;bin{i}_dndlogdp&#34;] for i in range(self.bins)]
+        )
     except KeyError as kerr:
-        raise IllegalValue(y, 
-                           &#34;WIBS.heatmap()&#34;, 
-                           [&#34;allparticles&#34;,&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,
-                            &#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;,&#34;nonfluor&#34;]) from kerr
+        raise IllegalValue(
+            y,
+            &#34;WIBS.heatmap()&#34;,
+            [&#34;allparticles&#34;, &#34;a&#34;, &#34;b&#34;, &#34;c&#34;,
+             &#34;ab&#34;, &#34;ac&#34;, &#34;bc&#34;, &#34;abc&#34;, &#34;nonfluor&#34;]
+        ) from kerr
     
     if kwargs[&#34;desample&#34;] &gt; 0:
         des = kwargs[&#34;desample&#34;]
         n = len(yy[0]) // des
-        y1 = yy[:,:n*des].reshape(len(yy),-1,des).mean(axis=2)
-        app = np.array([[np.mean(yy[i,n*des:]) for i in range(len(yy))]]).T
-        yy = np.append(y1,app,axis=1)
+        y1 = yy[:, :n*des].reshape(len(yy), -1, des).mean(axis=2)
+        app = np.array(
+            [[np.mean(yy[i, n*des:]) for i in range(len(yy))]]
+        ).T
+        yy = np.append(y1, app, axis=1)
     
-    
-    xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
+    xlims = [self.data[&#34;t&#34;][0], self.data[&#34;t&#34;][-1]]
     xlims = md.date2num(xlims)
-        
-    #draw plot
-    im = ax.imshow(yy,
-                   aspect=&#34;auto&#34;,
-                   norm=&#34;log&#34;,
-                   extent=[xlims[0],xlims[1],0,self.bins],
-                   cmap=kwargs[&#34;cmap&#34;],
-                   interpolation=&#34;none&#34;,
-                   origin=&#34;lower&#34;)
+
+    # draw plot
+    if kwargs[&#34;cbar_minmax&#34;] is not None:
+        im = ax.imshow(
+            yy,
+            aspect=&#34;auto&#34;,
+            norm=&#34;log&#34;,
+            extent=[xlims[0], xlims[1], 0, self.bins],
+            cmap=kwargs[&#34;cmap&#34;],
+            interpolation=&#34;none&#34;,
+            origin=&#34;lower&#34;,
+            vmin=kwargs[&#34;cbar_minmax&#34;][0],
+            vmax=kwargs[&#34;cbar_minmax&#34;][1]
+        )
+    else:
+        im = ax.imshow(
+            yy,
+            aspect=&#34;auto&#34;,
+            norm=&#34;log&#34;,
+            extent=[xlims[0], xlims[1], 0, self.bins],
+            cmap=kwargs[&#34;cmap&#34;],
+            interpolation=&#34;none&#34;,
+            origin=&#34;lower&#34;
+        )
     ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
     ax.set_ylabel(&#34;$D_P$ in µm&#34;)
     ax.set_xlabel(&#34;CET&#34;)
     
-    labels = [str(round(label,2)) for label in self.bin_means]
+    labels = [str(round(label, 2)) for label in self.bin_means]
     ticks = [tick+0.5 for tick in range(self.bins)]
-    ax.set_yticks(ticks,labels=labels)
-    
+    ax.set_yticks(ticks, labels=labels)
+
     ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
     ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
-    plt.colorbar(im,
-                 ax=ax,
-                 label=&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;,
-                 pad=kwargs[&#34;pad&#34;],
-                 orientation=kwargs[&#34;orientation&#34;],
-                 location=kwargs[&#34;location&#34;])</code></pre>
+    if kwargs[&#34;togglecbar&#34;]:
+        plt.colorbar(
+            im,
+            ax=ax,
+            label=&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;,
+            pad=kwargs[&#34;pad&#34;],
+            orientation=kwargs[&#34;orientation&#34;],
+            location=kwargs[&#34;location&#34;]
+        )</code></pre>
 </details>
 <div class="desc"><p>Draws a dndlogdp number size distribution heatmap over an existing
 mpl axis</p>
@@ -1781,6 +1888,9 @@ mpl axis</p>
 <dd>If a value greater 0 is passed the data will be desampled to chunks
 of 'desample' seconds. E.g. a value of <code>desample=60</code> will give a
 value for every minute.</dd>
+<dt><strong><code>cbar_minmax</code></strong> :&ensp;<code>tuple</code> of <code>float</code> of <code>len 2</code></dt>
+<dd>If 'cbar_minmax' is given, the coloarbar limits will be set to
+its values.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
@@ -1793,7 +1903,7 @@ value for every minute.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def plot(self,ax,y,**kwargs):
+<pre><code class="python">def plot(self, ax, y, **kwargs):
     &#34;&#34;&#34;
     Plots y over time on an existing mpl axis.
 
@@ -1825,39 +1935,42 @@ value for every minute.</dd>
 
     &#34;&#34;&#34;
 
-    defaults = {&#34;label&#34; : &#34;no label&#34;,
-                &#34;color&#34; : &#34;tab:purple&#34;,
-                &#34;secondary&#34; : False,
-                &#34;desample&#34; : 0}
-    for key,default in defaults.items():
+    defaults = {&#34;label&#34;: &#34;no label&#34;,
+                &#34;color&#34;: &#34;tab:purple&#34;,
+                &#34;secondary&#34;: False,
+                &#34;desample&#34;: 0}
+    for key, default in defaults.items():
         kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.plot()&#34;)
-    
+
     xx = self.data[&#34;t&#34;]
     try:
         yy = self.data[y]
     except KeyError as kerr:
-        raise IllegalValue(&#34;y&#34;, &#34;WIBS.plot()&#34;,list(self.data)) from kerr
+        raise IllegalValue(&#34;y&#34;, &#34;WIBS.plot()&#34;, list(self.data)) from kerr
         
     if kwargs[&#34;desample&#34;] &gt; 0:
         des = kwargs[&#34;desample&#34;]
         n = len(yy) // des
-        y1 = yy[:n*des].reshape(-1,des).mean(axis=1)
-        yy = np.append(y1,np.mean(yy[n*des:]))
-        xx = np.append(xx[:n*des:des],xx[n*des]) + timedelta(seconds=des/2)
+        y1 = yy[:n*des].reshape(-1, des).mean(axis=1)
+        yy = np.append(y1, np.mean(yy[n*des:]))
+        xx = np.append(
+            xx[:n*des:des],
+            xx[n*des]
+        ) + timedelta(seconds=des/2)
         
     if self.details[y][1] != &#34;No Unit&#34;:
         ylabel = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
     else:
         ylabel = self.details[y][0]
         
-    #draw plot
-    ax.plot(xx,yy,label=kwargs[&#34;label&#34;],color=kwargs[&#34;color&#34;])
-    
+    # draw plot
+    ax.plot(xx, yy, label=kwargs[&#34;label&#34;], color=kwargs[&#34;color&#34;])
+
     ax.set_xlabel(&#34;CET&#34;)
     ax.set_ylabel(ylabel)
     ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
-    
+
     ax.tick_params(axis=&#39;y&#39;, colors=kwargs[&#34;color&#34;])
     ax.axes.yaxis.label.set_color(kwargs[&#34;color&#34;])
     if not kwargs[&#34;secondary&#34;]:
@@ -1900,7 +2013,7 @@ value for every minute.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def quickheatmap(self,y):
+<pre><code class="python">def quickheatmap(self, y):
     &#34;&#34;&#34;
     Draws a dndlogdp number size distribution heatmap
 
@@ -1915,44 +2028,48 @@ value for every minute.</dd>
 
     &#34;&#34;&#34;
     
-    #error handling
+    # error handling
     try:
         yy = np.array(
             [self.data[f&#34;{y}_bin{i}_dndlogdp&#34;] for i in range(self.bins)]
-            ) if y != &#34;allparticles&#34; else np.array(
-                [self.data[f&#34;bin{i}_dndlogdp&#34;] for i in range(self.bins)]
-                )
+        ) if y != &#34;allparticles&#34; else np.array(
+            [self.data[f&#34;bin{i}_dndlogdp&#34;] for i in range(self.bins)]
+        )
     except KeyError as kerr:
-        raise IllegalValue(y, 
-                           &#34;WIBS.quickheatmap&#34;, 
-                           [&#34;allparticles&#34;,&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,
-                            &#34;ab&#34;,&#34;ac&#34;,&#34;bc&#34;,&#34;abc&#34;]) from kerr
-    
-    xlims = [self.data[&#34;t&#34;][0],self.data[&#34;t&#34;][-1]]
+        raise IllegalValue(
+            y,
+            &#34;WIBS.quickheatmap&#34;,
+            [&#34;allparticles&#34;, &#34;a&#34;, &#34;b&#34;, &#34;c&#34;,
+             &#34;ab&#34;, &#34;ac&#34;, &#34;bc&#34;, &#34;abc&#34;]
+        ) from kerr
+
+    xlims = [self.data[&#34;t&#34;][0], self.data[&#34;t&#34;][-1]]
     xlims = md.date2num(xlims)
         
     #draw plot
     _,ax = plt.subplots()
     
-    im = ax.imshow(yy,
-                   aspect=&#34;auto&#34;,
-                   norm=&#34;log&#34;,
-                   extent=[xlims[0],xlims[1],0,self.bins]
-                   ,cmap=&#34;RdYlBu_r&#34;,
-                   interpolation=&#34;none&#34;,
-                   origin=&#34;lower&#34;)
+    im = ax.imshow(
+        yy,
+        aspect=&#34;auto&#34;,
+        norm=&#34;log&#34;,
+        extent=[xlims[0], xlims[1], 0, self.bins],
+        cmap=&#34;RdYlBu_r&#34;,
+        interpolation=&#34;none&#34;,
+        origin=&#34;lower&#34;
+    )
     ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
     ax.set_ylabel(&#34;$D_P$ in µm&#34;)
     ax.set_xlabel(&#34;CET&#34;)
-    
-    labels = [str(round(label,2)) for label in self.bin_means]
+
+    labels = [str(round(label, 2)) for label in self.bin_means]
     ticks = [tick+0.5 for tick in range(self.bins)]
-    ax.set_yticks(ticks,labels=labels)
-    
+    ax.set_yticks(ticks, labels=labels)
+
     ax.yaxis.set_tick_params(which=&#39;minor&#39;, size=0)
     ax.yaxis.set_tick_params(which=&#39;minor&#39;, width=0)
-    plt.colorbar(im,ax=ax,label=&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;)
-    
+    plt.colorbar(im, ax=ax, label=&#34;dN/dlog$D_P$ in cm${}^{-3}$&#34;)
+
     plt.show()</code></pre>
 </details>
 <div class="desc"><p>Draws a dndlogdp number size distribution heatmap</p>
@@ -1972,7 +2089,7 @@ value for every minute.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def quickplot(self,y):
+<pre><code class="python">def quickplot(self, y):
     &#34;&#34;&#34;
     Plots the given y over time
 
@@ -1987,15 +2104,19 @@ value for every minute.</dd>
 
     &#34;&#34;&#34;
     
-    #error handling
+    # error handling
     xx = self.data[&#34;t&#34;]
     try:
         yy = self.data[y]
     except KeyError as kerr:
-        raise IllegalValue(y, &#34;WIBS.quickplot()&#34;,list(self.data)) from kerr
+        raise IllegalValue(
+            y, 
+            &#34;WIBS.quickplot()&#34;,
+            list(self.data)
+        ) from kerr
             
-    #draw plot
-    _,ax = plt.subplots()
+    # draw plot
+    _, ax = plt.subplots()
 
     ax.set_xlabel(&#34;CET&#34;)
     if self.details[y][1] != &#34;No Unit&#34;:
@@ -2003,11 +2124,11 @@ value for every minute.</dd>
     else:
         ylabel = self.details[y][0]
     ax.set_ylabel(ylabel)
-    
+
     ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
-    
-    ax.plot(xx,yy)
-    
+
+    ax.plot(xx, yy)
+
     plt.show()</code></pre>
 </details>
 <div class="desc"><p>Plots the given y over time</p>
@@ -2043,17 +2164,16 @@ value for every minute.</dd>
         exported data.
     &#34;&#34;&#34;
     
-    
     op_t = []
     for t in self.data[&#34;t&#34;]:
         op_t.append(t.replace(microsecond=0))
-    op_data = {&#34;t&#34;:np.array(op_t)}
+    op_data = {&#34;t&#34;: np.array(op_t)}
     for key in self.data.keys():
         if key == &#34;t&#34;:
             continue
         op_data[key] = self.data[key]
-    
-    return op_data,self.details</code></pre>
+
+    return op_data, self.details</code></pre>
 </details>
 <div class="desc"><p>Returns a tuple containing all data in a standardized form. Important
 for communication with <code><a title="agg_dim.drone.DroneWrapper" href="drone.html#agg_dim.drone.DroneWrapper">DroneWrapper</a></code> or
@@ -2092,24 +2212,24 @@ exported data.</dd>
     &#34;&#34;&#34;
     
     op = {
-        &#34;bins&#34; : self.bins,
-        &#34;bin_means&#34; : self.bin_means,
-        &#34;bin_borders&#34; : self.bin_borders,
-        &#34;data&#34; : self.data,
-        &#34;rawdata&#34; : self.rawdata,
-        &#34;details&#34; : self.details,
-        &#34;fl1_FTbg&#34; : self.fl1_FTbg,
-        &#34;fl2_FTbg&#34; : self.fl2_FTbg,
-        &#34;fl3_FTbg&#34; : self.fl3_FTbg,
-        &#34;FT_sigma&#34; : self.FT_sigma,
-        &#34;flow&#34; : self.flow
-        }
+        &#34;bins&#34;: self.bins,
+        &#34;bin_means&#34;: self.bin_means,
+        &#34;bin_borders&#34;: self.bin_borders,
+        &#34;data&#34;: self.data,
+        &#34;rawdata&#34;: self.rawdata,
+        &#34;details&#34;: self.details,
+        &#34;fl1_FTbg&#34;: self.fl1_FTbg,
+        &#34;fl2_FTbg&#34;: self.fl2_FTbg,
+        &#34;fl3_FTbg&#34;: self.fl3_FTbg,
+        &#34;FT_sigma&#34;: self.FT_sigma,
+        &#34;flow&#34;: self.flow
+    }
     
     if path[-5:] != &#34;.wibs&#34;:
         path += &#34;.wibs&#34;
-      
-    with open(path,&#34;wb&#34;) as dumppath:
-        pickle.dump(op,dumppath,4)</code></pre>
+
+    with open(path, &#34;wb&#34;) as dumppath:
+        pickle.dump(op, dumppath, 4)</code></pre>
 </details>
 <div class="desc"><p>Saves the obj as a preprocessed .wibs file</p>
 <h2 id="parameters">Parameters</h2>
@@ -2128,7 +2248,7 @@ exported data.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def stackedplot(self,ax,**kwargs):
+<pre><code class="python">def stackedplot(self, ax, **kwargs):
     &#34;&#34;&#34;
     Creates a Stacked Plot on an existing axis.
 
@@ -2170,37 +2290,36 @@ exported data.</dd>
     None
     &#34;&#34;&#34;
     
-    
-    defaults = {&#34;start&#34; : None,
-                &#34;end&#34; : None,
-                &#34;log&#34; : True,
-                &#34;xlabel&#34; : &#34;D$_p$ in µm&#34;,
-                &#34;ylabel&#34; : &#34;Fraction&#34;,
-                &#34;legend&#34; : True,
-                &#34;normalize&#34; : True,
-                &#34;legacy&#34; : False,
-                &#34;ylog&#34; : False}
-    for key,default in defaults.items():
+    defaults = {&#34;start&#34;: None,
+                &#34;end&#34;: None,
+                &#34;log&#34;: True,
+                &#34;xlabel&#34;: &#34;D$_p$ in µm&#34;,
+                &#34;ylabel&#34;: &#34;Fraction&#34;,
+                &#34;legend&#34;: True,
+                &#34;normalize&#34;: True,
+                &#34;legacy&#34;: False,
+                &#34;ylog&#34;: False}
+    for key, default in defaults.items():
         kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.stackedplot()&#34;)
-    
+
     m = np.array([True for i in self.data[&#34;t&#34;]])
-    if isinstance(kwargs[&#34;start&#34;],str):
-        kwargs[&#34;start&#34;] = datetime.strptime(kwargs[&#34;start&#34;],&#34;%H:%M:%S&#34;)
+    if isinstance(kwargs[&#34;start&#34;], str):
+        kwargs[&#34;start&#34;] = datetime.strptime(kwargs[&#34;start&#34;], &#34;%H:%M:%S&#34;)
         kwargs[&#34;start&#34;] = kwargs[&#34;start&#34;].replace(
             year=self.data[&#34;t&#34;][0].year,
-            month = self.data[&#34;t&#34;][0].month,
-            day = self.data[&#34;t&#34;][0].day
-            )
-        m = np.where(kwargs[&#34;start&#34;]&lt;self.data[&#34;t&#34;],m,False)
-    if isinstance(kwargs[&#34;end&#34;],str):
-        kwargs[&#34;end&#34;] = datetime.strptime(kwargs[&#34;end&#34;],&#34;%H:%M:%S&#34;)
+            month=self.data[&#34;t&#34;][0].month,
+            day=self.data[&#34;t&#34;][0].day
+        )
+        m = np.where(kwargs[&#34;start&#34;] &lt; self.data[&#34;t&#34;], m, False)
+    if isinstance(kwargs[&#34;end&#34;], str):
+        kwargs[&#34;end&#34;] = datetime.strptime(kwargs[&#34;end&#34;], &#34;%H:%M:%S&#34;)
         kwargs[&#34;end&#34;] = kwargs[&#34;end&#34;].replace(
-            year = self.data[&#34;t&#34;][0].year,
-            month = self.data[&#34;t&#34;][0].month,
-            day = self.data[&#34;t&#34;][0].day
-            )
-        m = np.where(kwargs[&#34;end&#34;]&gt;self.data[&#34;t&#34;],m,False)
+            year=self.data[&#34;t&#34;][0].year,
+            month=self.data[&#34;t&#34;][0].month,
+            day=self.data[&#34;t&#34;][0].day
+        )
+        m = np.where(kwargs[&#34;end&#34;] &gt; self.data[&#34;t&#34;], m, False)
     
     leg = &#34;partconc&#34; if kwargs[&#34;legacy&#34;] else &#34;dndlogdp&#34;
     xx = self.bin_means
@@ -2209,30 +2328,34 @@ exported data.</dd>
         totals.append(np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m]))
         totals[i] = 1 if totals[i] == 0 else totals[i]
     vals = np.array([0 for i in xx])
-    for ch in [&#34;a&#34;,&#34;b&#34;,&#34;c&#34;,&#34;ab&#34;,&#34;bc&#34;,&#34;ac&#34;,&#34;abc&#34;]:
+    for ch in [&#34;a&#34;, &#34;b&#34;, &#34;c&#34;, &#34;ab&#34;, &#34;bc&#34;, &#34;ac&#34;, &#34;abc&#34;]:
         new_vals = []
         for i in range(len(xx)):
             new_vals.append(
                 np.nanmean(self.data[f&#34;{ch}_bin{i}_{leg}&#34;][m])
-                )
+            )
         new_vals = np.array(new_vals) + vals
         if kwargs[&#34;normalize&#34;]:
-            ax.fill_between(xx,vals/totals,new_vals/totals,label=ch)
+            ax.fill_between(xx, vals/totals, new_vals/totals, label=ch)
         else:
-            ax.fill_between(xx,vals,new_vals,label=ch)
+            ax.fill_between(xx, vals, new_vals, label=ch)
         vals = new_vals
     if kwargs[&#34;normalize&#34;]:
-        ax.fill_between(xx,vals/totals,
-                        [1 for i in xx],
-                        label=&#34;non fluorescent&#34;)
+        ax.fill_between(
+            xx,
+            vals/totals,
+            [1 for i in xx],
+            label=&#34;non fluorescent&#34;
+        )
     else:
-        totals = [
-            np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m]) 
-            for i in range(len(xx))
-            ]
-        ax.fill_between(xx,vals,
-                        totals,
-                        label=&#34;non fluorescent&#34;)
+        totals = [np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m])
+                  for i in range(len(xx))]
+        ax.fill_between(
+            xx,
+            vals,
+            totals,
+            label=&#34;non fluorescent&#34;
+        )
     
     if kwargs[&#34;log&#34;]:
         ax.set_xscale(&#34;log&#34;)

@@ -403,7 +403,7 @@ class FData:
             
 class NewFData:
     
-    def __init__(self,file,bg_file="blank.blank",**kwargs):
+    def __init__(self, file, bg_file="blank.blank", **kwargs):
         """
         inits `NewFData` obj
 
@@ -463,24 +463,24 @@ class NewFData:
 
         """
         
-        #check if data is loaded from .csv or .fspec
+        # check if data is loaded from .csv or .fspec
         filetype = file.split(".")[-1]
         if filetype == "csv":
-        
-            #kwargs
-            defaults = {"sigma" : 1,
-                        "measurement_frequency" : None,
-                        "start" : "none",
-                        "end" : "none",
-                        "jit" : True,
-                        "bg_start" : "*",
-                        "bg_end" : "*",
-                        "layout" : [3,18]}
-            for key,value in zip(defaults.keys(),defaults.values()):
+
+            # kwargs
+            defaults = {"sigma": 1,
+                        "measurement_frequency": None,
+                        "start": "none",
+                        "end": "none",
+                        "jit": True,
+                        "bg_start": "*",
+                        "bg_end": "*",
+                        "layout": [3, 18]}
+            for key, value in zip(defaults.keys(), defaults.values()):
                 self._hk_kwargs(kwargs, key, value)
             self._hk_errorhandling(kwargs, defaults.keys(), "NewFData")
             
-            #error handling
+            # error handling
             for key in kwargs:
                 if key not in ["sigma",
                                "measurement_frequency",
@@ -489,18 +489,18 @@ class NewFData:
                                "jit",
                                "bg_start",
                                "bg_end"]:
-                    raise IllegalArgument(key,"NewFData")
+                    raise IllegalArgument(key, "NewFData")
             
-            #import background-data
+            # import background-data
             bg_filetype = bg_file.split(".")[-1]
             if bg_filetype == "csv":
-                with open(bg_file,"r",encoding="ansi") as f:
+                with open(bg_file, "r", encoding="ansi") as f:
                     bgdata_all = list(f)[1:-1]
                 for i in range(len(bgdata_all)):
                     bgdata_all[i] = bgdata_all[i].split(";")
                     if len(bgdata_all[i]) < 2:
                         print(bgdata_all[i])
-                bgdata_time = [bgdata_all[i][1] 
+                bgdata_time = [bgdata_all[i][1]
                                for i in range(len(bgdata_all))]
                 bgdata = bgdata_all[1:]
                 bg_start_index = 100
@@ -526,26 +526,28 @@ class NewFData:
                             bgdata[i] = bgdata[i][:-j]
                 bgdata = np.array(bgdata).transpose()
                 bgdata = bgdata[3:].astype("int")
-                bgdata = np.where(bgdata != 1000,bgdata,np.nan)
+                bgdata = np.where(bgdata != 1000, bgdata, np.nan)
                 self.bg = np.array(
-                    [np.nanmean(channel)+np.nanstd(channel)*self.sigma 
+                    [np.nanmean(channel)+np.nanstd(channel)*self.sigma
                      for channel in bgdata]
-                    )
+                )
                 self.bg = self.bg - 1000
             elif bg_filetype == "fspec":
-                with open(bg_file,"rb") as openbg:
+                with open(bg_file, "rb") as openbg:
                     bg_ip = pickle.load(openbg)
                 self.bg = np.array(
-                    [mean+std*self.sigma 
-                     for mean,std in zip(bg_ip["bg_means"],bg_ip["bg_stds"])]
-                    )
+                    [mean+std*self.sigma
+                     for mean, std in zip(bg_ip["bg_means"], bg_ip["bg_stds"])]
+                )
             else:
-                raise IllegalFileFormat(bg_filetype,
-                                        "csv or .fspec",
-                                        "bg_file")
+                raise IllegalFileFormat(
+                    bg_filetype,
+                    "csv or .fspec",
+                    "bg_file"
+                )
             
-            #import raw data
-            with open(file,"r",encoding="ansi") as f:
+            # import raw data
+            with open(file, "r", encoding="ansi") as f:
                 data = list(f)[1:-1]
             for i in range(len(data)):
                 data[i] = data[i].split(";")
@@ -556,13 +558,12 @@ class NewFData:
                     elif len(data[i]) > 19:
                         j = len(data[i]) - 19
                         data[i] = data[i][:-j]
-            #data = np.array(data).transpose()
-            data = [list(row) for row in zip(*data)] #transpose without np
+            data = [list(row) for row in zip(*data)]  # transpose without np
             self.rawtime = np.array(
                 [dt.datetime.strptime(
-                    time,"%H:%M:%S.%f"
-                    ).replace(microsecond=0) for time in data[1]]
-                )
+                    time, "%H:%M:%S.%f"
+                ).replace(microsecond=0) for time in data[1]]
+            )
             self.rawchannels = data[self.layout[0]:self.layout[1]]
             for i in range(len(self.rawchannels)):
                 for j in range(len(self.rawchannels[i])):
@@ -570,15 +571,15 @@ class NewFData:
                         self.rawchannels[i][j] = int(self.rawchannels[i][j])
                     except ValueError:
                         self.rawchannels[i][j] = 1000
-            self.rawchannels = np.array(self.rawchannels,int)
+            self.rawchannels = np.array(self.rawchannels, int)
             self.rawchannels = self.rawchannels - 1000
             self.rawchannels = self.rawchannels.T
-            rows,_ = np.where(self.rawchannels == 0)
+            rows, _ = np.where(self.rawchannels == 0)
             m = [i for i in range(len(self.rawchannels)) if i not in rows]
             self.rawchannels = self.rawchannels[m].T
             self.rawtime = self.rawtime[m]
             
-            #crop
+            # crop
             t_start = 0
             t_end = len(self.rawtime)
             if self.start != "none":
@@ -587,47 +588,48 @@ class NewFData:
                     tcounter += 1
                     if str(element)[11:19] == self.start:
                         t_start = tcounter
-                
+
             if self.end != "none":
                 tcounter = -1
                 for element in self.rawtime:
                     tcounter += 1
                     if str(element)[11:19] == self.end:
                         t_end = tcounter
-            
+
             self.rawtime = self.rawtime[t_start:t_end]
-            self.rawchannels = [channel[t_start:t_end] 
+            self.rawchannels = [channel[t_start:t_end]
                                 for channel in self.rawchannels]
             
-            #process data
+            # process data
             secs = []
             for t in self.rawtime:
                 if t not in secs:
                     secs.append(t)
             self.t = np.array(secs)
-            
+
             if self.jit:
                 numba_t = np.array(
-                    [(i - dt.datetime(1970, 1, 1)).total_seconds() 
+                    [(i - dt.datetime(1970, 1, 1)).total_seconds()
                      for i in self.t],
                     float
-                    )
+                )
                 numba_rt = np.array(
-                    [(i - dt.datetime(1970, 1, 1)).total_seconds() 
-                     for i in self.rawtime]
-                    ,float
-                    )
-                numba_rc = np.array(self.rawchannels,float)
-                numba_bg = np.array(self.bg,float)
+                    [(i - dt.datetime(1970, 1, 1)).total_seconds()
+                     for i in self.rawtime], float
+                )
+                numba_rc = np.array(self.rawchannels, float)
+                numba_bg = np.array(self.bg, float)
                 numba_ch = np.array(
-                    [[float(0) for j in range(len(numba_t))] 
+                    [[float(0) for j in range(len(numba_t))]
                      for i in range(len(numba_rc))]
-                    )
-                self.channels = self._hk_process_data(numba_t,
-                                                     numba_rc,
-                                                     numba_bg,
-                                                     numba_rt,
-                                                     numba_ch)
+                )
+                self.channels = self._hk_process_data(
+                    numba_t,
+                    numba_rc,
+                    numba_bg,
+                    numba_rt,
+                    numba_ch
+                )
                 if self.measurement_frequency != None:
                     self.channels /= self.measurement_frequency
                 else:
@@ -635,47 +637,48 @@ class NewFData:
                         [np.count_nonzero(
                             ~np.isnan(
                                 np.where(
-                                    self.rawtime == s,self.rawchannels[0],
+                                    self.rawtime == s,
+                                    self.rawchannels[0],
                                     np.nan
-                                    )
                                 )
-                            ) for s in secs]
-                        )
+                            )
+                        ) for s in secs]
+                    )
                     self.channels /= m_f
             else:
                 if self.measurement_frequency == None:
                     self.measurement_frequency = 100
                 self.channels = np.array(
-                    [[0 for j in range(len(self.t))] 
-                     for i in range(len(self.rawchannels))]
-                    ,float
-                    )
+                    [[0 for j in range(len(self.t))]
+                     for i in range(len(self.rawchannels))], float
+                )
                 for t in range(len(self.t)):
                     for channel in range(len(self.rawchannels)):
-                        
+
                         counter = 0
                         for val in range(len(self.rawchannels[channel])):
                             if self.rawchannels[channel][val] > self.bg[channel] and self.rawtime[val] == self.t[t]:
                                 counter += 1
-                        self.channels[channel][t] = counter / self.measurement_frequency
+                        self.channels[channel][t] = counter / \
+                            self.measurement_frequency
                     
         elif filetype == "fspec":
                 
-            with open(file,"rb") as openfile:
+            with open(file, "rb") as openfile:
                 ip = pickle.load(openfile)
-            
-            self._hk_kwargs(ip,"sigma",1)
-            self._hk_kwargs(ip,"measurement_frequency", 100)
-            self._hk_kwargs(ip,"bg", "null")
-            self._hk_kwargs(ip,"rawtime", "null")
-            self._hk_kwargs(ip,"rawchannels", "null")
-            self._hk_kwargs(ip,"t", "null")
-            self._hk_kwargs(ip,"channels","null")
-            
+
+            self._hk_kwargs(ip, "sigma", 1)
+            self._hk_kwargs(ip, "measurement_frequency", 100)
+            self._hk_kwargs(ip, "bg", "null")
+            self._hk_kwargs(ip, "rawtime", "null")
+            self._hk_kwargs(ip, "rawchannels", "null")
+            self._hk_kwargs(ip, "t", "null")
+            self._hk_kwargs(ip, "channels", "null")
+
             self._hk_kwargs(kwargs, "start", "none")
             self._hk_kwargs(kwargs, "end", "none")
             
-            #crop
+            # crop
             t_start = 0
             t_end = len(self.t)
             if self.start != "none":
@@ -684,24 +687,24 @@ class NewFData:
                     tcounter += 1
                     if str(element)[11:19] == self.start:
                         t_start = tcounter
-                
+
             if self.end != "none":
                 tcounter = -1
                 for element in self.t:
                     tcounter += 1
                     if str(element)[11:19] == self.end:
                         t_end = tcounter
-            
+
             self.t = self.t[t_start:t_end]
-            self.channels = np.array([channel[t_start:t_end] 
+            self.channels = np.array([channel[t_start:t_end]
                                       for channel in self.channels])
-            
+
         else:
             raise IllegalFileFormat(filetype, "csv-file or .fspec", file)
             
                    
     
-    def save(self,filename,**kwargs):
+    def save(self, filename, **kwargs):
         """
         Saves the obj in a preprocessed .fspec file
 
@@ -722,15 +725,14 @@ class NewFData:
 
         """
         
-        #kwargs
-        defaults = {"start" : "none",
-                    "end" : "none"}
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        # kwargs
+        defaults = {"start": "none",
+                    "end": "none"}
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), "NewFData.save()")
 
-        
-        #crop
+        # crop
         t_start = 0
         t_end = len(self.t)
         if kwargs["start"] != "none":
@@ -739,14 +741,14 @@ class NewFData:
                 tcounter += 1
                 if str(element)[11:19] == kwargs["start"]:
                     t_start = tcounter
-            
+
         if kwargs["end"] != "none":
             tcounter = -1
             for element in self.t:
                 tcounter += 1
                 if str(element)[11:19] == kwargs["end"]:
                     t_end = tcounter
-                    
+
         raw_start = 0
         raw_end = len(self.rawtime)
         if kwargs["start"] != "none":
@@ -755,45 +757,45 @@ class NewFData:
                 tcounter += 1
                 if str(element)[11:19] == kwargs["start"]:
                     raw_start = tcounter
-            
+
         if kwargs["end"] != "none":
             tcounter = -1
             for element in self.rawtime:
                 tcounter += 1
                 if str(element)[11:19] == kwargs["end"]:
                     raw_end = tcounter
-        
+
         save_t = self.t[t_start:t_end]
         save_channels = [channel[t_start:t_end] for channel in self.channels]
-        
-        #create background params
+
+        # create background params
         bg_means = np.array(
-            [np.mean(channel) 
+            [np.mean(channel)
              for channel in self.rawchannels[raw_start:raw_end]]
-            )
+        )
         bg_stds = np.array(
-            [np.std(channel) 
+            [np.std(channel)
              for channel in self.rawchannels[raw_start:raw_end]]
-            )
-        
-        op = {"sigma" : self.sigma,
-              "measurement_frequency" : self.measurement_frequency,
-              "bg" : self.bg,
-              "rawtime" : self.rawtime,
-              "rawchannels" : self.rawchannels,
-              "t" : save_t,
-              "channels" : save_channels,
-              "bg_means" : bg_means,
-              "bg_stds" : bg_stds}
+        )
+
+        op = {"sigma": self.sigma,
+              "measurement_frequency": self.measurement_frequency,
+              "bg": self.bg,
+              "rawtime": self.rawtime,
+              "rawchannels": self.rawchannels,
+              "t": save_t,
+              "channels": save_channels,
+              "bg_means": bg_means,
+              "bg_stds": bg_stds}
         
         if filename[-6:] != ".fspec":
             filename += ".fspec"
+
+        with open(filename, "wb") as writefile:
+            pickle.dump(op, writefile, 4)
         
-        with open(filename,"wb") as writefile:
-            pickle.dump(op,writefile,4)
         
-        
-    def quickplot(self,channelno):
+    def quickplot(self, channelno):
         """
         Draws a plot of the given channel
 
@@ -809,14 +811,16 @@ class NewFData:
         """
         
         if channelno > len(self.channels):
-            raise ValueError(f"The channel {channelno} doesnt exist. Try a channelno 1 <= channelno <= {len(self.channels)}")
-        
+            raise ValueError(f"The channel {channelno} doesnt exist. "
+                             "Try a channelno 1 <= channelno "
+                             f"<= {len(self.channels)}")
+
         channelname = "ch" + str(channelno)
         channelno -= 1
-        
-        #draw plot        
-        _,ax = plt.subplots()
-        ax.plot(self.t,self.channels[channelno],label=channelname)
+
+        # draw plot
+        _, ax = plt.subplots()
+        ax.plot(self.t, self.channels[channelno], label=channelname)
         ax.set_xlabel("CET")
         ax.set_ylabel("Fluorescence Index")
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
@@ -834,12 +838,15 @@ class NewFData:
 
         """
         
-        xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+        xx, yy = np.meshgrid(
+            self.t,
+            [i+0.5 for i in range(len(self.channels))]
+        )
         heatmap_data = deepcopy(self.channels)
         heatmap_data = self._hk_replacezeros(heatmap_data)
         
-        _,ax = plt.subplots()
-        
+        _, ax = plt.subplots()
+
         im = ax.pcolormesh(
             xx,
             yy,
@@ -847,23 +854,23 @@ class NewFData:
             cmap="RdYlBu_r",
             norm=LogNorm(),
             shading="nearest"
-            )
+        )
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         ax.set_ylabel("Channels")
         ax.set_xlabel("CET")
-        
+
         ticks = [i+0.5 for i in range(len(self.channels))]
         ticklabels = [i+1 for i in range(len(ticks))]
-        ax.set_yticks(ticks,labels=ticklabels)
+        ax.set_yticks(ticks, labels=ticklabels)
         ax.yaxis.set_tick_params(which='minor', size=0)
         ax.yaxis.set_tick_params(which='minor', width=0)
-        
-        plt.colorbar(im,ax=ax,label="Fluorescence Index")
-        
+
+        plt.colorbar(im, ax=ax, label="Fluorescence Index")
+
         plt.show()
         
         
-    def plot(self,channelno,ax,**kwargs):
+    def plot(self, channelno, ax, **kwargs):
         """
         Draws a plot of the given channelno vs time on an existing mpl axis.
 
@@ -891,43 +898,42 @@ class NewFData:
 
         """
         
-        #import kwargs   
-        defaults = {"quakes" : [],
-                    "quakeslabel" : "no label",
-                    "quakecolor" : "tab:purple",
-                    "color" : "tab:green"}
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        # import kwargs
+        defaults = {"quakes": [],
+                    "quakeslabel": "no label",
+                    "quakecolor": "tab:purple",
+                    "color": "tab:green"}
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), "NewFData.plot()")
-        
-        
+
         channelname = "ch" + str(channelno)
         channelno -= 1
         
-        #draw plot
+        # draw plot
         ax.plot(
             self.t,
             self.channels[channelno],
             label=channelname,
             color=kwargs["color"]
-            )
+        )
         ax.set_ylabel("fluorescence index (channel " + str(channelno+1) + ")")
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         if len(kwargs["quakes"]) != 0:
             ax.vlines(
-                x=[dt.datetime.strptime(element, "%H:%M:%S") 
+                x=[dt.datetime.strptime(element, "%H:%M:%S")
                    for element in kwargs["quakes"]],
                 ymin=min(self.channels[channelno]),
                 ymax=max(self.channels[channelno]),
                 color=kwargs["quakecolor"],
                 ls="dashed",
                 label=kwargs["quakeslabel"]
-                )
+            )
         ax.tick_params(axis='y', colors=kwargs["color"])
         ax.axes.yaxis.label.set_color(kwargs["color"])
         
         
-    def meanplot(self,ax,**kwargs):
+    def meanplot(self, ax, **kwargs):
         """
         Draws a plot of the mean fluorescence index over time on a given 
         mpl axis
@@ -963,47 +969,46 @@ class NewFData:
 
         """
         
-        #import kwargs
-        defaults = {"min_ch" : 1,
-                    "max_ch" : 15,
-                    "quakes" : [],
-                    "quakeslabel" : "no label",
-                    "quakecolor" : "tab:purple",
-                    "color" : "tab:green",
-                    "rolling" : 0}
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        # import kwargs
+        defaults = {"min_ch": 1,
+                    "max_ch": 15,
+                    "quakes": [],
+                    "quakeslabel": "no label",
+                    "quakecolor": "tab:purple",
+                    "color": "tab:green",
+                    "rolling": 0}
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), "NewFData.meanplot()")
-        
+
         kwargs["min_ch"] -= 1
-        #ch_len = len(list(range(kwargs["min_ch"],kwargs["max_ch"])))
-        
+
         meanchannel = np.mean(
             self.channels[kwargs["min_ch"]:kwargs["max_ch"]],
             axis=0
-            )
-        if kwargs["rolling"] > 0 and isinstance(kwargs["rolling"],int):
+        )
+        if kwargs["rolling"] > 0 and isinstance(kwargs["rolling"], int):
             meanchannel = np.convolve(
                 meanchannel,
                 np.ones(kwargs["rolling"]),
                 mode="same"
-                ) / kwargs["rolling"]
+            ) / kwargs["rolling"]
                 
-        #draw plot
+        # draw plot
         label = f"mean of channels {kwargs['min_ch']+1} - {kwargs['max_ch']}"
-        ax.plot(self.t,meanchannel,label=label,color=kwargs["color"])
+        ax.plot(self.t, meanchannel, label=label, color=kwargs["color"])
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         ax.set_ylabel(f"Fluorescence Index ({label})")
         if len(kwargs["quakes"]) != 0:
             ax.vlines(
-                x=[dt.datetime.strptime(element, "%H:%M:%S") 
+                x=[dt.datetime.strptime(element, "%H:%M:%S")
                    for element in kwargs["quakes"]],
                 ymin=min(meanchannel),
                 ymax=max(meanchannel),
                 color=kwargs["quakecolor"],
                 ls="dashed",
                 label=kwargs["quakeslabel"]
-                )
+            )
         ax.tick_params(axis='y', colors=kwargs["color"])
         ax.axes.yaxis.label.set_color(kwargs["color"])
         
@@ -1035,25 +1040,28 @@ class NewFData:
 
         """
         
-        #import kwargs
-        defaults = {"smooth" : True,
-                   "cmap" : "RdYlBu_r",
-                   "pad" : 0.01,
-                   "togglecbar" : True,
-                   "xlims" : "none"}
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        # import kwargs
+        defaults = {"smooth": True,
+                    "cmap": "RdYlBu_r",
+                    "pad": 0.01,
+                    "togglecbar": True,
+                    "xlims": "none"}
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), "NewFData.heatmap()")
-        
-        #prepare data
-        xx,yy = np.meshgrid(self.t,[i+0.5 for i in range(len(self.channels))])
+
+        # prepare data
+        xx, yy = np.meshgrid(
+            self.t, 
+            [i+0.5 for i in range(len(self.channels))]
+        )
         heatmap_data = deepcopy(self.channels)
         heatmap_data = self._hk_replacezeros(heatmap_data)
-        if isinstance(kwargs["xlims"],list):
-            ax.set_xlim([dt.datetime.strptime(element, "%H:%M:%S") 
+        if isinstance(kwargs["xlims"], list):
+            ax.set_xlim([dt.datetime.strptime(element, "%H:%M:%S")
                          for element in kwargs["xlims"]])
         
-        #draw
+        # draw
         if kwargs["smooth"]:
             im = ax.pcolormesh(
                 xx,
@@ -1062,7 +1070,7 @@ class NewFData:
                 cmap=kwargs["cmap"],
                 norm=LogNorm(),
                 shading="gouraud"
-                )
+            )
         else:
             im = ax.pcolormesh(
                 xx,
@@ -1071,18 +1079,23 @@ class NewFData:
                 cmap=kwargs["cmap"],
                 norm=LogNorm(),
                 shading="nearest"
-                )
+            )
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
         ax.set_ylabel("Channels")
         ax.set_xlabel("CET")
         
         ticks = [i+0.5 for i in range(len(self.channels))]
         ticklabels = [i+1 for i in range(len(ticks))]
-        ax.set_yticks(ticks,labels=ticklabels)
+        ax.set_yticks(ticks, labels=ticklabels)
         ax.yaxis.set_tick_params(which='minor', size=0)
         ax.yaxis.set_tick_params(which='minor', width=0)
         if kwargs["togglecbar"]:
-            plt.colorbar(im,ax=ax,label="Fluorescence Index",pad=kwargs["pad"])
+            plt.colorbar(
+                im,
+                ax=ax,
+                label="Fluorescence Index",
+                pad=kwargs["pad"]
+            )
             
             
     def returndata(self):
@@ -1103,21 +1116,21 @@ class NewFData:
         op = {}
         op_details = {}
         op_t = np.array([t.replace(microsecond=0) for t in self.t])
-        for i,ch in enumerate(self.channels):
+        for i, ch in enumerate(self.channels):
             name = f"ch{i+1}"
             op[name] = ch
-        op["meanchannel"] = np.mean(self.channels,axis=0)
+        op["meanchannel"] = np.mean(self.channels, axis=0)
         for key in op:
             if key[-1] != "l":
-                op_details[key] = [f"Channel {key[2:]}","Fluorescence Index"]
+                op_details[key] = [f"Channel {key[2:]}", "Fluorescence Index"]
             else:
-                op_details[key] = ["Mean Channel","Fluorescence Index"]
+                op_details[key] = ["Mean Channel", "Fluorescence Index"]
         op["t"] = op_t
-        
-        return op,op_details
+
+        return op, op_details
     
     
-    def append(self,fspec2,copy_raw=False):
+    def append(self, fspec2, copy_raw=False):
         """
         Appends the data of another `NewFData` obj to this one.
 
@@ -1134,43 +1147,45 @@ class NewFData:
         None
         """
         
-        self.t = np.append(self.t,fspec2.t)
+        self.t = np.append(self.t, fspec2.t)
         newchannels = [[] for i in range(len(self.channels))]
         for i in range(len(self.channels)):
-            newchannels[i] = np.append(self.channels[i],fspec2.channels[i])
+            newchannels[i] = np.append(self.channels[i], fspec2.channels[i])
         self.channels = np.array(newchannels)
-        
+
         if copy_raw:
-            self.rawtime = np.append(self.rawtime,fspec2.rawtime)
+            self.rawtime = np.append(self.rawtime, fspec2.rawtime)
             newchannels = [[] for i in range(len(self.rawchannels))]
             for i in range(len(self.rawchannels)):
                 newchannels[i] = np.append(self.rawchannels[i])
             self.rawchannels = np.array(newchannels)
         
         
-    #housekeeping funcs    
-    def _hk_kwargs(self,kwargs,key,default):
+    # housekeeping funcs
+    def _hk_kwargs(self, kwargs, key, default):
         """Turns kwargs into attributes"""
 
         op = kwargs[key] if key in kwargs else default
         if type(op) == str:
-            if op =="null":
-                print("WARNING: Loaded file seems to have been produced either from another object than NewFData or another version of NewFData. Some functions may not be available.")
-        setattr(self,key,op)
+            if op == "null":
+                print("WARNING: Loaded file seems to have been produced either"
+                      " from another object than NewFData or another version "
+                      "of NewFData. Some functions may not be available.")
+        setattr(self, key, op)
         
         
-    def _hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self, kwargs, key, default):
         """Gives kwargs a default value if they are not passed"""
 
         op = kwargs[key] if key in kwargs else default
         return op
         
         
-    def _hk_replacezeros(self,arr):
+    def _hk_replacezeros(self, arr):
         """replaces zeros for a logarithmic scale"""
 
         array = deepcopy(arr)
-        
+
         smallest = 10000
         for row in array:
             for element in row:
@@ -1184,17 +1199,21 @@ class NewFData:
         return array
     
     
-    def _hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self, kwargs, legallist, funcname):
         """Checks if all passed kwargs are legal"""
 
         for key in kwargs:
             if key not in legallist:
-                raise IllegalArgument(key,funcname,legallist)
+                raise IllegalArgument(key, funcname, legallist)
     
     
     @staticmethod
-    @njit(float64[:,:](float64[:],float64[:,:],float64[:],float64[:],float64[:,:]))
-    def _hk_process_data(tt,rc,bg,rt,channels):
+    @njit(float64[:, :](float64[:],
+                        float64[:, :],
+                        float64[:],
+                        float64[:],
+                        float64[:, :]))
+    def _hk_process_data(tt, rc, bg, rt, channels):
         """Numba compiled method to calculate fluorescence indices"""
 
         for t in prange(len(tt)):
@@ -1202,6 +1221,5 @@ class NewFData:
                 for val in prange(len(rc[channel])):
                     if rc[channel][val] > bg[channel] and rt[val] == tt[t]:
                         channels[channel][t] += 1
-             
+
         return channels
-      

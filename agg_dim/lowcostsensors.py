@@ -506,13 +506,17 @@ class FlyingFlo_USB:
     file : str
         takes a FlyingFlo_USB-produced csv-file.
     start : str, optional
-        takes a str in 'hh:mm:ss'-format and only imports data acquired after that timestamp. The default is "none".
+        takes a str in 'hh:mm:ss'-format and only imports data acquired after 
+        that timestamp. The default is "none".
     end : str, optional
-        takes a str in 'hh:mm:ss'-format and only imports data acquired before that timestamp. The default is "none".
+        takes a str in 'hh:mm:ss'-format and only imports data acquired before 
+        that timestamp. The default is "none".
     title : str, optional
-        takes a str and uses it as a title for quickplots. The default is "no title".
+        takes a str and uses it as a title for quickplots. 
+        The default is "no title".
     deviate : bool, optional
-        takes a bool to decide if the data should be expressed relative to mean. The default is False.
+        takes a bool to decide if the data should be expressed relative to 
+        mean. The default is False.
 
     Attributes
     ----------
@@ -521,7 +525,8 @@ class FlyingFlo_USB:
     deviated : bool
         True if the data is epressed relative to a mean.
     averaged : bool
-        True if the data is averaged minutewise (through FlyingFlo.average() method).
+        True if the data is averaged minutewise 
+        (through FlyingFlo.average() method).
     t : np.array of datetime obj of datetime module
         Contains the timestamps of all datapoints.
     y : {str : np.array}
@@ -529,65 +534,102 @@ class FlyingFlo_USB:
 
     """
     
-    def __init__(self,file,start="none",end="none",title="no title",deviate=False):
+    def __init__(self, 
+                 file, 
+                 start="none", 
+                 end="none", 
+                 title="no title", 
+                 deviate=False):
         
-        #init
+        # init
         self.title = title
         self.deviated = False
-        self.averaged = False 
+        self.averaged = False
         
-        #read data from csv to list
+        # read data from csv to list
         with open(file) as f:
-            data = list(csv.reader(f,delimiter=","))
-              
-        #extract x and y values from list
-        self.t = np.array([dt.datetime.strptime(data[i][1],"%H:%M:%S.%f") for i in range(1,len(data)-2)])
-        
+            data = list(csv.reader(f, delimiter=","))
+
+        # extract x and y values from list
+        self.t = np.array(
+            [dt.datetime.strptime(data[i][1], "%H:%M:%S.%f")
+             for i in range(1, len(data)-2)]
+        )
+
         self.y = {
-            "pm1" : [np.array([float(data[i][8]) for i in range(1,len(data)-2)]),"PM1",r'$\mu$g/$m^3$'],
-            "pm25" : [np.array([float(data[i][9]) for i in range(1,len(data)-2)]),"PM2.5","$\mu$g/$m^3$"],
-            "pm4" : [np.array([float(data[i][10]) for i in range(1,len(data)-2)]),"PM4","$\mu$g/$m^3$"],
-            "pm10" : [np.array([float(data[i][11]) for i in range(1,len(data)-2)]),"PM10","$\mu$g/$m^3$"],
-            "tempbme" : [np.array([float(data[i][4]) for i in range(1,len(data)-2)]),"temperature","°C"],
-            "humbme" : [np.array([float(data[i][6]) for i in range(1,len(data)-2)]),"humidity","%"],
-            "gas" : [np.array([float(data[i][5]) for i in range(1,len(data)-2)]),"gas resistance","$\Omega$"],
-            "co2" : [np.array([float(data[i][2]) for i in range(1,len(data)-2)]),r"$CO_2$","ppm"],
-            "tvoc" : [np.array([float(data[i][3]) for i in range(1,len(data)-2)]),"TVOC","ppb"],
-            "press" : [np.array([float(data[i][7]) for i in range(1,len(data)-2)]),"ambient pressure","hPa"],
-            "humsen" : [np.array([float(data[i][12]) for i in range(1,len(data)-2)]),"humidity","%"],
-            "tempsen" : [np.array([float(data[i][13]) for i in range(1,len(data)-2)]),"temperature","°C"],
-            "vocsen" : [np.array([float(data[i][14]) for i in range(1,len(data)-2)]),"VOC-Index","a.u"],
-            "nox" : [np.array([float(data[i][15]) for i in range(1,len(data)-2)]),r"$NO_X$-Index","a.u."]
-            }
+            "pm1": [np.array([float(data[i][8])
+                              for i in range(1, len(data)-2)]),
+                    "PM1", r'$\mu$g/$m^3$'],
+            "pm25": [np.array([float(data[i][9])
+                               for i in range(1, len(data)-2)]),
+                     "PM2.5", "$\mu$g/$m^3$"],
+            "pm4": [np.array([float(data[i][10])
+                              for i in range(1, len(data)-2)]),
+                    "PM4", "$\mu$g/$m^3$"],
+            "pm10": [np.array([float(data[i][11])
+                               for i in range(1, len(data)-2)]),
+                     "PM10", "$\mu$g/$m^3$"],
+            "tempbme": [np.array([float(data[i][4])
+                                  for i in range(1, len(data)-2)]),
+                        "temperature", "°C"],
+            "humbme": [np.array([float(data[i][6])
+                                 for i in range(1, len(data)-2)]),
+                       "humidity", "%"],
+            "gas": [np.array([float(data[i][5])
+                              for i in range(1, len(data)-2)]),
+                    "gas resistance", "$\Omega$"],
+            "co2": [np.array([float(data[i][2])
+                              for i in range(1, len(data)-2)]),
+                    r"$CO_2$", "ppm"],
+            "tvoc": [np.array([float(data[i][3])
+                               for i in range(1, len(data)-2)]),
+                     "TVOC", "ppb"],
+            "press": [np.array([float(data[i][7])
+                                for i in range(1, len(data)-2)]),
+                      "ambient pressure", "hPa"],
+            "humsen": [np.array([float(data[i][12])
+                                 for i in range(1, len(data)-2)]),
+                       "humidity", "%"],
+            "tempsen": [np.array([float(data[i][13])
+                                  for i in range(1, len(data)-2)]),
+                        "temperature", "°C"],
+            "vocsen": [np.array([float(data[i][14])
+                                 for i in range(1, len(data)-2)]),
+                       "VOC-Index", "a.u"],
+            "nox": [np.array([float(data[i][15])
+                              for i in range(1, len(data)-2)]),
+                    r"$NO_X$-Index", "a.u."]
+        }
               
-        #crop
+        # crop
         if start != "none":
             indices = []
             for i in range(len(self.t)):
-                if dt.datetime.strptime(start,"%H:%M:%S") <= self.t[i]:
+                if dt.datetime.strptime(start, "%H:%M:%S") <= self.t[i]:
                     indices.append(i)
             start_i = indices[0]
-        else: start_i = 0
-        
+        else:
+            start_i = 0
+
         if end != "none":
             indices = []
             for i in range(len(self.t)):
-                if dt.datetime.strptime(end,"%H:%M:%S") <= self.t[i]:
+                if dt.datetime.strptime(end, "%H:%M:%S") <= self.t[i]:
                     indices.append(i)
             end_i = indices[0]
-        else: end_i = len(self.t)-1
-        
-        self.t = [self.t[i] for i in range(start_i,end_i)]
+        else:
+            end_i = len(self.t)-1
+
+        self.t = [self.t[i] for i in range(start_i, end_i)]
         for key in self.y:
-            self.y[key][0] = [self.y[key][0][j] for j in range(start_i,end_i)]
+            self.y[key][0] = [self.y[key][0][j] for j in range(start_i, end_i)]
             
-            
-        #express data as relative from mean
+        # express data as relative from mean
         if deviate:
             self.deviatefrommean()
+
             
-            
-    def quickplot(self,y):
+    def quickplot(self, y):
         """
         draws a plot y vs time
 
@@ -610,22 +652,23 @@ class FlyingFlo_USB:
         try:
             yy = self.y[y]
         except Exception as exc:
-            raise ValueError(f"{y} cant be plotted! Plottable data: {', '.join(list(self.y))}") from exc
-        
-        _,ax = plt.subplots()
+            raise ValueError(f"{y} cant be plotted! Plottable data: "
+                             f"{', '.join(list(self.y))}") from exc
+
+        _, ax = plt.subplots()
         plt.title(self.title)
 
-        ax.plot(self.t,yy[0])
+        ax.plot(self.t, yy[0])
         if self.deviated:
             ax.set_ylabel(yy[1] + " in % deviation from mean")
         else:
             ax.set_ylabel(yy[1] + " in " + yy[2])
         ax.xaxis.set_major_formatter(md.DateFormatter('%H:%M'))
-        
+
         plt.show()
         
         
-    def plot(self,ax,y,**kwargs):
+    def plot(self, ax, y, **kwargs):
         """
         draws a plot y vs time on an existing matplotlib-axis
 
@@ -651,22 +694,23 @@ class FlyingFlo_USB:
         None.
 
         """
-        #kwargs
-        defaults = {"color" : "tab:brown",
-                    "secondary" : False
-            }
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        # kwargs
+        defaults = {"color": "tab:brown",
+                    "secondary": False
+                    }
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), "FlyingFlo_USB.plot()")
         
-        #get plotdata
+        # get plotdata
         try:
             yy = self.y[y]
         except Exception as exc:
-            raise ValueError(f"{y} cant be plotted! Plottable data: {', '.join(list(self.y))}") from exc
+            raise ValueError(f"{y} cant be plotted! Plottable data: "
+                             f"{', '.join(list(self.y))}") from exc
         
-        #draw plot
-        ax.plot(self.t,yy[0],color=kwargs["color"])
+        # draw plot
+        ax.plot(self.t, yy[0], color=kwargs["color"])
         if self.deviated:
             ax.set_ylabel(yy[1] + " in % deviation from mean")
         else:
@@ -692,15 +736,22 @@ class FlyingFlo_USB:
         
         minutes = np.array([timestamp.minute for timestamp in self.t])
         hours = np.array([timestamp.hour for timestamp in self.t])
-        
+
         for key in self.y:
             new_array = []
             minute = None
-            for m,h in zip(minutes,hours):
+            for m, h in zip(minutes, hours):
                 if minute == None:
                     minute = m
-                    checker = [mm==minute and hh==h for mm,hh in zip(minutes,hours)]
-                    appender = np.where(checker,self.y[key][0],minutes*np.NaN)
+                    checker = [mm == minute
+                               and hh == h
+                               for mm, hh
+                               in zip(minutes, hours)]
+                    appender = np.where(
+                        checker,
+                        self.y[key][0],
+                        minutes*np.NaN
+                    )
                     appender = appender[~np.isnan(appender)]
                     new_array.append(np.mean(appender))
                 elif minute != m:
@@ -728,17 +779,17 @@ class FlyingFlo_USB:
 
         """
         
-        for key,element in self.y.items():
-            
+        for key, element in self.y.items():
+
             mean_array = np.array(self.y[key][0].copy())
             mean_array = mean_array[~np.isnan(mean_array)]
             mean = np.mean(mean_array)
-            
+
             for i in range(len(element[0])):
                 element[0][i] = ((element[0][i] / mean) - 1)*100
-                
+
             self.y[key][0] = element[0]
-                
+
         self.deviated = True
         
     def returndata(self):
@@ -760,7 +811,7 @@ class FlyingFlo_USB:
             op_t.append(new_t)
             new_t += dt.timedelta(seconds=1)
         op_t = np.array(op_t)
-        
+
         mask = []
         compare_t = [i.replace(microsecond=0) for i in self.t]
         for i in op_t:
@@ -768,16 +819,17 @@ class FlyingFlo_USB:
                 mask.append(compare_t.index(i))
             else:
                 mask.append(np.nan)
-        op = {"t" : op_t}
+        op = {"t": op_t}
         op_details = {}
-        for key,val in self.y.items():
-            y_op = np.array([val[0][i] if not np.isnan(i) else np.nan for i in mask])
+        for key, val in self.y.items():
+            y_op = np.array([val[0][i] if not np.isnan(i)
+                            else np.nan for i in mask])
             op[key] = y_op
-            op_details[key] = [val[1],val[2]]
-            
-        return op,op_details
+            op_details[key] = [val[1], val[2]]
+
+        return op, op_details
     
-    def append(self,ffusb):
+    def append(self, ffusb):
         """
         Adds another `FlyingFlo_USB` obj to the current one.
 
@@ -795,33 +847,33 @@ class FlyingFlo_USB:
             self.y[key][0] = np.append(
                 self.y[key][0],
                 ffusb.y[key][0]
-                )
-        self.t = np.append(self.t,ffusb.t)
+            )
+        self.t = np.append(self.t, ffusb.t)      
         
         
-        
-    #Housekeeping funcs
-    
-    def _hk_kwargs(self,kwargs,key,default):
+    # Housekeeping funcs
+    def _hk_kwargs(self, kwargs, key, default):
         """Turns kwargs into attributes"""
         
         op = kwargs[key] if key in kwargs else default
         if type(op) == str:
             if op =="null":
-                print("WARNING: Loaded file seems to have been produced either from another object than NewFData or another version of NewFData. Some functions may not be available.")
+                print("WARNING: Loaded file seems to have been produced either"
+                      " from another object than NewFData or another version "
+                      "of NewFData. Some functions may not be available.")
         setattr(self, key, op)
         
         
-    def _hk_func_kwargs(self,kwargs,key,default):
+    def _hk_func_kwargs(self, kwargs, key, default):
         """Gives kwargs a default value if they are not passed"""
 
         op = kwargs[key] if key in kwargs else default
         return op
     
     
-    def _hk_errorhandling(self,kwargs,legallist,funcname):
+    def _hk_errorhandling(self, kwargs, legallist, funcname):
         """Checks if all passed kwargs are legal"""
 
         for key in kwargs:
             if key not in legallist:
-                raise IllegalArgument(key,funcname,legallist)
+                raise IllegalArgument(key, funcname, legallist)

@@ -60,7 +60,7 @@ data produces by the weather station.</p>
 </summary>
 <pre><code class="python">class WeatherData:
     
-    def __init__(self,file):
+    def __init__(self, file):
         &#34;&#34;&#34;
         Object to read data from the Weatherstation
 
@@ -79,15 +79,19 @@ data produces by the weather station.</p>
         &#34;&#34;&#34;
         
         if file.split(&#34;.&#34;)[1].lower() != &#34;csv&#34;:
-            raise IllegalFileFormat(file.split(&#34;.&#34;)[1], 
-                                    &#34;csv&#34;,
-                                    &#34;WeatherData argument&#34;)
+            raise IllegalFileFormat(
+                file.split(&#34;.&#34;)[1],
+                &#34;csv&#34;,
+                &#34;WeatherData argument&#34;
+            )
         with open(file) as f:
-            data = list(csv.reader(f,delimiter=&#34;,&#34;))
-            
-        datarange = range(1,len(data))
+            data = list(csv.reader(f, delimiter=&#34;,&#34;))
+
+        datarange = range(1, len(data))
+
         def read_date(ip_str):
-            return dt.datetime.strptime(ip_str,&#34;%Y/%m/%d %H:%M&#34;)
+            return dt.datetime.strptime(ip_str, &#34;%Y/%m/%d %H:%M&#34;)
+
         def float2(ip_str):
             try:
                 return float(ip_str)
@@ -95,43 +99,43 @@ data produces by the weather station.</p>
                 return np.nan
         
         self.data = {
-            &#34;t&#34; : np.array([read_date(data[i][0]) for i in datarange]),
-            &#34;indoortemp&#34; : np.array([float2(data[i][1]) for i in datarange]),
-            &#34;indoorhum&#34; : np.array([float2(data[i][2]) for i in datarange]),
-            &#34;outdoortemp&#34; : np.array([float2(data[i][3]) for i in datarange]),
-            &#34;outdoorhum&#34; : np.array([float2(data[i][4]) for i in datarange]),
-            &#34;dewpoint&#34; : np.array([float2(data[i][5]) for i in datarange]),
-            &#34;felttemp&#34; : np.array([float2(data[i][6]) for i in datarange]),
-            &#34;wind&#34; : np.array([float2(data[i][7]) for i in datarange]),
-            &#34;gust&#34; : np.array([float2(data[i][8]) for i in datarange]),
-            &#34;winddir&#34; : np.array([float2(data[i][9]) for i in datarange]),
-            &#34;abspress&#34; : np.array([float2(data[i][10]) for i in datarange]),
-            &#34;relpress&#34; : np.array([float2(data[i][11]) for i in datarange]),
-            &#34;solarrad&#34; : np.array([float2(data[i][12]) for i in datarange]),
-            &#34;uvi&#34; : np.array([float2(data[i][13]) for i in datarange]),
-            &#34;rain&#34; : np.array([float2(data[i][14]) for i in datarange])
-            }
+            &#34;t&#34;: np.array([read_date(data[i][0]) for i in datarange]),
+            &#34;indoortemp&#34;: np.array([float2(data[i][1]) for i in datarange]),
+            &#34;indoorhum&#34;: np.array([float2(data[i][2]) for i in datarange]),
+            &#34;outdoortemp&#34;: np.array([float2(data[i][3]) for i in datarange]),
+            &#34;outdoorhum&#34;: np.array([float2(data[i][4]) for i in datarange]),
+            &#34;dewpoint&#34;: np.array([float2(data[i][5]) for i in datarange]),
+            &#34;felttemp&#34;: np.array([float2(data[i][6]) for i in datarange]),
+            &#34;wind&#34;: np.array([float2(data[i][7]) for i in datarange]),
+            &#34;gust&#34;: np.array([float2(data[i][8]) for i in datarange]),
+            &#34;winddir&#34;: np.array([float2(data[i][9]) for i in datarange]),
+            &#34;abspress&#34;: np.array([float2(data[i][10]) for i in datarange]),
+            &#34;relpress&#34;: np.array([float2(data[i][11]) for i in datarange]),
+            &#34;solarrad&#34;: np.array([float2(data[i][12]) for i in datarange]),
+            &#34;uvi&#34;: np.array([float2(data[i][13]) for i in datarange]),
+            &#34;rain&#34;: np.array([float2(data[i][14]) for i in datarange])
+        }
         self.details = {
-            &#34;indoortemp&#34; : [&#34;temperature (indoors)&#34;,&#34;°C&#34;],
-            &#34;indoorhum&#34; : [&#34;relative humidity (indoors)&#34;, &#34;%&#34;],
-            &#34;outdoortemp&#34; : [&#34;temperature (outdoors)&#34;,&#34;°C&#34;],
-            &#34;outdoorhum&#34; : [&#34;relative humidity (outdoors)&#34;, &#34;%&#34;],
-            &#34;dewpoint&#34; : [&#34;dewpoint&#34;,&#34;°C&#34;],
-            &#34;felttemp&#34; : [&#34;felt temperature&#34;,&#34;°C&#34;],
-            &#34;wind&#34; : [&#34;windspeed&#34;,&#34;m/s&#34;],
-            &#34;gust&#34; : [&#34;windspeed (gust)&#34;, &#34;m/s&#34;],
-            &#34;winddir&#34; : [&#34;wind direction&#34;,&#34;°&#34;],
-            &#34;abspress&#34; : [&#34;absolute ambient pressure&#34;,&#34;hPa&#34;],
-            &#34;relpress&#34; : [&#34;relative ambient pressure&#34;,&#34;hPa&#34;],
-            &#34;solarrad&#34; : [&#34;solar radiation&#34;,&#34;W/m${}^2$&#34;],
-            &#34;uvi&#34; : [&#34;UV Index&#34;, &#34;A.U.&#34;],
-            &#34;rain&#34; : [&#34;hourly precipitation&#34;,&#34;mm&#34;]
-            }
+            &#34;indoortemp&#34;: [&#34;temperature (indoors)&#34;, &#34;°C&#34;],
+            &#34;indoorhum&#34;: [&#34;relative humidity (indoors)&#34;, &#34;%&#34;],
+            &#34;outdoortemp&#34;: [&#34;temperature (outdoors)&#34;, &#34;°C&#34;],
+            &#34;outdoorhum&#34;: [&#34;relative humidity (outdoors)&#34;, &#34;%&#34;],
+            &#34;dewpoint&#34;: [&#34;dewpoint&#34;, &#34;°C&#34;],
+            &#34;felttemp&#34;: [&#34;felt temperature&#34;, &#34;°C&#34;],
+            &#34;wind&#34;: [&#34;windspeed&#34;, &#34;m/s&#34;],
+            &#34;gust&#34;: [&#34;windspeed (gust)&#34;, &#34;m/s&#34;],
+            &#34;winddir&#34;: [&#34;wind direction&#34;, &#34;°&#34;],
+            &#34;abspress&#34;: [&#34;absolute ambient pressure&#34;, &#34;hPa&#34;],
+            &#34;relpress&#34;: [&#34;relative ambient pressure&#34;, &#34;hPa&#34;],
+            &#34;solarrad&#34;: [&#34;solar radiation&#34;, &#34;W/m${}^2$&#34;],
+            &#34;uvi&#34;: [&#34;UV Index&#34;, &#34;A.U.&#34;],
+            &#34;rain&#34;: [&#34;hourly precipitation&#34;, &#34;mm&#34;]
+        }
         
         
-    def plot(self,ax,y,**kwargs):
+    def plot(self, ax, y, **kwargs):
         &#34;&#34;&#34;
-        
+        Plots y over time on an existing mpl axis
 
         Parameters
         ----------
@@ -171,72 +175,72 @@ data produces by the weather station.</p>
         &#34;&#34;&#34;
         
         defaults = {
-            &#34;day&#34; : None,
-            &#34;setday&#34; : None,
-            &#34;start&#34; : None,
-            &#34;end&#34; : None,
-            &#34;secondary&#34; : False,
-            &#34;color&#34; : &#34;tab:blue&#34;,
-            &#34;plotlabel&#34; : &#34;no label&#34;,
-            &#34;ylabel&#34; : None
-            }
+            &#34;day&#34;: None,
+            &#34;setday&#34;: None,
+            &#34;start&#34;: None,
+            &#34;end&#34;: None,
+            &#34;secondary&#34;: False,
+            &#34;color&#34;: &#34;tab:blue&#34;,
+            &#34;plotlabel&#34;: &#34;no label&#34;,
+            &#34;ylabel&#34;: None
+        }
         
-        for key,default in zip(defaults.keys(),defaults.values()):
-            kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+        for key, default in zip(defaults.keys(), defaults.values()):
+            kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;WeatherData.plot()&#34;)
-        
-        mask = np.full(len(self.data[&#34;t&#34;]),True)
-        if isinstance(kwargs[&#34;day&#34;],str):
+
+        mask = np.full(len(self.data[&#34;t&#34;]), True)
+        if isinstance(kwargs[&#34;day&#34;], str):
             day = kwargs[&#34;day&#34;]
-            day = &#34;.&#34;.join([day[:2],day[2:4],day[4:]])
+            day = &#34;.&#34;.join([day[:2], day[2:4], day[4:]])
             correctdate = dt.datetime.strptime(day, &#34;%d.%m.%Y&#34;).date()
             for i in range(len(self.data[&#34;t&#34;])):
                 if self.data[&#34;t&#34;][i].date() != correctdate:
                     mask[i] = False
-        if isinstance(kwargs[&#34;start&#34;],str):
+        if isinstance(kwargs[&#34;start&#34;], str):
             starthour = int(kwargs[&#34;start&#34;][:2])
             startminute = int(kwargs[&#34;start&#34;][2:4])
             startsecond = int(kwargs[&#34;start&#34;][4:])
             for i in range(len(self.data[&#34;t&#34;])):
                 if self.data[&#34;t&#34;][i].hour &lt; starthour:
                     mask[i] = False
-                elif (self.data[&#34;t&#34;][i].hour == starthour and 
+                elif (self.data[&#34;t&#34;][i].hour == starthour and
                       self.data[&#34;t&#34;][i].minute &lt; startminute):
                     mask[i] = False
-                elif (self.data[&#34;t&#34;][i].hour == starthour and 
-                      self.data[&#34;t&#34;][i].minute == startminute and 
+                elif (self.data[&#34;t&#34;][i].hour == starthour and
+                      self.data[&#34;t&#34;][i].minute == startminute and
                       self.data[&#34;t&#34;][i].second &lt; startsecond):
                     mask[i] = False
-        if isinstance(kwargs[&#34;end&#34;],str):
+        if isinstance(kwargs[&#34;end&#34;], str):
             endhour = int(kwargs[&#34;end&#34;][:2])
             endminute = int(kwargs[&#34;end&#34;][2:4])
             endsecond = int(kwargs[&#34;end&#34;][4:])
             for i in range(len(self.data[&#34;t&#34;])):
                 if self.data[&#34;t&#34;][i].hour &gt; endhour:
                     mask[i] = False
-                elif (self.data[&#34;t&#34;][i].hour == endhour and 
+                elif (self.data[&#34;t&#34;][i].hour == endhour and
                       self.data[&#34;t&#34;][i].minute &gt; endminute):
                     mask[i] = False
-                elif (self.data[&#34;t&#34;][i].hour == endhour and 
-                      self.data[&#34;t&#34;][i].minute == endminute and 
+                elif (self.data[&#34;t&#34;][i].hour == endhour and
+                      self.data[&#34;t&#34;][i].minute == endminute and
                       self.data[&#34;t&#34;][i].second &gt; endsecond):
                     mask[i] = False
                     
         xx = self.data[&#34;t&#34;][mask]
         yy = self.data[y][mask]
-        
-        if isinstance(kwargs[&#34;setday&#34;],str):
+
+        if isinstance(kwargs[&#34;setday&#34;], str):
             dday = int(kwargs[&#34;setday&#34;][:2])
             dmonth = int(kwargs[&#34;setday&#34;][2:4])
             dyear = int(kwargs[&#34;setday&#34;][4:])
-            xx = np.array([d.replace(day=dday,
-                                     month=dmonth,
-                                     year=dyear) for d in xx])
+            xx = np.array(
+                [d.replace(day=dday, month=dmonth, year=dyear) for d in xx]
+            )
             
-        if not isinstance(kwargs[&#34;ylabel&#34;],str):
+        if not isinstance(kwargs[&#34;ylabel&#34;], str):
             kwargs[&#34;ylabel&#34;] = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
-        
-        ax.plot(xx,yy,label=kwargs[&#34;plotlabel&#34;],color=kwargs[&#34;color&#34;])
+
+        ax.plot(xx, yy, label=kwargs[&#34;plotlabel&#34;], color=kwargs[&#34;color&#34;])
         ax.set_ylabel(kwargs[&#34;ylabel&#34;])
         ax.set_xlabel(&#34;CET&#34;)
         ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
@@ -248,7 +252,7 @@ data produces by the weather station.</p>
             ax.spines[&#34;right&#34;].set_color(kwargs[&#34;color&#34;])
             ax.spines[&#34;left&#34;].set_alpha(0)
         
-    def returndata(self,secondwise=True):
+    def returndata(self, secondwise=True):
         &#34;&#34;&#34;
         Returns a tuple containing all data in a standardized form. Important 
         for communication with DroneWrapper or Wrapper objs.
@@ -264,36 +268,38 @@ data produces by the weather station.</p>
         &#34;&#34;&#34;
         
         if not secondwise:
-            return self.data,self.details
+            return self.data, self.details
         op_t = [self.data[&#34;t&#34;][0]]
         ts = op_t[0]
         indices = [0]
         while ts &lt; self.data[&#34;t&#34;][-1]:
             ts = op_t[-1] + dt.timedelta(seconds=1)
             op_t.append(ts)
-            indices.append(np.where(self.data[&#34;t&#34;]==ts.replace(second=0))[0][0])
+            indices.append(
+                np.where(self.data[&#34;t&#34;] == ts.replace(second=0))[0][0]
+            )
         indices = np.array(indices)
-        op_data = {&#34;t&#34; : np.array(op_t)}
-        
+        op_data = {&#34;t&#34;: np.array(op_t)}
+
         for key in self.data.keys():
             if key == &#34;t&#34;:
                 continue
             op_data[key] = self.data[key][indices]
-        return op_data,self.details
+        return op_data, self.details
         
-        
-    #housekeeping funcs
     
-    def _hk_errorhandling(self,kwargs,legallist,funcname):
+    # housekeeping funcs
+    def _hk_errorhandling(self, kwargs, legallist, funcname):
         &#34;&#34;&#34;Checks if all passed kwargs are legal&#34;&#34;&#34;
 
         for key in kwargs:
             if key not in legallist:
-                raise IllegalArgument(key,funcname,legallist)
-                
-    def _hk_func_kwargs(self,kwargs,key,default):
+                raise IllegalArgument(key, funcname, legallist)
+
+
+    def _hk_func_kwargs(self, kwargs, key, default):
         &#34;&#34;&#34;Gives kwargs a default value if they are not passed&#34;&#34;&#34;
- 
+
         op = kwargs[key] if key in kwargs else default
         return op</code></pre>
 </details>
@@ -320,9 +326,9 @@ data produces by the weather station.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def plot(self,ax,y,**kwargs):
+<pre><code class="python">def plot(self, ax, y, **kwargs):
     &#34;&#34;&#34;
-    
+    Plots y over time on an existing mpl axis
 
     Parameters
     ----------
@@ -362,72 +368,72 @@ data produces by the weather station.</p>
     &#34;&#34;&#34;
     
     defaults = {
-        &#34;day&#34; : None,
-        &#34;setday&#34; : None,
-        &#34;start&#34; : None,
-        &#34;end&#34; : None,
-        &#34;secondary&#34; : False,
-        &#34;color&#34; : &#34;tab:blue&#34;,
-        &#34;plotlabel&#34; : &#34;no label&#34;,
-        &#34;ylabel&#34; : None
-        }
+        &#34;day&#34;: None,
+        &#34;setday&#34;: None,
+        &#34;start&#34;: None,
+        &#34;end&#34;: None,
+        &#34;secondary&#34;: False,
+        &#34;color&#34;: &#34;tab:blue&#34;,
+        &#34;plotlabel&#34;: &#34;no label&#34;,
+        &#34;ylabel&#34;: None
+    }
     
-    for key,default in zip(defaults.keys(),defaults.values()):
-        kwargs[key] = self._hk_func_kwargs(kwargs,key,default)
+    for key, default in zip(defaults.keys(), defaults.values()):
+        kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;WeatherData.plot()&#34;)
-    
-    mask = np.full(len(self.data[&#34;t&#34;]),True)
-    if isinstance(kwargs[&#34;day&#34;],str):
+
+    mask = np.full(len(self.data[&#34;t&#34;]), True)
+    if isinstance(kwargs[&#34;day&#34;], str):
         day = kwargs[&#34;day&#34;]
-        day = &#34;.&#34;.join([day[:2],day[2:4],day[4:]])
+        day = &#34;.&#34;.join([day[:2], day[2:4], day[4:]])
         correctdate = dt.datetime.strptime(day, &#34;%d.%m.%Y&#34;).date()
         for i in range(len(self.data[&#34;t&#34;])):
             if self.data[&#34;t&#34;][i].date() != correctdate:
                 mask[i] = False
-    if isinstance(kwargs[&#34;start&#34;],str):
+    if isinstance(kwargs[&#34;start&#34;], str):
         starthour = int(kwargs[&#34;start&#34;][:2])
         startminute = int(kwargs[&#34;start&#34;][2:4])
         startsecond = int(kwargs[&#34;start&#34;][4:])
         for i in range(len(self.data[&#34;t&#34;])):
             if self.data[&#34;t&#34;][i].hour &lt; starthour:
                 mask[i] = False
-            elif (self.data[&#34;t&#34;][i].hour == starthour and 
+            elif (self.data[&#34;t&#34;][i].hour == starthour and
                   self.data[&#34;t&#34;][i].minute &lt; startminute):
                 mask[i] = False
-            elif (self.data[&#34;t&#34;][i].hour == starthour and 
-                  self.data[&#34;t&#34;][i].minute == startminute and 
+            elif (self.data[&#34;t&#34;][i].hour == starthour and
+                  self.data[&#34;t&#34;][i].minute == startminute and
                   self.data[&#34;t&#34;][i].second &lt; startsecond):
                 mask[i] = False
-    if isinstance(kwargs[&#34;end&#34;],str):
+    if isinstance(kwargs[&#34;end&#34;], str):
         endhour = int(kwargs[&#34;end&#34;][:2])
         endminute = int(kwargs[&#34;end&#34;][2:4])
         endsecond = int(kwargs[&#34;end&#34;][4:])
         for i in range(len(self.data[&#34;t&#34;])):
             if self.data[&#34;t&#34;][i].hour &gt; endhour:
                 mask[i] = False
-            elif (self.data[&#34;t&#34;][i].hour == endhour and 
+            elif (self.data[&#34;t&#34;][i].hour == endhour and
                   self.data[&#34;t&#34;][i].minute &gt; endminute):
                 mask[i] = False
-            elif (self.data[&#34;t&#34;][i].hour == endhour and 
-                  self.data[&#34;t&#34;][i].minute == endminute and 
+            elif (self.data[&#34;t&#34;][i].hour == endhour and
+                  self.data[&#34;t&#34;][i].minute == endminute and
                   self.data[&#34;t&#34;][i].second &gt; endsecond):
                 mask[i] = False
                 
     xx = self.data[&#34;t&#34;][mask]
     yy = self.data[y][mask]
-    
-    if isinstance(kwargs[&#34;setday&#34;],str):
+
+    if isinstance(kwargs[&#34;setday&#34;], str):
         dday = int(kwargs[&#34;setday&#34;][:2])
         dmonth = int(kwargs[&#34;setday&#34;][2:4])
         dyear = int(kwargs[&#34;setday&#34;][4:])
-        xx = np.array([d.replace(day=dday,
-                                 month=dmonth,
-                                 year=dyear) for d in xx])
+        xx = np.array(
+            [d.replace(day=dday, month=dmonth, year=dyear) for d in xx]
+        )
         
-    if not isinstance(kwargs[&#34;ylabel&#34;],str):
+    if not isinstance(kwargs[&#34;ylabel&#34;], str):
         kwargs[&#34;ylabel&#34;] = f&#34;{self.details[y][0]} in {self.details[y][1]}&#34;
-    
-    ax.plot(xx,yy,label=kwargs[&#34;plotlabel&#34;],color=kwargs[&#34;color&#34;])
+
+    ax.plot(xx, yy, label=kwargs[&#34;plotlabel&#34;], color=kwargs[&#34;color&#34;])
     ax.set_ylabel(kwargs[&#34;ylabel&#34;])
     ax.set_xlabel(&#34;CET&#34;)
     ax.xaxis.set_major_formatter(md.DateFormatter(&#39;%H:%M&#39;))
@@ -439,7 +445,8 @@ data produces by the weather station.</p>
         ax.spines[&#34;right&#34;].set_color(kwargs[&#34;color&#34;])
         ax.spines[&#34;left&#34;].set_alpha(0)</code></pre>
 </details>
-<div class="desc"><h2 id="parameters">Parameters</h2>
+<div class="desc"><p>Plots y over time on an existing mpl axis</p>
+<h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>ax</code></strong> :&ensp;<code>mpl-axis</code></dt>
 <dd>takes a mpl-axis on which the data will be plotted.</dd>
@@ -482,7 +489,7 @@ the given y</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def returndata(self,secondwise=True):
+<pre><code class="python">def returndata(self, secondwise=True):
     &#34;&#34;&#34;
     Returns a tuple containing all data in a standardized form. Important 
     for communication with DroneWrapper or Wrapper objs.
@@ -498,22 +505,24 @@ the given y</dd>
     &#34;&#34;&#34;
     
     if not secondwise:
-        return self.data,self.details
+        return self.data, self.details
     op_t = [self.data[&#34;t&#34;][0]]
     ts = op_t[0]
     indices = [0]
     while ts &lt; self.data[&#34;t&#34;][-1]:
         ts = op_t[-1] + dt.timedelta(seconds=1)
         op_t.append(ts)
-        indices.append(np.where(self.data[&#34;t&#34;]==ts.replace(second=0))[0][0])
+        indices.append(
+            np.where(self.data[&#34;t&#34;] == ts.replace(second=0))[0][0]
+        )
     indices = np.array(indices)
-    op_data = {&#34;t&#34; : np.array(op_t)}
-    
+    op_data = {&#34;t&#34;: np.array(op_t)}
+
     for key in self.data.keys():
         if key == &#34;t&#34;:
             continue
         op_data[key] = self.data[key][indices]
-    return op_data,self.details</code></pre>
+    return op_data, self.details</code></pre>
 </details>
 <div class="desc"><p>Returns a tuple containing all data in a standardized form. Important
 for communication with DroneWrapper or Wrapper objs.</p>
