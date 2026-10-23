@@ -1243,8 +1243,9 @@ exported data.</dd>
             The default is False
         layout : dict or str
             Makes sure, the data is read correctly from the .csv-file. Legal 
-            strings are &#34;desktopmode&#34;, &#34;box_pallnsdorfer&#34; and &#34;FlyingFlo2.0&#34;. 
-            For custom dicts see documentation. The default is &#34;FlyingFlo2.0&#34;.
+            strings are &#34;desktopmode&#34;, &#34;hk_file&#34;, &#34;box_pallnsdorfer&#34; 
+            and &#34;FlyingFlo2.0&#34;. The default is &#34;FlyingFlo2.0&#34;.
+            For custom dicts see the layout under Examples: 
         t_no_beaglebone : bool, optional
             If True, only the time column written by the raspy will be used 
             instead of the time column written by beaglebone. The default is
@@ -1265,6 +1266,16 @@ exported data.</dd>
         details : dict of list of strs
             contains lists with `len=2` which contain information what data is 
             stored in `self.data`
+            
+        Examples
+        --------
+        &gt;&gt;&gt; # layout kwarg:
+        &gt;&gt;&gt; layout = {&#34;bins&#34;: list of int,
+        &gt;&gt;&gt;           &#34;ydata&#34;: list of int or &#34;NULL&#34;,
+        &gt;&gt;&gt;           &#34;ydata2&#34;: list of int,
+        &gt;&gt;&gt;           &#34;popstime&#34;: int,
+        &gt;&gt;&gt;           &#34;t&#34;: int (-1 if it doesnt exist),
+        &gt;&gt;&gt;           &#34;flow&#34;: int}
 
         &#34;&#34;&#34;
 
@@ -1313,9 +1324,7 @@ exported data.</dd>
         self.plottypes2 = [
             [&#34;total&#34;, &#34;part. conc.&#34;, r&#34;Counts/$cm^3$&#34;],
             [&#34;popstemp&#34;, &#34;temperature inside POPS-box&#34;, &#34;°C&#34;],
-            [&#34;boardtemp&#34;, &#34;boardtemp&#34;, &#34;°C&#34;],
-            [&#34;overpm25&#34;, &#34;PM2.5 from POPS&#34;, r&#34;Counts/$cm^3$&#34;],
-            [&#34;underpm25&#34;, &#34;particles smaller than 350 nm&#34;, r&#34;Counts/$cm^3$&#34;]
+            [&#34;boardtemp&#34;, &#34;boardtemp&#34;, &#34;°C&#34;]
         ]
         
         # kwargs
@@ -1328,7 +1337,7 @@ exported data.</dd>
                     &#34;wintertime&#34;: False,
                     &#34;layout&#34;: &#34;FlyingFlo2.0&#34;,
                     &#34;t_no_beaglebone&#34;: True}
-        for key, value in zip(defaults.keys(), defaults.values()):
+        for key, value in defaults.items():
             self._hk_kwargs(kwargs, key, value)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;Pops&#34;)
         
@@ -1357,26 +1366,38 @@ exported data.</dd>
                                    &#34;popstime&#34;: 3,
                                    &#34;t&#34;: 1,
                                    &#34;flow&#34;: 18}
+                case &#34;hk_file&#34;:
+                    self.layout = {&#34;bins&#34;: list(range(34, 50)),
+                                   &#34;ydata&#34;: &#34;NULL&#34;,
+                                   &#34;ydata2&#34;: [6, 21, 12],
+                                   &#34;popstime&#34;: 0,
+                                   &#34;t&#34;: -1,
+                                   &#34;flow&#34;: 16}
                 case _:
-                    raise UnknownLayoutError(self.layout,
-                                             [&#34;desktopmode&#34;,
-                                              &#34;box_pallnsdorfer&#34;,
-                                              &#34;FlyingFlo2.0&#34;],
-                                             &#34;POPS&#34;)
+                    raise UnknownLayoutError(
+                        self.layout,
+                        [&#34;desktopmode&#34;,
+                         &#34;box_pallnsdorfer&#34;,
+                         &#34;FlyingFlo2.0&#34;,
+                         &#34;hk_file&#34;],
+                        &#34;POPS&#34;
+                    )
         self.ydata = np.array(
-            [det[0] for det in self.plottypes])
+            [det[0] for det in self.plottypes]
+        )
 
         if self.filename.endswith(&#34;.csv&#34;):
             with open(self.filename, &#34;r&#34;) as f:
                 data = list(f)[1:]
             for i in range(len(data)):
                 data[i] = data[i].split(&#34;,&#34;)
-            newdata = []
-            for dat in data:
-                if dat[0][0] == &#34;2&#34;:  # only works for the next 974 years
-                    newdata.append(dat)
-            data = newdata
-            del newdata
+            if self.layout[&#34;t&#34;] &gt; 0:
+                newdata = []
+                for dat in data:
+                    if dat[0][0] == &#34;2&#34;:  # only works for the next 974 years
+                        newdata.append(dat)
+                data = newdata
+                del newdata
             
             # deletes last row if it hasnt been written completely
             if len(data[0]) &gt; len(data[-1]):
@@ -1466,9 +1487,8 @@ exported data.</dd>
                 try:
                     self.data[key] = self.data[key]-np.nanmean(self.bgobj[key])
                 except:
-                    msg = f&#34;WARNING: {key} could not be bg-corrected, because&#34;
-                    msg += f&#34;it does not exist in {self.bgobj}&#34;
-                    print(msg)
+                    print(f&#34;WARNING: {key} could not be bg-corrected, because&#34;
+                          f&#34;it does not exist in {self.bgobj}&#34;)
             
         # make values relative
         if isinstance(self.relobj, Pops):
@@ -1575,7 +1595,7 @@ exported data.</dd>
         
         try:
             self.data[y]
-        except ValueError:
+        except:
             legals = &#34;,&#34;.join(self.data.keys())
             msg = f&#34;{y} is no legal &#39;y&#39; for Pops.plot(). Consider one of the &#34;
             msg += &#34;following: &#34;
@@ -1702,6 +1722,8 @@ exported data.</dd>
         msg += &#34;. Check out the docu and consider using Pops.newheatmap() &#34;
         msg += &#34;instead.&#34;
         print(msg)
+        print(&#34;WARNING: Pops.heatmap() is deprecated and might be removed soon&#34;
+              )
         
         # kwargs
         defaults = {&#34;start&#34;: &#34;none&#34;,
@@ -2288,8 +2310,9 @@ mean of it</dd>
 The default is False</dd>
 <dt><strong><code>layout</code></strong> :&ensp;<code>dict</code> or <code>str</code></dt>
 <dd>Makes sure, the data is read correctly from the .csv-file. Legal
-strings are "desktopmode", "box_pallnsdorfer" and "FlyingFlo2.0".
-For custom dicts see documentation. The default is "FlyingFlo2.0".</dd>
+strings are "desktopmode", "hk_file", "box_pallnsdorfer"
+and "FlyingFlo2.0". The default is "FlyingFlo2.0".
+For custom dicts see the layout under Examples:</dd>
 <dt><strong><code>t_no_beaglebone</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>If True, only the time column written by the raspy will be used
 instead of the time column written by beaglebone. The default is
@@ -2310,7 +2333,16 @@ True.</dd>
 <dt><strong><code>details</code></strong> :&ensp;<code>dict</code> of <code>list</code> of <code>strs</code></dt>
 <dd>contains lists with <code>len=2</code> which contain information what data is
 stored in <code>self.data</code></dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; # layout kwarg:
+&gt;&gt;&gt; layout = {&quot;bins&quot;: list of int,
+&gt;&gt;&gt;           &quot;ydata&quot;: list of int or &quot;NULL&quot;,
+&gt;&gt;&gt;           &quot;ydata2&quot;: list of int,
+&gt;&gt;&gt;           &quot;popstime&quot;: int,
+&gt;&gt;&gt;           &quot;t&quot;: int (-1 if it doesnt exist),
+&gt;&gt;&gt;           &quot;flow&quot;: int}
+</code></pre></div>
 <h3>Methods</h3>
 <dl>
 <dt id="agg_dim.particle_counters.Pops.add"><code class="name flex">
@@ -2691,6 +2723,8 @@ The default is False.</dd>
     msg += &#34;. Check out the docu and consider using Pops.newheatmap() &#34;
     msg += &#34;instead.&#34;
     print(msg)
+    print(&#34;WARNING: Pops.heatmap() is deprecated and might be removed soon&#34;
+          )
     
     # kwargs
     defaults = {&#34;start&#34;: &#34;none&#34;,
@@ -2970,7 +3004,7 @@ The default is "horizontal".</dd>
     
     try:
         self.data[y]
-    except ValueError:
+    except:
         legals = &#34;,&#34;.join(self.data.keys())
         msg = f&#34;{y} is no legal &#39;y&#39; for Pops.plot(). Consider one of the &#34;
         msg += &#34;following: &#34;

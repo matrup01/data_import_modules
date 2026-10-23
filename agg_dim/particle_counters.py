@@ -40,8 +40,9 @@ class Pops:
             The default is False
         layout : dict or str
             Makes sure, the data is read correctly from the .csv-file. Legal 
-            strings are "desktopmode", "box_pallnsdorfer" and "FlyingFlo2.0". 
-            For custom dicts see documentation. The default is "FlyingFlo2.0".
+            strings are "desktopmode", "hk_file", "box_pallnsdorfer" 
+            and "FlyingFlo2.0". The default is "FlyingFlo2.0".
+            For custom dicts see the layout under Examples. 
         t_no_beaglebone : bool, optional
             If True, only the time column written by the raspy will be used 
             instead of the time column written by beaglebone. The default is
@@ -62,6 +63,16 @@ class Pops:
         details : dict of list of strs
             contains lists with `len=2` which contain information what data is 
             stored in `self.data`
+            
+        Examples
+        --------
+        >>> # layout kwarg:
+        >>> layout = {"bins": list of int,
+        >>>           "ydata": list of int or "NULL",
+        >>>           "ydata2": list of int,
+        >>>           "popstime": int,
+        >>>           "t": int (-1 if it doesnt exist),
+        >>>           "flow": int}
 
         """
 
@@ -110,9 +121,7 @@ class Pops:
         self.plottypes2 = [
             ["total", "part. conc.", r"Counts/$cm^3$"],
             ["popstemp", "temperature inside POPS-box", "°C"],
-            ["boardtemp", "boardtemp", "°C"],
-            ["overpm25", "PM2.5 from POPS", r"Counts/$cm^3$"],
-            ["underpm25", "particles smaller than 350 nm", r"Counts/$cm^3$"]
+            ["boardtemp", "boardtemp", "°C"]
         ]
         
         # kwargs
@@ -125,7 +134,7 @@ class Pops:
                     "wintertime": False,
                     "layout": "FlyingFlo2.0",
                     "t_no_beaglebone": True}
-        for key, value in zip(defaults.keys(), defaults.values()):
+        for key, value in defaults.items():
             self._hk_kwargs(kwargs, key, value)
         self._hk_errorhandling(kwargs, defaults.keys(), "Pops")
         
@@ -154,26 +163,38 @@ class Pops:
                                    "popstime": 3,
                                    "t": 1,
                                    "flow": 18}
+                case "hk_file":
+                    self.layout = {"bins": list(range(34, 50)),
+                                   "ydata": "NULL",
+                                   "ydata2": [6, 21, 12],
+                                   "popstime": 0,
+                                   "t": -1,
+                                   "flow": 16}
                 case _:
-                    raise UnknownLayoutError(self.layout,
-                                             ["desktopmode",
-                                              "box_pallnsdorfer",
-                                              "FlyingFlo2.0"],
-                                             "POPS")
+                    raise UnknownLayoutError(
+                        self.layout,
+                        ["desktopmode",
+                         "box_pallnsdorfer",
+                         "FlyingFlo2.0",
+                         "hk_file"],
+                        "POPS"
+                    )
         self.ydata = np.array(
-            [det[0] for det in self.plottypes])
+            [det[0] for det in self.plottypes]
+        )
 
         if self.filename.endswith(".csv"):
             with open(self.filename, "r") as f:
                 data = list(f)[1:]
             for i in range(len(data)):
                 data[i] = data[i].split(",")
-            newdata = []
-            for dat in data:
-                if dat[0][0] == "2":  # only works for the next 974 years
-                    newdata.append(dat)
-            data = newdata
-            del newdata
+            if self.layout["t"] > 0:
+                newdata = []
+                for dat in data:
+                    if dat[0][0] == "2":  # only works for the next 974 years
+                        newdata.append(dat)
+                data = newdata
+                del newdata
             
             # deletes last row if it hasnt been written completely
             if len(data[0]) > len(data[-1]):
@@ -263,9 +284,8 @@ class Pops:
                 try:
                     self.data[key] = self.data[key]-np.nanmean(self.bgobj[key])
                 except:
-                    msg = f"WARNING: {key} could not be bg-corrected, because"
-                    msg += f"it does not exist in {self.bgobj}"
-                    print(msg)
+                    print(f"WARNING: {key} could not be bg-corrected, because"
+                          f"it does not exist in {self.bgobj}")
             
         # make values relative
         if isinstance(self.relobj, Pops):
@@ -499,6 +519,8 @@ class Pops:
         msg += ". Check out the docu and consider using Pops.newheatmap() "
         msg += "instead."
         print(msg)
+        print("WARNING: Pops.heatmap() is deprecated and might be removed soon"
+              )
         
         # kwargs
         defaults = {"start": "none",
