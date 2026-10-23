@@ -1,3 +1,12 @@
+######################### MR 23.10.2026 #########################
+#                  "added hk_file pops layout"                  #
+#                                                               #
+# - added 'hk_file' layout to Pops to make it possible to       #
+#   directly read in housekeeping files from the SD card        #
+# - removed 'overpm25' and 'underpm25' plottypes from Pops as   #
+#   they weren't implemented properly                           #
+#################################################################
+
 ######################### MR 05.10.2026 #########################
 #                       "some wibs fixes"                       #
 #                                                               #
