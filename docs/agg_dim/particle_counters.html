@@ -1245,7 +1245,7 @@ exported data.</dd>
             Makes sure, the data is read correctly from the .csv-file. Legal 
             strings are &#34;desktopmode&#34;, &#34;hk_file&#34;, &#34;box_pallnsdorfer&#34; 
             and &#34;FlyingFlo2.0&#34;. The default is &#34;FlyingFlo2.0&#34;.
-            For custom dicts see the layout under Examples: 
+            For custom dicts see the layout under Examples. 
         t_no_beaglebone : bool, optional
             If True, only the time column written by the raspy will be used 
             instead of the time column written by beaglebone. The default is
@@ -2153,7 +2153,7 @@ exported data.</dd>
         print(msg)
         self.desample(60)
     
-    def desample(self, samplesize):
+    def desample(self, samplesize, ignorenans=False):
         &#34;&#34;&#34;
         Averages all data by a custom amount of seconds
         
@@ -2162,6 +2162,9 @@ exported data.</dd>
         samplesize : int
             The data will be desampled to chunks of this many seconds (e.g. 
             `samplesize=60` means minutewise averaging)
+        ignorenans : bool
+            If True, the desampling will be done using nanmean instead of mean.
+            The default is False.
 
         Returns
         -------
@@ -2174,22 +2177,40 @@ exported data.</dd>
         for key in self.data:
             if key != &#34;t&#34; and key != &#34;popstime&#34;:
                 if key in self.ydata:
-                    yy = self.data[key][:n1*samplesize].reshape(
-                        -1,
-                        samplesize
-                    ).mean(axis=1)
+                    if ignorenans:
+                        yy = np.nanmean(
+                            self.data[key][:n1*samplesize].reshape(
+                                -1,
+                                samplesize
+                            ),
+                            axis=1
+                        )
+                    else:
+                        yy = self.data[key][:n1*samplesize].reshape(
+                            -1,
+                            samplesize
+                        ).mean(axis=1)
                     self.data[key] = np.append(
                         yy,
-                        np.mean(self.data[key][n1*samplesize:])
+                        np.nanmean(self.data[key][n1*samplesize:])
                     )
                 else:
-                    yy = self.data[key][:n2*samplesize].reshape(
-                        -1,
-                        samplesize
-                    ).mean(axis=1)
+                    if ignorenans:
+                        yy = np.nanmean(
+                            self.data[key][:n2*samplesize].reshape(
+                                -1,
+                                samplesize
+                            ),
+                            axis=1
+                        )
+                    else:
+                        yy = self.data[key][:n2*samplesize].reshape(
+                            -1,
+                            samplesize
+                        ).mean(axis=1)
                     self.data[key] = np.append(
                         yy,
-                        np.mean(self.data[key][n2*samplesize:])
+                        np.nanmean(self.data[key][n2*samplesize:])
                     )
             elif key == &#34;t&#34;:
                 self.data[key] = np.append(
@@ -2219,7 +2240,17 @@ exported data.</dd>
 
         &#34;&#34;&#34;
         
-        return self.data, self.details
+        op_data = self.data
+        for i in range(len(&#34;t&#34;)):
+            op_data[&#34;t&#34;][i] = op_data[&#34;t&#34;][i].replace(
+                microsecond=0
+            )
+        for i in range(len(&#34;popstime&#34;)):
+            op_data[&#34;popstime&#34;][i] = op_data[&#34;popstime&#34;][i].replace(
+                microsecond=0
+            )
+        
+        return op_data, self.details
         
     
     # housekeeping funcs
@@ -2312,7 +2343,7 @@ The default is False</dd>
 <dd>Makes sure, the data is read correctly from the .csv-file. Legal
 strings are "desktopmode", "hk_file", "box_pallnsdorfer"
 and "FlyingFlo2.0". The default is "FlyingFlo2.0".
-For custom dicts see the layout under Examples:</dd>
+For custom dicts see the layout under Examples.</dd>
 <dt><strong><code>t_no_beaglebone</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>If True, only the time column written by the raspy will be used
 instead of the time column written by beaglebone. The default is
@@ -2474,14 +2505,14 @@ soon since it was succeeded by Pops.desample.</p>
 <p>None.</p></div>
 </dd>
 <dt id="agg_dim.particle_counters.Pops.desample"><code class="name flex">
-<span>def <span class="ident">desample</span></span>(<span>self, samplesize)</span>
+<span>def <span class="ident">desample</span></span>(<span>self, samplesize, ignorenans=False)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def desample(self, samplesize):
+<pre><code class="python">def desample(self, samplesize, ignorenans=False):
     &#34;&#34;&#34;
     Averages all data by a custom amount of seconds
     
@@ -2490,6 +2521,9 @@ soon since it was succeeded by Pops.desample.</p>
     samplesize : int
         The data will be desampled to chunks of this many seconds (e.g. 
         `samplesize=60` means minutewise averaging)
+    ignorenans : bool
+        If True, the desampling will be done using nanmean instead of mean.
+        The default is False.
 
     Returns
     -------
@@ -2502,22 +2536,40 @@ soon since it was succeeded by Pops.desample.</p>
     for key in self.data:
         if key != &#34;t&#34; and key != &#34;popstime&#34;:
             if key in self.ydata:
-                yy = self.data[key][:n1*samplesize].reshape(
-                    -1,
-                    samplesize
-                ).mean(axis=1)
+                if ignorenans:
+                    yy = np.nanmean(
+                        self.data[key][:n1*samplesize].reshape(
+                            -1,
+                            samplesize
+                        ),
+                        axis=1
+                    )
+                else:
+                    yy = self.data[key][:n1*samplesize].reshape(
+                        -1,
+                        samplesize
+                    ).mean(axis=1)
                 self.data[key] = np.append(
                     yy,
-                    np.mean(self.data[key][n1*samplesize:])
+                    np.nanmean(self.data[key][n1*samplesize:])
                 )
             else:
-                yy = self.data[key][:n2*samplesize].reshape(
-                    -1,
-                    samplesize
-                ).mean(axis=1)
+                if ignorenans:
+                    yy = np.nanmean(
+                        self.data[key][:n2*samplesize].reshape(
+                            -1,
+                            samplesize
+                        ),
+                        axis=1
+                    )
+                else:
+                    yy = self.data[key][:n2*samplesize].reshape(
+                        -1,
+                        samplesize
+                    ).mean(axis=1)
                 self.data[key] = np.append(
                     yy,
-                    np.mean(self.data[key][n2*samplesize:])
+                    np.nanmean(self.data[key][n2*samplesize:])
                 )
         elif key == &#34;t&#34;:
             self.data[key] = np.append(
@@ -2536,6 +2588,9 @@ soon since it was succeeded by Pops.desample.</p>
 <dt><strong><code>samplesize</code></strong> :&ensp;<code>int</code></dt>
 <dd>The data will be desampled to chunks of this many seconds (e.g.
 <code>samplesize=60</code> means minutewise averaging)</dd>
+<dt><strong><code>ignorenans</code></strong> :&ensp;<code>bool</code></dt>
+<dd>If True, the desampling will be done using nanmean instead of mean.
+The default is False.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None.</p></div>
@@ -3304,7 +3359,17 @@ of this obj.</dd>
 
     &#34;&#34;&#34;
     
-    return self.data, self.details</code></pre>
+    op_data = self.data
+    for i in range(len(&#34;t&#34;)):
+        op_data[&#34;t&#34;][i] = op_data[&#34;t&#34;][i].replace(
+            microsecond=0
+        )
+    for i in range(len(&#34;popstime&#34;)):
+        op_data[&#34;popstime&#34;][i] = op_data[&#34;popstime&#34;][i].replace(
+            microsecond=0
+        )
+    
+    return op_data, self.details</code></pre>
 </details>
 <div class="desc"><p>Returns a tuple containing all data in a standardized form.
 Important for communication with <code>DroneWrapper</code> or <code>Wrapper</code> objs.</p>

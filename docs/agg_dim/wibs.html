@@ -1092,6 +1092,13 @@ el.replaceWith(d);
         legacy : bool, optional
             If True, partconc is used instead of dndlogdp to calculate the 
             stacked areas. The default is False.
+        channels: list of str, optional
+            Only channels in this list will be plotted in the stackedplot.
+            The default is[&#34;a&#34;, &#34;b&#34;, &#34;c&#34;, &#34;ab&#34;, &#34;bc&#34;, &#34;ac&#34;, &#34;abc&#34;, &#34;nonfluor&#34;].
+        channellabels: list of str, optional
+            These labels will be used for the legend. They must have the same
+            len as &#39;channels&#39;. The default is [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;AB&#34;, &#34;BC&#34;, &#34;AC&#34;, 
+            &#34;ABC&#34;, &#34;non fluorescent&#34;]
 
         Returns
         -------
@@ -1106,7 +1113,11 @@ el.replaceWith(d);
                     &#34;legend&#34;: True,
                     &#34;normalize&#34;: True,
                     &#34;legacy&#34;: False,
-                    &#34;ylog&#34;: False}
+                    &#34;ylog&#34;: False,
+                    &#34;channels&#34;: [&#34;a&#34;, &#34;b&#34;, &#34;c&#34;, &#34;ab&#34;, &#34;bc&#34;, 
+                                 &#34;ac&#34;, &#34;abc&#34;, &#34;nonfluor&#34;],
+                    &#34;channellabels&#34;: [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;AB&#34;, &#34;BC&#34;,
+                                      &#34;AC&#34;, &#34;ABC&#34;, &#34;non fluorescent&#34;]}
         for key, default in defaults.items():
             kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.stackedplot()&#34;)
@@ -1136,7 +1147,7 @@ el.replaceWith(d);
             totals.append(np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m]))
             totals[i] = 1 if totals[i] == 0 else totals[i]
         vals = np.array([0 for i in xx])
-        for ch in [&#34;a&#34;, &#34;b&#34;, &#34;c&#34;, &#34;ab&#34;, &#34;bc&#34;, &#34;ac&#34;, &#34;abc&#34;]:
+        for ch, label in zip(kwargs[&#34;channels&#34;], kwargs[&#34;channellabels&#34;]):
             new_vals = []
             for i in range(len(xx)):
                 new_vals.append(
@@ -1144,26 +1155,26 @@ el.replaceWith(d);
                 )
             new_vals = np.array(new_vals) + vals
             if kwargs[&#34;normalize&#34;]:
-                ax.fill_between(xx, vals/totals, new_vals/totals, label=ch)
+                ax.fill_between(xx, vals/totals, new_vals/totals, label=label)
             else:
-                ax.fill_between(xx, vals, new_vals, label=ch)
+                ax.fill_between(xx, vals, new_vals, label=label)
             vals = new_vals
-        if kwargs[&#34;normalize&#34;]:
-            ax.fill_between(
-                xx,
-                vals/totals,
-                [1 for i in xx],
-                label=&#34;non fluorescent&#34;
-            )
-        else:
-            totals = [np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m])
-                      for i in range(len(xx))]
-            ax.fill_between(
-                xx,
-                vals,
-                totals,
-                label=&#34;non fluorescent&#34;
-            )
+        # if kwargs[&#34;normalize&#34;]:
+        #     ax.fill_between(
+        #         xx,
+        #         vals/totals,
+        #         [1 for i in xx],
+        #         label=&#34;non fluorescent&#34;
+        #     )
+        # else:
+        #     totals = [np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m])
+        #               for i in range(len(xx))]
+        #     ax.fill_between(
+        #         xx,
+        #         vals,
+        #         totals,
+        #         label=&#34;non fluorescent&#34;
+        #     )
         
         if kwargs[&#34;log&#34;]:
             ax.set_xscale(&#34;log&#34;)
@@ -1197,7 +1208,7 @@ el.replaceWith(d);
             True.
         xlabel : str, optional
             Sets the x label to the given str. The default is &#39;D$_p$ in μm&#39;.
-        ylable : str, optional
+        ylabel : str, optional
             Sets the y label to the given str. The default is 
             &#39;dN/dlogD$_p$ in cm{^{-3}$&#39;.
         scatter : bool, optional
@@ -1219,6 +1230,8 @@ el.replaceWith(d);
             Decides which particle type should be plotted. (legal values are: 
             a,b,c,ab,ac,bc,abc). If all particles should be plotted without 
             considering particle type, dont pass this kwarg.
+        legendlabel: str, optional
+            Adds a label that is used if a legend is plotted
 
         Returns
         -------
@@ -1235,7 +1248,8 @@ el.replaceWith(d);
                     &#34;scatter_color&#34;: &#34;tab:blue&#34;,
                     &#34;scatter_line&#34;: True,
                     &#34;bin_borders&#34;: None,
-                    &#34;particletype&#34;: None}
+                    &#34;particletype&#34;: None,
+                    &#34;legendlabel&#34;: &#34;add label using &#39;legendlabel&#39; kwarg&#34;}
 
         for key, default in defaults.items():
             kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
@@ -1282,7 +1296,12 @@ el.replaceWith(d);
                                  &#34;&#39;particletype&#39; blank&#34;)
      
         if kwargs[&#34;scatter&#34;]:
-            ax.scatter(xx, yy, color=kwargs[&#34;scatter_color&#34;])
+            ax.scatter(
+                xx,
+                yy,
+                color=kwargs[&#34;scatter_color&#34;],
+                label=kwargs[&#34;legendlabel&#34;]
+            )
             if kwargs[&#34;scatter_line&#34;]:
                 ax.plot(
                     xx,
@@ -1304,7 +1323,13 @@ el.replaceWith(d);
                                          &#34;&#39;bin_borders&#39; manually in WIBS.dndlo&#34;
                                          &#34;gdp() or consult docu.&#34;)
             width = np.array([bb[i+1]-bb[i] for i in range(self.bins)])
-            ax.bar(xx, yy, width*0.8, align=&#34;center&#34;)
+            ax.bar(
+                xx,
+                yy,
+                width*0.8,
+                align=&#34;center&#34;,
+                label=kwargs[&#34;legendlabel&#34;]
+            )
         if kwargs[&#34;log&#34;]:
             ax.set_xscale(&#34;log&#34;)
         ax.set_xlabel(&#34;D$_p$ in μm&#34;)
@@ -1576,7 +1601,7 @@ peak RAM usage. The default is 600.</dd>
         True.
     xlabel : str, optional
         Sets the x label to the given str. The default is &#39;D$_p$ in μm&#39;.
-    ylable : str, optional
+    ylabel : str, optional
         Sets the y label to the given str. The default is 
         &#39;dN/dlogD$_p$ in cm{^{-3}$&#39;.
     scatter : bool, optional
@@ -1598,6 +1623,8 @@ peak RAM usage. The default is 600.</dd>
         Decides which particle type should be plotted. (legal values are: 
         a,b,c,ab,ac,bc,abc). If all particles should be plotted without 
         considering particle type, dont pass this kwarg.
+    legendlabel: str, optional
+        Adds a label that is used if a legend is plotted
 
     Returns
     -------
@@ -1614,7 +1641,8 @@ peak RAM usage. The default is 600.</dd>
                 &#34;scatter_color&#34;: &#34;tab:blue&#34;,
                 &#34;scatter_line&#34;: True,
                 &#34;bin_borders&#34;: None,
-                &#34;particletype&#34;: None}
+                &#34;particletype&#34;: None,
+                &#34;legendlabel&#34;: &#34;add label using &#39;legendlabel&#39; kwarg&#34;}
 
     for key, default in defaults.items():
         kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
@@ -1661,7 +1689,12 @@ peak RAM usage. The default is 600.</dd>
                              &#34;&#39;particletype&#39; blank&#34;)
  
     if kwargs[&#34;scatter&#34;]:
-        ax.scatter(xx, yy, color=kwargs[&#34;scatter_color&#34;])
+        ax.scatter(
+            xx,
+            yy,
+            color=kwargs[&#34;scatter_color&#34;],
+            label=kwargs[&#34;legendlabel&#34;]
+        )
         if kwargs[&#34;scatter_line&#34;]:
             ax.plot(
                 xx,
@@ -1683,7 +1716,13 @@ peak RAM usage. The default is 600.</dd>
                                      &#34;&#39;bin_borders&#39; manually in WIBS.dndlo&#34;
                                      &#34;gdp() or consult docu.&#34;)
         width = np.array([bb[i+1]-bb[i] for i in range(self.bins)])
-        ax.bar(xx, yy, width*0.8, align=&#34;center&#34;)
+        ax.bar(
+            xx,
+            yy,
+            width*0.8,
+            align=&#34;center&#34;,
+            label=kwargs[&#34;legendlabel&#34;]
+        )
     if kwargs[&#34;log&#34;]:
         ax.set_xscale(&#34;log&#34;)
     ax.set_xlabel(&#34;D$_p$ in μm&#34;)
@@ -1708,7 +1747,7 @@ before this timestamp will be used for the dNdlogDp curve.</dd>
 True.</dd>
 <dt><strong><code>xlabel</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>Sets the x label to the given str. The default is 'D$_p$ in μm'.</dd>
-<dt><strong><code>ylable</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dt><strong><code>ylabel</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>Sets the y label to the given str. The default is
 'dN/dlogD$_p$ in cm{^{-3}$'.</dd>
 <dt><strong><code>scatter</code></strong> :&ensp;<code>bool</code>, optional</dt>
@@ -1730,6 +1769,8 @@ has none, an <code>AttributeError</code> will be raised.</dd>
 <dd>Decides which particle type should be plotted. (legal values are:
 a,b,c,ab,ac,bc,abc). If all particles should be plotted without
 considering particle type, dont pass this kwarg.</dd>
+<dt><strong><code>legendlabel</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Adds a label that is used if a legend is plotted</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -2284,6 +2325,13 @@ exported data.</dd>
     legacy : bool, optional
         If True, partconc is used instead of dndlogdp to calculate the 
         stacked areas. The default is False.
+    channels: list of str, optional
+        Only channels in this list will be plotted in the stackedplot.
+        The default is[&#34;a&#34;, &#34;b&#34;, &#34;c&#34;, &#34;ab&#34;, &#34;bc&#34;, &#34;ac&#34;, &#34;abc&#34;, &#34;nonfluor&#34;].
+    channellabels: list of str, optional
+        These labels will be used for the legend. They must have the same
+        len as &#39;channels&#39;. The default is [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;AB&#34;, &#34;BC&#34;, &#34;AC&#34;, 
+        &#34;ABC&#34;, &#34;non fluorescent&#34;]
 
     Returns
     -------
@@ -2298,7 +2346,11 @@ exported data.</dd>
                 &#34;legend&#34;: True,
                 &#34;normalize&#34;: True,
                 &#34;legacy&#34;: False,
-                &#34;ylog&#34;: False}
+                &#34;ylog&#34;: False,
+                &#34;channels&#34;: [&#34;a&#34;, &#34;b&#34;, &#34;c&#34;, &#34;ab&#34;, &#34;bc&#34;, 
+                             &#34;ac&#34;, &#34;abc&#34;, &#34;nonfluor&#34;],
+                &#34;channellabels&#34;: [&#34;A&#34;, &#34;B&#34;, &#34;C&#34;, &#34;AB&#34;, &#34;BC&#34;,
+                                  &#34;AC&#34;, &#34;ABC&#34;, &#34;non fluorescent&#34;]}
     for key, default in defaults.items():
         kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
     self._hk_errorhandling(kwargs, defaults.keys(), &#34;WIBS.stackedplot()&#34;)
@@ -2328,7 +2380,7 @@ exported data.</dd>
         totals.append(np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m]))
         totals[i] = 1 if totals[i] == 0 else totals[i]
     vals = np.array([0 for i in xx])
-    for ch in [&#34;a&#34;, &#34;b&#34;, &#34;c&#34;, &#34;ab&#34;, &#34;bc&#34;, &#34;ac&#34;, &#34;abc&#34;]:
+    for ch, label in zip(kwargs[&#34;channels&#34;], kwargs[&#34;channellabels&#34;]):
         new_vals = []
         for i in range(len(xx)):
             new_vals.append(
@@ -2336,26 +2388,26 @@ exported data.</dd>
             )
         new_vals = np.array(new_vals) + vals
         if kwargs[&#34;normalize&#34;]:
-            ax.fill_between(xx, vals/totals, new_vals/totals, label=ch)
+            ax.fill_between(xx, vals/totals, new_vals/totals, label=label)
         else:
-            ax.fill_between(xx, vals, new_vals, label=ch)
+            ax.fill_between(xx, vals, new_vals, label=label)
         vals = new_vals
-    if kwargs[&#34;normalize&#34;]:
-        ax.fill_between(
-            xx,
-            vals/totals,
-            [1 for i in xx],
-            label=&#34;non fluorescent&#34;
-        )
-    else:
-        totals = [np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m])
-                  for i in range(len(xx))]
-        ax.fill_between(
-            xx,
-            vals,
-            totals,
-            label=&#34;non fluorescent&#34;
-        )
+    # if kwargs[&#34;normalize&#34;]:
+    #     ax.fill_between(
+    #         xx,
+    #         vals/totals,
+    #         [1 for i in xx],
+    #         label=&#34;non fluorescent&#34;
+    #     )
+    # else:
+    #     totals = [np.nanmean(self.data[f&#34;bin{i}_{leg}&#34;][m])
+    #               for i in range(len(xx))]
+    #     ax.fill_between(
+    #         xx,
+    #         vals,
+    #         totals,
+    #         label=&#34;non fluorescent&#34;
+    #     )
     
     if kwargs[&#34;log&#34;]:
         ax.set_xscale(&#34;log&#34;)
@@ -2399,6 +2451,13 @@ show the raw dndlogdp. The default is True.</dd>
 <dt><strong><code>legacy</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>If True, partconc is used instead of dndlogdp to calculate the
 stacked areas. The default is False.</dd>
+<dt><strong><code>channels</code></strong> :&ensp;<code>list</code> of <code>str</code>, optional</dt>
+<dd>Only channels in this list will be plotted in the stackedplot.
+The default is["a", "b", "c", "ab", "bc", "ac", "abc", "nonfluor"].</dd>
+<dt><strong><code>channellabels</code></strong> :&ensp;<code>list</code> of <code>str</code>, optional</dt>
+<dd>These labels will be used for the legend. They must have the same
+len as 'channels'. The default is ["A", "B", "C", "AB", "BC", "AC",
+"ABC", "non fluorescent"]</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
