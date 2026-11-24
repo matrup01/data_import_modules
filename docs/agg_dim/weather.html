@@ -275,16 +275,23 @@ data produces by the weather station.</p>
         while ts &lt; self.data[&#34;t&#34;][-1]:
             ts = op_t[-1] + dt.timedelta(seconds=1)
             op_t.append(ts)
-            indices.append(
-                np.where(self.data[&#34;t&#34;] == ts.replace(second=0))[0][0]
-            )
+            try:
+                indices.append(
+                    np.where(self.data[&#34;t&#34;] == ts.replace(second=0))[0][0]
+                )
+            except:
+                indices.append(-1)
         indices = np.array(indices)
         op_data = {&#34;t&#34;: np.array(op_t)}
 
         for key in self.data.keys():
             if key == &#34;t&#34;:
                 continue
-            op_data[key] = self.data[key][indices]
+            op_data[key] = np.where(
+                [indices == -1],
+                np.nan,
+                self.data[key][indices]
+            ).flatten()
         return op_data, self.details
         
     
@@ -512,16 +519,23 @@ the given y</dd>
     while ts &lt; self.data[&#34;t&#34;][-1]:
         ts = op_t[-1] + dt.timedelta(seconds=1)
         op_t.append(ts)
-        indices.append(
-            np.where(self.data[&#34;t&#34;] == ts.replace(second=0))[0][0]
-        )
+        try:
+            indices.append(
+                np.where(self.data[&#34;t&#34;] == ts.replace(second=0))[0][0]
+            )
+        except:
+            indices.append(-1)
     indices = np.array(indices)
     op_data = {&#34;t&#34;: np.array(op_t)}
 
     for key in self.data.keys():
         if key == &#34;t&#34;:
             continue
-        op_data[key] = self.data[key][indices]
+        op_data[key] = np.where(
+            [indices == -1],
+            np.nan,
+            self.data[key][indices]
+        ).flatten()
     return op_data, self.details</code></pre>
 </details>
 <div class="desc"><p>Returns a tuple containing all data in a standardized form. Important
