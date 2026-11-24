@@ -1,3 +1,16 @@
+######################### MR 24.11.2026 #########################
+#                       "some minor fixes"                      #
+#                                                               #
+# - added 'channels' and 'channellabels' kwargs to              #
+#   WIBS.stackedplot()                                          #
+# - fixed a bug where interrupts in weatherdata broke           #
+#   WeatherData.returndata()                                    #
+# - added 'legendlabel' kwarg to WIBS.dndlogdp()                #
+# - fixed Pops obj being wrapped with microseconds by Wrapper   #
+#   when 'hk_file' layout is used.                              #
+# - added 'ignorenans' kwarg for Pops.desample()                #
+#################################################################
+
 ######################### MR 23.10.2026 #########################
 #                  "added hk_file pops layout"                  #
 #                                                               #

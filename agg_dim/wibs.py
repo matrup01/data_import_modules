@@ -1049,6 +1049,13 @@ class WIBS:
         legacy : bool, optional
             If True, partconc is used instead of dndlogdp to calculate the 
             stacked areas. The default is False.
+        channels: list of str, optional
+            Only channels in this list will be plotted in the stackedplot.
+            The default is["a", "b", "c", "ab", "bc", "ac", "abc", "nonfluor"].
+        channellabels: list of str, optional
+            These labels will be used for the legend. They must have the same
+            len as 'channels'. The default is ["A", "B", "C", "AB", "BC", "AC", 
+            "ABC", "non fluorescent"]
 
         Returns
         -------
@@ -1063,7 +1070,11 @@ class WIBS:
                     "legend": True,
                     "normalize": True,
                     "legacy": False,
-                    "ylog": False}
+                    "ylog": False,
+                    "channels": ["a", "b", "c", "ab", "bc", 
+                                 "ac", "abc", "nonfluor"],
+                    "channellabels": ["A", "B", "C", "AB", "BC",
+                                      "AC", "ABC", "non fluorescent"]}
         for key, default in defaults.items():
             kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
         self._hk_errorhandling(kwargs, defaults.keys(), "WIBS.stackedplot()")
@@ -1093,7 +1104,7 @@ class WIBS:
             totals.append(np.nanmean(self.data[f"bin{i}_{leg}"][m]))
             totals[i] = 1 if totals[i] == 0 else totals[i]
         vals = np.array([0 for i in xx])
-        for ch in ["a", "b", "c", "ab", "bc", "ac", "abc"]:
+        for ch, label in zip(kwargs["channels"], kwargs["channellabels"]):
             new_vals = []
             for i in range(len(xx)):
                 new_vals.append(
@@ -1101,26 +1112,26 @@ class WIBS:
                 )
             new_vals = np.array(new_vals) + vals
             if kwargs["normalize"]:
-                ax.fill_between(xx, vals/totals, new_vals/totals, label=ch)
+                ax.fill_between(xx, vals/totals, new_vals/totals, label=label)
             else:
-                ax.fill_between(xx, vals, new_vals, label=ch)
+                ax.fill_between(xx, vals, new_vals, label=label)
             vals = new_vals
-        if kwargs["normalize"]:
-            ax.fill_between(
-                xx,
-                vals/totals,
-                [1 for i in xx],
-                label="non fluorescent"
-            )
-        else:
-            totals = [np.nanmean(self.data[f"bin{i}_{leg}"][m])
-                      for i in range(len(xx))]
-            ax.fill_between(
-                xx,
-                vals,
-                totals,
-                label="non fluorescent"
-            )
+        # if kwargs["normalize"]:
+        #     ax.fill_between(
+        #         xx,
+        #         vals/totals,
+        #         [1 for i in xx],
+        #         label="non fluorescent"
+        #     )
+        # else:
+        #     totals = [np.nanmean(self.data[f"bin{i}_{leg}"][m])
+        #               for i in range(len(xx))]
+        #     ax.fill_between(
+        #         xx,
+        #         vals,
+        #         totals,
+        #         label="non fluorescent"
+        #     )
         
         if kwargs["log"]:
             ax.set_xscale("log")
@@ -1154,7 +1165,7 @@ class WIBS:
             True.
         xlabel : str, optional
             Sets the x label to the given str. The default is 'D$_p$ in μm'.
-        ylable : str, optional
+        ylabel : str, optional
             Sets the y label to the given str. The default is 
             'dN/dlogD$_p$ in cm{^{-3}$'.
         scatter : bool, optional
@@ -1176,6 +1187,8 @@ class WIBS:
             Decides which particle type should be plotted. (legal values are: 
             a,b,c,ab,ac,bc,abc). If all particles should be plotted without 
             considering particle type, dont pass this kwarg.
+        legendlabel: str, optional
+            Adds a label that is used if a legend is plotted
 
         Returns
         -------
@@ -1192,7 +1205,8 @@ class WIBS:
                     "scatter_color": "tab:blue",
                     "scatter_line": True,
                     "bin_borders": None,
-                    "particletype": None}
+                    "particletype": None,
+                    "legendlabel": "add label using 'legendlabel' kwarg"}
 
         for key, default in defaults.items():
             kwargs[key] = self._hk_func_kwargs(kwargs, key, default)
@@ -1239,7 +1253,12 @@ class WIBS:
                                  "'particletype' blank")
      
         if kwargs["scatter"]:
-            ax.scatter(xx, yy, color=kwargs["scatter_color"])
+            ax.scatter(
+                xx,
+                yy,
+                color=kwargs["scatter_color"],
+                label=kwargs["legendlabel"]
+            )
             if kwargs["scatter_line"]:
                 ax.plot(
                     xx,
@@ -1261,7 +1280,13 @@ class WIBS:
                                          "'bin_borders' manually in WIBS.dndlo"
                                          "gdp() or consult docu.")
             width = np.array([bb[i+1]-bb[i] for i in range(self.bins)])
-            ax.bar(xx, yy, width*0.8, align="center")
+            ax.bar(
+                xx,
+                yy,
+                width*0.8,
+                align="center",
+                label=kwargs["legendlabel"]
+            )
         if kwargs["log"]:
             ax.set_xscale("log")
         ax.set_xlabel("D$_p$ in μm")

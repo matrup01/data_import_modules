@@ -950,7 +950,7 @@ class Pops:
         print(msg)
         self.desample(60)
     
-    def desample(self, samplesize):
+    def desample(self, samplesize, ignorenans=False):
         """
         Averages all data by a custom amount of seconds
         
@@ -959,6 +959,9 @@ class Pops:
         samplesize : int
             The data will be desampled to chunks of this many seconds (e.g. 
             `samplesize=60` means minutewise averaging)
+        ignorenans : bool
+            If True, the desampling will be done using nanmean instead of mean.
+            The default is False.
 
         Returns
         -------
@@ -971,22 +974,40 @@ class Pops:
         for key in self.data:
             if key != "t" and key != "popstime":
                 if key in self.ydata:
-                    yy = self.data[key][:n1*samplesize].reshape(
-                        -1,
-                        samplesize
-                    ).mean(axis=1)
+                    if ignorenans:
+                        yy = np.nanmean(
+                            self.data[key][:n1*samplesize].reshape(
+                                -1,
+                                samplesize
+                            ),
+                            axis=1
+                        )
+                    else:
+                        yy = self.data[key][:n1*samplesize].reshape(
+                            -1,
+                            samplesize
+                        ).mean(axis=1)
                     self.data[key] = np.append(
                         yy,
-                        np.mean(self.data[key][n1*samplesize:])
+                        np.nanmean(self.data[key][n1*samplesize:])
                     )
                 else:
-                    yy = self.data[key][:n2*samplesize].reshape(
-                        -1,
-                        samplesize
-                    ).mean(axis=1)
+                    if ignorenans:
+                        yy = np.nanmean(
+                            self.data[key][:n2*samplesize].reshape(
+                                -1,
+                                samplesize
+                            ),
+                            axis=1
+                        )
+                    else:
+                        yy = self.data[key][:n2*samplesize].reshape(
+                            -1,
+                            samplesize
+                        ).mean(axis=1)
                     self.data[key] = np.append(
                         yy,
-                        np.mean(self.data[key][n2*samplesize:])
+                        np.nanmean(self.data[key][n2*samplesize:])
                     )
             elif key == "t":
                 self.data[key] = np.append(
@@ -1016,7 +1037,17 @@ class Pops:
 
         """
         
-        return self.data, self.details
+        op_data = self.data
+        for i in range(len("t")):
+            op_data["t"][i] = op_data["t"][i].replace(
+                microsecond=0
+            )
+        for i in range(len("popstime")):
+            op_data["popstime"][i] = op_data["popstime"][i].replace(
+                microsecond=0
+            )
+        
+        return op_data, self.details
         
     
     # housekeeping funcs

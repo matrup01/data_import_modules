@@ -228,16 +228,23 @@ class WeatherData:
         while ts < self.data["t"][-1]:
             ts = op_t[-1] + dt.timedelta(seconds=1)
             op_t.append(ts)
-            indices.append(
-                np.where(self.data["t"] == ts.replace(second=0))[0][0]
-            )
+            try:
+                indices.append(
+                    np.where(self.data["t"] == ts.replace(second=0))[0][0]
+                )
+            except:
+                indices.append(-1)
         indices = np.array(indices)
         op_data = {"t": np.array(op_t)}
 
         for key in self.data.keys():
             if key == "t":
                 continue
-            op_data[key] = self.data[key][indices]
+            op_data[key] = np.where(
+                [indices == -1],
+                np.nan,
+                self.data[key][indices]
+            ).flatten()
         return op_data, self.details
         
     
